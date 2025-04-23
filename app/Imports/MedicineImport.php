@@ -19,54 +19,6 @@ class MedicineImport implements ToModel,WithHeadingRow
     public function model(array $row)
     {
 
-        // $urls = explode('|', $row['final_urls']);
-        // foreach ($urls as $url) {
-        //     $url = trim($url); // clean space
-        //     $fileContents = Http::get($url)->body();
-        
-        //     // Generate a unique filename
-        //     $fileName = 'medicines/' . Str::random(10) . '_' . basename($url);
-        
-        //     // Save to storage/app/public/medicines/n
-        //     Storage::disk('public')->put($fileName, $fileContents);
-            
-        
-        //     // Optional: store file name in DB or array
-        //     $savedImages[] = $fileName;
-        // }
-        $urls = explode('|', $row['final_urls']);
-$savedImages = [];
-
-foreach ($urls as $url) {
-    $url = trim($url); // clean space
-
-    // Skip invalid URLs
-    if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
-        continue;
-    }
-
-    try {
-        // Get the file content
-        $fileContents = Http::get($url)->body();
-
-        // Generate a unique filename
-        $fileName = Str::random(10) . '_' . basename($url);
-
-        // Define the storage path (inside public disk)
-        $storagePath = 'medicines/' . $fileName;
-
-        // Save to storage/app/public/medicines/
-        Storage::disk('public')->put($storagePath, $fileContents);
-
-        // Append local URL (will be accessible via asset() or public path)
-        $savedImages[] = asset('storage/' . $storagePath); // e.g., http://127.0.0.1:8000/storage/medicines/abc.jpg
-    } catch (\Exception $e) {
-        // Optional: log or skip failed downloads
-        continue;
-    }
-}
-        echo '<pre>';print_r(value:   $savedImages);
-        die();
             return new Medicine([
             
                     'product_id'            => $row['product_id'],
@@ -103,7 +55,7 @@ foreach ($urls as $url) {
                     'interaction'           => $row['interaction'],
                     'manufacturer_details'  => $row['manufacturer_details'],
                     'marketer_details'      => $row['marketer_details'],
-                    'image_url' => json_encode($savedImages),
+                    // 'image_url' => json_encode($savedImages),
                 ]);
             // unset($medicine->product_name); 
     }

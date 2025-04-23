@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaboratoriesController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\PharmaciesController;
+use App\Http\Controllers\PopularBrandController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -125,6 +126,9 @@ Route::group(['middleware' => ['auth']], function () {
 
         });
 
+
+
+        
     });
 
 });
@@ -133,11 +137,31 @@ require __DIR__ . '/auth.php';
 
 
 
-
-
 Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile.custom');
 
 
 
+Route::prefix('api')->group(function () {
+    // Route::get('/sample', [SampleController::class, 'index']);
+    // Route::get('/medicines/search?query={$query}', [MedicineController::class, 'search']);
+    Route::get('/medicines/search', [MedicineController::class, 'search']);
+
+
+    Route::get('/medicines/{productId}', [MedicineController::class, 'medicineByProductId']);
+
+});
+
+
+// Popular brands
+Route::get('/popular', [PopularBrandController::class, 'index'])->name('popular.index');
+Route::post('/popular', [PopularBrandController::class, 'store'])->name('popular.store');
+
+// Route::put('/popular/{id}', [PopularBrandController::class, 'update'])->name('popular.update');
+Route::get('/popular/{id}/edit', [PopularBrandController::class, 'edit'])->name('popular.edit');
+Route::put('/popular/{id}', [PopularBrandController::class, 'update'])->name('popular.update');
+
+
+// Route for deleting a popular brand
+Route::delete('/popular/{id}', [PopularBrandController::class, 'destroy'])->name('popular.destroy');
 
 
