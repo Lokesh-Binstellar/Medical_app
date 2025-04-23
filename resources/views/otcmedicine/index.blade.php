@@ -6,27 +6,15 @@
                 <div class="col-md-10">
                     <div class="card shadow">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title mb-0">Medicine</h4>
+                            <h4 class="card-title mb-0">OTC</h4>
                             {{-- <a href="{{ route('user.create') }}" class="btn btn-primary">Add user</a>  --}}
-                            <form action="{{ route('medicine.import') }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('otcmedicine.import') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <input type="file" name="file" required>
-                                <button type="submit" class="btn btn-primary">Import Medicine</button>
+                                <button type="submit" class="btn btn-primary">Import OTC</button>
                             </form>
                         </div>
-                        <div class="mt-2 " style="padding-left: 17px;padding-right: 17px;">
-                            <form id="searchForm" method="GET" action="{{ route('medicine.index') }}"
-                                class="d-flex gap-2 mb-3">
-                                <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
-                                    placeholder="Search by name or id" class="form-control " style="max-width: 300px;" />
-
-                                <button type="submit" class="btn btn-primary">Search by name or id</button>
-
-                                <button type="button" class="btn btn-secondary"
-                                    onclick="window.location.href='{{ route('medicine.index') }}'">Reset</button>
-                            </form>
-
-                        </div>
+                       
                         <div class="card-body">
                             <table class="table table-bordered  mt-3">
                                 <thead class="thead-dark">
@@ -34,18 +22,20 @@
                                         <th scope="col">#</th>
                                         <th scope="col">ID</th>
                                         <th scope="col">Name</th>
-                                        <th scope="col">Salt composition</th>
+                                        <th scope="col">breadcrumbs</th>
+                                        <th scope="col">Manufacturers</th>
                                         <th scope="col">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($medicines as $index => $med)
+                                    @foreach ($otc as $index => $ot)
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
-                                            <td>{{ $med->product_id }}</td>
-                                            <td>{{ $med->product_name }}</td>
-                                            <td>{{ $med->salt_composition }}</td>
-                                            <td><a href="{{ route('medicine.show', $med->id) }}"
+                                            <td>{{ $ot->otc_id }}</td>
+                                            <td>{{ $ot->name }}</td>
+                                            <td>{{ $ot->breadcrumbs }}</td>
+                                            <td>{{ $ot->manufacturers }}</td>
+                                            <td><a href="{{ route('otcmedicine.show', $ot->id) }}"
                                                     class="btn btn-info btn-sm">View</a></td>
 
 
@@ -66,9 +56,9 @@
                                 </tbody>
 
                             </table>
-                            <div class="d-flex justify-content-center mt-4">
+                            {{-- <div class="d-flex justify-content-center mt-4">
                                 {{ $medicines->links() }}
-                            </div>
+                            </div> --}}
                             {{-- @if ($user->isEmpty())
                                 <div class="text-center mt-3 text-muted">No pharmacist records found.</div>
                             @endif --}}
@@ -78,19 +68,5 @@
             </div>
         </div>
     </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const searchInput = document.getElementById("searchInput");
-
-            // Trigger search on change
-            searchInput.addEventListener("change", function() {
-                document.getElementById("searchForm").submit();
-            });
-
-            // Clear input on page refresh (if needed)
-            if (performance.navigation.type === 1) { // 1 means reload
-                searchInput.value = "";
-            }
-        });
-    </script>
+  
 @endsection

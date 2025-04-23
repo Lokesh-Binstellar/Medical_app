@@ -165,14 +165,19 @@
                         <span class="sub-item">Pharmacies</span>
                     </a>
                 </li>
-                <li class="n nav-item @if (!in_array('Laboratories', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
+                <li class=" nav-item @if (!in_array('Laboratories', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
                     <a href="{{ route('laboratorie.index') }}">
                         <span class="sub-item">Laboratories</span>
                     </a>
                 </li>
-                <li class="n nav-item ">
+                <li class=" nav-item @if (!in_array('Medicines', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
                     <a href="{{ route('medicine.index') }}">
                         <span class="sub-item">Medicine</span>
+                    </a>
+                </li>
+                <li class=" nav-item @if (!in_array('Otcmedicines', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
+                    <a href="{{ route('otcmedicine.index') }}">
+                        <span class="sub-item">OTC</span>
                     </a>
                 </li>
                 <li class="nav-item">

@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaboratoriesController;
 use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\OtcController;
 use App\Http\Controllers\PharmaciesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
@@ -109,23 +110,22 @@ Route::group(['middleware' => ['auth']], function () {
     Route::prefix('medicine')->group(function () {
         Route::get('', [MedicineController::class, 'index'])->name('medicine.index');
         Route::post('import', [MedicineController::class, 'import'])->name('medicine.import');
-        // Route::group(['middleware' => 'permission:Laboratories,create'], function () {
-        //     Route::get('/create', [LaboratoriesController::class, 'create'])->name('laboratorie.create');
-        //     Route::post('/store', [LaboratoriesController::class, 'store'])->name('laboratorie.store');
-        // });
-        // Route::group(['middleware' => 'permission:Laboratories,update'], function () {
-        //     Route::get('/{id}/edit', [LaboratoriesController::class, 'edit'])->name('laboratorie.edit');
-        //     Route::put('/{id}', [LaboratoriesController::class, 'update'])->name('laboratorie.update');
-        // });
-        // Route::group(['middleware' => 'permission:Laboratories,delete'], function () {
-        //     Route::delete('/{id}', [LaboratoriesController::class, 'destroy'])->name('laboratorie.destroy');
-        // });
+        Route::get('/{id}', [MedicineController::class, 'show'])->name('medicine.show');
         Route::group(['middleware' => 'permission:Laboratories,read'], function () {
-            Route::get('/{id}', [LaboratoriesController::class, 'show'])->name('medicine.show');
+           
 
         });
 
     });
+
+    Route::prefix('otcmedicine')->group(function () {
+        Route::get('', [OtcController::class, 'index'])->name('otcmedicine.index');
+        Route::post('import', [OtcController::class, 'import'])->name('otcmedicine.import');
+        Route::get('/{id}', [OtcController::class, 'show'])->name('otcmedicine.show');
+    });
+
+
+
 
 });
 

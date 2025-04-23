@@ -41,5 +41,6 @@ class Medicine extends Model
         'interaction',
         'manufacturer_details',
         'marketer_details',
+        'image_url'
     ];
 }
