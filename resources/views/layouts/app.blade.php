@@ -43,15 +43,17 @@
                 sessionStorage.fonts = true;
             },
         });
-    </script>
+        </script>
 
-    <!-- CSS Files -->
-    {{-- <link rel="stylesheet" href="assets/css/bootstrap.min.css" /> --}}
-    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/css/plugins.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/css/kaiadmin.min.css') }}" />
-    <!-- Add Parsley CSS (Optional, but recommended for styling) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.9.2/parsley.css">
+<!-- CSS Files -->
+{{-- <link rel="stylesheet" href="assets/css/bootstrap.min.css" /> --}}
+<link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/css/plugins.min.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/css/kaiadmin.min.css') }}" />
+<!-- Add Parsley CSS (Optional, but recommended for styling) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.9.2/parsley.css">
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
 
     
 
@@ -238,6 +240,8 @@
             }
         };
     </script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+@yield('script')
 </body>
 
 </html>

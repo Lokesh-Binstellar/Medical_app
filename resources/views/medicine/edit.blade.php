@@ -43,23 +43,23 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6 col-lg-4">
-<!-- Name -->
-<div class="form-group">
-    <label for="name">Name</label>
-    <input type="text" name="name" value="{{ $user->name }}"
-        class="form-control" id="name" required
-        data-parsley-required-message="The name field is required." />
-</div>
+                                        <!-- Name -->
+                                        <div class="form-group">
+                                            <label for="name">Name</label>
+                                            <input type="text" name="name" value="{{ $user->name }}"
+                                                class="form-control" id="name" required
+                                                data-parsley-required-message="The name field is required." />
+                                        </div>
 
-<!-- Email -->
-<div class="form-group">
-    <label for="email">Email</label>
-    <input type="email" name="email" value="{{ $user->email }}"
-        class="form-control" id="email" required
-        data-parsley-pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
-        data-parsley-pattern-message="Email must be valid."
-        data-parsley-required-message="The email field is required." />
-</div>
+                                        <!-- Email -->
+                                        <div class="form-group">
+                                            <label for="email">Email</label>
+                                            <input type="email" name="email" value="{{ $user->email }}"
+                                                class="form-control" id="email" required
+                                                data-parsley-pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
+                                                data-parsley-pattern-message="Email must be valid."
+                                                data-parsley-required-message="The email field is required." />
+                                        </div>
 
 
 
@@ -127,28 +127,25 @@
     </script>
 
 
-<script>
-    const nameInput = document.getElementById('name');
-    const emailInput = document.getElementById('email');
+    <script>
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
 
-    // 🔹 Trim name only when user leaves the field (on blur)
-    nameInput.addEventListener('blur', function () {
-        this.value = this.value.trim(); // only trims start & end spaces
-    });
+        // 🔹 Trim name only when user leaves the field (on blur)
+        nameInput.addEventListener('blur', function() {
+            this.value = this.value.trim(); // only trims start & end spaces
+        });
 
-    // 🔹 Block all spaces in email while typing
-    emailInput.addEventListener('keypress', function (e) {
-        if (e.key === ' ') {
-            e.preventDefault();
-        }
-    });
+        // 🔹 Block all spaces in email while typing
+        emailInput.addEventListener('keypress', function(e) {
+            if (e.key === ' ') {
+                e.preventDefault();
+            }
+        });
 
-    // 🔹 Remove spaces if user pastes something in email
-    emailInput.addEventListener('input', function () {
-        this.value = this.value.replace(/\s+/g, '');
-    });
-</script>
-
-
-    
+        // 🔹 Remove spaces if user pastes something in email
+        emailInput.addEventListener('input', function() {
+            this.value = this.value.replace(/\s+/g, '');
+        });
+    </script>
 @endsection
