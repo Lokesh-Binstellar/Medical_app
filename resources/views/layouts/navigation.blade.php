@@ -175,6 +175,16 @@
                         <span class="sub-item">Medicine</span>
                     </a>
                 </li>
+                <li class=" nav-item @if (!in_array('Otcmedicines', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
+                    <a href="{{ route('otcmedicine.index') }}">
+                        <span class="sub-item">OTC</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('popular.index') }}">
+                        <span class="sub-item">Popular Brands</span> 
+                    </a>
+                </li>
                 <li class="nav-item">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

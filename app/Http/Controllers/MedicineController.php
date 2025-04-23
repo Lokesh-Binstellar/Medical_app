@@ -12,10 +12,24 @@ class MedicineController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    { 
-        $medicines=Medicine::all();
-        return view('medicine.index',compact('medicines'));
+    public function index(Request $request)
+    {
+        $query = Medicine::query();
+    
+        // Check if search parameter exists and is not empty
+        if ($request->has('search') && $request->search != '') {
+            $searchTerm = $request->search;
+            
+            // Search both product_id and product_name
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('product_id', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('product_name', 'like', '%' . $searchTerm . '%');
+            });
+        }
+    
+        // Paginate the results, you can change 100 to whatever number you want per page
+        $medicines = $query->paginate(100);
+        return view('medicine.index', compact('medicines'));
     }
     
 
