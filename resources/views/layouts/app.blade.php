@@ -22,6 +22,7 @@
             padding-left:0px;
         }
     </style>
+     @yield('styles')
 
     <!-- Fonts and icons -->
     <script src="assets/js/plugin/webfont/webfont.min.js"></script>

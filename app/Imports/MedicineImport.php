@@ -18,7 +18,7 @@ class MedicineImport implements ToModel, WithHeadingRow
      */
     public function model(array $row)
     {
-
+        $savedImages=[];
         if (!empty($row['final_urls'])) {
             $urls = explode('|', $row['final_urls']);
         

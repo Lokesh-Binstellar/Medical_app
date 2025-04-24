@@ -180,9 +180,14 @@
                         <span class="sub-item">OTC</span>
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item @if (!in_array('PopularBrand', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
                     <a href="{{ route('popular.index') }}">
                         <span class="sub-item">Popular Brands</span> 
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a href="{{ route('popular_category.index') }}">
+                        <span class="sub-item">Popular categories</span> 
                     </a>
                 </li>
                 <li class="nav-item">

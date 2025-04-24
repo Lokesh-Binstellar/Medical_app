@@ -1,14 +1,20 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container mt-5">
-        <div class="page-inner">
+    <div class="">
+        <div class=" page-inner px-0">
             <div class="row justify-content-center">
-                <div class="col-md-10">
+                <div class="col-md-12">
                     <div class="card shadow">
                         <div class="card-header d-flex justify-content-between align-items-center">
+                            <div id="loader" class="text-center mt-3" style="display:none;">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Importing...</span>
+                                </div>
+                                <p class="mt-2">Please wait, importing...</p>
+                            </div>
                             <h4 class="card-title mb-0">Medicine</h4>
                             {{-- <a href="{{ route('user.create') }}" class="btn btn-primary">Add user</a>  --}}
-                            <form action="{{ route('medicine.import') }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('medicine.import') }}" id="importForm" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <input type="file" name="file" required>
                                 <button type="submit" class="btn btn-primary">Import Medicine</button>
@@ -28,6 +34,7 @@
 
                         </div>
                         <div class="card-body">
+                            <div class="table-responsive">
                             <table class="table table-bordered  mt-3">
                                 <thead class="thead-dark">
                                     <tr>
@@ -41,7 +48,7 @@
                                 <tbody>
                                     @foreach ($medicines as $index => $med)
                                         <tr>
-                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{$medicines->firstItem() + $index}}</td>
                                             <td>{{ $med->product_id }}</td>
                                             <td>{{ $med->product_name }}</td>
                                             <td>{{ $med->salt_composition }}</td>
@@ -66,6 +73,7 @@
                                 </tbody>
 
                             </table>
+                            </div>
                             <div class="d-flex justify-content-center mt-4">
                                 {{ $medicines->links() }}
                             </div>
@@ -92,5 +100,11 @@
                 searchInput.value = "";
             }
         });
+      
+        document.getElementById('importForm').addEventListener('submit', function () {
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('loader').style.display = 'block';
+        });
+  
     </script>
 @endsection

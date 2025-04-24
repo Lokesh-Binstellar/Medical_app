@@ -2,7 +2,7 @@
 @section('content')
 <div class="container">
     <h1 class="mb-4">Medicine Details</h1>
-    <a href="{{ route('medicine.index') }}" class="btn btn-primary mt-3 text-right" width='200'>← Back to List</a>
+    <a href="{{ route('medicine.index') }}" class="btn btn-primary mt-3 mb-3 text-right" width='200'>← Back to List</a>
     <div class="card p-4 shadow">
         <table class="table table-bordered">
             <tbody>

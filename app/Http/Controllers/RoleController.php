@@ -133,6 +133,9 @@ class RoleController extends Controller
             if ($tablesArr['otcmedicines']) {
                 $filterArr['Otcmedicines'] = 'Otcmedicines';
             }
+            if ($tablesArr['popular_brands']) {
+                $filterArr['PopularBrand'] = 'PopularBrand';
+            }
             
             $permissionData = new Permission();
             return view('role.edit', ['pageConfigs' => $pageConfigs, 'role' => $role, 'accessData' => $filterArr, 'permissionData' => $permissionData]);

@@ -32,7 +32,8 @@ return new class extends Migration
             $table->string('country_of_origin')->nullable(); // country_of_origin column
             $table->text('manufacturer_details')->nullable(); // Manufacturer details column
             $table->text('marketer_details')->nullable(); // Marketer details column
-            $table->string('image_url')->nullable();
+            $table->text('image_url')->nullable();
+            $table->text('category')->nullable();
             $table->timestamps();
         });
     }

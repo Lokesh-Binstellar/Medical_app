@@ -15,8 +15,8 @@ class LaboratoriesController extends Controller
      */
     public function index()
     {
-        $laboratorie=Laboratories::all();
-        return view('laboratorie.index',compact('laboratorie'));
+        $laboratorie = Laboratories::all();
+        return view('laboratorie.index', compact('laboratorie'));
     }
 
     /**
@@ -40,9 +40,9 @@ class LaboratoriesController extends Controller
             'owner_name' => 'required',
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|min:11|numeric',
-            'city'=>'required',
-            'state'=>'required',
-            'pincode'=>'required',
+            'city' => 'required',
+            'state' => 'required',
+            'pincode' => 'required',
             'address' => 'required',
             'latitude' => 'required',
             'longitude' => 'required',
@@ -50,9 +50,9 @@ class LaboratoriesController extends Controller
             'username' => 'required',
             'password' => 'required',
             'license' => 'required',
-            'pickup'=>'required',
+            'pickup' => 'required',
         ]);
-    
+
         if ($validation->fails()) {
             return back()->withErrors($validation)->withInput();
         }
@@ -64,35 +64,35 @@ class LaboratoriesController extends Controller
             'password' => Hash::make($request->password),
             'role_id' => $roleId
         ]);
-    
+
         $params['user_id'] = $user->id;
-    
+
         // Handle Image
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $imagePath = public_path('assets/image') . '/' . $imageName;
             $image->move(public_path('assets/image'), $imageName);
-    
+
             $imageData = file_get_contents($imagePath);
             $type = pathinfo($imagePath, PATHINFO_EXTENSION);
             $base64Image = 'data:image/' . $type . ';base64,' . base64_encode($imageData);
-    
+
             $params['image'] = $base64Image;
-    
+
             if (File::exists($imagePath)) {
                 File::delete($imagePath);
             }
         }
-    
+
         // Create Pharmacy
         Laboratories::create($params);
-    
-     
+
+
 
         return redirect()->route('laboratorie.index')
 
-                        ->with('success','laboratorie created successfully.');
+            ->with('success', 'laboratorie created successfully.');
     }
 
     /**
@@ -111,8 +111,8 @@ class LaboratoriesController extends Controller
     {
         $laboratorie = Laboratories::find($id);
         // dd($laboratorie);
-        
-        return view('laboratorie.edit',compact('laboratorie'));
+
+        return view('laboratorie.edit', compact('laboratorie'));
     }
 
     /**
@@ -120,81 +120,81 @@ class LaboratoriesController extends Controller
      */
     public function update(Request $request, $id)
     {
-         // Validate the request
-         $laboratorie = Laboratories::findOrFail($id);
+        // Validate the request
+        $laboratorie = Laboratories::findOrFail($id);
 
-         // Validate input
-         $validation = validator($request->all(), [
-             'lab_name' => 'required',
-             'owner_name' => 'required',
-             'email' => 'required|email',
-             'phone' => 'required|min:11|numeric',
-             'city' => 'required',
-             'state' => 'required',
-             'pincode' => 'required|max:9',
-             'address' => 'required',
-             'latitude' => 'required',
-             'longitude' => 'required',
-             'username' => 'required',
-             'license' => 'required',
-             'pickup'=>'required',
-             'image' => 'nullable|file', // optional for update
-         ]);
- 
-         if ($validation->fails()) {
-             return back()->withErrors($validation)->withInput();
-         }
- 
-         // Update related user
-         $user = User::find($laboratorie->user_id);
-         if ($user) {
-             $user->name = $request->username;
-             $user->email = $request->email;
-             if ($request->filled('password')) {
-                 $user->password = Hash::make($request->password);
-             }
-             $user->save();
-         }
- 
-         // Prepare updated pharmacy data
-         $data = $request->only([
-             'lab_name',
-             'owner_name',
-             'email',
-             'phone',
-             'city',
-             'state',
-             'pincode',
-             'address',
-             'latitude',
-             'longitude',
-             'username',
-             'license',
-             'pickup'
-         ]);
- 
-         // Handle image update
-         if ($request->hasFile('image')) {
-             $image = $request->file('image');
-             $imageName = time() . '_' . $image->getClientOriginalName();
-             $imagePath = public_path('assets/image') . '/' . $imageName;
-             $image->move(public_path('assets/image'), $imageName);
- 
-             $imageData = file_get_contents($imagePath);
-             $type = pathinfo($imagePath, PATHINFO_EXTENSION);
-             $base64Image = 'data:image/' . $type . ';base64,' . base64_encode($imageData);
- 
-             $data['image'] = $base64Image;
- 
-             if (File::exists($imagePath)) {
-                 File::delete($imagePath);
-             }
-         }
- 
-         // Update pharmacy record
-         $laboratorie->update($data);
+        // Validate input
+        $validation = validator($request->all(), [
+            'lab_name' => 'required',
+            'owner_name' => 'required',
+            'email' => 'required|email',
+            'phone' => 'required|min:11|numeric',
+            'city' => 'required',
+            'state' => 'required',
+            'pincode' => 'required|max:9',
+            'address' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
+            'username' => 'required',
+            'license' => 'required',
+            'pickup' => 'required',
+            'image' => 'nullable|file', // optional for update
+        ]);
+
+        if ($validation->fails()) {
+            return back()->withErrors($validation)->withInput();
+        }
+
+        // Update related user
+        $user = User::find($laboratorie->user_id);
+        if ($user) {
+            $user->name = $request->username;
+            $user->email = $request->email;
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
+            $user->save();
+        }
+
+        // Prepare updated pharmacy data
+        $data = $request->only([
+            'lab_name',
+            'owner_name',
+            'email',
+            'phone',
+            'city',
+            'state',
+            'pincode',
+            'address',
+            'latitude',
+            'longitude',
+            'username',
+            'license',
+            'pickup'
+        ]);
+
+        // Handle image update
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $imagePath = public_path('assets/image') . '/' . $imageName;
+            $image->move(public_path('assets/image'), $imageName);
+
+            $imageData = file_get_contents($imagePath);
+            $type = pathinfo($imagePath, PATHINFO_EXTENSION);
+            $base64Image = 'data:image/' . $type . ';base64,' . base64_encode($imageData);
+
+            $data['image'] = $base64Image;
+
+            if (File::exists($imagePath)) {
+                File::delete($imagePath);
+            }
+        }
+
+        // Update pharmacy record
+        $laboratorie->update($data);
         return redirect()->route('laboratorie.index')
-                         ->with('success', 'laboratorie updated successfully!');
+            ->with('success', 'laboratorie updated successfully!');
     }
 
     /**
@@ -202,11 +202,11 @@ class LaboratoriesController extends Controller
      */
     public function destroy($id)
     {
-        $laboratorie=Laboratories::findOrFail($id);
+        $laboratorie = Laboratories::findOrFail($id);
         // dd( $laboratorie);
         $laboratorie->delete();
 
-       return redirect()->route('laboratorie.index')
-                        ->with('success','laboratorie deleted successfully');
+        return redirect()->route('laboratorie.index')
+            ->with('success', 'laboratorie deleted successfully');
     }
 }

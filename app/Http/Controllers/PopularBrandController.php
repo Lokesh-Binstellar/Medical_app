@@ -27,14 +27,30 @@ class PopularBrandController extends Controller
         $brand->name = $request->name;
 
         if ($request->hasFile('logo')) {
-            $path = $request->file('logo')->store('brands', 'public');
-            $brand->logo = $path;
+            $file = $request->file('logo');
+            $originalName = $file->getClientOriginalName(); // e.g. logo.png
+            $destinationPath = storage_path('app/public/brand');
+
+            // Check if file with same name exists
+            $filename = time() . '_' . $originalName;
+            if (file_exists($destinationPath . '/' . $originalName)) {
+                $file->move($destinationPath, $filename); // Unique name
+            } else {
+                $file->move($destinationPath, $originalName); // Same name
+                $filename = $originalName;
+            }
+
+            // Save full URL and original name
+            $brand->logo = url('storage/brand/' . $filename); // Base URL + file path
+            $brand->logo = $originalName; // Just original file name
         }
 
         $brand->save();
 
         return redirect()->route('popular.index')->with('success', 'Brand added successfully.');
     }
+
+
 
     public function edit($id)
     {
@@ -61,6 +77,7 @@ class PopularBrandController extends Controller
             }
 
             $path = $request->file('logo')->store('brands', 'public');
+
             $brand->logo = $path;
         }
 
@@ -79,6 +96,24 @@ class PopularBrandController extends Controller
             ->get();
 
         return response()->json($brands);
+    }
+    public function getBrand()
+    {
+        $brands = PopularBrand::all();
+
+        $brandsData = $brands->map(function ($brand) {
+            return [
+                'id' => $brand->id,
+                'name' => $brand->name,
+                'logo' => $brand->logo ? url('storage/brand/' . basename($brand->logo)) : [],
+
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $brandsData
+        ], 200);
     }
 
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\OtcController;
 use App\Http\Controllers\PharmaciesController;
 use App\Http\Controllers\PopularBrandController;
+use App\Http\Controllers\PopularCategoryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -113,13 +114,13 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('import', [MedicineController::class, 'import'])->name('medicine.import');
         Route::get('/{id}', [MedicineController::class, 'show'])->name('medicine.show');
         Route::group(['middleware' => 'permission:Laboratories,read'], function () {
-           
+
 
         });
 
 
 
-        
+
     });
 
     Route::prefix('otcmedicine')->group(function () {
@@ -142,16 +143,16 @@ Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile
 
 
 Route::prefix('api')->group(function () {
-    // Route::get('/sample', [SampleController::class, 'index']);
-    // Route::get('/medicines/search?query={$query}', [MedicineController::class, 'search']);
     Route::get('/medicines/search', [MedicineController::class, 'search']);
-
+    Route::get('/medicines/searchID', [MedicineController::class, 'medicineByProductId']);
 
     Route::get('/medicines/{productId}', [MedicineController::class, 'medicineByProductId']);
+    Route::get('/popular/brand', [PopularBrandController::class, 'getBrand'])->name('popular.get_brand');
+    Route::get('/popular/category', [PopularCategoryController::class, ' getCategory'])->name('popular.getCategory');
 
 });
 
-
+Route::get('/popular', [PopularBrandController::class, 'index'])->name('popular.index');
 // Popular brands
 Route::get('/popular', [PopularBrandController::class, 'index'])->name('popular.index');
 Route::post('/popular', [PopularBrandController::class, 'store'])->name('popular.store');
@@ -165,3 +166,13 @@ Route::put('/popular/{id}', [PopularBrandController::class, 'update'])->name('po
 Route::delete('/popular/{id}', [PopularBrandController::class, 'destroy'])->name('popular.destroy');
 
 
+
+// Popular category
+
+Route::prefix('popularCategory')->name('popular_category.')->group(function () {
+    Route::get('/', [PopularCategoryController::class, 'index'])->name('index');         // GET /popularCategory
+    Route::post('/', [PopularCategoryController::class, 'store'])->name('store');        // POST /popularCategory
+    Route::get('{id}/edit', [PopularCategoryController::class, 'edit'])->name('edit');   // GET /popularCategory/{id}/edit
+    Route::put('{id}', [PopularCategoryController::class, 'update'])->name('update');    // PUT /popularCategory/{id}
+    Route::delete('{id}', [PopularCategoryController::class, 'destroy'])->name('destroy'); // DELETE /popularCategory/{id}
+});

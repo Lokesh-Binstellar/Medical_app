@@ -27,5 +27,6 @@ class Otcmedicine extends Model
         'manufacturer_details',
         'marketer_details',
         'image_url',
+        'category'
     ];
 }

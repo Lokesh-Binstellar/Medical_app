@@ -11,13 +11,13 @@
                 <div class="col-md-12">
                     <div class="card shadow">                    
                         <div class="card-header d-flex justify-content-between flex-column ">
-                            <h4 class="card-title pb-3 ">Popular Brands </h4>
+                            <h4 class="card-title pb-3 ">Popular Category </h4>
                             <div class="d-flex justify-content-between align-items-center">
-                                <form action="{{ route('popular.store') }}" method="POST" enctype="multipart/form-data" class="d-flex gap-2">
+                                <form action="{{ route('popular_category.store') }}" method="POST" enctype="multipart/form-data" class="d-flex gap-2">
                                     @csrf
                                     <select name="name" class="form-control select2" id="brand-select" required style="width: 250px;">
                                         <option value="">Select Brand</option>
-                                        @foreach ($popularBrands as $item)
+                                        @foreach ($popularCategory as $item)
                                             <option value="{{ $item }}">{{ $item }}</option>
                                         @endforeach
                                     </select>
@@ -37,31 +37,31 @@
                                 <thead class="thead-dark">
                                     <tr>
                                         <th>#</th>
-                                        <th>Brand Name</th>
+                                        <th>Category Name</th>
                                         <th>Logo</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($AddedBrands as $index => $brand)
+                                    @forelse ($AddedCategory as $index => $category)
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
-                                            <td>{{ $brand->name }}</td>
+                                            <td>{{ $category->name }}</td>
                                             <td>
-                                                @if ($brand->logo)
-                                                    <img src="{{url('storage/brand/' .$brand->logo)}}" alt="logo" width="50">
+                                                @if ($category->logo)
+                                                    <img src="{{url('storage/category/' .$category->logo)}}" alt="logo" width="50">
                                                 @else
                                                     <span class="text-muted">No Logo</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 <!-- Edit Button -->
-                                                <a href="{{ route('popular.edit', $brand->id) }}" class="btn btn-sm btn-warning">
+                                                <a href="{{ route('popular_category.edit', $category->id) }}" class="btn btn-sm btn-warning">
                                                     Edit
                                                 </a>
 
                                                 <!-- Delete Button -->
-                                                <form action="{{ route('popular.destroy', $brand->id) }}" method="POST" style="display:inline-block;">
+                                                <form action="{{ route('popular_category.destroy', $category->id) }}" method="POST" style="display:inline-block;">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this brand?')">

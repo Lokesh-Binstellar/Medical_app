@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Imports\MedicineImport;
 use App\Models\Medicine;
+use App\Models\Otcmedicine;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -15,23 +16,23 @@ class MedicineController extends Controller
     public function index(Request $request)
     {
         $query = Medicine::query();
-    
+
         // Check if search parameter exists and is not empty
         if ($request->has('search') && $request->search != '') {
             $searchTerm = $request->search;
-            
+
             // Search both product_id and product_name
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('product_id', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('product_name', 'like', '%' . $searchTerm . '%');
+                    ->orWhere('product_name', 'like', '%' . $searchTerm . '%');
             });
         }
-    
+
         // Paginate the results, you can change 100 to whatever number you want per page
         $medicines = $query->paginate(100);
         return view('medicine.index', compact('medicines'));
     }
-    
+
 
     /**
      * Show the form for creating a new resource.
@@ -97,28 +98,47 @@ class MedicineController extends Controller
     public function search(Request $request)
     {
         $query = $request->query('query');
-
+    
         if (!$query) {
             return response()->json(['message' => 'Query parameter is required.'], 400);
         }
-
-        $results = Medicine::where('salt_composition', 'LIKE', "%$query%")
+    
+        // Search from Medicine
+        $medicines = Medicine::where('salt_composition', 'LIKE', "%$query%")
             ->orWhere('product_name', 'LIKE', "%$query%")
             ->select('id', 'product_id', 'product_name', 'salt_composition', 'packaging_detail', 'image_url')
             ->get()
             ->map(function ($item) {
                 $baseUrl = url('storage/medicines');
-
-                $item->image_url = collect(explode(',', $item->image_url))
-                    ->map(function ($img) use ($baseUrl) {
-                        $imgName = trim(basename($img)); // ensures no double URL prefix
-                        return "{$baseUrl}/{$imgName}";
-                    });
-
+                $item->image_url = $item->image_url
+                    ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
+                    : [];
+                $item->type = 'medicine';
                 return $item;
             });
-        return response()->json($results);
+    
+        // Search from OtcMedicine
+        $otc = Otcmedicine::where('name', 'LIKE', "%$query%")
+            ->select('id', 'otc_id', 'name', 'packaging', 'image_url')
+            ->get()
+            ->map(function ($item) {
+                $baseUrl = url('storage/otcmedicines');
+                $item->image_url = $item->image_url
+                    ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
+                    : [];
+                $item->type = 'otc';
+                return $item;
+            });
+    
+        // Merge both collections
+        $results = $medicines->merge($otc);
+    
+        return response()->json([
+            'success' => true,
+            'data' => $results
+        ]);
     }
+    
 
 
     //     public function search($salt_composition){
@@ -127,26 +147,57 @@ class MedicineController extends Controller
 
 
 
-    public function medicineByProductId($productId)
-    {
-        $medicine = Medicine::where('product_id', $productId)->first();
-    
-        if (!$medicine) {
-            return response()->json(['message' => 'Medicine not found.'], 404);
-        }
-    
-        // Explode image_url into array with full URLs
-        $baseUrl = url('storage/medicines');
-        $medicine->image_url = collect(explode(',', $medicine->image_url))
-            ->map(function ($img) use ($baseUrl) {
-                $imgName = trim(basename($img));
-                return "{$baseUrl}/{$imgName}";
-            });
-    
-        return response()->json([
-            'data' => $medicine]);
-    }
     
 
+    
+    public function medicineByProductId(Request $request)
+    {
+        // Step 1: Check if 'id' parameter is passed
+        if (!$request->has('id') || empty($request->id)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ID parameter is required.'
+            ], 400);
+        }
+    
+        // Step 2: Get the product ID from the query
+        $productId = $request->query('id');
+    
+        // Step 3: Search in both medicines and otcmedicines
+        $medicine = Medicine::where('product_id', $productId)->first();
+        $otc = Otcmedicine::where('otc_id', $productId)->first();
+    
+        // Step 4: If neither found
+        if (!$medicine && !$otc) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product not found in either table.'
+            ], 404);
+        }
+    
+        // Step 5: Prepare base URL
+        $baseUrl = url('storage/medicines');
+    
+        // Step 6: Format image URLs if present
+        if ($medicine) {
+            $medicine->image_url = $medicine->image_url
+                ? collect(explode(',', $medicine->image_url))->map(fn($img) => $baseUrl . '/' . trim(basename($img)))->toArray()
+                : [];
+        }
+    
+        if ($otc) {
+            $otc->image_url = $otc->image_url
+                ? collect(explode(',', $otc->image_url))->map(fn($img) => $baseUrl . '/' . trim(basename($img)))->toArray()
+                : [];
+        }
+    
+        // Step 7: Return whichever was found
+        return response()->json([
+            'success' => true,
+            'data' => $medicine ?? $otc,
+            'source' => $medicine ? 'medicines' : 'otcmedicines'
+        ], 200);
+    }
+    
 
 }
