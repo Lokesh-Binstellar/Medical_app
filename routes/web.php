@@ -26,6 +26,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile.custom');
 
     Route::prefix('roles')->group(function () {
         Route::get('', [RoleController::class, 'index'])->name('roles.index');
@@ -112,15 +113,23 @@ Route::group(['middleware' => ['auth']], function () {
     Route::prefix('medicine')->group(function () {
         Route::get('', [MedicineController::class, 'index'])->name('medicine.index');
         Route::post('import', [MedicineController::class, 'import'])->name('medicine.import');
-        Route::get('/{id}', [MedicineController::class, 'show'])->name('medicine.show');
-        Route::group(['middleware' => 'permission:Laboratories,read'], function () {
-
-
+        Route::group(['middleware' => 'permission:PopularBrand,read'], function () {
+            Route::get('/{id}', [MedicineController::class, 'show'])->name('medicine.show');
         });
-
-
-
-
+    });
+    //PopularCategory
+    Route::prefix('popularCategory')->group(function () {
+        Route::get('/', [PopularCategoryController::class, 'index'])->name('popular_category.index');
+        Route::group(['middleware' => 'permission:PopularCategory,create'], function () {
+            Route::post('/store', [PopularCategoryController::class, 'store'])->name('popular_category.store');
+        });
+        Route::group(['middleware' => 'permission:PopularCategory,update'], function () {
+            Route::get('{id}/edit', [PopularCategoryController::class, 'edit'])->name('popular_category.edit');   // GET /popularCategory/{id}/edit
+            Route::put('{id}', [PopularCategoryController::class, 'update'])->name('popular_category.update');
+        });
+        Route::group(['middleware' => 'permission:PopularCategory,delete'], function () {
+            Route::delete('{id}', [PopularCategoryController::class, 'destroy'])->name('popular_category.destroy'); // DELETE /popularCategory/{id}
+        });
     });
 
     Route::prefix('otcmedicine')->group(function () {
@@ -129,50 +138,24 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/{id}', [OtcController::class, 'show'])->name('otcmedicine.show');
     });
 
+    Route::prefix('popular')->group(function () {
+        Route::get('/', [PopularBrandController::class, 'index'])->name('popular.index');
+        Route::group(['middleware' => 'permission:PopularBrand,create'], function () {
+            Route::post('/store', [PopularBrandController::class, 'store'])->name('popular.store');
+        });
+        Route::group(['middleware' => 'permission:PopularBrand,update'], function () {
+            Route::get('/{id}/edit', [PopularBrandController::class, 'edit'])->name('popular.edit');
+            Route::put('/{id}', [PopularBrandController::class, 'update'])->name('popular.update');
+        });
+        Route::group(['middleware' => 'permission:PopularBrand,delete'], function () {
+            Route::delete('/{id}', [PopularBrandController::class, 'destroy'])->name('popular.destroy');
+        });
 
 
+    });
 
 });
 
 require __DIR__ . '/auth.php';
 
 
-
-Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile.custom');
-
-
-
-Route::prefix('api')->group(function () {
-    Route::get('/medicines/search', [MedicineController::class, 'search']);
-    Route::get('/medicines/searchID', [MedicineController::class, 'medicineByProductId']);
-
-    Route::get('/medicines/{productId}', [MedicineController::class, 'medicineByProductId']);
-    Route::get('/popular/brand', [PopularBrandController::class, 'getBrand'])->name('popular.get_brand');
-    Route::get('/popular/category', [PopularCategoryController::class, ' getCategory'])->name('popular.getCategory');
-
-});
-
-Route::get('/popular', [PopularBrandController::class, 'index'])->name('popular.index');
-// Popular brands
-Route::get('/popular', [PopularBrandController::class, 'index'])->name('popular.index');
-Route::post('/popular', [PopularBrandController::class, 'store'])->name('popular.store');
-
-// Route::put('/popular/{id}', [PopularBrandController::class, 'update'])->name('popular.update');
-Route::get('/popular/{id}/edit', [PopularBrandController::class, 'edit'])->name('popular.edit');
-Route::put('/popular/{id}', [PopularBrandController::class, 'update'])->name('popular.update');
-
-
-// Route for deleting a popular brand
-Route::delete('/popular/{id}', [PopularBrandController::class, 'destroy'])->name('popular.destroy');
-
-
-
-// Popular category
-
-Route::prefix('popularCategory')->name('popular_category.')->group(function () {
-    Route::get('/', [PopularCategoryController::class, 'index'])->name('index');         // GET /popularCategory
-    Route::post('/', [PopularCategoryController::class, 'store'])->name('store');        // POST /popularCategory
-    Route::get('{id}/edit', [PopularCategoryController::class, 'edit'])->name('edit');   // GET /popularCategory/{id}/edit
-    Route::put('{id}', [PopularCategoryController::class, 'update'])->name('update');    // PUT /popularCategory/{id}
-    Route::delete('{id}', [PopularCategoryController::class, 'destroy'])->name('destroy'); // DELETE /popularCategory/{id}
-});

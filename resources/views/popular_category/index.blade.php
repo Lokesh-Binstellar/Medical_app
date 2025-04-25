@@ -22,7 +22,7 @@
                                         @endforeach
                                     </select>
                                     <input type="file" name="logo" class="form-control-file" >
-                                    <button type="submit" class="btn btn-primary  ">Add Brand</button>
+                                    <button type="submit" class="btn btn-primary  ">Add Category</button>
                                 </form>
                             </div>
                             

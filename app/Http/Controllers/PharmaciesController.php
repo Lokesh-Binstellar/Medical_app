@@ -74,20 +74,22 @@ class PharmaciesController extends Controller
         // Handle Image
         if ($request->hasFile('image')) {
             $image = $request->file('image');
+        
+            // Generate unique image name
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = public_path('assets/image') . '/' . $imageName;
-            $image->move(public_path('assets/image'), $imageName);
-
-            $imageData = file_get_contents($imagePath);
-            $type = pathinfo($imagePath, PATHINFO_EXTENSION);
-            $base64Image = 'data:image/' . $type . ';base64,' . base64_encode($imageData);
-
-            $params['image'] = $base64Image;
-
-            if (File::exists($imagePath)) {
-                File::delete($imagePath);
-            }
+        
+            // Define the destination path
+            $destinationPath = public_path('assets/image');
+        
+            // Move image to the destination
+            $image->move($destinationPath, $imageName);
+        
+            // Store just the image name (or relative path if preferred)
+            $params['image'] = $imageName; // or use 'assets/image/' . $imageName if needed
+        
+            // No need to delete the file now since we're storing it
         }
+        
 
         // Create Pharmacy
         Pharmacies::create($params);
@@ -180,18 +182,18 @@ class PharmaciesController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = public_path('assets/image') . '/' . $imageName;
-            $image->move(public_path('assets/image'), $imageName);
-
-            $imageData = file_get_contents($imagePath);
-            $type = pathinfo($imagePath, PATHINFO_EXTENSION);
-            $base64Image = 'data:image/' . $type . ';base64,' . base64_encode($imageData);
-
-            $data['image'] = $base64Image;
-
-            if (File::exists($imagePath)) {
-                File::delete($imagePath);
+            $imagePath = public_path('assets/image/') . $imageName;
+    
+            // Move new image to folder
+            $image->move(public_path('assets/image/'), $imageName);
+    
+            // Delete old image if exists
+            if ($pharmacy->image && File::exists(public_path('assets/image/') . $pharmacy->image)) {
+                File::delete(public_path('assets/image/') . $pharmacy->image);
             }
+    
+            // Save new image name to database
+            $data['image'] = $imageName;
         }
 
         // Update pharmacy record
@@ -199,6 +201,30 @@ class PharmaciesController extends Controller
 
         return redirect()->route('pharmacist.index')->with('success', 'Pharmacy updated successfully!');
     }
+
+// Api
+public function getPharmacy()
+{
+    $pharmacies = Pharmacies::all();
+
+    $pharmacyData = $pharmacies->map(function ($pharmacy) {
+        return [
+           'id' => $pharmacy->id,
+           'pharmacy_name' => $pharmacy->pharmacy_name,
+           'latitude'=>$pharmacy->latitude,
+           'longitude'=>$pharmacy->longitude,
+           'image' => $pharmacy->image
+                ? [url('assets/image/' . basename($pharmacy->image))]
+                : [],
+        ];
+    });
+
+    return response()->json([
+        'success' => true,
+        'data' => $pharmacyData
+    ], 200);
+}
+
 
 
     /**

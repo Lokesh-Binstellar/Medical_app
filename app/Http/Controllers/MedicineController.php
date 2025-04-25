@@ -55,7 +55,9 @@ class MedicineController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $medicines = Medicine::find($id);
+
+        return view('medicine.show', compact('medicines'));
     }
 
     /**

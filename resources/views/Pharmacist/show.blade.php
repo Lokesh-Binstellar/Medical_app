@@ -14,7 +14,7 @@
                 {{-- Image --}}
                 @if($pharmacy->image)
                     <div class="col-md-4 text-center mb-4">
-                        <img src="{{ $pharmacy->image }}" alt="Pharmacy Image" class="img-fluid rounded shadow" style="max-height: 250px;">
+                        <img src="{{ asset('assets/image/' . $pharmacy->image) }}" alt="Pharmacy Image" class="img-fluid rounded shadow" style="max-height: 250px;">
                         <p class="mt-2"><strong>Pharmacy Image</strong></p>
                     </div>
                 @endif
@@ -72,7 +72,7 @@
                                 <td>{{ $pharmacy->license }}</td>
                             </tr>
                            
-                            <tr>
+                            {{-- <tr>
                                 <th>Status</th>
                                 <td>
                                     <span class="badge {{ $pharmacy->status == 1 ? 'bg-success' : 'bg-danger' }}">
@@ -80,7 +80,7 @@
                                     </span>
                                 </td>
                                 
-                            </tr>
+                            </tr> --}}
                         
                         </tbody>
                     </table>

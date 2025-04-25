@@ -14,8 +14,6 @@ class OtcController extends Controller
      */
     public function index(Request $request)
     {
-
-
         $query = Otcmedicine::query();
 
         if ($request->has('search') && $request->search != '') {
@@ -26,9 +24,7 @@ class OtcController extends Controller
                 $q->where('otc_id', 'like', '%' . $searchTerm . '%')
                     ->orWhere('name', 'like', '%' . $searchTerm . '%');
             });
-        }
-
-        // Paginate the results, you can change 100 to whatever number you want per page
+        }       // Paginate the results, you can change 100 to whatever number you want per page
         $otc = $query->paginate(100);
         return view('otcmedicine.index', compact('otc'));
     }

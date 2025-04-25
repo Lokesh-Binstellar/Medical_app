@@ -31,14 +31,7 @@ class RoleController extends Controller
     {
         $tables = DB::select('SHOW TABLES');
         $fillArr = [];
-        // foreach ($tables as $table) {
-        //     // dd($table);
-        //     // $fillArr = array($table->Tables_in_medical_app);
-
-        //     $tableName = array_values((array) $table)[0];
-        //     $fillArr[] = $tableName; // Better than array_push in this context
-        // }
-        // return $fillArr;
+            // dd($table);    
         return view('role.create');
     }
 
@@ -56,17 +49,6 @@ class RoleController extends Controller
         
         $validatedData['guard_name'] = 'web';
         $role = Role::create($validatedData);
-
-        // foreach ($request->permission as $key => $value) {
-        //     $data['role_id'] = $role->id;
-        //     $data['module'] = $key;
-        //     $data['create'] = isset($value['create']) && $value['create'] == 'on' ? 1 : 0;
-        //     $data['read'] = isset($value['read']) && $value['read'] == 'on' ? 1 : 0;
-        //     $data['update'] = isset($value['update']) && $value['update'] == 'on' ? 1 : 0;
-        //     $data['delete'] = isset($value['delete']) && $value['delete'] == 'on' ? 1 : 0;
-        //     Permission::create($data);
-        // }
-
 
         return redirect()->route('roles.edit',$role->id)->with('success', 'Role created successfully!');
     }
@@ -136,7 +118,9 @@ class RoleController extends Controller
             if ($tablesArr['popular_brands']) {
                 $filterArr['PopularBrand'] = 'PopularBrand';
             }
-            
+            if ($tablesArr['popular_categories']) {
+                $filterArr['PopularCategory'] = 'PopularCategory';
+            }
             $permissionData = new Permission();
             return view('role.edit', ['pageConfigs' => $pageConfigs, 'role' => $role, 'accessData' => $filterArr, 'permissionData' => $permissionData]);
         } else {

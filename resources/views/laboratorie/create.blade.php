@@ -252,7 +252,11 @@
                                   <option value="0" {{ (isset($pharmacies) && $pharmacies->status == '0') ? 'selected' : '' }}>Inactive</option>
                               </select>
                             </div> --}}
-
+                            <div class="form-group col-md-6 d-flex justify-content-center flex-column">
+                                <label for="test">Upload Test Details</label>
+                                <input type="file" name="test" class="form-control-file" id="test" required
+                                    data-parsley-required-message="The image field is required.">
+                            </div>
 
                             <!-- Address (full width) -->
                             <div class="form-group col-md-12">

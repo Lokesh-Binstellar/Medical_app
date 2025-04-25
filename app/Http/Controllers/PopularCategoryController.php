@@ -117,7 +117,7 @@ class PopularCategoryController extends Controller
     public function categorySearch(Request $request)
     {
         $query = $request->get('q', '');
-        $category = Otcmedicine::where('marketer', 'LIKE', "%$query%")
+        $category = Otcmedicine::where('category', 'LIKE', "%$query%")
             ->select('marketer')
             ->distinct()
             ->limit(10)
@@ -127,7 +127,7 @@ class PopularCategoryController extends Controller
     }
     public function getCategory()
     {
-        $categories= PopularCategory::all();
+        $categories = PopularCategory::all();
 
         $categoryData = $categories->map(function ($category) {
             return [

@@ -185,7 +185,7 @@
                         <span class="sub-item">Popular Brands</span> 
                     </a>
                 </li>
-                <li class="nav-item ">
+                <li class="nav-item @if (!in_array('PopularCategory', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
                     <a href="{{ route('popular_category.index') }}">
                         <span class="sub-item">Popular categories</span> 
                     </a>
