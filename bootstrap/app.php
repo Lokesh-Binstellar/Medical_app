@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\checkPermission;
 use App\Http\Middleware\checkRole;
+use App\Http\Middleware\JwtAuth;
 use App\Http\Middleware\PreventBackHistory;
 use App\Http\Middleware\TokenValidation;  // Import TokenValidation
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
@@ -21,10 +22,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => checkRole::class,
             'permission' => checkPermission::class,
+<<<<<<< Updated upstream
             'preventHistory' => PreventBackHistory::class,
             'stateful' => EnsureFrontendRequestsAreStateful::class, // Sanctum middleware
             'substituteBindings' => SubstituteBindings::class, // Laravel bindings middleware
             'tokenValidation' => TokenValidation::class, // Add TokenValidation here
+=======
+            'preventHistory'=>PreventBackHistory::class,
+            'jwt.auth' => JwtAuth::class,
+>>>>>>> Stashed changes
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
