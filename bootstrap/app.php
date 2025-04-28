@@ -3,6 +3,9 @@
 use App\Http\Middleware\checkPermission;
 use App\Http\Middleware\checkRole;
 use App\Http\Middleware\PreventBackHistory;
+use App\Http\Middleware\TokenValidation;  // Import TokenValidation
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -18,9 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => checkRole::class,
             'permission' => checkPermission::class,
-            'preventHistory'=>PreventBackHistory::class
+            'preventHistory' => PreventBackHistory::class,
+            'stateful' => EnsureFrontendRequestsAreStateful::class, // Sanctum middleware
+            'substituteBindings' => SubstituteBindings::class, // Laravel bindings middleware
+            'tokenValidation' => TokenValidation::class, // Add TokenValidation here
         ]);
-        // $middleware->append(checkRole::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->renderable(function (\Illuminate\Session\TokenMismatchException $e) {

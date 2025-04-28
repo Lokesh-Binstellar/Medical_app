@@ -7,6 +7,7 @@ use App\Models\Medicine;
 use App\Models\Otcmedicine;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Auth;
 
 class MedicineController extends Controller
 {
@@ -99,8 +100,28 @@ class MedicineController extends Controller
     // search medicine 
     public function search(Request $request)
     {
+        // // Check if the request has a Bearer token
+        // if (!$request->bearerToken()) {
+            
+        //     // Return a JSON response if no token is provided
+        //     return response()->json(['message' => 'Unauthorized. No token provided.'], 401);
+        // }
+    
+        // // Attempt to authenticate the user using the token
+        // $user = Auth::guard('sanctum')->user();
+    
+        // // Check if the user is authenticated
+        // if (!$user) {
+        //     // Return a JSON response if the token is invalid
+        //     return response()->json(['message' => 'Unauthorized. Invalid token.'], 401);
+        // }
+
+
+
+    
         $query = $request->query('query');
     
+        // Check if the query parameter is present
         if (!$query) {
             return response()->json(['message' => 'Query parameter is required.'], 400);
         }
@@ -143,15 +164,16 @@ class MedicineController extends Controller
     
 
 
+
     //     public function search($salt_composition){
     // return ['result'=>'serching working '.$salt_composition];
     //     }
 
 
 
-    
 
-    
+
+
     public function medicineByProductId(Request $request)
     {
         // Step 1: Check if 'id' parameter is passed
@@ -161,14 +183,14 @@ class MedicineController extends Controller
                 'message' => 'ID parameter is required.'
             ], 400);
         }
-    
+
         // Step 2: Get the product ID from the query
         $productId = $request->query('id');
-    
+
         // Step 3: Search in both medicines and otcmedicines
         $medicine = Medicine::where('product_id', $productId)->first();
         $otc = Otcmedicine::where('otc_id', $productId)->first();
-    
+
         // Step 4: If neither found
         if (!$medicine && !$otc) {
             return response()->json([
@@ -176,23 +198,23 @@ class MedicineController extends Controller
                 'message' => 'Product not found in either table.'
             ], 404);
         }
-    
+
         // Step 5: Prepare base URL
         $baseUrl = url('storage/medicines');
-    
+
         // Step 6: Format image URLs if present
         if ($medicine) {
             $medicine->image_url = $medicine->image_url
                 ? collect(explode(',', $medicine->image_url))->map(fn($img) => $baseUrl . '/' . trim(basename($img)))->toArray()
                 : [];
         }
-    
+
         if ($otc) {
             $otc->image_url = $otc->image_url
                 ? collect(explode(',', $otc->image_url))->map(fn($img) => $baseUrl . '/' . trim(basename($img)))->toArray()
                 : [];
         }
-    
+
         // Step 7: Return whichever was found
         return response()->json([
             'success' => true,
@@ -200,6 +222,4 @@ class MedicineController extends Controller
             'source' => $medicine ? 'medicines' : 'otcmedicines'
         ], 200);
     }
-    
-
 }
