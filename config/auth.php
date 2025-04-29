@@ -40,25 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        'guards' => [
-            // Sanctum guard for frontend or web app
-            'web' => [
-                'driver' => 'session',  // Default session driver for Sanctum
-                'provider' => 'users',
-            ],
-
-            // API guard for JWT authentication
-            'api' => [
-                'driver' => 'jwt',  // Use 'jwt' driver for API authentication
-                'provider' => 'users',
-                'hash' => false,  // Optional, depending on your requirements
-            ],
+        
+        'api' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
         ],
-
-        // 'api' => [
-        //     'driver' => 'jwt',
-        //     'provider' => 'users',
-        // ],
     ],
 
     /*

@@ -39,6 +39,7 @@ class JwtAuth
             if (!$user) {
                 return response()->json(['message' => 'User not found.'], 404);
             }
+            \Log::info('JWT Token verified. User ID: ' . $user->id);
 
             // Attach the user to the request for further use in the controller
             $request->attributes->add(['user' => $user]);
