@@ -35,6 +35,6 @@ return Application::configure(basePath: dirname(__DIR__))
         });
     })->create();
     
-    // Add TokenValidation here
+   , // Add TokenValidation here
 
   
