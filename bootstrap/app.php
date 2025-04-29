@@ -1,5 +1,5 @@
 <?php
-
+ 
 use App\Http\Middleware\checkPermission;
 use App\Http\Middleware\checkRole;
 use App\Http\Middleware\JwtAuth;
@@ -10,7 +10,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-
+ 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
@@ -25,7 +25,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'preventHistory'=>PreventBackHistory::class,
             'stateful' => EnsureFrontendRequestsAreStateful::class, // Sanctum middleware
             'substituteBindings' => SubstituteBindings::class, // Laravel bindings middleware
+<<<<<<< Updated upstream
+            'tokenValidation' => TokenValidation::class, // Add TokenValidation here
+=======
             'tokenValidation' => TokenValidation::class,
+>>>>>>> Stashed changes
+            'jwt.auth' => JwtAuth::class,
         ]);
         // $middleware->append(checkRole::class);
     })
@@ -34,7 +39,12 @@ return Application::configure(basePath: dirname(__DIR__))
             return redirect()->back();
         });
     })->create();
+<<<<<<< Updated upstream
+ 
+ 
+ 
+=======
     
-   , // Add TokenValidation here
 
   
+>>>>>>> Stashed changes
