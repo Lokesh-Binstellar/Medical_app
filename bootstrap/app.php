@@ -25,8 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'preventHistory'=>PreventBackHistory::class,
             'stateful' => EnsureFrontendRequestsAreStateful::class, // Sanctum middleware
             'substituteBindings' => SubstituteBindings::class, // Laravel bindings middleware
-            'tokenValidation' => TokenValidation::class, // Add TokenValidation here
-            'jwt.auth' => JwtAuth::class,
+            'tokenValidation' => TokenValidation::class,
         ]);
         // $middleware->append(checkRole::class);
     })
@@ -35,6 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return redirect()->back();
         });
     })->create();
+    
+    // Add TokenValidation here
 
-
-
+  
