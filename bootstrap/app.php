@@ -25,11 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'preventHistory'=>PreventBackHistory::class,
             'stateful' => EnsureFrontendRequestsAreStateful::class, // Sanctum middleware
             'substituteBindings' => SubstituteBindings::class, // Laravel bindings middleware
-<<<<<<< Updated upstream
             'tokenValidation' => TokenValidation::class, // Add TokenValidation here
-=======
-            'tokenValidation' => TokenValidation::class,
->>>>>>> Stashed changes
             'jwt.auth' => JwtAuth::class,
         ]);
         // $middleware->append(checkRole::class);
@@ -39,12 +35,6 @@ return Application::configure(basePath: dirname(__DIR__))
             return redirect()->back();
         });
     })->create();
-<<<<<<< Updated upstream
  
  
  
-=======
-    
-
-  
->>>>>>> Stashed changes

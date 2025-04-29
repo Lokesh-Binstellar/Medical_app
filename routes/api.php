@@ -31,10 +31,10 @@ Route::middleware(['tokenValidation'])->group(function () {
 });
 
 
-Route::middleware(['jwt.auth'])->group(function () {
+// Route::middleware(['jwt.auth'])->group(function () {
     
-    Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
-});
+//     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+// });
 
-// Route::post('/send-otp', [AuthController::class, 'sendOtp']);
-// Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+Route::post('/send-otp', [AuthController::class, 'sendOtp']);
+Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
