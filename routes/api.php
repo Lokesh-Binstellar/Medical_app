@@ -8,10 +8,19 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-Route::middleware(['auth:api'])->group(function () {
+
+use App\Http\Controllers\AuthToken;
+
+// Route::get('/user', function (Request $request) {
+//     return $request->user();
+// })->middleware('auth:sanctum');
+Route::post('/login', [AuthToken::class, 'login']);
+
+Route::middleware(['tokenValidation'])->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
     Route::get('/pharmacy', [PharmaciesController::class, 'getPharmacy'])->name('pharmacy.getPharmacy');
     Route::get('/medicines/search', [MedicineController::class, 'search']);
     Route::get('/medicines/searchID', [MedicineController::class, 'medicineByProductId']);
