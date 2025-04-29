@@ -54,7 +54,7 @@ class AuthController extends Controller
             );
 
             // Set OTP expiry time with correct time zone (Asia/Kolkata)
-            $otp_expiry_time = \Carbon\Carbon::now('Asia/Kolkata')->addMinutes(5);
+            $otp_expiry_time = \Carbon\Carbon::now('Asia/Kolkata')->addMinutes(30);
 
             // Step 6: Save OTP and expiry time to the database
             $user->update([
@@ -75,57 +75,55 @@ class AuthController extends Controller
     }
 
     public function verifyOtp(Request $request)
-    {  // Validate incoming request
-        $request->validate([
-            'phone' => 'required|digits_between:10,15',
-            'otp_code' => 'required|digits:6',
-        ]);
+{
+    $request->validate([
+        'phone' => 'required|digits_between:10,15',
+        'otp_code' => 'required|digits:6',
+    ]);
 
-        $phone = $request->phone;
+    $phone = $request->phone;
 
-       
-        // Fetch user by phone number
-        $user = MobileUser::where('phone', $phone)->first();
-
-        if (!$user) {
-            return response()->json(['message' => 'User not found.'], 404);
-        }
-
-        // Debug logs
-        Log::info("OTP Received: " . $request->otp_code);
-        Log::info("OTP Stored in DB: " . $user->otp_code);
-        Log::info("OTP Expiry Time: " . $user->otp_expires_at);
-
-        // Check if OTP is valid or expired
-        if ($user->otp_code !== $request->otp_code || \Carbon\Carbon::now('Asia/Kolkata')->gt($user->otp_expires_at)) {
-            return response()->json(['message' => 'Invalid or expired OTP.'], 400);
-        }
-        
-
-        // OTP is valid, update user record (mark phone as verified)
-        $user->update([
-            'phone_verified_at' => now(),
-            'otp_code' => null,
-            'otp_expires_at' => null,
-        ]);
-
-        // Generate JWT token
-        $jwtSecret = env('JWT_SECRET');
-        $payload = [
-            'user_id' => $user->id,
-            'exp' => time() + 3600, // Expiration time for token (1 hour)
-        ];
-
-        try {
-            $jwt = JWT::encode($payload, $jwtSecret);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Error generating JWT token.'], 500);
-        }
-
-        return response()->json([
-            'message' => 'User verified successfully.',
-            'token' => $jwt,
-            'user' => $user,
-        ]);
+    // Add +91 if not present
+    if (!str_starts_with($phone, '+')) {
+        $phone = '+91' . $phone;
     }
+    $user = MobileUser::where('phone', $phone)->first();
+
+    if (!$user) {
+        return response()->json(['message' => 'User not found.'], 404);
+    }
+
+
+    Log::info("OTP Received: " . $request->otp_code);
+    Log::info("OTP Stored in DB: " . $user->otp_code);
+    Log::info("OTP Expiry Time: " . $user->otp_expires_at);
+
+    if ((string) $user->otp_code !== (string) $request->otp_code || now()->gt($user->otp_expires_at)) {
+        return response()->json(['message' => 'Invalid or expired OTP.'], 400);
+    }
+
+    $user->update([
+        'phone_verified_at' => now(),
+        'otp_code' => null,
+        'otp_expires_at' => null,
+    ]);
+
+    $jwtSecret = env('JWT_SECRET');
+    $payload = [
+        'user_id' => $user->id,
+        'exp' => time() + 3600,
+    ];
+
+    try {
+        $jwt = JWT::encode($payload, $jwtSecret, 'HS256');
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Error generating JWT token.'], 500);
+    }
+
+    return response()->json([
+        'message' => 'User verified successfully.',
+        'token' => $jwt,
+        'user' => $user,
+    ]);
+}
 }
