@@ -14,7 +14,7 @@
                 {{-- Image --}}
                 @if($pharmacy->image)
                     <div class="col-md-4 text-center mb-4">
-                        <img src="{{ asset('assets/image/' . $pharmacy->image) }}" alt="Pharmacy Image" class="img-fluid rounded shadow" style="max-height: 250px;">
+                        <img src="{{  $pharmacy->image }}" alt="Pharmacy Image" class="img-fluid rounded shadow" style="max-height: 250px;">
                         <p class="mt-2"><strong>Pharmacy Image</strong></p>
                     </div>
                 @endif

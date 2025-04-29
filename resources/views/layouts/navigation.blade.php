@@ -121,8 +121,8 @@
         <!-- Logo Header -->
         <div class="logo-header" data-background-color="dark">
             <a href="{{ route('dashboard') }}" class="logo">
-                <img src="{{ asset('assets/img/gomeds.png') }}" alt="navbar brand" class="navbar-brand"
-                   width="130" height="42" />
+                <img src="{{ asset('assets/img/gomeds.png') }}" alt="navbar brand" class="navbar-brand" width="130"
+                    height="42" />
             </a>
             <div class="nav-toggle">
                 <button class="btn btn-toggle toggle-sidebar">
@@ -141,53 +141,63 @@
     <div class="sidebar-wrapper scrollbar scrollbar-inner">
         <div class="sidebar-content">
             <ul class="nav nav-secondary">
-             
+
                 <li class="nav-item ">
-                    <a href="{{ route('dashboard') }}" >
+                    <a href="{{ route('dashboard') }}">
                         <span class="sub-item">Dashboard</span>
                     </a>
                 </li>
-                <li class="nav-item @if (!in_array('Roles', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
+                <li class="nav-item @if (!in_array('Roles', $permissions) && $isSuperAdmin != 1) d-none @endif">
                     <a href="{{ route('roles.index') }}">
                         <span class="sub-item">Role</span>
                     </a>
                 </li>
-                <li class="nav-item @if (!in_array('Users', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
+                <li class="nav-item @if (!in_array('Users', $permissions) && $isSuperAdmin != 1) d-none @endif">
                     <a href="{{ route('user.index') }}">
                         <span class="sub-item">User</span>
                     </a>
                 </li>
-                
+
                 {{-- if --}}
-                
-                <li class="nav-item @if (!in_array('Pharmacies', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
+
+                <li class="nav-item @if (!in_array('Pharmacies', $permissions) && $isSuperAdmin != 1) d-none @endif">
                     <a href="{{ route('pharmacist.index') }}">
                         <span class="sub-item">Pharmacies</span>
                     </a>
                 </li>
-                <li class=" nav-item @if (!in_array('Laboratories', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
+
+                <li class="nav-item @if (!in_array('Pharmacies', $permissions)) d-none @endif">
+                    <a href="{{ route('add.medicine') }}">
+                        <span class="sub-item">Add Medicine</span>
+                    </a>
+                </li>
+                
+
+
+
+                <li class=" nav-item @if (!in_array('Laboratories', $permissions) && $isSuperAdmin != 1) d-none @endif">
                     <a href="{{ route('laboratorie.index') }}">
                         <span class="sub-item">Laboratories</span>
                     </a>
                 </li>
-                <li class=" nav-item @if (!in_array('Medicines', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
+                <li class=" nav-item @if (!in_array('Medicines', $permissions) && $isSuperAdmin != 1) d-none @endif">
                     <a href="{{ route('medicine.index') }}">
                         <span class="sub-item">Medicine</span>
                     </a>
                 </li>
-                <li class=" nav-item @if (!in_array('Otcmedicines', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
+                <li class=" nav-item @if (!in_array('Otcmedicines', $permissions) && $isSuperAdmin != 1) d-none @endif">
                     <a href="{{ route('otcmedicine.index') }}">
                         <span class="sub-item">OTC</span>
                     </a>
                 </li>
-                <li class="nav-item @if (!in_array('PopularBrand', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
+                <li class="nav-item @if (!in_array('PopularBrand', $permissions) && $isSuperAdmin != 1) d-none @endif">
                     <a href="{{ route('popular.index') }}">
-                        <span class="sub-item">Popular Brands</span> 
+                        <span class="sub-item">Popular Brands</span>
                     </a>
                 </li>
-                <li class="nav-item @if (!in_array('PopularCategory', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
+                <li class="nav-item @if (!in_array('PopularCategory', $permissions) && $isSuperAdmin != 1) d-none @endif">
                     <a href="{{ route('popular_category.index') }}">
-                        <span class="sub-item">Popular categories</span> 
+                        <span class="sub-item">Popular categories</span>
                     </a>
                 </li>
                 <li class="nav-item">

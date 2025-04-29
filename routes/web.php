@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaboratoriesController;
 use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\MedicineSearchController;
 use App\Http\Controllers\OtcController;
 use App\Http\Controllers\PharmaciesController;
 use App\Http\Controllers\PopularBrandController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+
 
 Route::get('/', function () {
     return view('auth.login');
@@ -153,6 +155,25 @@ Route::group(['middleware' => ['auth']], function () {
 
 
     });
+
+
+
+
+
+
+// // Route to show Add Medicine page
+// Route::get('/add-medicine', [MedicineSearchController::class, 'index'])->name('add.medicine');
+
+// // Route for the search functionality
+// Route::get('/search-medicine', [MedicineSearchController::class, 'search'])->name('search.medicine');
+
+// // Route to store added medicines
+// Route::post('/add-medicine/store', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
+Route::get('/pharmacist/add-medicine', [MedicineSearchController::class, 'index'])->name('add.medicine');
+Route::get('/search-medicine', [MedicineSearchController::class, 'search'])->name('search.medicine');
+Route::post('/add-medicine', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
+Route::post('/medicines/store', [MedicineSearchController::class, 'store'])->name('medicines.store');
+
 
 });
 
