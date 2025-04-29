@@ -27,7 +27,7 @@ class JwtAuth
 
         try {
             // Decode the token using JWT_KEY from config
-            $jwtSecret = Config::get('app.jwt_key');
+            $jwtSecret = Config::get('app.JWT_SECRET');
             $decoded = JWT::decode($token, $jwtSecret, ['HS256']);
 
             // Get the user ID from the decoded token

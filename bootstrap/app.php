@@ -22,16 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => checkRole::class,
             'permission' => checkPermission::class,
-<<<<<<< Updated upstream
-            'preventHistory' => PreventBackHistory::class,
-            'stateful' => EnsureFrontendRequestsAreStateful::class, // Sanctum middleware
-            'substituteBindings' => SubstituteBindings::class, // Laravel bindings middleware
-            'tokenValidation' => TokenValidation::class, // Add TokenValidation here
-=======
-            'preventHistory'=>PreventBackHistory::class,
-            'jwt.auth' => JwtAuth::class,
->>>>>>> Stashed changes
+            'preventHistory'=>PreventBackHistory::class
         ]);
+        // $middleware->append(checkRole::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->renderable(function (\Illuminate\Session\TokenMismatchException $e) {
