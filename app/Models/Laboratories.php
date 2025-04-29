@@ -22,6 +22,9 @@ class Laboratories extends Model
         'username',
         'password',
         'license',
+        'test',
+        'price',
+        'homeprice',
         'pickup',
         'status',
     ];

@@ -33,14 +33,6 @@
 
 
 @extends('layouts.app')
-@section('styles')
-    <style>
-        .cust-icon {
-            padding-bottom: 20px important;
-
-        }
-    </style>
-@endsection
 @section('content')
     {{-- <div class="container">
         <div class="page-inner">
@@ -260,37 +252,10 @@
                                   <option value="0" {{ (isset($pharmacies) && $pharmacies->status == '0') ? 'selected' : '' }}>Inactive</option>
                               </select>
                             </div> --}}
-                            <div class="container mt-4 " id="formRepeater">
-                                <div class="row g-3 align-items-end mb-3 repeater-group">
-
-                                    <div class="col-md-4">
-                                        <label for="brand-select" class="form-label">Test</label>
-                                        <select name="test[]" class="form-control" required>
-                                            <option value="">Select Test</option>
-                                            @foreach ($tests as $test)
-                                                <option value="{{ $test->id }}">{{ $test->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Price</label>
-                                        <input type="number" class="form-control" name="price[]" min="0"
-                                            placeholder="Price" required>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Home Price</label>
-                                        <input type="number" class="form-control" name="homeprice[]" min="0"
-                                            placeholder="Home Price" required>
-                                    </div>
-                                    <div class="col-md-2 cust-icon">
-                                        <a onclick="removeField(this)"><img src={{ asset('minus-icon.png') }}
-                                                width="20" height="20"></a>
-                                        <button type="button" onclick="addField()" class="btn btn-link p-0 ms-2">
-                                            <img src="{{ asset('plus.png') }}" width="20" height="20"
-                                                alt="Add">
-                                        </button>
-                                    </div>
-                                </div>
+                            <div class="form-group col-md-6 d-flex justify-content-center flex-column">
+                                <label for="test">Upload Test Details</label>
+                                <input type="file" name="test" class="form-control-file" id="test" required
+                                    data-parsley-required-message="The image field is required.">
                             </div>
 
                             <!-- Address (full width) -->
@@ -359,56 +324,6 @@
                     }
                 });
             }
-        });
-
-        // form repeater-group
-        function addField() {
-            const repeater = document.getElementById('formRepeater');
-            const newGroup = document.createElement('div');
-            newGroup.className = 'row g-3 align-items-end mb-3 repeater-group';
-
-            newGroup.innerHTML = `
-             <div class="col-md-4">
-                                    <label for="brand-select" class="form-label">Test</label>
-                                    <select name="test[]" class="form-control" required>
-                                        <option value="">Select Test</option>
-                                        @foreach ($tests as $test)
-                                            <option value="{{ $test->id }}">{{ $test->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">Price</label>
-                                    <input type="number" class="form-control" name="price[]" min="0" placeholder="Price" required>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">Home Price</label>
-                                    <input type="number" class="form-control"  name="homeprice[]" min="0"  placeholder="Home Price" required>
-                                </div>
-                                <div class="col-md-2 cust-icon">
-                                    <a onclick="removeField(this)"><img src={{ asset('minus-icon.png') }} width="20" height="20"></a>
-                                    <button type="button" onclick="addField()" class="btn btn-link p-0 ms-2">
-                                            <img src="{{ asset('plus.png') }}" width="20" height="20"
-                                                alt="Add">
-                                        </button>                                   
-    </a>
-                                </div>
-        `;
-
-            repeater.appendChild(newGroup);
-        }
-
-        function removeField(button) {
-            const group = button.closest('.repeater-group');
-            if (group) group.remove();
-        }
-    </script>
-@endsection
-@section('script')
-    <script>
-        $(document).ready(function() {
-            // Initialize Select2 with AJAX
-            $('.select2').select2()
         });
     </script>
 @endsection

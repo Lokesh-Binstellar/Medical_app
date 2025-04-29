@@ -200,6 +200,11 @@
                         <span class="sub-item">Popular categories</span>
                     </a>
                 </li>
+                <li class="nav-item ">
+                    <a href="{{ route('labtest.index') }}">
+                        <span class="sub-item">Lab Test</span> 
+                    </a>
+                </li>
                 <li class="nav-item">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

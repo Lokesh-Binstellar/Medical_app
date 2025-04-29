@@ -44,11 +44,11 @@ class JwtAuth
             // Attach the user to the request for further use in the controller
             $request->attributes->add(['user' => $user]);
 
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json(['message' => 'Invalid or expired token.'], 401);
         }
         return $next($request);
 
-        
+
     }
 }
