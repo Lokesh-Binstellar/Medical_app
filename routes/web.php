@@ -6,6 +6,7 @@ use App\Http\Controllers\LabtestController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicineSearchController;
 use App\Http\Controllers\OtcController;
+use App\Http\Controllers\packageCategoryController;
 use App\Http\Controllers\PharmaciesController;
 use App\Http\Controllers\PopularBrandController;
 use App\Http\Controllers\PopularCategoryController;
@@ -157,8 +158,24 @@ Route::group(['middleware' => ['auth']], function () {
 
     });
 
+    Route::prefix('labtest')->group(function () {
+        Route::get('', [LabtestController::class, 'index'])->name('labtest.index');
+        Route::post('import', [LabtestController::class, 'import'])->name('labtest.import');
+        Route::get('/{id}', [LabtestController::class, 'show'])->name('labtest.show');
+    });
 
 
+    Route::prefix('packageCategory')->group(function () {
+        Route::get('', [packageCategoryController::class, 'index'])->name('packageCategory.index');  // Route to display all categories
+        Route::post('import', [packageCategoryController::class, 'import'])->name('packageCategory.import');  // Route for importing categories
+        Route::get('/{id}', [packageCategoryController::class, 'show'])->name('packageCategory.show');  // Route to display a single category by ID
+        Route::get('/create', [packageCategoryController::class, 'create'])->name('packageCategory.create');  // Route to show the form to create a new category
+        Route::post('/', [packageCategoryController::class, 'store'])->name('packageCategory.store');  // Route to store a new category
+        Route::get('/{id}/edit', [packageCategoryController::class, 'edit'])->name('packageCategory.edit');  // Route to show the edit form for a category
+        Route::put('/{id}', [packageCategoryController::class, 'update'])->name('packageCategory.update');  // Route to update the category
+        Route::delete('/{id}', [packageCategoryController::class, 'destroy'])->name('packageCategory.destroy');  // Route to delete a category
+    });
+    
 
 
 

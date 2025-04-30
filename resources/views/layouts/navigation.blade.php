@@ -205,6 +205,11 @@
                         <span class="sub-item">Lab Test</span> 
                     </a>
                 </li>
+                <li class="nav-item ">
+                    <a href="{{ route('packageCategory.index') }}">
+                        <span class="sub-item">Package Category</span> 
+                    </a>
+                </li>
                 <li class="nav-item">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

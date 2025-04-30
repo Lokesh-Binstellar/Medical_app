@@ -34,7 +34,6 @@ class LaboratoriesController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all()); 
         $params = $request->all();
 
         // Validate
@@ -49,27 +48,25 @@ class LaboratoriesController extends Controller
             'address' => 'required',
             'latitude' => 'required',
             'longitude' => 'required',
-            'image' => 'nullable|file|image|max:10240', // Image validation with size limit (10MB)
+            'image' => 'nullable|file|image|max:10240',
             'username' => 'required',
             'password' => 'required',
             'license' => 'required',
+            'nabl_iso_certified' => 'required|boolean',
             'pickup' => 'required',
-            'test' => 'nullable|array',  // test should be an array
-            'test.*' => 'string',        // Each test should be a string
-            'price' => 'nullable|array', // price should be an array
-            'price.*' => 'string',       // Each price should be a string
-            'homeprice' => 'nullable|array', // homeprice should be an array
-            'homeprice.*' => 'string',   // Each homeprice should be a string
+            'gstno' => 'nullable|string|max:20',
+            'test' => 'nullable|array',
+            'test.*' => 'string',
+            'price' => 'nullable|array',
+            'homeprice' => 'nullable|array',
         ]);
 
         if ($validation->fails()) {
             return back()->withErrors($validation)->withInput();
         }
 
-        // Get roleId for laboratory role
         $roleId = \App\Models\Role::where('name', 'laboratory')->value('id');
 
-        // Create user and get ID
         $user = User::create([
             'name' => $request->username,
             'email' => $request->email,
@@ -79,64 +76,87 @@ class LaboratoriesController extends Controller
 
         $params['user_id'] = $user->id;
 
-        // Handle Image Upload
+        // Image upload
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = public_path('assets/image') . '/' . $imageName;
-            $image->move(public_path('assets/image'), $imageName);
-
-            // Saving only the image path, instead of base64
-            $params['image'] = 'assets/image/' . $imageName;
+            $destinationPath = public_path('assets/image/');
+            $image->move($destinationPath, $imageName);
+            $params['image'] = $imageName;
         }
 
-        // Handle Test, Price, Homeprice data as JSON
-        $tests = $request->test ?? []; // Get tests, or an empty array if not provided
-        $prices = $request->price ?? []; // Get prices, or an empty array if not provided
-        $homeprices = $request->homeprice ?? []; // Get homeprices, or an empty array if not provided
-
-        // Create an array to hold the test, price, and homeprice for each entry
         $testData = [];
+        $tests = $request->test ?? [];
+        $prices = $request->price ?? [];
+        $homeprices = $request->homeprice ?? [];
+
         foreach ($tests as $key => $test) {
             $testData[] = [
                 'test' => $test,
-                'price' => isset($prices[$key]) ? $prices[$key] : null,
-                'homeprice' => isset($homeprices[$key]) ? $homeprices[$key] : null,
+                'price' => $prices[$key] ?? null,
+                'homeprice' => $homeprices[$key] ?? null,
             ];
         }
 
-        // Store the test data as JSON
         $params['test'] = json_encode($testData);
+        unset($params['price'], $params['homeprice']);
 
-        // $params['price'] = json_encode($prices);
-        // $params['homeprice'] = json_encode($homeprices);
-        // dd($params);
-
-        // Create the laboratory record
         Laboratories::create($params);
 
+        // dd( );
         return redirect()->route('laboratorie.index')
             ->with('success', 'Laboratory created successfully.');
     }
 
     /**
      * Display the specified resource.
-     */
-    public function show($id)
-    {
-        $lab = Laboratories::with('user')->findOrFail($id);
-        return view('laboratorie.show', compact('lab'));
+     */public function show($id)
+{
+    // Fetch the laboratory details
+    $lab = Laboratories::findOrFail($id);
+
+    // Decode the JSON data from the 'test' column
+    $testData = json_decode($lab->test, true); // Decode the JSON into an array
+
+    // Prepare the lab tests with their names and prices
+    $labTests = [];
+
+    foreach ($testData as $test) {
+        // Fetch the test name from lab_tests table based on test ID
+        $testInfo = \DB::table('lab_tests')
+            ->where('id', $test['test']) // Match test ID
+            ->select('name as test_name')
+            ->first();
+
+        // Append the test info to the labTests array
+        $labTests[] = [
+            'test_name' => $testInfo ? $testInfo->test_name : 'Unknown',
+            'price' => $test['price'],
+            'homeprice' => $test['homeprice'],
+        ];
     }
+
+    // Pass the laboratory details and the parsed tests to the view
+    return view('laboratorie.show', compact('lab', 'labTests'));
+}
+
+    
+    
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit($id)
     {
-        $laboratorie = Laboratories::find($id);
-        // dd($laboratorie);
+        $laboratorie = Laboratories::findOrFail($id);
 
-        return view('laboratorie.edit', compact('laboratorie'));
+
+        $labTests = json_decode($laboratorie->test, true) ?? [];
+
+
+        $allTests = LabTest::all();
+
+        return view('laboratorie.edit', compact('laboratorie', 'labTests', 'allTests'));
     }
 
     /**
@@ -144,30 +164,30 @@ class LaboratoriesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // Validate the request
         $laboratorie = Laboratories::findOrFail($id);
 
         // Validate input
-        $validation = validator($request->all(), [
-            'lab_name' => 'required',
-            'owner_name' => 'required',
+        $data = $request->validate([
+            'lab_name' => 'required|string',
+            'owner_name' => 'required|string',
             'email' => 'required|email',
             'phone' => 'required|min:11|numeric',
-            'city' => 'required',
-            'state' => 'required',
+            'city' => 'required|string',
+            'state' => 'required|string',
             'pincode' => 'required|max:9',
-            'address' => 'required',
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'username' => 'required',
-            'license' => 'required',
-            'pickup' => 'required',
-            'image' => 'nullable|file', // optional for update
+            'address' => 'required|string',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'username' => 'required|string',
+            'license' => 'required|string',
+            'pickup' => 'required|string',
+            'gstno' => 'nullable|string',
+            'nabl_iso_certified' => 'required|boolean',
+            'image' => 'nullable|image|max:10240',
+            'test.*' => 'nullable|string',
+            'price.*' => 'nullable|numeric',
+            'homeprice.*' => 'nullable|numeric',
         ]);
-
-        if ($validation->fails()) {
-            return back()->withErrors($validation)->withInput();
-        }
 
         // Update related user
         $user = User::find($laboratorie->user_id);
@@ -180,7 +200,7 @@ class LaboratoriesController extends Controller
             $user->save();
         }
 
-        // Prepare updated pharmacy data
+
         $data = $request->only([
             'lab_name',
             'owner_name',
@@ -194,32 +214,81 @@ class LaboratoriesController extends Controller
             'longitude',
             'username',
             'license',
-            'pickup'
+            'pickup',
+            'gstno',
+            'nabl_iso_certified'
         ]);
 
-        // Handle image update
+        // Image upload and old delete
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = public_path('assets/image') . '/' . $imageName;
-            $image->move(public_path('assets/image'), $imageName);
+            $destinationPath = public_path('assets/image/');
+            $image->move($destinationPath, $imageName);
+            $data['image'] = $imageName;
 
-            $imageData = file_get_contents($imagePath);
-            $type = pathinfo($imagePath, PATHINFO_EXTENSION);
-            $base64Image = 'data:image/' . $type . ';base64,' . base64_encode($imageData);
-
-            $data['image'] = $base64Image;
-
-            if (File::exists($imagePath)) {
-                File::delete($imagePath);
+            if ($laboratorie->image && File::exists($destinationPath . $laboratorie->image)) {
+                File::delete($destinationPath . $laboratorie->image);
             }
         }
 
-        // Update pharmacy record
+
+        $existingTests = json_decode($laboratorie->test, true) ?? [];
+
+        // Prepare test data to update
+        $testData = [];
+        $tests = $request->test ?? [];
+        $prices = $request->price ?? [];
+        $homeprices = $request->homeprice ?? [];
+
+        foreach ($tests as $key => $testId) {
+            if (!empty($testId)) {
+
+                $found = false;
+                foreach ($existingTests as &$existingTest) {
+                    if ($existingTest['test'] == $testId) {
+                        $existingTest['price'] = $prices[$key] ?? 0;
+                        $existingTest['homeprice'] = $homeprices[$key] ?? 0;
+                        $found = true;
+                        break;
+                    }
+                }
+
+                // If the test is not found, add a new one
+                if (!$found) {
+                    $testData[] = [
+                        'test' => $testId,
+                        'price' => $prices[$key] ?? 0,
+                        'homeprice' => $homeprices[$key] ?? 0,
+                    ];
+                }
+            }
+        }
+
+
+        $mergedTests = array_merge($existingTests, $testData);
+
+
+        $uniqueTests = [];
+        foreach ($mergedTests as $test) {
+            $uniqueTests[$test['test']] = $test;
+        }
+
+        // Re-index the array
+        $testData = array_values($uniqueTests);
+
+
+        $data['test'] = json_encode($testData);
+
+
         $laboratorie->update($data);
+        // dd($laboratorie);
+
         return redirect()->route('laboratorie.index')
-            ->with('success', 'laboratorie updated successfully!');
+            ->with('success', 'Laboratory updated successfully!');
     }
+
+
 
     /**
      * Remove the specified resource from storage.

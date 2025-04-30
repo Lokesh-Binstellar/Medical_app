@@ -22,9 +22,9 @@ class Laboratories extends Model
         'username',
         'password',
         'license',
+        'gstno',
+        'nabl_iso_certified',
         'test',
-        'price',
-        'homeprice',
         'pickup',
         'status',
     ];
@@ -32,4 +32,12 @@ class Laboratories extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+
+//     public function labtests()
+// {
+//     // Assuming a laboratory has many tests (many-to-many relationship)
+//     return $this->belongsToMany(LabTest::class, 'lab_tests', 'id', 'id');
+// }
+
 }

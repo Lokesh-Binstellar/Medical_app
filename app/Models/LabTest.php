@@ -22,4 +22,11 @@ class LabTest extends Model
         'faq',
         'references',
     ];
+
+//     public function laboratories()
+// {
+//     // A test can belong to many laboratories (many-to-many relationship)
+//     return $this->belongsToMany(Laboratories::class, 'laboratory_test', 'id', 'id');
+// }
+
 }

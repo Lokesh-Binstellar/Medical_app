@@ -51,6 +51,7 @@
 <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/css/plugins.min.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/css/kaiadmin.min.css') }}" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 <!-- Add Parsley CSS (Optional, but recommended for styling) -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.9.2/parsley.css">
 
