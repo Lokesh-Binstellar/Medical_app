@@ -59,7 +59,7 @@ class packageCategoryController extends Controller
 
         $package->save();
 
-        return redirect()->route('popular.index')->with('success', 'packageCategory added successfully.');
+        return redirect()->route('packageCategory.index')->with('success', 'packageCategory added successfully.');
     }
 
     /**

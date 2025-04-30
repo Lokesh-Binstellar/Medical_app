@@ -18,20 +18,20 @@
 
                         <div class="card-body">
                             <!-- Form for adding a new package category -->
-                            <div class="mb-4">
+                            <div class="mb-4 ">
                                 <form action="{{ route('packageCategory.store') }}" method="POST" enctype="multipart/form-data" class="row g-3">
                                     @csrf
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label for="name" class="form-label">Package Category Name</label>
                                         <input type="text" name="name" class="form-control" id="name" required placeholder="Enter category name">
                                     </div>
                                     
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label for="logo" class="form-label">Category Logo (Optional)</label>
                                         <input type="file" name="logo" class="form-control" id="logo">
                                     </div>
                                     
-                                    <div class="col-12">
+                                    <div class="col-md-4 mt-4">
                                         <button type="submit" class="btn btn-primary w-100">Add Package</button>
                                     </div>
                                 </form>
@@ -43,52 +43,24 @@
                             @endif
 
                             <!-- Table to display added categories -->
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-striped table-hover">
-                                    <thead class="thead-dark">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Package Name</th>
-                                            <th>Logo</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($AddedBrands as $index => $brand)
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="add-row" class="display table table-striped table-hover data-table">
+                                        <thead>
                                             <tr>
-                                                <td>{{ $index + 1 }}</td>
-                                                <td>{{ $brand->name }}</td>
-                                                <td>
-                                                    @if ($brand->logo)
-                                                        <img src="{{ url('storage/brand/' . $brand->logo) }}" alt="logo" width="50" class="rounded">
-                                                    @else
-                                                        <span class="text-muted">No Logo</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <!-- Edit Button -->
-                                                    <a href="{{ route('popular.edit', $brand->id) }}" class="btn btn-sm btn-warning">
-                                                        <i class="bi bi-pencil-square"></i> Edit
-                                                    </a>
-
-                                                    <!-- Delete Button -->
-                                                    <form action="{{ route('popular.destroy', $brand->id) }}" method="POST" style="display:inline-block;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this brand?')">
-                                                            <i class="bi bi-trash"></i> Delete
-                                                        </button>
-                                                    </form>
-                                                </td>
+                                                <th>#</th>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>Package Image</th>
+                                                <th style="width: 10%">Action</th>
                                             </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="4" class="text-center text-muted">No popular brands added yet.</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>
