@@ -7,16 +7,42 @@ use App\Models\User;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use DataTables;
 
 class PharmaciesController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $pharmacist = Pharmacies::all();
-        return view('pharmacist.index', compact('pharmacist'));
+
+        if ($request->ajax()) {
+            $data = Pharmacies::query();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    $btn = '
+                    <div class="form-button-action d-flex gap-2">
+                   <a href="' . route('pharmacist.show', $row->id) . '" class="btn btn-link btn-success btn-lg" data-bs-toggle="tooltip" title="View">
+        <i class="fa fa-eye"></i>
+    </a>
+                     <a href="' . route('pharmacist.edit', $row->id) . '" class="btn btn-link btn-primary btn-lg" data-bs-toggle="tooltip" title="Edit">
+        <i class="fa fa-edit"></i>
+    </a>
+     <a href="javascript:void(0)" class="btn btn-link btn-danger btn-lg" data-id="' . $row->id . '" onclick="deleteUser(' . $row->id . ')">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>';
+                   
+                    return $btn;
+
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+        // $tests = LabTest::all();
+        return view('pharmacist.index');
     }
 
     /**
@@ -60,7 +86,7 @@ class PharmaciesController extends Controller
         }
         $roleId = \App\Models\Role::where('name', 'pharmacy')->value('id');
 
-     
+
         // Create user and get ID
         $user = User::create([
             'name' => $request->username,
@@ -74,22 +100,22 @@ class PharmaciesController extends Controller
         // Handle Image
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-        
+
             // Generate unique image name
             $imageName = time() . '_' . $image->getClientOriginalName();
-        
+
             // Define the destination path
             $destinationPath = public_path('assets/image');
-        
+
             // Move image to the destination
             $image->move($destinationPath, $imageName);
-        
+
             // Store just the image name (or relative path if preferred)
             $params['image'] = $imageName; // or use 'assets/image/' . $imageName if needed
-        
+
             // No need to delete the file now since we're storing it
         }
-        
+
 
         // Create Pharmacy
         Pharmacies::create($params);
@@ -152,15 +178,15 @@ class PharmaciesController extends Controller
         if ($user) {
             $user->name = $request->username;
             $user->email = $request->email;
-        
+
             // Only update password if provided
             if ($request->filled('password')) {
                 $user->password = Hash::make($request->password);
             }
-        
+
             $user->save();
         }
-        
+
 
         // Prepare updated pharmacy data
         $data = $request->only([
@@ -183,15 +209,15 @@ class PharmaciesController extends Controller
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $imagePath = public_path('assets/image/') . $imageName;
-    
+
             // Move new image to folder
             $image->move(public_path('assets/image/'), $imageName);
-    
+
             // Delete old image if exists
             if ($pharmacy->image && File::exists(public_path('assets/image/') . $pharmacy->image)) {
                 File::delete(public_path('assets/image/') . $pharmacy->image);
             }
-    
+
             // Save new image name to database
             $data['image'] = $imageName;
         }
@@ -202,28 +228,28 @@ class PharmaciesController extends Controller
         return redirect()->route('pharmacist.index')->with('success', 'Pharmacy updated successfully!');
     }
 
-// Api
-public function getPharmacy()
-{
-    $pharmacies = Pharmacies::all();
+    // Api
+    public function getPharmacy()
+    {
+        $pharmacies = Pharmacies::all();
 
-    $pharmacyData = $pharmacies->map(function ($pharmacy) {
-        return [
-           'id' => $pharmacy->id,
-           'pharmacy_name' => $pharmacy->pharmacy_name,
-           'latitude'=>$pharmacy->latitude,
-           'longitude'=>$pharmacy->longitude,
-           'image' => $pharmacy->image
-                ? [url('assets/image/' . basename($pharmacy->image))]
-                : [],
-        ];
-    });
+        $pharmacyData = $pharmacies->map(function ($pharmacy) {
+            return [
+                'id' => $pharmacy->id,
+                'pharmacy_name' => $pharmacy->pharmacy_name,
+                'latitude' => $pharmacy->latitude,
+                'longitude' => $pharmacy->longitude,
+                'image' => $pharmacy->image
+                    ? [url('assets/image/' . basename($pharmacy->image))]
+                    : [],
+            ];
+        });
 
-    return response()->json([
-        'success' => true,
-        'data' => $pharmacyData
-    ], 200);
-}
+        return response()->json([
+            'success' => true,
+            'data' => $pharmacyData
+        ], 200);
+    }
 
 
 

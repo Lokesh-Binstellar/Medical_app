@@ -1,100 +1,89 @@
 
 @extends('layouts.app')
+@section('style')
+<style>
+
+</style>
+
+@endsection
 @section('content')
 <div class="container">
     <div class="page-inner px-0">
         <div class="row justify-content-center">
-            <div class="col-md-12">
-                <div class="card shadow">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="card-title mb-0">Laboratory </h4>
-                        <a href="{{ route('laboratorie.create') }}" class="btn btn-primary">Add Laboratory</a>
+            <div class="col-md-11">
+                <div class="card">
+                    <div class="card-header rounded-top" style="background-color:#5ecbd8">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h4 class="card-title text-white">Laboratory </h4>
+                            <a href="{{ route('laboratorie.create') }}"  class="btn btn-primary text-white  fw-bold ">Add Laboratory</a>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-bordered mt-3">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Address</th>
-                                    <th scope="col">Phone</th>
-                                    <th scope="col">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($laboratorie as $index =>$lab)
-                            
-                      
-                            <tr class="">
-                                <td>{{ $index + 1 }}</td>
-                                <td>{{$lab->lab_name }}</td>
-                                <td>{{$lab->email }}</td>
-                                <td>{{$lab->address }}</td>
-                                <td>{{$lab->phone }}</td>
-                                {{-- <td class="d-flex gap-2">
-                                    <a href="{{ route('laboratorie.edit',$lab->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                                    <form action="{{ route('laboratorie.destroy',$lab->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this record?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                    </form> 
-                                    
-                                  
-                                </td> --}}
-
-
-                                <td class="d-flex gap-2">
-
-                                    {{-- Show Button --}}
-                                    <a href="{{ route('laboratorie.show', $lab->id) }}"
-                                        class="btn btn-info btn-sm">View</a>
-
-                                    {{-- Edit Button with Permission --}}
-                                    @php
-                                        $chkEdit = \App\Models\Permission::checkCRUDPermissionToUser(
-                                            'Pharmacies',
-                                            'Update',
-                                        );
-                                    @endphp
-                                    @if ($chkEdit)
-                                        <a href="{{ route('laboratorie.edit',$lab->id) }}"
-                                            class="btn btn-warning btn-sm">Edit</a>
-                                    @endif
-
-                                    {{-- Delete Button with Permission --}}
-                                    @php
-                                        $chkDelete = \App\Models\Permission::checkCRUDPermissionToUser(
-                                            'Pharmacies',
-                                            'Delete',
-                                        );
-                                    @endphp
-                                    @if ($chkDelete)
-                                        <form action="{{ route('laboratorie.destroy',$lab->id) }}"
-                                            method="POST"
-                                            onsubmit="return confirm('Are you sure you want to delete this record?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
-                                    @endif
-
-                                </td>
-                            </tr>
-                        
-                            @endforeach
-                            </tbody>
-                        </table>
+                            <table id="add-row" class="display table table-striped table-hover data-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Address</th>
+                                        <th>Phone</th>
+                                        <th style="width: 10%">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
                         </div>
-
-                        @if ($laboratorie->isEmpty())
-                            <div class="text-center mt-3 text-muted">No pharmacist records found.</div>
-                        @endif
                     </div>
                 </div>
+            </div>
+            </div>
+            </div>
             </div>
         </div>
     </div>
 </div>
 @endsection
+@section('script')
+<script>
+$(function() {
+
+    var table = $('.data-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('laboratorie.index') }}",
+        columns: [{
+                data: 'id',
+                name: 'id'
+            },
+            {
+                data: 'lab_name',
+                name: 'lab_name'
+            },
+            {
+                data: 'email',
+                name: 'email'
+            },
+            {
+                data: 'address',
+                name: 'address'
+            },
+            {
+                data: 'phone',
+                name: 'phone'
+            },
+            {
+                data: 'action',
+                name: 'action',
+                orderable: false,
+                searchable: false
+            },
+        ]
+    });
+
+});
+</script>
+@endsection
+
+

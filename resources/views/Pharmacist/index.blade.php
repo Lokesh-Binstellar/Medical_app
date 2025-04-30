@@ -3,10 +3,10 @@
     <div class=" ">
         <div class="page-inner px-0">
             <div class="row justify-content-center">
-                <div class="col-md-12">
+                <div class="col-md-10">
                     <div class="card shadow">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title mb-0">Pharmacy</h4>
+                        <div class="card-header d-flex justify-content-between align-items-center rounded-top" style="background-color:#5ecbd8">
+                            <h4 class="card-title mb-0 text-white">Pharmacy</h4>
                             {{-- <a href="{{ route('pharmacist.create') }}" class="btn btn-primary">Create Pharmacist</a> --}}
                             @php
                                 $chk = \App\Models\Permission::checkCRUDPermissionToUser('Pharmacies', 'create');
@@ -18,90 +18,72 @@
                                 }
                             @endphp
                         </div>
+                       
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered mt-3">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">pharmacy name</th>
-                                        <th scope="col">owner name</th>
-                                        <th scope="col">email </th>
-                                        <th scope="col">Phone</th>
-                                        {{-- <th scope="col">Address</th> --}}
-                                        {{-- <th scope="col">latitude</th>
-                                        <th scope="col">longitude</th>
-                                        <th scope="col">image</th>
-                                        <th scope="col">username</th>
-                                        <th scope="col">license</th> --}}
-                                        <th scope="col">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($pharmacist as $index => $pharmacy)
+                                <table id="add-row" class="display table table-striped table-hover data-table">
+                                    <thead>
                                         <tr>
-                                            <td>{{ $index + 1 }}</td>
-                                            <td>{{ $pharmacy->pharmacy_name }}</td>
-                                            <td>{{ $pharmacy->owner_name }}</td>
-                                            <td>{{ $pharmacy->email }}</td>
-                                            <td>{{ $pharmacy->phone }}</td>
-                                            {{-- <td>{{ $pharmacy->address }}</td>                                           --}}
-                                            {{-- <td>{{ $pharmacy->latitude}}</td>
-                                            <td>{{ $pharmacy->longitude}}</td>
-                                            <td><img src="{{ $pharmacy->image}}" width="150"></td>
-                                            <td>{{ $pharmacy->username}}</td>
-                                            <td>{{ $pharmacy->license}}</td> --}}
-
-                                            <td class="d-flex gap-2">
-
-                                                {{-- Show Button --}}
-                                                <a href="{{ route('pharmacist.show', $pharmacy->id) }}"
-                                                    class="btn btn-info btn-sm">View</a>
-
-                                                {{-- Edit Button with Permission --}}
-                                                @php
-                                                    $chkEdit = \App\Models\Permission::checkCRUDPermissionToUser(
-                                                        'Pharmacies',
-                                                        'Update',
-                                                    );
-                                                @endphp
-                                                @if ($chkEdit)
-                                                    <a href="{{ route('pharmacist.edit', $pharmacy->id) }}"
-                                                        class="btn btn-warning btn-sm">Edit</a>
-                                                @endif
-
-                                                {{-- Delete Button with Permission --}}
-                                                @php
-                                                    $chkDelete = \App\Models\Permission::checkCRUDPermissionToUser(
-                                                        'Pharmacies',
-                                                        'Delete',
-                                                    );
-                                                @endphp
-                                                @if ($chkDelete)
-                                                    <form action="{{ route('pharmacist.destroy', $pharmacy->id) }}"
-                                                        method="POST"
-                                                        onsubmit="return confirm('Are you sure you want to delete this record?');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                                    </form>
-                                                @endif
-
-                                            </td>
-
+                                            <th>#</th>
+                                            <th>pharmacy name</th>
+                                            <th>owner name</th>
+                                            <th>email </th>
+                                            <th>Phone</th>
+                                            <th style="width: 10%">Action</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
                             </div>
-
-                            @if ($pharmacist->isEmpty())
-                                <div class="text-center mt-3 text-muted">No pharmacist records found.</div>
-                            @endif
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+@endsection
+@section('script')
+<script>
+$(function() {
+
+var table = $('.data-table').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: "{{ route('pharmacist.index') }}",
+    columns: [
+        { data: 'id', name: 'id' },
+        { data: 'pharmacy_name', name: 'pharmacy_name' },
+        { data: 'owner_name', name: 'owner_name' },
+        { data: 'email', name: 'email' },
+        { data: 'phone', name: 'phone' },
+        { data: 'action', name: 'action', orderable: false, searchable: false }
+    ]
+});
+
+// Delete user function
+window.deleteUser = function(id) {
+    if (confirm('Are you sure you want to delete this pharmacist?')) {
+        $.ajax({
+            url: '{{ route('pharmacist.destroy', '') }}/' + id, // Dynamic URL with ID
+            type: 'DELETE',
+            data: {
+                _token: '{{ csrf_token() }}',  // CSRF token
+            },
+            success: function(response) {
+                alert('Pharmacist deleted successfully!');
+                table.ajax.reload();  // Refresh the table to reflect the changes
+            },
+            error: function(xhr, status, error) {
+                alert('Error: ' + error);
+            }
+        });
+    }
+}
+
+});
+
+
+
+</script>
 @endsection

@@ -6,16 +6,35 @@ use App\Imports\LabTestImport;
 use App\Models\LabTest;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use DataTables;
 
 class LabtestController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tests = LabTest::all();
-        return view('laboratorie.labtest.index', compact('tests'));
+
+
+        if ($request->ajax()) {
+
+            $data = LabTest::query();
+
+            return Datatables::of($data)
+                    ->addIndexColumn()
+                    ->addColumn('action', function($row){
+       
+                        $btn = '<a href="' . route('labtest.show', $row->id) . '" class="btn btn-primary btn-border btn-round">View</a>';
+
+      
+                            return $btn;
+                    })
+                    ->rawColumns(['action'])
+                    ->make(true);
+        }
+        // $tests = LabTest::all();
+        return view('laboratorie.labtest.index');
     }
 
     /**

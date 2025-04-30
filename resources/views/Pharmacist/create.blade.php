@@ -22,15 +22,15 @@
                 enctype="multipart/form-data">
                 @csrf
                 <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Pharmacy Registration Form</h4>
+                    <div class="card-header rounded-top" style="background-color:#5ecbd8">
+                        <h4 class="card-title  text-white">Pharmacy Registration Form</h4>
                     </div>
 
                     <div class="card-body">
                         <div class="form row">
                             <!-- Pharmacy Name -->
                             <div class="form-group col-md-6">
-                                <label for="pharmacy_name">Pharmacy Name</label>
+                                <label class="fw-semibold" for="pharmacy_name">Pharmacy Name</label>
                                 <input type="text" name="pharmacy_name" class="form-control" id="pharmacy_name" required
                                     data-parsley-required-message="The pharmacy name field is required."
                                     onblur="trimFieldValue('pharmacy_name')">
@@ -38,7 +38,7 @@
 
                             <!-- Owner Name -->
                             <div class="form-group col-md-6">
-                                <label for="owner_name">Owner Name</label>
+                                <label class="fw-semibold" for="owner_name">Owner Name</label>
                                 <input type="text" name="owner_name" class="form-control" id="owner_name" required
                                     data-parsley-required-message="The owner name field is required."
                                     onblur="trimFieldValue('owner_name')">
@@ -46,7 +46,7 @@
 
                             <!-- Email -->
                             <div class="form-group col-md-6">
-                                <label for="email">Email</label>
+                                <label class="fw-semibold" for="email">Email</label>
                                 <input type="email" name="email" class="form-control" id="email" required
                                     data-parsley-pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$"
                                     data-parsley-pattern-message="Email must be in the format like name@domain.com"
@@ -60,7 +60,7 @@
 
                             <!-- Phone -->
                             <div class="form-group col-md-6">
-                                <label for="phone">Phone</label>
+                                <label class="fw-semibold" for="phone">Phone</label>
                                 <input type="tel" name="phone" class="form-control" id="phone" required
                                     pattern="^\d{7,12}$" data-parsley-pattern="^\d{7,12}$"
                                     data-parsley-pattern-message="Please enter a valid phone number with 7 to 12 digits."
@@ -73,14 +73,14 @@
 
                             <!-- Username -->
                             <div class="form-group col-md-6">
-                                <label for="username">Username</label>
+                                <label class="fw-semibold" for="username">Username</label>
                                 <input type="text" name="username" class="form-control" id="username" required
                                     data-parsley-required-message="The username field is required.">
                             </div>
 
                             <!-- Password -->
                             <div class="form-group col-md-6">
-                                <label for="password">Password</label>
+                                <label class="fw-semibold" for="password">Password</label>
                                 <input type="password" name="password" class="form-control" id="password" required
                                     data-parsley-minlength="8"
                                     data-parsley-pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&]).+$"
@@ -90,7 +90,7 @@
 
                             <!-- City -->
                             <div class="form-group col-md-6">
-                                <label for="city">City</label>
+                                <label class="fw-semibold" for="city">City</label>
                                 <input type="text" name="city" class="form-control" id="city" required
                                     data-parsley-required-message="The city field is required."
                                     onblur="trimFieldValue('city')">
@@ -98,7 +98,7 @@
 
                             <!-- Pincode -->
                             <div class="form-group col-md-6">
-                                <label for="pincode">Pincode</label>
+                                <label class="fw-semibold" for="pincode">Pincode</label>
                                 <input type="text" name="pincode" class="form-control" id="pincode" required
                                     data-parsley-pattern="^\d{6}$"
                                     data-parsley-pattern-message="Pincode must be exactly 6 digits."
@@ -108,7 +108,7 @@
 
                             <!-- State -->
                             <div class="form-group col-md-6">
-                                <label for="state">State</label>
+                                <label class="fw-semibold" for="state">State</label>
                                 <input type="text" name="state" class="form-control" id="state" required
                                     data-parsley-required-message="The state field is required."
                                     onblur="trimFieldValue('state')">
@@ -116,7 +116,7 @@
 
                             <!-- Latitude -->
                             <div class="form-group col-md-6">
-                                <label for="latitude">Latitude</label>
+                                <label class="fw-semibold" for="latitude">Latitude</label>
                                 <input type="text" name="latitude" class="form-control" id="latitude" required
                                     data-parsley-required-message="The latitude field is required."
                                     data-parsley-pattern="^-?(90(\.0+)?|[1-8]?\d(\.\d+)?|0(\.\d+)?)$"
@@ -127,7 +127,7 @@
 
                             <!-- Longitude -->
                             <div class="form-group col-md-6">
-                                <label for="longitude">Longitude</label>
+                                <label class="fw-semibold" for="longitude">Longitude</label>
                                 <input type="text" name="longitude" class="form-control" id="longitude" required
                                     data-parsley-required-message="The longitude field is required."
                                     data-parsley-pattern="^-?(180(\.0+)?|1[0-7]\d(\.\d+)?|[1-9]?\d(\.\d+)?)$"
@@ -138,7 +138,7 @@
 
                             <!-- License -->
                             <div class="form-group col-md-6">
-                                <label for="license">Drug License No.</label>
+                                <label class="fw-semibold" for="license">Drug License No.</label>
                                 <input type="text" name="license" class="form-control" id="license" required
                                     data-parsley-required-message="The drug license no. field is required."
                                     data-parsley-pattern="^[A-Za-z0-9/-]+$"
@@ -148,13 +148,13 @@
 
                             <!-- Image -->
                             <div class="form-group col-md-6 d-flex justify-content-center flex-column">
-                                <label for="image">Image</label>
+                                <label class="fw-semibold" for="image">Image</label>
                                 <input type="file" name="image" class="form-control-file" id="image" required
                                     data-parsley-required-message="The image field is required.">
                             </div>
 
                             {{-- <div class="form-group input-group  d-flex flex-column" style="width:100px">      
-                            <label class="" for="inputGroupSelect01">Status:</label>
+                            <label class="fw-semibold" class="" for="inputGroupSelect01">Status:</label>
                             <select class="custom-select " id="inputGroupSelect01" name="role_id" class="form-control">
                               <option value="1" {{ (isset($pharmacies) && $pharmacies->status == '1') ? 'selected' : '' }}>Active</option>
                               <option value="0" {{ (isset($pharmacies) && $pharmacies->status == '0') ? 'selected' : '' }}>Inactive</option>
@@ -163,7 +163,7 @@
 
                             <!-- Address -->
                             <div class="form-group col-md-12">
-                                <label for="address">Address</label>
+                                <label class="fw-semibold" for="address">Address</label>
                                 <textarea name="address" id="address" rows="3" class="form-control" required data-parsley-minlength="10"
                                     data-parsley-required-message="The address field is required." onblur="trimFieldValue('address')"></textarea>
                             </div>

@@ -8,16 +8,29 @@ use App\Models\User;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use DataTables;
 
 class LaboratoriesController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $laboratorie = Laboratories::all();
-        return view('laboratorie.index', compact('laboratorie'));
+        
+        if ($request->ajax()) {
+            $data = Laboratories::query();
+            return Datatables::of($data)
+                    ->addIndexColumn()
+                    ->addColumn('action', function($row){
+                        $btn = '<a href="' . route('laboratorie.show', $row->id) . '" class="btn btn-primary btn-border btn-round">View</a>';
+                            return $btn;
+                    })
+                    ->rawColumns(['action'])
+                    ->make(true);
+        }
+        // $tests = LabTest::all();
+        return view('laboratorie.index');
     }
 
     /**

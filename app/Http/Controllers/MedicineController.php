@@ -8,6 +8,7 @@ use App\Models\Otcmedicine;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
+use DataTables;
 
 class MedicineController extends Controller
 {
@@ -16,22 +17,28 @@ class MedicineController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Medicine::query();
+        if ($request->ajax()) {
+            $data = Medicine::query();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    $btn = '
+                    <div class="form-button-action d-flex gap-2">
+                   <a href="' . route('medicine.show', $row->id) . '" class="btn btn-link btn-success btn-lg" data-bs-toggle="tooltip" title="View">
+        <i class="fa fa-eye"></i>
+    </a>
+                   
+                    </div>';
+                   
+                    return $btn;
 
-        // Check if search parameter exists and is not empty
-        if ($request->has('search') && $request->search != '') {
-            $searchTerm = $request->search;
-
-            // Search both product_id and product_name
-            $query->where(function ($q) use ($searchTerm) {
-                $q->where('product_id', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('product_name', 'like', '%' . $searchTerm . '%');
-            });
+                })
+                ->rawColumns(['action'])
+                ->make(true);
         }
-
-        // Paginate the results, you can change 100 to whatever number you want per page
-        $medicines = $query->paginate(100);
-        return view('medicine.index', compact('medicines'));
+        // $tests = LabTest::all();
+        return view('medicine.index');
+        
     }
 
 
@@ -57,6 +64,8 @@ class MedicineController extends Controller
     public function show(string $id)
     {
         $medicines = Medicine::find($id);
+
+        
 
         return view('medicine.show', compact('medicines'));
     }

@@ -6,6 +6,7 @@ use App\Imports\OtcImport;
 use App\Models\Otcmedicine;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use DataTables;
 
 class OtcController extends Controller
 {
@@ -14,19 +15,28 @@ class OtcController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Otcmedicine::query();
+        if ($request->ajax()) {
+            $data = Otcmedicine::query();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    $btn = '
+                    <div class="form-button-action d-flex gap-2">
+                   <a href="' . route('otcmedicine.show', $row->id) . '" class="btn btn-link btn-success btn-lg" data-bs-toggle="tooltip" title="View">
+        <i class="fa fa-eye"></i>
+    </a>
+                   
+                    </div>';
+                   
+                    return $btn;
 
-        if ($request->has('search') && $request->search != '') {
-            $searchTerm = $request->search;
-
-            // Search both product_id and product_name
-            $query->where(function ($q) use ($searchTerm) {
-                $q->where('otc_id', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('name', 'like', '%' . $searchTerm . '%');
-            });
-        }       // Paginate the results, you can change 100 to whatever number you want per page
-        $otc = $query->paginate(100);
-        return view('otcmedicine.index', compact('otc'));
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+        // $tests = LabTest::all();
+        return view('otcmedicine.index');
+        
     }
 
     /**
