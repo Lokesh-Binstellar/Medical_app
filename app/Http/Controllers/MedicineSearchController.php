@@ -1,14 +1,22 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Pharmacies;
+use App\Models\Phrmacymedicine;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class MedicineSearchController extends Controller
 {
     public function index()
     {
-        return view('Pharmacist.add-medicine');
+        $pharmacy = Pharmacies::where('user_id',Auth::user()->id)->first();
+        $medicines = Phrmacymedicine::where('phrmacy_id',$pharmacy->id)->get();
+        // dd($medicines);
+        return view('Pharmacist.add-medicine',compact('medicines'));
+
+        
     }
 
     public function search(Request $request)
@@ -48,20 +56,24 @@ class MedicineSearchController extends Controller
 
     public function store(Request $request)
     {
-        // Validate if needed
-        $data = $request->input('medician');
-
-        // Just show JSON for testing
-        return response()->json($data);
-
-        // Optionally save in DB (as JSON)
-        /*
-        DB::table('medicine_orders')->insert([
-            'user_id' => auth()->id(),
-            'medicines_json' => json_encode($data),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        */
+        $data = $request->all();
+        $user = Auth::user();
+        // Validate basic structure (you can add more rules as needed)
+        // dd($data);
+        
+        $pharmacy = Pharmacies::where('user_id',$user->id)->first();
+        
+        
+        // Store in database
+        $medicine = new Phrmacymedicine(); // your model
+        $medicine->medicine = json_encode($data['medicine']);
+        $medicine->total_amount = $data['total_amount'];
+        $medicine->mrp_amount = $data['mrp_amount'];
+        $medicine->commission_amount = $data['commission_amount'];
+        $medicine->phrmacy_id = $pharmacy->id;
+        $medicine->save();
+    
+        return redirect()->back()->with('success', 'Medicine added successfully!');
     }
+    
 }

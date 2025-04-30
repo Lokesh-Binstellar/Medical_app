@@ -1,25 +1,36 @@
 <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
     <div class="container-fluid">
+        <div class="d-flex flex-column">
         <!-- 👇 This is the new added part -->
         @auth
-    <span class="fw-bold text-primary">
-        Welcome,
-        @if(Auth::user()->laboratories)
-            {{ Auth::user()->laboratories->lab_name }}
-        @elseif(Auth::user()->pharmacies)
-            {{ Auth::user()->pharmacies->pharmacy_name }}
+            <span class="fw-bold text-primary">
+                Welcome,
+                @if (Auth::user()->laboratories)
+                    {{ Auth::user()->laboratories->lab_name }}
+                @elseif(Auth::user()->pharmacies)
+                    {{ Auth::user()->pharmacies->pharmacy_name }}
+                @else
+                    {{ Auth::user()->name }}
+                @endif
+            </span>
         @else
-            {{ Auth::user()->name }}
-        @endif
-    </span>
-@else
-    <span class="fw-bold text-primary">
-        Welcome, Guest!
-    </span>
-@endauth
+            <span class="fw-bold text-primary">
+                Welcome, Guest!
+            </span>
+        @endauth
 
-    
         
+        @auth
+        @if (Auth::user()->pharmacies)
+        <span class="fw-bold text-primary">
+            Address :
+                {{ Auth::user()->pharmacies->address}}
+        
+        </span>
+@endif
+    @endauth
+
+</div>
 
         {{-- <nav class="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex">
             <div class="input-group">
@@ -51,26 +62,28 @@
                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-envelope"></i>
                 </a>
-             
+
             </li>
-           
+
 
             <li class="nav-item topbar-user dropdown hidden-caret">
-                <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#"
-                    aria-expanded="false">
+                <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#" aria-expanded="false">
                     <div class="avatar-sm">
-                        <img src="{{asset('assets/img/profile.jpg')}}" alt="..." class="avatar-img rounded-circle" />
+                        <img src="{{ asset('assets/img/profile.jpg') }}" alt="..."
+                            class="avatar-img rounded-circle" />
                     </div>
                     <span class="profile-username">
                         <span class="op-7">Hi,</span>
                         {{-- <span class="fw-bold">{{ Auth::user()->name }}</span> --}}
-                        <span class="fw-bold">@if(Auth::user()->laboratories)
-                            {{ Auth::user()->laboratories->owner_name }}
-                        @elseif(Auth::user()->pharmacies)
-                            {{ Auth::user()->pharmacies->owner_name }}
-                        @else
-                            {{ Auth::user()->name }}
-                        @endif</span>
+                        <span class="fw-bold">
+                            @if (Auth::user()->laboratories)
+                                {{ Auth::user()->laboratories->owner_name }}
+                            @elseif(Auth::user()->pharmacies)
+                                {{ Auth::user()->pharmacies->owner_name }}
+                            @else
+                                {{ Auth::user()->name }}
+                            @endif
+                        </span>
                     </span>
                 </a>
                 <ul class="dropdown-menu dropdown-user animated fadeIn">
@@ -78,20 +91,23 @@
                         <li>
                             <div class="user-box">
                                 <div class="avatar-lg">
-                                    <img src="{{asset('assets/img/profile.jpg')}}" alt="image profile"
+                                    <img src="{{ asset('assets/img/profile.jpg') }}" alt="image profile"
                                         class="avatar-img rounded" />
                                 </div>
                                 <div class="u-text">
                                     {{-- <h4>{{ Auth::user()->name }}</h4> --}}
-                                    <h4>@if(Auth::user()->laboratories)
-                                        {{ Auth::user()->laboratories->owner_name }}
-                                    @elseif(Auth::user()->pharmacies)
-                                        {{ Auth::user()->pharmacies->owner_name }}
-                                    @else
-                                        {{ Auth::user()->name }}
-                                    @endif</h4>
+                                    <h4>
+                                        @if (Auth::user()->laboratories)
+                                            {{ Auth::user()->laboratories->owner_name }}
+                                        @elseif(Auth::user()->pharmacies)
+                                            {{ Auth::user()->pharmacies->owner_name }}
+                                        @else
+                                            {{ Auth::user()->name }}
+                                        @endif
+                                    </h4>
                                     <p class="text-muted">{{ Auth::user()->email }}</p>
-                                    <a href="{{ route('profile.custom') }}" class="btn btn-xs btn-secondary btn-sm">View Profile</a>
+                                    <a href="{{ route('profile.custom') }}"
+                                        class="btn btn-xs btn-secondary btn-sm">View Profile</a>
 
                                 </div>
                             </div>
@@ -112,7 +128,8 @@
                                                     this.closest('form').submit();">
                                     {{ __('Log Out') }}
                                 </x-dropdown-link> --}}
-                            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                <a class="dropdown-item" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault();
                                                     this.closest('form').submit();">Logout</a>
                             </form>
                         </li>
@@ -121,4 +138,5 @@
             </li>
         </ul>
     </div>
+    
 </nav>

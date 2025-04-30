@@ -21,8 +21,39 @@
         .parsley-errors-list{
             padding-left:0px;
         }
+        .totalgst {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f9f9f9;
+            width: 300px;
+        }
+
+        .totalgst strong {
+            font-weight: 600;
+        }
+
+        .totalgst .amt {
+            margin-bottom: 10px;
+        }
+
+
+        .medicine_search {
+            width: 350px !important;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mrp,
+        .discount,
+        .discount_percent {
+            width: 100px !important;
+            /* text-align: right; */
+        }
     </style>
-     @yield('styles')
+
 
     <!-- Fonts and icons -->
     <script src="assets/js/plugin/webfont/webfont.min.js"></script>
@@ -62,6 +93,7 @@
 
     <!-- CSS Just for demo purpose, don't include it in your project -->
     <link rel="stylesheet" href="{{ asset('assets/css/demo.css') }}" />
+    @yield('styles')
 </head>
 
 <body>
