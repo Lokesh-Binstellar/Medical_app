@@ -32,7 +32,11 @@ class Laboratories extends Model
     {
         return $this->belongsTo(User::class);
     }
-
+    public function labPackageAssignments()
+    {
+        return $this->hasMany(LabPackages::class, 'lab_id');
+    }
+    
 
 //     public function labtests()
 // {

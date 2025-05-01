@@ -1,93 +1,8 @@
-{{-- 
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
-<form class="max-w-sm mx-auto" action="{{ route('laboratorie.store') }}" method="POST">
-    @csrf
-    <div class="mb-5">
-        <label for="name" class="block mb-2 text-sm font-medium text-gray-900 ">Name</label>
-        <input type="text" name="name" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@flowbite.com" required />
-      </div>
-  <div class="mb-5">
-    <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Your email</label>
-    <input type="email" id="email" name="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@flowbite.com" required />
-  </div>
-  <div class="mb-5">
-    <label for="address" class="block mb-2 text-sm font-medium text-gray-900 d">Address</label>
-    <textarea name="address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
-    </textarea>
-  </div>
-  <div class="flex items-start mb-5">
-    <label for="phone" class="block mb-2 text-sm font-medium text-gray-900">Phone</label> 
-    <input type="tel" name="phone" value="" id="phone"
-        class="ml-4 p-2 border border-gray-300 rounded-sm bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800" 
-        required />
-</div>
-  <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
-</form>
-</x-app-layout> --}}
-
 
 
 @extends('layouts.app')
 @section('content')
-    {{-- <div class="container">
-        <div class="page-inner">
-            <form class="max-w-sm mx-auto" action="{{ route('laboratorie.store') }}" method="POST">
-                @csrf
-              
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <div class="card-title">laboratorie Form</div>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6 col-lg-4">
-                                        <!-- Name -->
-                                        <div class="form-group">
-                                            <label for="name">Name</label>
-                                            <input type="text" name="name" 
-                                                class="form-control" id="name" required />
-                                        </div>
-
-                                        <!-- Email -->
-                                        <div class="form-group">
-                                            <label for="email">Email</label>
-                                            <input type="email" name="email" 
-                                                class="form-control" id="email" required />
-                                        </div>
-
-                                        <!-- Address -->
-                                        <div class="form-group">
-                                            <label for="address">Address</label>
-                                            <textarea class="form-control" name="address" id="address" rows="5" required></textarea>
-                                        </div>
-
-                                        <!-- Phone -->
-                                        <div class="form-group">
-                                            <label for="phone">Phone</label>
-                                            <input type="tel" name="phone" 
-                                                class="form-control" id="phone" required />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card-action">
-                                <button type="submit" class="btn btn-success">Submit</button>
-                                <a href="{{ url()->previous() }}" class="btn btn-danger">Cancel</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div> --}}
+ 
     <div class="container">
         <div class="page-inner">
             <form id="myForm" class="form-horizontal" action="{{ route('laboratorie.store') }}" method="POST"
@@ -278,9 +193,8 @@
         </div>
     </div>
     <script>
-        // Wait for the DOM to be ready
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Parsley for the form
+    
+        document.addEventListener('DOMContentLoaded', function() {   
             $('#myForm').parsley();
         });
     </script>
@@ -288,7 +202,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Fields to auto-trim on blur
+       
             const trimFields = ['pharmacy_name', 'owner_name', 'city', 'state', 'address'];
 
             trimFields.forEach(id => {
@@ -299,18 +213,16 @@
                     });
                 }
             });
-
-            // Email field - block space entirely, cursor should not move
+    
             const emailInput = document.getElementById('email');
             if (emailInput) {
                 // Prevent spacebar press (keydown)
                 emailInput.addEventListener('keydown', function(e) {
                     if (e.key === ' ' || e.keyCode === 32) {
-                        e.preventDefault(); // completely stop the space
+                        e.preventDefault(); 
                     }
                 });
-
-                // Remove spaces if pasted or autofilled
+       
                 emailInput.addEventListener('input', function() {
                     const cursorPos = emailInput.selectionStart;
                     const cleaned = emailInput.value.replace(/\s+/g, '');

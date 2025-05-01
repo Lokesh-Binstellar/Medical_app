@@ -25,9 +25,7 @@ class MedicineController extends Controller
                     $btn = '
                     <div class="form-button-action d-flex gap-2">
                    <a href="' . route('medicine.show', $row->id) . '" class="btn btn-link btn-success btn-lg" data-bs-toggle="tooltip" title="View">
-        <i class="fa fa-eye"></i>
-    </a>
-                   
+        <i class="fa fa-eye"></i></a>              
                     </div>';
                    
                     return $btn;

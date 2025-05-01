@@ -7,6 +7,7 @@ use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicineSearchController;
 use App\Http\Controllers\OtcController;
 use App\Http\Controllers\packageCategoryController;
+use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PharmaciesController;
 use App\Http\Controllers\PopularBrandController;
 use App\Http\Controllers\PopularCategoryController;
@@ -128,11 +129,11 @@ Route::group(['middleware' => ['auth']], function () {
             Route::post('/store', [PopularCategoryController::class, 'store'])->name('popular_category.store');
         });
         Route::group(['middleware' => 'permission:PopularCategory,update'], function () {
-            Route::get('{id}/edit', [PopularCategoryController::class, 'edit'])->name('popular_category.edit');   // GET /popularCategory/{id}/edit
+            Route::get('{id}/edit', [PopularCategoryController::class, 'edit'])->name('popular_category.edit');  
             Route::put('{id}', [PopularCategoryController::class, 'update'])->name('popular_category.update');
         });
         Route::group(['middleware' => 'permission:PopularCategory,delete'], function () {
-            Route::delete('{id}', [PopularCategoryController::class, 'destroy'])->name('popular_category.destroy'); // DELETE /popularCategory/{id}
+            Route::delete('{id}', [PopularCategoryController::class, 'destroy'])->name('popular_category.destroy'); 
         });
     });
 
@@ -166,26 +167,30 @@ Route::group(['middleware' => ['auth']], function () {
 
 
     Route::prefix('packageCategory')->group(function () {
-        Route::get('', [packageCategoryController::class, 'index'])->name('packageCategory.index');  // Route to display all categories
-        Route::post('import', [packageCategoryController::class, 'import'])->name('packageCategory.import');  // Route for importing categories
-        Route::get('/{id}', [packageCategoryController::class, 'show'])->name('packageCategory.show');  // Route to display a single category by ID
-        Route::get('/create', [packageCategoryController::class, 'create'])->name('packageCategory.create');  // Route to show the form to create a new category
-        Route::post('/', [packageCategoryController::class, 'store'])->name('packageCategory.store');  // Route to store a new category
-        Route::get('/{id}/edit', [packageCategoryController::class, 'edit'])->name('packageCategory.edit');  // Route to show the edit form for a category
-        Route::put('/{id}', [packageCategoryController::class, 'update'])->name('packageCategory.update');  // Route to update the category
-        Route::delete('/{id}', [packageCategoryController::class, 'destroy'])->name('packageCategory.destroy');  // Route to delete a category
+        Route::get('', [packageCategoryController::class, 'index'])->name('packageCategory.index');
+        Route::get('/create', [packageCategoryController::class, 'create'])->name('packageCategory.create'); 
+        Route::post('/', [packageCategoryController::class, 'store'])->name('packageCategory.store');   
+        Route::get('/{id}/edit', [packageCategoryController::class, 'edit'])->name('packageCategory.edit'); 
+        Route::put('/{id}', [packageCategoryController::class, 'update'])->name('packageCategory.update');  
+        Route::delete('/{id}', [packageCategoryController::class, 'destroy'])->name('packageCategory.destroy'); 
     });
-    
+
+    Route::prefix('labPackage')->group(function () {
+        Route::get('', [PackageController::class, 'index'])->name('labPackage.index'); 
+        Route::post('/', [PackageController::class, 'store'])->name('labPackage.store');
+        Route::get('/create', [PackageController::class, 'create'])->name('labPackage.create');   
+        Route::post('import', [PackageController::class, 'import'])->name('labPackage.import');  
+        Route::get('/{id}/edit', [PackageController::class, 'edit'])->name('labPackage.edit'); 
+        Route::put('/{id}', [PackageController::class, 'update'])->name('labPackage.update');  
+        Route::get('/{id}', [PackageController::class, 'show'])->name('labPackage.show'); 
+        Route::delete('/{id}', [PackageController::class, 'destroy'])->name('labPackage.destroy'); 
+    });
 
 
 
-// // Route to show Add Medicine page
-// Route::get('/add-medicine', [MedicineSearchController::class, 'index'])->name('add.medicine');
 
-// // Route for the search functionality
-// Route::get('/search-medicine', [MedicineSearchController::class, 'search'])->name('search.medicine');
 
-// // Route to store added medicines
+
 // Route::post('/add-medicine/store', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
 Route::get('/pharmacist/add-medicine', [MedicineSearchController::class, 'index'])->name('add.medicine');
 Route::get('/search-medicine', [MedicineSearchController::class, 'search'])->name('search.medicine');

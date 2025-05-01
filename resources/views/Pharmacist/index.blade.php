@@ -61,7 +61,7 @@ var table = $('.data-table').DataTable({
     ]
 });
 
-// Delete user function
+// Delete  function
 window.deleteUser = function(id) {
     if (confirm('Are you sure you want to delete this pharmacist?')) {
         $.ajax({

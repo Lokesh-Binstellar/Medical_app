@@ -11,4 +11,10 @@ class PackageCategory extends Model
         'name',
         'package_image'
     ];
+
+    public function labPackageAssignments()
+    {
+        return $this->hasMany(LabPackages::class, 'package_category_id');
+    }
+    
 }

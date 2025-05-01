@@ -19,20 +19,26 @@
                         <div class="card-body">
                             <!-- Form for adding a new package category -->
                             <div class="mb-4 ">
-                                <form action="{{ route('packageCategory.store') }}" method="POST" enctype="multipart/form-data" class="row g-3">
+                                @if ($errors->any())
+                                    {{ implode('', $errors->all('<div>:message</div>')) }}
+                                @endif
+                                <form action="{{ route('packageCategory.store') }}" method="POST"
+                                    enctype="multipart/form-data" class="row g-3">
                                     @csrf
                                     <div class="col-md-4">
                                         <label for="name" class="form-label">Package Category Name</label>
-                                        <input type="text" name="name" class="form-control" id="name" required placeholder="Enter category name">
+                                        <input type="text" name="name" class="form-control" id="name" required
+                                            placeholder="Enter category name">
                                     </div>
-                                    
+
                                     <div class="col-md-4">
-                                        <label for="logo" class="form-label">Category Logo (Optional)</label>
-                                        <input type="file" name="logo" class="form-control" id="logo">
+                                        <label for="package_image" class="form-label">Category Logo(jpeg,png,jpg,gif,svg)
+                                        </label>
+                                        <input type="file" name="package_image" class="form-control" id="package_image">
                                     </div>
-                                    
+
                                     <div class="col-md-4 mt-4">
-                                        <button type="submit" class="btn btn-primary w-100">Add Package</button>
+                                        <button type="submit" class="btn btn-primary w-100">Add Package Category</button>
                                     </div>
                                 </form>
                             </div>
@@ -61,19 +67,76 @@
                                 </div>
                             </div>
                         </div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    </div>
 @endsection
 
 @section('script')
     <script>
-        $(document).ready(function() {
-            // Initialize Select2 (if needed)
-            $('.select2').select2();
+        $(function() {
+
+            var table = $('.data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('packageCategory.index') }}",
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'id'
+                    },
+                    {
+                        data: 'id',
+                        name: 'id'
+                    },
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'package_image',
+                        name: 'package_image'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+
+            $('body').on('click', '.deleteCategory', function() {
+                var category_id = $(this).data("id");
+
+                if (!confirm("Are you sure you want to delete?")) {
+                    return;
+                }
+
+                $.ajax({
+                    type: "DELETE",
+                    url: "/packageCategory/" + category_id,
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (typeof table !== 'undefined') {
+                            table.draw();
+                        }
+                        alert('Category deleted successfully');
+                    },
+                    error: function(xhr) {
+                        console.log('Error:', xhr.responseText);
+                        alert('Failed to delete category.');
+                    }
+                });
+
+
+            });
+
+
         });
     </script>
 @endsection

@@ -58,12 +58,7 @@ class PharmaciesController extends Controller
      */
     public function store(Request $request)
     {
-
-
-
         $params = $request->all();
-
-        // Validate
         $validation = validator($params, [
             'pharmacy_name' => 'required',
             'owner_name' => 'required',
@@ -99,25 +94,12 @@ class PharmaciesController extends Controller
 
         // Handle Image
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-
-            // Generate unique image name
+            $image = $request->file('image');         
             $imageName = time() . '_' . $image->getClientOriginalName();
-
-            // Define the destination path
             $destinationPath = public_path('assets/image');
-
-            // Move image to the destination
             $image->move($destinationPath, $imageName);
-
-            // Store just the image name (or relative path if preferred)
-            $params['image'] = $imageName; // or use 'assets/image/' . $imageName if needed
-
-            // No need to delete the file now since we're storing it
+            $params['image'] = $imageName; 
         }
-
-
-        // Create Pharmacy
         Pharmacies::create($params);
 
         return redirect()->route('pharmacist.index')->with('success', 'Pharmacy created successfully!');
