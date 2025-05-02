@@ -18,32 +18,32 @@ class PackageController extends Controller
 
         if ($request->ajax()) {
             $data = LabPackages::with(['laboratory', 'packageCategory']);
-    
+
             return DataTables::of($data)
 
                 ->addIndexColumn()
-    
+
                 ->editColumn('lab_id', function ($row) {
                     return $row->laboratory->lab_name ?? '-';
                 })
-    
+
                 ->editColumn('package_category_id', function ($row) {
                     return $row->packageCategory->name ?? '-';
                 })
-    
+
                 ->addColumn('action', function ($row) {
                     $btn = '<div class="d-flex gap-2">
                     <a href="' . route('labPackage.show', $row->id) . '" class="btn btn-sm btn-info">View</a>
                     <a href="' . route('labPackage.edit', $row->id) . '" class="btn  btn-warning btn-sm" data-bs-toggle="tooltip" title="Edit">Edit</a>
                      <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deletePackage">Delete</a>
                     </div>';
-    return $btn;
+                    return $btn;
                 })
-    
+
                 ->rawColumns(['action'])
                 ->make(true);
         }
-       return view('laboratorie.labpackages.index');
+        return view('laboratorie.labpackages.index');
     }
 
     /**
@@ -51,10 +51,10 @@ class PackageController extends Controller
      */
     public function create()
     {
-        $labData=Laboratories::all();
-        $packageCategory=PackageCategory::all();
-        return view('laboratorie.labpackages.create',compact('labData','packageCategory'));
-        
+        $labData = Laboratories::all();
+        $packageCategory = PackageCategory::all();
+        return view('laboratorie.labpackages.create', compact('labData', 'packageCategory'));
+
     }
 
     /**
@@ -62,21 +62,21 @@ class PackageController extends Controller
      */
     public function store(Request $request)
     {
-      
-            $validator=$request->validate([
-                'lab_id' => 'required',
-                'package_category_id' => 'required',
-                'package_name' => 'required|string|max:255',
-                'price' => 'required|numeric|min:0',
-                'home_price' => 'required|numeric|min:0',
-                'description' => 'nullable|string',
-            ]);
-        
-            LabPackages::create($validator);
-        
-            return redirect()->route('labPackage.index')->with('success', 'Lab package assigned successfully.');
-      
-        
+
+        $validator = $request->validate([
+            'lab_id' => 'required',
+            'package_category_id' => 'required',
+            'package_name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'home_price' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+        ]);
+
+        LabPackages::create($validator);
+
+        return redirect()->route('labPackage.index')->with('success', 'Lab package assigned successfully.');
+
+
     }
 
     /**
@@ -98,7 +98,7 @@ class PackageController extends Controller
         $packageCategory = PackageCategory::all();
         // dd($pharmacies);
 
-        return view('laboratorie.labpackages.edit', compact('labPackage','labData','packageCategory'));
+        return view('laboratorie.labpackages.edit', compact('labPackage', 'labData', 'packageCategory'));
     }
 
     /**
@@ -106,23 +106,23 @@ class PackageController extends Controller
      */
     public function update(Request $request, string $id)
     {
-      
-            $validator = $request->validate([
-                'lab_id' => 'required',
-                'package_category_id' => 'required',
-                'package_name' => 'required|string|max:255',
-                'price' => 'required|numeric|min:0',
-                'home_price' => 'required|numeric|min:0',
-                'description' => 'nullable|string',
-            ]);
-        
-            $labPackage = LabPackages::findOrFail($id);
-        
-            $labPackage->update($validator);
-        
-            return redirect()->route('labPackage.index')->with('success', 'Lab package updated successfully.');
-     
-        
+
+        $validator = $request->validate([
+            'lab_id' => 'required',
+            'package_category_id' => 'required',
+            'package_name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'home_price' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+        ]);
+
+        $labPackage = LabPackages::findOrFail($id);
+
+        $labPackage->update($validator);
+
+        return redirect()->route('labPackage.index')->with('success', 'Lab package updated successfully.');
+
+
     }
 
     /**

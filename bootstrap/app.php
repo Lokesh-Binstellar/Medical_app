@@ -1,8 +1,9 @@
 <?php
  
+use App\Http\Middleware\AuthTest;
+use App\Http\Middleware\CheckApiAccessKey;
 use App\Http\Middleware\checkPermission;
 use App\Http\Middleware\checkRole;
-use App\Http\Middleware\JwtAuth;
 use App\Http\Middleware\PreventBackHistory;
 use App\Http\Middleware\TokenValidation;  // Import TokenValidation
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
@@ -23,10 +24,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => checkRole::class,
             'permission' => checkPermission::class,
             'preventHistory'=>PreventBackHistory::class,
-            'stateful' => EnsureFrontendRequestsAreStateful::class, // Sanctum middleware
-            'substituteBindings' => SubstituteBindings::class, // Laravel bindings middleware
-            'tokenValidation' => TokenValidation::class, // Add TokenValidation here
-            'jwt.auth' => JwtAuth::class,
+            'stateful' => EnsureFrontendRequestsAreStateful::class, 
+            'substituteBindings' => SubstituteBindings::class, 
+            'tokenValidation' => TokenValidation::class, 
+            'check.api.key' =>CheckApiAccessKey::class,
+            'authTest'=>AuthTest::class
         ]);
         // $middleware->append(checkRole::class);
     })

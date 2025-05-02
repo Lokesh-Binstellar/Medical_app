@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mobile_users', function (Blueprint $table) {
+        Schema::create('customers', function (Blueprint $table) {
             $table->id();
-            $table->string('phone')->unique();
+            $table->string('mobile_no')->unique();
             $table->string('otp_code')->nullable();
-            $table->timestamp('otp_expires_at')->nullable();
-            $table->timestamp('phone_verified_at')->nullable();
-            $table->rememberToken();
+            $table->timestamp('otp_expires_at')->nullable(); // OTP expiry
+            $table->string('firstName')->nullable();
+            $table->string('lastName')->nullable();
+            $table->timestamp('mobile_no_verified_at')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('mobile_users');
+        Schema::dropIfExists('customers');
     }
 };

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MobileUser;
+use App\Models\Customers;
 use Illuminate\Http\Request;
 use App\Services\TwilioService;
 use Firebase\JWT\JWT;
@@ -18,13 +18,13 @@ class AuthController extends Controller
     public function sendOtp(Request $request)
     {
         $request->validate([
-            'phone' => 'required|digits_between:10,15',
+            'mobile_no' => 'required|digits_between:10,15',
         ]);
 
-        $phone = $request->phone;
+        $mobile_no = $request->mobile_no;
 
-        if (!str_starts_with($phone, '+')) {
-            $phone = '+91' . $phone;  // Add country code if not present
+        if (!str_starts_with($mobile_no, '+')) {
+            $mobile_no = '+91' . $mobile_no;  // Add country code if not present
         }
 
         $otp = rand(100000, 999999);  // Generate OTP
@@ -33,15 +33,15 @@ class AuthController extends Controller
         $authToken = env('TWILIO_AUTH_TOKEN');
         $fromNumber = env('TWILIO_PHONE_NUMBER');
 
-        $user = MobileUser::firstOrCreate([
-            'phone' => $phone,
+        $user = Customers::firstOrCreate([
+            'mobile_no' => $mobile_no,
         ]);
 
         try {
             $twilio = new Client($sid, $authToken);
 
             $twilio->messages->create(
-                $phone,
+                $mobile_no,
                 [
                     'from' => $fromNumber,
                     'body' => "Your OTP is: $otp",
@@ -72,17 +72,17 @@ class AuthController extends Controller
     {
         // Validate input
         $request->validate([
-            'phone' => 'required|digits_between:10,15',
+            'mobile_no' => 'required|digits_between:10,15',
             'otp_code' => 'required|digits:6',
         ]);
 
-        $phone = $request->phone;
-        if (!str_starts_with($phone, '+')) {
-            $phone = '+91' . $phone;
+        $mobile_no = $request->mobile_no;
+        if (!str_starts_with($mobile_no, '+')) {
+            $mobile_no = '+91' . $mobile_no;
         }
 
-        // Retrieve user by phone
-        $user = MobileUser::where('phone', $phone)->first();
+       
+        $user = Customers::where('mobile_no', $mobile_no)->first();
 
         if (!$user) {
             return response()->json(['message' => 'User not found.'], 404);
@@ -95,7 +95,7 @@ class AuthController extends Controller
 
         // Update user as verified
         $user->update([
-            'phone_verified_at' => now(),
+            'mobile_no_verified_at' => now(),
             'otp_code' => null,
             'otp_expires_at' => null,
         ]);
@@ -124,5 +124,36 @@ class AuthController extends Controller
         ]);
     }
 
+    // update Customers details
+    public function update(Request $request, $id)
+    {
+      
+        $request->validate([
+            'firstName' => 'required|string|max:255',
+            'lastName' => 'required|string|max:255',
+        ]);
+        $customer = Customers::find($id);
+    
+        if (!$customer) {
+            return response()->json(['message' => 'Customer not found'], 404);
+        }
+        $customer->update([
+            'firstName' => $request->firstName,
+            'lastName' => $request->lastName,
+        ]);
+    
+        return response()->json([
+            'status' => true,
+            'message' => 'Customer updated successfully',
+           'customer' => [
+            'mobile_no' => $customer->mobile_no,
+            'firstName' => $customer->firstName,
+            'lastName' => $customer->lastName,
+        ],
+        ]);
+    }
+    public function store(){
+       return 'ok';
+    }
 
 }
