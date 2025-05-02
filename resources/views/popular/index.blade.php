@@ -10,19 +10,19 @@
             <div class="row justify-content-center">
                 <div class="col-md-12">
                     <div class="card shadow">                    
-                        <div class="card-header d-flex justify-content-between flex-column ">
-                            <h4 class="card-title pb-3 ">Popular Brands </h4>
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0 ">Popular Brands </h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <form action="{{ route('popular.store') }}" method="POST" enctype="multipart/form-data" class="d-flex gap-2">
                                     @csrf
                                     <select name="name" class="form-control select2" id="brand-select" required style="width: 250px;">
                                         <option value="">Select Brand</option>
                                         @foreach ($popularBrands as $item)
-                                            <option value="{{ $item }}">{{ $item }}</option>
+                                            <option value="{{ $item }}" >{{ $item }}</option>
                                         @endforeach
                                     </select>
                                     <input type="file" name="logo" class="form-control-file" >
-                                    <button type="submit" class="btn btn-primary  ">Add Brand</button>
+                                    <button type="submit" class="btn btn-primary addButton">+ Add Brand</button>
                                 </form>
                             </div>
                             

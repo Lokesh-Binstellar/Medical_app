@@ -6,8 +6,13 @@
                 <div class="col-md-10">
                     <div class="card shadow">
                         <div class="card-header d-flex justify-content-between align-items-center rounded-top" >
-                            <h4 class="card-title mb-0 text-white">Pharmacy</h4>
-                          
+                            <h4 class="card-title mb-0 text-white">Otcmedicine</h4>
+                            <form action="{{ route('otcmedicine.import') }}" id="importForm" method="POST"
+                            enctype="multipart/form-data">
+                            @csrf
+                            <input type="file" name="file" required>
+                            <button type="submit" class="btn btn-primary addButton">+ Import Medicine</button>
+                        </form>
                            
                         </div>
                        
