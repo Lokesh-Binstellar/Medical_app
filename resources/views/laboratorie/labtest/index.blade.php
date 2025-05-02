@@ -7,7 +7,7 @@
 
                 <div class="col-md-10">
                     <div class="card">
-                        <div class="card-header rounded-top" style="background-color:#5ecbd8">
+                        <div class="card-header rounded-top" style="background-color:#000000">
                             <div class="d-flex align-items-center justify-content-between">
                                 <h4 class="card-title">Lab Test</h4>
                                 <form action="{{ route('labtest.import') }}" id="importForm" method="POST"
@@ -40,7 +40,7 @@
         </div>
     </div>
 @endsection
-@section('script')
+@section('scripts')
     <script>
         $(function() {
 

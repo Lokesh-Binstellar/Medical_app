@@ -5,7 +5,7 @@
     <div class="card shadow-lg rounded">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Laboratory Details</h5>
-            <a href="{{ route('laboratorie.index') }}" class="btn btn-light btn-sm">← Back to List</a>
+            <a href="{{ route('laboratorie.index') }}" class="btn btn-light addButton">← Back to List</a>
         </div>
 
         <div class="card-body">
@@ -13,7 +13,7 @@
                 {{-- Image Section --}}
                 @if($lab->image)
                 <div class="col-md-4 text-center mb-4">
-                    <img src="{{ asset('assets/image/' . $lab->image) }}" alt="Laboratory Image" class="img-fluid rounded-circle shadow-lg" style="max-height: 250px;">
+                    <img src="{{ asset('assets/image/' . $lab->image) }}" alt="Laboratory Image" class="img-fluid shadow-lg" style="max-height: 250px;">
                     <p class="mt-3 text-muted"><strong>Laboratory Image</strong></p>
                 </div>
                 @endif

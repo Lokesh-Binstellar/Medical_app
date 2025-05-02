@@ -6,22 +6,57 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-       $user=User::all();
-       
-       return view('user.index',compact('user'));
+        if ($request->ajax()) {
+            $data = User::with('role')->latest()->get();
+
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('role', function ($row) {
+                    return $row->role->name ?? '';
+                })
+                ->addColumn('action', function ($row) {
+                    return '
+                <div class="dropdown">
+                  <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+  <ul class="dropdown-menu">
+                    <li>
+                      <a class="dropdown-item" href="' . route('user.edit', $row->id) . '">Edit</a>
+                    </li>
+                    <li>
+                      <form action="' . route('user.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
+                        ' . csrf_field() . method_field('DELETE') . '
+                        <button class="dropdown-item " type="submit">Delete</button>
+                      </form>
+                    </li>
+                  </ul>
+                </div>';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        return view('user.index'); // Assuming this is the blade filename
     }
+    // public function index()
+    // {
+    //    $user=User::all();
+
+    //    return view('user.index',compact('user'));
+    // }
 
     /**
      * Show the form for creating a new resource.
      */
+
     public function create()
     {
         $roles = Role::all();
@@ -35,13 +70,13 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'email' =>'required|email|unique:users,email' , 
-           'role_id' => '',        
-        ]); 
-      User::create($request->all());
+            'email' => 'required|email|unique:users,email',
+            'role_id' => '',
+        ]);
+        User::create($request->all());
         return redirect()->route('user.index')
 
-                        ->with('success','Pharmacist created successfully.');
+            ->with('success', 'Pharmacist created successfully.');
     }
 
     /**
@@ -49,7 +84,7 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-      //
+        //
     }
 
     /**
@@ -60,8 +95,8 @@ class UserController extends Controller
         $roles = Role::all();
         $user = User::find($id);
         // dd($pharmacies);
-        
-        return view('user.edit',compact('user','roles'));
+
+        return view('user.edit', compact('user', 'roles'));
     }
 
     /**
@@ -86,38 +121,38 @@ class UserController extends Controller
     public function update(Request $request, string $id)
     {
         $user = User::findOrFail($id);
-    
+
         $validatedData = $request->validate([
             'name' => 'required',
             'email' => 'required|email',
             'role_id' => '',
             'password' => 'nullable|min:6|confirmed', // optional password field
         ]);
-    
+
         // If password is filled, hash it and add to update data
         if ($request->filled('password')) {
             $validatedData['password'] = Hash::make($request->password);
         } else {
             unset($validatedData['password']); // Don't override with null
         }
-    
+
         // Update the user with validated data
         $user->update($validatedData);
-    
+
         return redirect()->route('user.index')
-                         ->with('success', 'User updated successfully!');
+            ->with('success', 'User updated successfully!');
     }
-    
+
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        $user=User::find($id);
+        $user = User::find($id);
         // dd( $user->delete());
         $user->delete();
 
-       return redirect()->route('user.index')
-                        ->with('success','user deleted successfully');
+        return redirect()->route('user.index')
+            ->with('success', 'user deleted successfully');
     }
 }

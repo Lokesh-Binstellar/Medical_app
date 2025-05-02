@@ -18,7 +18,7 @@
                             <!-- Pharmacy Name -->
                             <div class="form-group col-md-6">
                                 <label for="lab_name">Laboratory Name</label>
-                                <input type="text" name="lab_name" class="form-control" id="pharmacy_name" required
+                                <input type="text" name="lab_name" class="form-control" id="lab_name" required
                                     data-parsley-required-message="The laboratory name field is required."
                                     onblur="trimFieldValue('laboratory_name')">
                                 @error('lab_name')

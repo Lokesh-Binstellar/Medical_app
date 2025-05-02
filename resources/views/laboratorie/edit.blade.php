@@ -1,316 +1,239 @@
 @extends('layouts.app')
+
 @section('styles')
-    <style>
-        .cust-icon {
-            padding-bottom: 20px !important;
-        }
-
-        .p-8-4 {
-            padding: 8.4px !important;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
 @endsection
-
 @section('content')
-    <div class="container">
-        <div class="page-inner">
-            @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-
-            <form id="myForm" class="form-horizontal" action="{{ route('laboratorie.update', $laboratorie->id) }}"
-                method="POST" enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
-                <div class="card shadow-lg">
-                    <div class="card-header bg-primary text-white rounded-top">
-                        <h4 class="card-title text-white">Update Laboratory</h4>
+    <div class="col-12">
+        <div class="card">
+            <h5 class="card-header">Laboratory Update Form</h5>
+            <div class="card-body">
+                <form class="row g-3" id="labCreateForm"
+                    action="{{ route('laboratorie.update', $laboratorie->id) }}"method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    {{-- Laboratory Name --}}
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" name="lab_name" id="lab_name" class="form-control"
+                                placeholder="Laboratory Name" onblur="trimFieldValue('laboratory_name')"
+                                value="{{ $laboratorie->lab_name }}" />
+                            <label for="lab_name">Laboratory Name</label>
+                        </div>
+                        @error('lab_name')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
 
-                    <div class="card-body">
-                        <div class="row g-4">
-                            <!-- Laboratory Name -->
-                            <div class="col-md-6">
-                                <label for="lab_name" class="fw-semibold">Laboratory Name</label>
-                                <input type="text" name="lab_name" class="form-control" id="lab_name"
-                                    value="{{ old('lab_name', $laboratorie->lab_name) }}" required
-                                    data-parsley-required-message="The laboratory name field is required."
-                                    onblur="trimFieldValue('lab_name')">
-                                @error('lab_name')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
 
-                            <!-- Owner Name -->
-                            <div class="col-md-6">
-                                <label for="owner_name" class="fw-semibold">Owner Name</label>
-                                <input type="text" name="owner_name" class="form-control" id="owner_name"
-                                    value="{{ old('owner_name', $laboratorie->owner_name) }}" required
-                                    data-parsley-required-message="The owner name field is required."
-                                    onblur="trimFieldValue('owner_name')">
-                            </div>
-
-                            <!-- Email -->
-                            <div class="col-md-6">
-                                <label for="email" class="fw-semibold">Email</label>
-                                <input type="email" name="email" class="form-control" id="email"
-                                    value="{{ old('email', $laboratorie->email) }}" required
-                                    data-parsley-pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$"
-                                    data-parsley-pattern-message="Email must be in the format like name@domain.com"
-                                    data-parsley-required-message="The email field is required.">
-                                @error('email')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <!-- Phone -->
-                            <div class="col-md-6">
-                                <label for="phone" class="fw-semibold">Phone</label>
-                                <input type="tel" name="phone" class="form-control" id="phone"
-                                    value="{{ old('phone', $laboratorie->phone) }}" required pattern="^\d{7,12}$"
-                                    data-parsley-pattern="^\d{7,12}$"
-                                    data-parsley-pattern-message="Please enter a valid phone number with 7 to 12 digits."
-                                    data-parsley-required-message="The phone field is required."
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,12)">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="username" class="fw-semibold">Username</label>
-                                <input type="text" name="username" class="form-control" id="username"    value="{{ old('username', $laboratorie->username) }}"required
-                                    data-parsley-required-message="The username field is required.">
-                            </div>
-                            <!-- City -->
-                            <div class="col-md-6">
-                                <label for="city" class="fw-semibold">City</label>
-                                <input type="text" name="city" class="form-control" id="city"
-                                    value="{{ old('city', $laboratorie->city) }}" required
-                                    data-parsley-required-message="The city field is required."
-                                    onblur="trimFieldValue('city')">
-                            </div>
-
-                            <!-- Pincode -->
-                            <div class="col-md-6">
-                                <label for="pincode" class="fw-semibold">Pincode</label>
-                                <input type="text" name="pincode" class="form-control" id="pincode"
-                                    value="{{ old('pincode', $laboratorie->pincode) }}" required
-                                    data-parsley-pattern="^\d{6}$"
-                                    data-parsley-pattern-message="Pincode must be exactly 6 digits."
-                                    data-parsley-required-message="The pincode field is required."
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)">
-                            </div>
-
-                            <!-- State -->
-                            <div class="col-md-6">
-                                <label for="state" class="fw-semibold">State</label>
-                                <input type="text" name="state" class="form-control" id="state"
-                                    value="{{ old('state', $laboratorie->state) }}" required
-                                    data-parsley-required-message="The state field is required."
-                                    onblur="trimFieldValue('state')">
-                            </div>
-
-                            <!-- Latitude -->
-                            <div class="col-md-6">
-                                <label for="latitude" class="fw-semibold">Latitude</label>
-                                <input type="text" name="latitude" class="form-control" id="latitude"
-                                    value="{{ old('latitude', $laboratorie->latitude) }}" required
-                                    data-parsley-required-message="The latitude field is required."
-                                    data-parsley-pattern="^-?(90(\.0+)?|[1-8]?\d(\.\d+)?|0(\.\d+)?)$"
-                                    data-parsley-pattern-message="Latitude must be a number between -90 and 90 with up to 10 decimal places."
-                                    oninput="this.value=this.value.replace(/[^0-9.-]/g,'').slice(0,10)">
-                            </div>
-
-                            <!-- Longitude -->
-                            <div class="col-md-6">
-                                <label for="longitude" class="fw-semibold">Longitude</label>
-                                <input type="text" name="longitude" class="form-control" id="longitude"
-                                    value="{{ old('longitude', $laboratorie->longitude) }}" required
-                                    data-parsley-required-message="The longitude field is required."
-                                    data-parsley-pattern="^-?(180(\.0+)?|1[0-7]\d(\.\d+)?|[1-9]?\d(\.\d+)?)$"
-                                    data-parsley-pattern-message="Longitude must be a number between -180 and 180 with up to 10 decimal places."
-                                    oninput="this.value=this.value.replace(/[^0-9.-]/g,'').slice(0,10)">
-                            </div>
-
-                            <!-- License -->
-                            <div class="col-md-6">
-                                <label for="license" class="fw-semibold">License No.</label>
-                                <input type="text" name="license" class="form-control" id="license"
-                                    value="{{ old('license', $laboratorie->license) }}" required
-                                    data-parsley-required-message="The drug license no. field is required."
-                                    data-parsley-pattern="^[A-Za-z0-9/-]+$"
-                                    data-parsley-pattern-message="The drug license number can only contain letters, numbers, hyphens, and slashes.">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="nabl_iso_certified" class="form-label fw-semibold">NABL ISO Certified (Yes/No)</label>
-                                <select class="form-select" id="nabl_iso_certified" name="nabl_iso_certified" required>
-                                    <option value="" disabled {{ old('nabl_iso_certified', $laboratorie->nabl_iso_certified) === null ? 'selected' : '' }}>Select an option</option>
-                                    <option value="1" {{ old('nabl_iso_certified', $laboratorie->nabl_iso_certified) == '1' ? 'selected' : '' }}>Yes</option>
-                                    <option value="0" {{ old('nabl_iso_certified', $laboratorie->nabl_iso_certified) == '0' ? 'selected' : '' }}>No</option>
-                                </select>
-                            </div>
-                            
-
-                            @php
-                                $pickupValue = old('pickup', isset($laboratorie) ? $laboratorie->pickup : '');
-                            @endphp
-
-                            <div class="form-group col-md-6">
-                                <label>Pickup Available</label><br>
-
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="pickup" id="pickup_yes"
-                                        value="1" {{ $pickupValue == '1' ? 'checked' : '' }} required
-                                        data-parsley-required-message="Please select if pickup is available."
-                                        data-parsley-errors-container="#pickup-error">
-                                    <label class="form-check-label" for="pickup_yes">Yes</label>
-                                </div>
-
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="pickup" id="pickup_no"
-                                        value="0" {{ $pickupValue == '0' ? 'checked' : '' }} required
-                                        data-parsley-required-message="Please select if pickup is available."
-                                        data-parsley-errors-container="#pickup-error">
-                                    <label class="form-check-label" for="pickup_no">No</label>
-                                </div>
-
-                                <div id="pickup-error" class="text-danger mt-1"></div>
-                            </div>
-                            <!-- Image -->
-                            <div class="form-group col-md-6 d-flex justify-content-center flex-column">
-                                @if ($laboratorie->image)
-                                    <div class="mb-2">
-                                        <img src="{{ asset('assets/image/' . $laboratorie->image) }}" alt="Labrotry Image" class="img-thumbnail"
-                                            style="max-height: 150px;">
-                                    </div>
-                                @endif
-                                <input type="file" name="image" class="form-control"
-                                    data-parsley-required="{{ $laboratorie->image ? 'false' : 'true' }}"
-                                    data-parsley-required-message="The image field is required.">
-                                <small class="text-muted">Leave blank to keep existing image</small>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="gst" class="fw-semibold">GST No.</label>
-                                <input type="text" name="gstno" class="form-control" id="gst"
-                                    value="{{ old('gstno', $laboratorie->gstno) }}" required
-                                    data-parsley-required-message="The GST no. field is required."
-                                    data-parsley-pattern="^[A-Za-z0-9/-]+$"
-                                    data-parsley-pattern-message="The drug license number can only contain letters, numbers, hyphens, and slashes.">
-                            </div>
-
-                            <!-- Address -->
-                            <div class="col-md-12">
-                                <label for="address" class="fw-semibold">Address</label>
-                                <textarea name="address" id="address" rows="3" class="form-control" required data-parsley-minlength="10"
-                                    data-parsley-required-message="The address field is required." onblur="trimFieldValue('address')">{{ old('address', $laboratorie->address) }}</textarea>
-                            </div>
-
-                            <!-- Test Details -->
-                            <div id="formRepeater">
-                                @foreach ($labTests as $index => $item)
-                                    <div class="row g-3 align-items-end mb-3 repeater-group">
-                                        <div class="col-md-4">
-                                            <label class="form-label fw-semibold">Test</label>
-                                            <select name="test[]" class="form-select" required>
-                                                <option value="">Select Test</option>
-                                                @foreach ($allTests as $test)
-                                                    <option value="{{ $test->id }}" {{ $test->id == $item['test'] ? 'selected' : '' }}>
-                                                        {{ $test->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label fw-semibold">Price</label>
-                                            <input type="number" class="form-control" name="price[]" min="0" value="{{ $item['price'] ?? '' }}" placeholder="Price" required>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label fw-semibold">Home Price</label>
-                                            <input type="number" class="form-control" name="homeprice[]" min="0" value="{{ $item['homeprice'] ?? '' }}" placeholder="Home Price" required>
-                                        </div>
-                                        <div class="col-md-2 d-flex align-items-end gap-2">
-                                            <button type="button" onclick="removeField(this)" class="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                                <i class="bi bi-dash-lg"></i>
-                                            </button>
-                                            <button type="button" onclick="addField()" class="btn btn-outline-success btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                                <i class="bi bi-plus-lg"></i>
-                                            </button>
-                                           
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                            
-
+                    {{-- Owner Name --}}
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" name="owner_name" id="owner_name" class="form-control"
+                                placeholder="Owner Name" onblur="trimFieldValue('owner_name')"
+                                value="{{ $laboratorie->owner_name }}" />
+                            <label for="owner_name">Owner Name</label>
                         </div>
                     </div>
 
-                    <div class="card-footer text-right">
-                        <button type="submit" class="btn btn-primary">Update Laboratory</button>
-                        <a href="{{ url()->previous() }}" class="btn btn-danger">Cancel</a>
+                    {{-- Email --}}
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="email" name="email" id="email" class="form-control" placeholder="Email"
+                                value="{{ $laboratorie->email }}" />
+                            <label for="email">Email</label>
+                        </div>
+                        @error('email')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
-                </div>
-            </form>
+
+                    {{-- Phone --}}
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="tel" name="phone" id="phone" class="form-control" placeholder="Phone"
+                                pattern="^\d{7,12}$" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,12)"
+                                value="{{ $laboratorie->phone }}" />
+                            <label for="phone">Phone</label>
+                        </div>
+                    </div>
+
+                    {{-- Username --}}
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" name="username" id="username" class="form-control" placeholder="Username"
+                                value="{{ $laboratorie->username }}" />
+                            <label for="username">Username</label>
+                        </div>
+                    </div>
+
+                    {{-- Password --}}
+                    <div class="col-md-6">
+                        <div class="form-password-toggle">
+                            <div class="input-group input-group-merge">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="password" name="password" id="password" class="form-control"
+                                        placeholder="Password" />
+                                    <label for="password">Password</label>
+                                </div>
+                                <span class="input-group-text cursor-pointer"><i class="mdi mdi-eye-off-outline"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- City --}}
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" name="city" id="city" class="form-control" placeholder="City"
+                                onblur="trimFieldValue('city')" value="{{ $laboratorie->city }}" />
+                            <label for="city">City</label>
+                        </div>
+                    </div>
+
+                    {{-- Pincode --}}
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" name="pincode" id="pincode" class="form-control" placeholder="Pincode"
+                                pattern="^\d{6}$" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)"
+                                value="{{ $laboratorie->pincode }}" />
+                            <label for="pincode">Pincode</label>
+                        </div>
+                    </div>
+
+                    {{-- State --}}
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" name="state" id="state" class="form-control" placeholder="State"
+                                value="{{ $laboratorie->state }}" />
+                            <label for="state">State</label>
+                        </div>
+                    </div>
+
+                    {{-- Latitude --}}
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" name="latitude" id="latitude" class="form-control"
+                                placeholder="Latitude" oninput="this.value=this.value.replace(/[^0-9.-]/g,'').slice(0,10)"
+                                value="{{ $laboratorie->latitude }}" />
+                            <label for="latitude">Latitude</label>
+                        </div>
+                    </div>
+
+                    {{-- Longitude --}}
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" name="longitude" id="longitude" class="form-control"
+                                placeholder="Longitude"
+                                oninput="this.value=this.value.replace(/[^0-9.-]/g,'').slice(0,10)"
+                                value="{{ $laboratorie->longitude }}" />
+                            <label for="longitude">Longitude</label>
+                        </div>
+                    </div>
+
+                    {{-- License --}}
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" name="license" id="license" class="form-control"
+                                placeholder="Drug License No." value="{{ $laboratorie->license }}" />
+                            <label for="license">Drug License No.</label>
+                        </div>
+                    </div>
+
+                    {{-- GST  --}}
+
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" name="gstno" id="gstno" class="form-control"
+                                placeholder="Gst No." value="{{ $laboratorie->gstno }}" />
+                            <label for="gstno">GST No.</label>
+                        </div>
+                    </div>
+
+                    {{-- NABL ISO Certified  --}}
+
+
+
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <select id="nabl_iso_certified" name="nabl_iso_certified" class="form-select select2"
+                                data-allow-clear="true">
+                                <option value="" disabled
+                                    {{ old('nabl_iso_certified') === null && isset($laboratory) && $laboratory->nabl_iso_certified === null ? 'selected' : '' }}>
+                                    Select an option
+                                </option>
+                                <option value="1"
+                                    {{ old('nabl_iso_certified', $laboratory->nabl_iso_certified ?? '') == '1' ? 'selected' : '' }}>
+                                    Yes
+                                </option>
+                                <option value="0"
+                                    {{ old('nabl_iso_certified', $laboratory->nabl_iso_certified ?? '') == '0' ? 'selected' : '' }}>
+                                    No
+                                </option>
+                            </select>
+
+                            <label for="nabl_iso_certified">NABL ISO Certified (Yes/No)</label>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <label class="form-label">Pickup Available</label>
+                        <div class="form-check custom mb-2">
+                            <input class="form-check-input" type="radio" name="pickup" id="pickup_yes"
+                                value="1" @if ($laboratorie->pickup == "1") checked @endif>
+                            <label class="form-check-label" for="pickup_yes">Yes</label>
+                        </div>
+                        <div class="form-check custom">
+                            <input class="form-check-input" type="radio" name="pickup" id="pickup_no" value="0"
+                                @if ($laboratorie->pickup == "0") checked @endif>  
+                            <label class="form-check-label" for="pickup_no">No</label>
+                        </div>
+                    </div>
+
+
+
+
+
+                    {{-- Image --}}
+                    <div class="col-md-6">
+                        @if ($laboratorie->image)
+                            <div class="mb-2">
+                                <img id="image" src="{{ asset('assets/image/' . $laboratorie->image) }}"
+                                    alt="Labrotry Image" class="img-thumbnail" style="max-height: 150px;">
+                            </div>
+                        @endif
+                        <label class="fw-semibold mb-1 " for="image">Upload Image</label>
+                        <input type="file" name="image" id="image" class="form-control "
+                            value="{{ $laboratorie->image }}" />
+                    </div>
+
+                    {{-- Address --}}
+                    <div class="col-md-12">
+                        <div class="form-floating form-floating-outline">
+                            <textarea name="address" id="address" class="form-control" placeholder="Address" style="height: 100px;">{{ $laboratorie->address }}</textarea>
+                            <label for="address">Address</label>
+                        </div>
+                    </div>
+
+                    {{-- Buttons --}}
+                    <div class="card-action">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="button" class="btn btn-primary"
+                            onclick="window.location='{{ route('laboratorie.index') }}'">Cancel</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-    <script>
-
-
-document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Parsley for the form
-            $('#myForm').parsley();
-        });
-        
-    const testOptions = @json($allTests->map(fn($t) => ['id' => $t->id, 'name' => $t->name]));
-
-    function addField() {
-        const repeater = document.getElementById('formRepeater');
-        const newGroup = document.createElement('div');
-        newGroup.className = 'row g-3 align-items-end mb-3 repeater-group';
-
-        const optionsHtml = testOptions.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
-
-        newGroup.innerHTML = `
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">Test</label>
-                <select name="test[]" class="form-select" required>
-                    <option value="">Select Test</option>
-                    ${optionsHtml}
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-semibold">Price</label>
-                <input type="number" class="form-control" name="price[]" min="0" placeholder="Price" required>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-semibold">Home Price</label>
-                <input type="number" class="form-control" name="homeprice[]" min="0" placeholder="Home Price" required>
-            </div>
-            <div class="col-md-2 d-flex align-items-end gap-2">
-                <button type="button" onclick="removeField(this)" class="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                    <i class="bi bi-dash-lg"></i>
-                </button>
-                <button type="button" onclick="addField()" class="btn btn-outline-success btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                    <i class="bi bi-plus-lg"></i>
-                </button>
-            </div>
-        `;
-
-        repeater.appendChild(newGroup);
-    }
-
-    function removeField(button) {
-        const repeater = document.getElementById('formRepeater');
-        const groups = repeater.querySelectorAll('.repeater-group');
-        if (groups.length > 1) {
-            button.closest('.repeater-group').remove();
-        }
-    }
-</script>
 @endsection
-
-
+@section('scripts')
+    <script src="{{ asset('js/laboratorie/laboratorie_form.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
+@endsection

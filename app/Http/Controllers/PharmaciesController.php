@@ -7,7 +7,7 @@ use App\Models\User;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 class PharmaciesController extends Controller
 {
@@ -18,26 +18,35 @@ class PharmaciesController extends Controller
     {
 
         if ($request->ajax()) {
-            $data = Pharmacies::query();
-            return Datatables::of($data)
+            $data = Pharmacies::all();
+            // dd($data);
+            return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '
-                    <div class="form-button-action d-flex gap-2">
-                   <a href="' . route('pharmacist.show', $row->id) . '" class="btn btn-link btn-success btn-lg" data-bs-toggle="tooltip" title="View">
-        <i class="fa fa-eye"></i>
-    </a>
-                     <a href="' . route('pharmacist.edit', $row->id) . '" class="btn btn-link btn-primary btn-lg" data-bs-toggle="tooltip" title="Edit">
-        <i class="fa fa-edit"></i>
-    </a>
-     <a href="javascript:void(0)" class="btn btn-link btn-danger btn-lg" data-id="' . $row->id . '" onclick="deleteUser(' . $row->id . ')">
-                            <i class="fa fa-times"></i>
-                        </a>
-                    </div>';
-                   
-                    return $btn;
+                    
 
-                })
+                return '
+                <div class="dropdown">
+                  <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+  <ul class="dropdown-menu">
+                    <li>
+                     <a href="' . route('pharmacist.show', $row->id) . '"class="dropdown-item" >View
+    </a>
+                    </li>
+
+                    <li>
+                    <a href="' . route('pharmacist.edit', $row->id) . '" class="dropdown-item" >Edit</a>
+                    </li>
+                    
+                    <li>
+                      <form action="' . route('pharmacist.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
+                        ' . csrf_field() . method_field('DELETE') . '
+                        <button class="dropdown-item " type="submit">Delete</button>
+                      </form>
+                    </li>
+                  </ul>
+                </div>';
+            })
                 ->rawColumns(['action'])
                 ->make(true);
         }
@@ -70,7 +79,7 @@ class PharmaciesController extends Controller
             'address' => 'required',
             'latitude' => 'required',
             'longitude' => 'required',
-            'image' => 'required|file',
+            'image' => 'nullable|file|image|max:10240',
             'username' => 'required',
             'password' => 'required',
             'license' => 'required',
@@ -92,13 +101,12 @@ class PharmaciesController extends Controller
 
         $params['user_id'] = $user->id;
 
-        // Handle Image
         if ($request->hasFile('image')) {
-            $image = $request->file('image');         
+            $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $destinationPath = public_path('assets/image');
+            $destinationPath = public_path('assets/image/');
             $image->move($destinationPath, $imageName);
-            $params['image'] = $imageName; 
+            $params['image'] = $imageName;
         }
         Pharmacies::create($params);
 
@@ -148,7 +156,7 @@ class PharmaciesController extends Controller
             'longitude' => 'required',
             'username' => 'required',
             'license' => 'required',
-            'image' => 'nullable|file', // optional for update
+            'image' => 'nullable|image|max:10240',
         ]);
 
         if ($validation->fails()) {
@@ -186,22 +194,17 @@ class PharmaciesController extends Controller
             'license',
         ]);
 
-        // Handle image update
+        // Image upload and old delete
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = public_path('assets/image/') . $imageName;
-
-            // Move new image to folder
-            $image->move(public_path('assets/image/'), $imageName);
-
-            // Delete old image if exists
-            if ($pharmacy->image && File::exists(public_path('assets/image/') . $pharmacy->image)) {
-                File::delete(public_path('assets/image/') . $pharmacy->image);
-            }
-
-            // Save new image name to database
+            $destinationPath = public_path('assets/image/');
+            $image->move($destinationPath, $imageName);
             $data['image'] = $imageName;
+
+            if ($pharmacy->image && File::exists($destinationPath . $pharmacy->image)) {
+                File::delete($destinationPath . $pharmacy->image);
+            }
         }
 
         // Update pharmacy record

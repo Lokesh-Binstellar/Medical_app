@@ -8,7 +8,7 @@ use App\Models\Otcmedicine;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 class MedicineController extends Controller
 {
@@ -19,24 +19,27 @@ class MedicineController extends Controller
     {
         if ($request->ajax()) {
             $data = Medicine::query();
-            return Datatables::of($data)
+            return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '
-                    <div class="form-button-action d-flex gap-2">
-                   <a href="' . route('medicine.show', $row->id) . '" class="btn btn-link btn-success btn-lg" data-bs-toggle="tooltip" title="View">
-        <i class="fa fa-eye"></i></a>              
-                    </div>';
-                   
-                    return $btn;
+                    return '
+                <div class="dropdown">
+                  <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+  <ul class="dropdown-menu">
+                    <li>
+                     <a href="' . route('medicine.show', $row->id) . '"class="dropdown-item" >View
+    </a>
+                    </li>
 
+                    
+                  </ul>
+                </div>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);
         }
         // $tests = LabTest::all();
         return view('medicine.index');
-        
     }
 
 
@@ -63,7 +66,7 @@ class MedicineController extends Controller
     {
         $medicines = Medicine::find($id);
 
-        
+
 
         return view('medicine.show', compact('medicines'));
     }
@@ -109,14 +112,14 @@ class MedicineController extends Controller
     {
         // // Check if the request has a Bearer token
         // if (!$request->bearerToken()) {
-            
+
         //     // Return a JSON response if no token is provided
         //     return response()->json(['message' => 'Unauthorized. No token provided.'], 401);
         // }
-    
+
         // // Attempt to authenticate the user using the token
         // $user = Auth::guard('sanctum')->user();
-    
+
         // // Check if the user is authenticated
         // if (!$user) {
         //     // Return a JSON response if the token is invalid
@@ -125,14 +128,14 @@ class MedicineController extends Controller
 
 
 
-    
+
         $query = $request->query('query');
-    
+
         // Check if the query parameter is present
         if (!$query) {
             return response()->json(['message' => 'Query parameter is required.'], 400);
         }
-    
+
         // Search from Medicine
         $medicines = Medicine::where('salt_composition', 'LIKE', "%$query%")
             ->orWhere('product_name', 'LIKE', "%$query%")
@@ -146,7 +149,7 @@ class MedicineController extends Controller
                 $item->type = 'medicine';
                 return $item;
             });
-    
+
         // Search from OtcMedicine
         $otc = Otcmedicine::where('name', 'LIKE', "%$query%")
             ->select('id', 'otc_id', 'name', 'packaging', 'image_url')
@@ -159,16 +162,16 @@ class MedicineController extends Controller
                 $item->type = 'otc';
                 return $item;
             });
-    
+
         // Merge both collections
         $results = $medicines->merge($otc);
-    
+
         return response()->json([
             'success' => true,
             'data' => $results
         ]);
     }
-    
+
 
 
 

@@ -1,136 +1,149 @@
-{{-- <!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+
+<html lang="en" class="light-style layout-wide customizer-hide" dir="ltr" data-theme="theme-default"
+    data-assets-path="../../assets/" data-template="vertical-menu-template">
 
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
     <title>Gomeds</title>
-    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
-    <link rel="icon" href="../assets/img/kaiadmin/favicon.ico" type="image/x-icon" />
+
+    <meta name="description" content="" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/img/kaiadmin/favicon.ico" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&ampdisplay=swap"
+        rel="stylesheet" />
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/materialdesignicons.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/fontawesome.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/flag-icons.css') }}" />
+
+    <!-- Menu waves for no-customizer fix -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/node-waves/node-waves.css') }}" />
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/css/rtl/core.css') }}"
+        class="template-customizer-core-css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/css/rtl/theme-default.css') }}"
+        class="template-customizer-theme-css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/demo.css') }}" />
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/typeahead-js/typeahead.css') }}" />
+    <!-- Vendor -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/@form-validation/umd/styles/index.min.css') }}" />
+
+    <!-- Page CSS -->
+    <!-- Page -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-auth.css') }}" />
+
+    <!-- Helpers -->
+    <script src="{{ asset('assets/vendor/js/helpers.js') }}"></script>
+    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+    <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
+    <script src="{{ asset('assets/vendor/js/template-customizer.js') }}"></script>
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="{{ asset('assets/js/config.js') }}"></script>
+
     <style>
-        .parsley-required,
-        .parsley-errors-list li,
+        body {
+            background: #000000;
+        }
+
+        .btn-primary {
+            color: #FFFFFF;
+            background-color: #033a62;
+            border-color: #033a62;
+            box-shadow: 0px 4px 8px -4px rgba(76, 78, 100, 0.42);
+            padding: 8px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .bg-primary {
+            background: #E2DCC8;
+        }
+
+        .main-logo {
+            /* height: 180px; */
+            width: 250px;
+        }
+
+        .form-check-input:checked {
+            background-color: #033a62 !important;
+            border-color: #033a62 !important;
+        }
+
+        .form-check-input {
+            border-color: #033a62 !important;
+        }
+
+        a,
+        a:hover {
+            color: #033a62;
+        }
+
         .red-text {
-            color: red !important;
-            list-style: none;
-            padding-left: 0px !important;
-        }
-
-        .parsley-required {
             color: red;
-            padding-left: 0px !important;
         }
 
-        .parsley-errors-list {
-            padding-left: 0px;
+        @media screen and (max-width: 425px) {
+            .authentication-wrapper.authentication-basic .authentication-inner {
+                padding: 0 10px;
+            }
         }
     </style>
-
-    <!-- Fonts and icons -->
-    <script src="../assets/js/plugin/webfont/webfont.min.js"></script>
-    <script>
-        WebFont.load({
-            google: {
-                families: ["Public Sans:300,400,500,600,700"]
-            },
-            custom: {
-                families: [
-                    "Font Awesome 5 Solid",
-                    "Font Awesome 5 Regular",
-                    "Font Awesome 5 Brands",
-                    "simple-line-icons",
-                ],
-                urls: ["../assets/css/fonts.min.css"],
-            },
-            active: function() {
-                sessionStorage.fonts = true;
-            },
-        });
-    </script>
-
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="../assets/css/plugins.min.css" />
-    <link rel="stylesheet" href="../assets/css/kaiadmin.min.css" />
-    <link rel="stylesheet" href="../assets/css/demo.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.9.2/parsley.css">
+    @yield('styles')
 </head>
 
 <body>
-    <div class="wrapper d-flex justify-content-center align-items-center">
-        <div class="main-panel">
-            <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh; margin: 0 auto;">
-                <div class="card shadow" style="width: 400px;">
-                    
+    <!-- Content -->
 
-                    <div class="card-body">
-                        @if ($errors->any())
-                        <div class="alert alert-danger" id="form-error-box">
-                            @foreach ($errors->all() as $error)
-                                <div>{{ $error }}</div>
-                            @endforeach
-                        </div>
-                    @endif
-                        <h4 class="card-title text-center mb-4">Login</h4>
-
-                        <form id="loginForm" method="POST" action="{{ route('login') }}" data-parsley-validate>
-                            @csrf
-                            <div class="form-group mb-3">
-                                <label for="email2">Email Address</label>
-                                <input type="email" name="email" class="form-control" id="email"
-                                    data-parsley-type="email"
-                                    data-parsley-pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                                    data-parsley-pattern-message="Please enter a valid email address"
-                                    placeholder="Enter your email" required />
-                            </div>
-
-                            <div class="form-group mb-4">
-                                <label for="password">Password</label>
-                                <input type="password" name="password" class="form-control" id="password"
-                                    placeholder="Password" required data-parsley-minlength="6"
-                                    data-parsley-minlength-message="Password must be at least 6 characters long" />
-                            </div>
-
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Login</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+    <div class="position-relative main-container">
+        <div class="authentication-wrapper authentication-basic container-p-y">
+            <div class="authentication-inner py-4 text-center">
+                <img src="{{ asset('assets/img/gomeds.png') }}" class="main-logo" alt="">
+                @yield('content')
             </div>
         </div>
     </div>
 
-    <!-- Core JS Files -->
-    <script src="../assets/js/core/jquery-3.7.1.min.js"></script>
-    <script src="../assets/js/core/popper.min.js"></script>
-    <script src="../assets/js/core/bootstrap.min.js"></script>
+    <!-- / Content -->
 
-    <!-- Plugins -->
-    <script src="../assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
-    <script src="../assets/js/plugin/datatables/datatables.min.js"></script>
-    <script src="../assets/js/kaiadmin.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.9.2/parsley.min.js"></script>
+    <!-- Core JS -->
+    <!-- build:js assets/vendor/js/core.js -->
+    <script src="{{ asset('assets/vendor/libs/jquery/jquery.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/popper/popper.js') }}"></script>
+    <script src="{{ asset('assets/vendor/js/bootstrap.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/node-waves/node-waves.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/hammer/hammer.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/i18n/i18n.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/typeahead-js/typeahead.js') }}"></script>
+    <script src="{{ asset('assets/vendor/js/menu.js') }}"></script>
 
-    <!-- Parsley Init -->
-    <script>
-        $(document).ready(function() {
-            $('#loginForm').parsley();
-        });
-        document.addEventListener('DOMContentLoaded', function () {
-        const formErrorBox = document.getElementById('form-error-box');
-        const email = document.getElementById('email');  // email field id
-        const password = document.getElementById('password');
+    <!-- endbuild -->
 
-        function hideErrors() {
-            if (formErrorBox) {
-                formErrorBox.style.display = 'none';
-            }
-        }
+    <!-- Vendors JS -->
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
 
-        email.addEventListener('input', hideErrors);
-        password.addEventListener('input', hideErrors);
-    });
-    </script>
+    <!-- Main JS -->
+    <script src="{{ asset('assets/js/main.js') }}"></script>
+
+    <!-- Page JS -->
+    <script src="{{ asset('assets/js/pages-auth.js') }}"></script>
+    @yield('scripts')
 </body>
 
-</html> --}}
+</html>

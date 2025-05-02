@@ -8,7 +8,7 @@ use App\Models\User;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 class LaboratoriesController extends Controller
 {
@@ -20,11 +20,30 @@ class LaboratoriesController extends Controller
         
         if ($request->ajax()) {
             $data = Laboratories::query();
-            return Datatables::of($data)
+            return DataTables::of($data)
                     ->addIndexColumn()
                     ->addColumn('action', function($row){
-                        $btn = '<a href="' . route('laboratorie.show', $row->id) . '" class="btn btn-primary btn-border btn-round">View</a>';
-                            return $btn;
+                        return '
+                        <div class="dropdown">
+                          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+          <ul class="dropdown-menu">
+                            <li>
+                             <a href="' . route('laboratorie.show', $row->id) . '"class="dropdown-item" >View
+            </a>
+                            </li>
+        
+                            <li>
+                            <a href="' . route('laboratorie.edit', $row->id) . '" class="dropdown-item" >Edit</a>
+                            </li>
+                            
+                            <li>
+                              <form action="' . route('laboratorie.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
+                                ' . csrf_field() . method_field('DELETE') . '
+                                <button class="dropdown-item " type="submit">Delete</button>
+                              </form>
+                            </li>
+                          </ul>
+                        </div>';
                     })
                     ->rawColumns(['action'])
                     ->make(true);

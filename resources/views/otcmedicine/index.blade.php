@@ -5,7 +5,7 @@
             <div class="row justify-content-center">
                 <div class="col-md-10">
                     <div class="card shadow">
-                        <div class="card-header d-flex justify-content-between align-items-center rounded-top" style="background-color:#5ecbd8">
+                        <div class="card-header d-flex justify-content-between align-items-center rounded-top" >
                             <h4 class="card-title mb-0 text-white">Pharmacy</h4>
                           
                            
@@ -37,27 +37,42 @@
   
   
 @endsection
-@section('script')
+@section('scripts')
 <script>
-$(function() {
+    $(function() {
 
-var table = $('.data-table').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('pharmacist.index') }}",
-    columns: [
-        { data: 'id', name: 'id' },
-        { data: 'id', name: 'id' },
-        { data: 'pharmacy_name', name: 'pharmacy_name' },
-        { data: 'owner_name', name: 'owner_name' },
-        { data: 'email', name: 'email' },
-        { data: 'phone', name: 'phone' },
-        { data: 'action', name: 'action', orderable: false, searchable: false }
-    ]
-});
+        var table = $('.data-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('otcmedicine.index') }}",
+            columns: [ { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                {
+                    data: 'otc_id',
+                    name: 'otc_id'
+                },
+                {
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'breadcrumbs',
+                    name: 'breadcrumbs'
+                },
+                {
+                    data: 'manufacturers',
+                    name: 'manufacturers'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }
+            ]
+        });
 
 
-});
 
+    });
 </script>
 @endsection

@@ -1,281 +1,374 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="en" class="light-style layout-navbar-fixed layout-menu-fixed layout-compact" dir="ltr"
+    data-theme="theme-default" data-assets-path="../../assets/" data-template="vertical-menu-template">
 
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>gomeds</title>
-    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
-    <link rel="icon" href="assets/img/kaiadmin/favicon.ico" type="image/x-icon" />
+    <meta charset="utf-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+    @yield('token')
+    <title>@yield('title')</title>
+    {{-- <title>Dashboard - {{ config('app.name', 'Laravel') }}</title> --}}
+
+    <meta name="description" content="" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/img/kaiadmin/favicon.ico" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&ampdisplay=swap"
+        rel="stylesheet" />
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/materialdesignicons.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/fontawesome.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/flag-icons.css') }}" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+
+    <!-- Menu waves for no-customizer fix -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/node-waves/node-waves.css') }}" />
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/css/rtl/core.css') }}" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/css/rtl/theme-default.css') }}"
+        class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="{{ asset('assets/css/demo.css') }}" />
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/typeahead-js/typeahead.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/apex-charts/apex-charts.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/swiper/swiper.css') }}" />
+
+    <!-- Page CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/cards-statistics.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/cards-analytics.css') }}" />
+
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
+    <link rel="stylesheet"
+        href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-rowgroup-bs5/rowgroup.bootstrap5.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
+
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/@form-validation/umd/styles/index.min.css') }}" />
     <style>
-        .parsley-required,
-        .parsley-errors-list li,
-        .red-text {
-            color: red !important;
-            list-style:none;
-            padding-left:0px !important;
-        }
-        .parsley-required{
-            color: red;
-            padding-left:0px !important;
-        }
-        .parsley-errors-list{
-            padding-left:0px;
-        }
-        .totalgst {
-            border: 1px solid #ddd;
-            padding: 15px;
+        /* ::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px #033a62;
             border-radius: 10px;
-            background: #f9f9f9;
-            width: 300px;
+            background-color: #033a62;
         }
 
-        .totalgst strong {
-            font-weight: 600;
+        ::-webkit-scrollbar {
+            width: 8px;
+            padding-top: 10px;
+            background-color: #033a62;
         }
 
-        .totalgst .amt {
-            margin-bottom: 10px;
+        ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            -webkit-box-shadow: inset 0 0 6px #033a62;
+            background-color: #f5f5f5;
+            height: 20px;
+        } */
+
+        .app-brand {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-
-        .medicine_search {
-            width: 350px !important;
-            max-width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .red-text {
+            color: red;
         }
 
-        .mrp,
-        .discount,
-        .discount_percent {
-            width: 100px !important;
-            /* text-align: right; */
+        .parsley-required,
+        .parsley-type,
+        .parsley-errors-list  {
+            color: red !important;
+        }
+
+        .parsley-errors-list{
+            font-size: 12px !important;
+        }
+
+        .table-responsive {
+            overflow: unset;
+        }
+
+        .dataTables_scrollBody {
+            overflow: unset !important;
+        }
+
+        div.dataTables_processing>div:last-child>div {
+            background: #033a62;
+        }
+
+        .layout-navbar-fixed:not(.layout-menu-collapsed) .layout-content-navbar:not(.layout-without-menu) .layout-navbar,
+        .layout-menu-fixed.layout-navbar-fixed:not(.layout-menu-collapsed) .layout-content-navbar:not(.layout-without-menu) .layout-navbar {
+            left: 17.63rem !important;
+        }
+
+        .layout-navbar-fixed .layout-navbar.navbar-detached {
+            width: 84% !important;
+        }
+
+        .align {
+            text-align: left !important;
+        }
+
+        .text-truncate {
+            white-space: wrap;
+        }
+
+        #layout-navbar {
+            -webkit-backdrop-filter: blur(6px) !important;
+        }
+
+        @media screen and (max-width: 1440px) {
+            .layout-navbar-fixed .layout-navbar.navbar-detached {
+                width: 79% !important;
+            }
+        }
+
+        @media screen and (max-width: 1366px) {
+            .layout-navbar-fixed .layout-navbar.navbar-detached {
+                width: 78% !important;
+            }
+        }
+
+        @media screen and (max-width: 1024px) {
+            .close-menu {
+                position: absolute;
+                right: 5px;
+                top: 5px;
+                background-color: #033a62;
+                color: #fff;
+                border-radius: 5px;
+            }
+
+            .layout-navbar-fixed:not(.layout-menu-collapsed) .layout-content-navbar:not(.layout-without-menu) .layout-navbar,
+            .layout-menu-fixed.layout-navbar-fixed:not(.layout-menu-collapsed) .layout-content-navbar:not(.layout-without-menu) .layout-navbar {
+                left: 0 !important;
+            }
+
+            .layout-navbar-fixed .layout-navbar.navbar-detached {
+                width: 100% !important;
+            }
+
+        }
+
+        @media screen and (max-width: 1024px) {
+            .layout-menu-toggle a {
+                padding-left: 20px !important;
+            }
+
+            .close-menu.mdi:before {
+                font-size: 22px;
+                line-height: 22px;
+            }
+
+            .pr {
+                padding-right: 24px;
+            }
+
+            .dropdown-menu-end[data-bs-popper] {
+                right: 24px;
+                /* left: 18px !important; */
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+
+            .pr {
+                padding-right: 24px;
+            }
+
+            .dropdown-menu-end[data-bs-popper] {
+                right: 16px;
+                /* left: 18px !important; */
+            }
         }
     </style>
 
-
-    <!-- Fonts and icons -->
-    <script src="assets/js/plugin/webfont/webfont.min.js"></script>
-    <script>
-        WebFont.load({
-            google: {
-                families: ["Public Sans:300,400,500,600,700"]
-            },
-            custom: {
-                families: [
-                    "Font Awesome 5 Solid",
-                    "Font Awesome 5 Regular",
-                    "Font Awesome 5 Brands",
-                    "simple-line-icons",
-                ],
-                urls: ["assets/css/fonts.min.css"],
-            },
-            active: function() {
-                sessionStorage.fonts = true;
-            },
-        });
-        </script>
-
-<!-- CSS Files -->
-{{-- <link rel="stylesheet" href="assets/css/bootstrap.min.css" /> --}}
-<link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/css/plugins.min.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/css/kaiadmin.min.css') }}" />
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-<!-- Add Parsley CSS (Optional, but recommended for styling) -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.9.2/parsley.css">
-
-<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
-
-    
-
-
-    <!-- CSS Just for demo purpose, don't include it in your project -->
-    <link rel="stylesheet" href="{{ asset('assets/css/demo.css') }}" />
     @yield('styles')
+
+    <!-- Helpers -->
+    <script src="{{ asset('assets/vendor/js/helpers.js') }}"></script>
+    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+    <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
+    {{-- <script src="{{ asset('assets/vendor/js/template-customizer.js') }}"></script> --}}
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="{{ asset('assets/js/config.js') }}"></script>
 </head>
 
 <body>
-    <div class="wrapper">
-        <!-- Sidebar -->
-        @include('layouts.navigation')
-        <!-- End Sidebar -->
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+        <div class="layout-container">
+            <!-- Menu -->
+            @include('layouts.navigation')
+            <!-- / Menu -->
 
-        <div class="main-panel">
-            <div class="main-header">
-                <div class="main-header-logo">
-                    <!-- Logo Header -->
-                    <div class="logo-header" data-background-color="dark">
-                        <a href="index.html" class="logo">
-                            {{-- <img src="assets/img/kaiadmin/logo_light.svg" alt="navbar brand" class="navbar-brand"
-                                height="20" /> --}}
-                        </a>
-                        <div class="nav-toggle">
-                            <button class="btn btn-toggle toggle-sidebar">
-                                <i class="gg-menu-right"></i>
-                            </button>
-                            <button class="btn btn-toggle sidenav-toggler">
-                                <i class="gg-menu-left"></i>
-                            </button>
-                        </div>
-                        <button class="topbar-toggler more">
-                            <i class="gg-more-vertical-alt"></i>
-                        </button>
-                    </div>
-                    <!-- End Logo Header -->
-                </div>
-                <!-- Navbar Header -->
+            <!-- Layout container -->
+            <div class="layout-page">
+                <!-- Navbar -->
                 @include('layouts.header')
-                <!-- End Navbar -->
-            </div>
+                <!-- / Navbar -->
 
-            <div class="container">
-                {{-- --}}
+                <!-- Content wrapper -->
+                <div class="content-wrapper">
+                    <!-- Content -->
+                    {{-- <div class="container-xxl flex-grow-1 container-p-y"> --}}
+                    <div class="container-fluid">
+                        @yield('content')
+                    </div>
+                    <!-- / Content -->
 
-                @yield('content')
-            </div>
-            @include('layouts.footer')
-        </div>
+                    <!-- Footer -->
+                    @include('layouts.footer')
+                    <!-- / Footer -->
 
-        <!-- Custom template | don't include it in your project! -->
-        <div class="custom-template">
-            <div class="title">Settings</div>
-            <div class="custom-content">
-                <div class="switcher">
-                    <div class="switch-block">
-                        <h4>Logo Header</h4>
-                        <div class="btnSwitch">
-                            <button type="button" class="selected changeLogoHeaderColor" data-color="dark"></button>
-                            <button type="button" class="changeLogoHeaderColor" data-color="blue"></button>
-                            <button type="button" class="changeLogoHeaderColor" data-color="purple"></button>
-                            <button type="button" class="changeLogoHeaderColor" data-color="light-blue"></button>
-                            <button type="button" class="changeLogoHeaderColor" data-color="green"></button>
-                            <button type="button" class="changeLogoHeaderColor" data-color="orange"></button>
-                            <button type="button" class="changeLogoHeaderColor" data-color="red"></button>
-                            <button type="button" class="changeLogoHeaderColor" data-color="white"></button>
-                            <br />
-                            <button type="button" class="changeLogoHeaderColor" data-color="dark2"></button>
-                            <button type="button" class="changeLogoHeaderColor" data-color="blue2"></button>
-                            <button type="button" class="changeLogoHeaderColor" data-color="purple2"></button>
-                            <button type="button" class="changeLogoHeaderColor" data-color="light-blue2"></button>
-                            <button type="button" class="changeLogoHeaderColor" data-color="green2"></button>
-                            <button type="button" class="changeLogoHeaderColor" data-color="orange2"></button>
-                            <button type="button" class="changeLogoHeaderColor" data-color="red2"></button>
-                        </div>
-                    </div>
-                    <div class="switch-block">
-                        <h4>Navbar Header</h4>
-                        <div class="btnSwitch">
-                            <button type="button" class="changeTopBarColor" data-color="dark"></button>
-                            <button type="button" class="changeTopBarColor" data-color="blue"></button>
-                            <button type="button" class="changeTopBarColor" data-color="purple"></button>
-                            <button type="button" class="changeTopBarColor" data-color="light-blue"></button>
-                            <button type="button" class="changeTopBarColor" data-color="green"></button>
-                            <button type="button" class="changeTopBarColor" data-color="orange"></button>
-                            <button type="button" class="changeTopBarColor" data-color="red"></button>
-                            <button type="button" class="selected changeTopBarColor" data-color="white"></button>
-                            <br />
-                            <button type="button" class="changeTopBarColor" data-color="dark2"></button>
-                            <button type="button" class="changeTopBarColor" data-color="blue2"></button>
-                            <button type="button" class="changeTopBarColor" data-color="purple2"></button>
-                            <button type="button" class="changeTopBarColor" data-color="light-blue2"></button>
-                            <button type="button" class="changeTopBarColor" data-color="green2"></button>
-                            <button type="button" class="changeTopBarColor" data-color="orange2"></button>
-                            <button type="button" class="changeTopBarColor" data-color="red2"></button>
-                        </div>
-                    </div>
-                    <div class="switch-block">
-                        <h4>Sidebar</h4>
-                        <div class="btnSwitch">
-                            <button type="button" class="changeSideBarColor" data-color="white"></button>
-                            <button type="button" class="selected changeSideBarColor" data-color="dark"></button>
-                            <button type="button" class="changeSideBarColor" data-color="dark2"></button>
-                        </div>
-                    </div>
+                    <div class="content-backdrop fade"></div>
                 </div>
+                <!-- Content wrapper -->
             </div>
-            {{-- <div class="custom-toggle">
-                <i class="icon-settings"></i>
-            </div> --}}
+            <!-- / Layout page -->
         </div>
-        <!-- End Custom template -->
+
+        <!-- Overlay -->
+        <div class="layout-overlay layout-menu-toggle"></div>
+
+        <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+        <div class="drag-target"></div>
     </div>
-    <!--   Core JS Files   -->
-    <script src="{{ asset('assets/js/core/jquery-3.7.1.min.js') }}"></script>
-    <script src="{{ asset('assets/js/core/popper.min.js') }}"></script>
-    <script src="{{ asset('assets/js/core/bootstrap.min.js') }}"></script>
+    <!-- / Layout wrapper -->
 
-    <!-- jQuery Scrollbar -->
-    <script src="{{ asset('assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js') }}"></script>
+    <!-- Core JS -->
+    <!-- build:js assets/vendor/js/core.js -->
+    <script src="{{ asset('assets/vendor/libs/jquery/jquery.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/moment/moment.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/popper/popper.js') }}"></script>
+    <script src="{{ asset('assets/vendor/js/bootstrap.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/node-waves/node-waves.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/hammer/hammer.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/i18n/i18n.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/typeahead-js/typeahead.js') }}"></script>
+    <script src="{{ asset('assets/vendor/js/menu.js') }}"></script>
 
-    <!-- Chart JS -->
-    <script src="{{ asset('assets/js/plugin/chart.js/chart.min.js') }}"></script>
+    <!-- endbuild -->
 
-    <!-- jQuery Sparkline -->
-    <script src="{{ asset('assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js') }}"></script>
+    <!-- Vendors JS -->
+    <script src="{{ asset('assets/vendor/libs/apex-charts/apexcharts.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/swiper/swiper.js') }}"></script>
 
-    <!-- Chart Circle -->
-    <script src="{{ asset('assets/js/plugin/chart-circle/circles.min.js') }}"></script>
+    <!-- Main JS -->
+    <script src="{{ asset('assets/js/main.js') }}"></script>
 
-    <!-- Datatables -->
-    <script src="{{ asset('assets/js/plugin/datatables/datatables.min.js') }}"></script>
+    <!-- Page JS -->
+    <script src="{{ asset('assets/js/dashboards-analytics.js') }}"></script>
+    <script src="{{ asset('assets/js/form-layouts.js') }}"></script>
 
-    <!-- Bootstrap Notify -->
-    <script src="{{ asset('assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
 
-    <!-- jQuery Vector Maps -->
-    <script src="{{ asset('assets/js/plugin/jsvectormap/jsvectormap.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugin/jsvectormap/world.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
+    {{-- <script src="https://code.highcharts.com/highcharts.js"></script> --}}
+    {{-- <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1mG52tiHM3duCJupl0CtEB3xpzUGiohQ&callback=initAutocomplete&libraries=places&v=weekly"
+    defer
+  ></script> --}}
 
-    <!-- Sweet Alert -->
-    <script src="{{ asset('assets/js/plugin/sweetalert/sweetalert.min.js') }}"></script>
+  
+  
 
-    <!-- Kaiadmin JS -->
-    <script src="{{ asset('assets/js/kaiadmin.min.js') }}"></script>
+    @yield('scripts')
 
-    <!-- Kaiadmin DEMO methods, don't include it in your project! -->
-    <script src="{{ asset('assets/js/setting-demo.js') }}"></script>
-    <script src="{{ asset('assets/js/demo.js') }}"></script>
-    <!-- Add Parsley JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.9.2/parsley.min.js"></script>
     <script>
-        $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
-            type: "line",
-            height: "70",
-            width: "100%",
-            lineWidth: "2",
-            lineColor: "#177dff",
-            fillColor: "rgba(23, 125, 255, 0.14)",
-        });
+        $(document).ready(function() {
 
-        $("#lineChart2").sparkline([99, 125, 122, 105, 110, 124, 115], {
-            type: "line",
-            height: "70",
-            width: "100%",
-            lineWidth: "2",
-            lineColor: "#f3545d",
-            fillColor: "rgba(243, 84, 93, .14)",
-        });
+            $(".close-menu").click(function() {
 
-        $("#lineChart3").sparkline([105, 103, 123, 100, 95, 105, 115], {
-            type: "line",
-            height: "70",
-            width: "100%",
-            lineWidth: "2",
-            lineColor: "#ffa534",
-            fillColor: "rgba(255, 165, 52, .14)",
+                $("#layout-menu").hide();
+                $(".layout-navbar-fixed").removeClass("layout-menu-expanded");
+            });
+
+
+            $(".layout-menu-toggle").click(function() {
+                $("#layout-menu").show();
+                $(".layout-navbar-fixed").addClass("layout-menu-expanded");
+            });
+            // layout-menu-toggle
+
+
         });
     </script>
-    <script>
-        window.onload = function () {
-            if (!@json(Auth::check())) {
-                window.location.href = "{{ route('login') }}";
-            }
-        };
-    </script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-@yield('script')
+    {{-- <script>
+        function markAllAsRead() {
+            fetch('/notifications/mark-all-as-read', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.querySelectorAll('.dropdown-notifications-item').forEach(item => {
+                            item.classList.add('marked-as-read');
+                        });
+                        document.querySelector('.badge-dot').innerText = '0'; // Update badge count
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function markAsRead(notificationId) {
+            fetch(`/notifications/${notificationId}/read`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.querySelector(`[data-id="${notificationId}"]`).classList.add('marked-as-read');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function archiveNotification(notificationId) {
+            fetch(`/notifications/${notificationId}/archive`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        document.querySelector(`[data-id="${notificationId}"]`).remove();
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script> --}}
 </body>
 
 </html>

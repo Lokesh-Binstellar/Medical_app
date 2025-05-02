@@ -6,13 +6,13 @@
                 <div class="col-md-10">
                     <div class="card shadow">
                         <div class="card-header d-flex justify-content-between align-items-center rounded-top"
-                            style="background-color:#5ecbd8">
+                            >
                             <h4 class="card-title mb-0 text-white">Medicine</h4>
                             <form action="{{ route('medicine.import') }}" id="importForm" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
                                 <input type="file" name="file" required>
-                                <button type="submit" class="btn btn-primary">Import Medicine</button>
+                                <button type="submit" class="btn btn-primary addButton">+ Import Medicine</button>
                             </form>
                         </div>
 
@@ -21,8 +21,8 @@
                                 <table id="add-row" class="display table table-striped table-hover data-table">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th>ID</th>
+                                            <th>id</th>
+                                            <th>product id</th>
                                             <th>Name</th>
                                             <th>Salt composition</th>
                                             <th style="width: 10%">Action</th>
@@ -39,7 +39,7 @@
         </div>
     </div>
 @endsection
-@section('script')
+@section('scripts')
     <script>
         $(function() {
 
@@ -47,10 +47,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: "{{ route('medicine.index') }}",
-                columns: [{
-                        data: 'id',
-                        name: 'id'
-                    },
+                columns: [ { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                     {
                         data: 'product_id',
                         name: 'product_id'

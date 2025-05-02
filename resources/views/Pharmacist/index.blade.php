@@ -3,9 +3,9 @@
     <div class=" ">
         <div class="page-inner px-0">
             <div class="row justify-content-center">
-                <div class="col-md-10">
+                <div class="col-md-12">
                     <div class="card shadow">
-                        <div class="card-header d-flex justify-content-between align-items-center rounded-top" style="background-color:#5ecbd8">
+                        <div class="card-header d-flex justify-content-between align-items-center rounded-top">
                             <h4 class="card-title mb-0 text-white">Pharmacy</h4>
                             {{-- <a href="{{ route('pharmacist.create') }}" class="btn btn-primary">Create Pharmacist</a> --}}
                             @php
@@ -14,7 +14,7 @@
                                 if ($chk) {
                                     echo '<div class="col-sm-12 col-md-6 col-lg-6 text-end "><a href="' .
                                         route('pharmacist.create') .
-                                        '" class="btn btn-primary"><i class="mdi mdi-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Add Pharmacy </span></a></div>';
+                                        '" class="btn btn-primary addButton">+ Add Pharmacy </a></div>';
                                 }
                             @endphp
                         </div>
@@ -24,12 +24,12 @@
                                 <table id="add-row" class="display table table-striped table-hover data-table">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
+                                            <th>Id</th>
                                             <th>pharmacy name</th>
                                             <th>owner name</th>
                                             <th>email </th>
                                             <th>Phone</th>
-                                            <th style="width: 10%">Action</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -43,7 +43,8 @@
         </div>
     </div>
 @endsection
-@section('script')
+@section('scripts')
+
 <script>
 $(function() {
 
@@ -52,7 +53,7 @@ var table = $('.data-table').DataTable({
     serverSide: true,
     ajax: "{{ route('pharmacist.index') }}",
     columns: [
-        { data: 'id', name: 'id' },
+        { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
         { data: 'pharmacy_name', name: 'pharmacy_name' },
         { data: 'owner_name', name: 'owner_name' },
         { data: 'email', name: 'email' },

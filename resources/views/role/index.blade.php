@@ -1,83 +1,54 @@
 @extends('layouts.app')
 @section('content')
-   
-           
-          
-                  {{-- <table class="table-auto">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>#</th>
-                            <th>Role_Name</th>                        
-                    </thead>
-                    <tbody>
-                        @foreach ($role as $index => $roles)
-                           
-                     
-                            <tr class="">
-                                <td>{{ $index + 1 }}</td>
-                                <td>{{ $roles->name }}</td>                            
-                                <td class="flex gap-2">
-                                    <a href="{{ route('pharmacist.edit',$pharmacy->id) }}" class="bg-blue-600 text-white px-4 py-2 rounded">Edit</a>
-                                    <form action="{{ route('pharmacist.destroy', $pharmacy->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this record?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded">Delete</button>
-                                    </form>
-                                   
-                                   
-                                </td>
-                            </tr>
-                       
-                            @endforeach
-                    </tbody>
-                </table> --}}
-                <div class="container">
-                  <div class="page-inner">
-                    <div class="row">
-                      <div class="col-md-6">
-                        <div class="card">
-                          <div class="card-header d-flex justify-content-between align-items-center">
-                            <div class="card-title">Role Table</div>
-                            <button class="btn btn-primary "> <a href="{{ route('roles.create') }}" class="text-white" >Create role</a></button>
-                          </div>
-                          <div class="card-body">
-                            <table class="table table-bordered  mt-3">
-                              <thead class="thead-dark">
-                                <tr>
-                                  <th scope="col">#</th>
-                                  <th scope="col">Role name</th>                                  
-                                  <th scope="col">Action</th>                                  
-                                </tr>
-                              </thead>
-                              <tbody>
-                                  @foreach ($role as $index => $roles)
-                                <tr>
-                                  <td>{{ $index + 1 }}</td>
-                                  <td>{{ $roles->name }}</td>
-                                  <td class="d-flex gap-2">
-                                    <a href="{{route('roles.edit',$roles->id)}}"><button type="button" class="btn btn-warning ms-auto">Update</button></a>
-                                    <form action="{{ route('roles.destroy', $roles->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this record?');">
-                                      @csrf
-                                      @method('DELETE')
-                                      <button type="submit" class="btn btn-danger ms-auto">Delete</button>
-                                  </form>
-                                  </td>
-                                 
-                                </tr>
-                                @endforeach
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                       
-                     
-                       
-                      </div>
-                    </div>
-                  </div>
-                </div>
-         
-      
-    @endsection
+<div class="container">
+  <div class="page-inner">
+    <div class="row">
+      <div class="col-md">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Role Table</h4>
+            <a href="{{ route('roles.create') }}" class="btn addButton btn-primary ">+ Create Role</a>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover" id="roleTable">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Role Name</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody></tbody> <!-- DataTables fills this -->
+              </table>
+            </div>
+          </div>
+        </div>
 
-    
+      </div>
+    </div>
+  </div>
+</div>
+@endsection
+
+@section('scripts')
+<!-- Include jQuery & DataTables JS if not already -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+<script>
+$(document).ready(function() {
+  $('#roleTable').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: "{{ route('roles.index') }}",
+    columns: [
+      { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+      { data: 'name', name: 'name' },
+      { data: 'action', name: 'action', orderable: false, searchable: false }
+    ]
+  });
+});
+</script>
+@endsection

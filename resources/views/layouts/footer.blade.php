@@ -1,27 +1,16 @@
-
-<footer class="footer">
-    <div class="container-fluid d-flex justify-content-between">
-        <nav class="pull-left">
-            <ul class="nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="http://www.themekita.com">
-                      
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#"> Help </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">  </a>
-                </li>
-            </ul>
-        </nav>
-        <div class="copyright">
-            © 2025 <strong>GoMeds</strong> — Your Health, Our Priority.
-        </div>
-        <div>
-            Distributed by
-            <a target="_blank" href="https://themewagon.com/"></a>.
+<footer class="content-footer footer bg-footer-theme">
+    <div class="container-fluid">
+        <div class="footer-container d-flex align-items-center justify-content-between py-3 flex-md-row flex-column">
+            <div class="mb-2 mb-md-0 text-sm-left text-center">
+                ©
+                <script>
+                    document.write(new Date().getFullYear());
+                </script>
+                Crystal Event. All Rights Reserved
+            </div>
+            <div class="mb-2 mb-md-0">
+                <a href="https://www.vitalconcept.co.uk/" class="footer-link m-0" target="_blank">Design and Developed by Vital Concept Limited</a>
+            </div>
         </div>
     </div>
 </footer>

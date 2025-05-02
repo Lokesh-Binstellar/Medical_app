@@ -7,7 +7,9 @@ use App\Models\Role;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
-use Validator;
+use Illuminate\Support\Facades\Validator as FacadesValidator;
+use Yajra\DataTables\Facades\DataTables;
+
 // use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
@@ -16,12 +18,64 @@ class RoleController extends Controller
      * Display a listing of the resource.
      
      */
-
-  
-    public function index()
+    public function index(Request $request)
     {
-        $role = Role::all();
-        return view('role.index', compact('role'));
+        if ($request->ajax()) {
+            $data = Role::latest()->get();
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function($row){
+                    $btn = '<a href="'.route('roles.edit', $row->id).'" class="btn btn-sm btn-warning">Edit</a>';
+                    $btn .= ' <form action="'.route('roles.destroy', $row->id).'" method="POST" style="display:inline-block;">
+                                '.csrf_field().'
+                                '.method_field("DELETE").'
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm(\'Are you sure?\')">Delete</button>
+                              </form>';
+                    return $btn;
+                })
+                ->addColumn('action', function ($row) {
+                    $html = "";
+                
+                    $updateCheck = Permission::checkCRUDPermissionToUser("Items", "update");
+                    $deleteCheck = Permission::checkCRUDPermissionToUser("Items", "delete");
+                    $isSuperAdmin = Permission::isSuperAdmin();
+                
+                    if (!$isSuperAdmin && !$updateCheck && !$deleteCheck) {
+                        return '';
+                    }
+                
+                    if ($updateCheck) {
+                        $html .= '<li><a class="dropdown-item dropdown-trigger-17500btn waves-effect" href="' . route('roles.edit', $row->id) . '">Edit</a></li>';
+                    }
+                
+                    if ($isSuperAdmin || $deleteCheck) {
+                        $html .= '<li>
+                            <form action="' . route('roles.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure you want to delete this record?\');" style="margin:0;">
+                                ' . csrf_field() . '
+                                ' . method_field('DELETE') . '
+                                <button type="submit" class="dropdown-item dropdown-trigger-17500btn waves-effect" >
+                                    Delete
+                                </button>
+                            </form>
+                        </li>';
+                    }
+                
+                    return '
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-primary px-3 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                Action
+                            </button>
+                            <ul class="dropdown-menu">
+                                ' . $html . '
+                            </ul>
+                        </div>';
+                })
+                
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+    
+        return view('role.index');
     }
 
     /**
@@ -42,13 +96,14 @@ class RoleController extends Controller
     {
         $params = $request->all();
 
-        $validatedData = $request->validate([
-            'name' => 'required|string|unique:roles,name|max:255',
-         
+        $validation = FacadesValidator::make($params,[
+            'name' => 'required|string|unique:roles,name',
+            
         ]);
         
-        $validatedData['guard_name'] = 'web';
-        $role = Role::create($validatedData);
+        $params['guard_name'] = 'web';
+        // dd($params);
+        $role = Role::create($params);
 
         return redirect()->route('roles.edit',$role->id)->with('success', 'Role created successfully!');
     }

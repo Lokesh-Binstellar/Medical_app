@@ -6,7 +6,7 @@ use App\Imports\OtcImport;
 use App\Models\Otcmedicine;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 class OtcController extends Controller
 {
@@ -17,26 +17,27 @@ class OtcController extends Controller
     {
         if ($request->ajax()) {
             $data = Otcmedicine::query();
-            return Datatables::of($data)
+            return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '
-                    <div class="form-button-action d-flex gap-2">
-                   <a href="' . route('otcmedicine.show', $row->id) . '" class="btn btn-link btn-success btn-lg" data-bs-toggle="tooltip" title="View">
-        <i class="fa fa-eye"></i>
+                    return '
+                <div class="dropdown">
+                  <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+  <ul class="dropdown-menu">
+                    <li>
+                     <a href="' . route('otcmedicine.show', $row->id) . '"class="dropdown-item" >View
     </a>
-                   
-                    </div>';
-                   
-                    return $btn;
+                    </li>
 
+                    
+                  </ul>
+                </div>';
                 })
                 ->rawColumns(['action'])
                 ->make(true);
         }
         // $tests = LabTest::all();
         return view('otcmedicine.index');
-        
     }
 
     /**
