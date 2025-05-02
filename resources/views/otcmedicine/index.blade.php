@@ -5,16 +5,16 @@
             <div class="row justify-content-center">
                 <div class="col-md-10">
                     <div class="card shadow">
-                        {{-- <div class="card-header d-flex justify-content-between align-items-center rounded-top" >
+                        <div class="card-header d-flex justify-content-between align-items-center rounded-top" >
                             <h4 class="card-title mb-0 text-white">Otcmedicine</h4>
                             <form action="{{ route('otcmedicine.import') }}" id="importForm" method="POST"
                             enctype="multipart/form-data">
                             @csrf
                             <input type="file" name="file" required>
                             <button type="submit" class="btn btn-primary addButton">+ Import Medicine</button>
-                        </form> --}}
-                           
-                        <div class="card-header d-flex justify-content-between align-items-center rounded-top" style="background-color:#5ecbd8">
+                        </form>
+                    </div>
+                        {{-- <div class="card-header d-flex justify-content-between align-items-center rounded-top" style="background-color:#5ecbd8">
                             <h4 class="card-title mb-0 text-white">OTC</h4>
                             <form action="{{ route('otcmedicine.import') }}" id="importForm" method="POST"
                                 enctype="multipart/form-data">
@@ -22,7 +22,7 @@
                                 <input type="file" name="file" required>
                                 <button type="submit" class="btn btn-primary">Import Medicine</button>
                             </form>
-                        </div>
+                        </div> --}}
                            
                      
                        
