@@ -19,6 +19,8 @@ return new class extends Migration
             $table->decimal('total_amount', 10, 2);
             $table->decimal('commission_amount', 10, 2);
             $table->timestamps();
+
+            $table->foreign('phrmacy_id')->references('id')->on('pharmacies')->onDelete('cascade');
         });
     }
 

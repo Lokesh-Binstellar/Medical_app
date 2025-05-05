@@ -49,7 +49,7 @@
                     <i class="menu-icon tf-icons mdi mdi-account-outline"></i>
                     <div data-i18n="User">User</div>
                 </a>
-            </li>
+            </li>  
         @endif
 
         @if (in_array('Pharmacies', $permissions) || $isSuperAdmin == 1)
@@ -143,6 +143,15 @@
             </li>
         @endif
 
+      
+            <li
+                class="menu-item {{ in_array(Route::current()->getName(), ['addMedicine.index']) ? 'active' : '' }}">
+                <a href="{{  route('addMedicine.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons mdi mdi-pill"></i>
+                    <div data-i18n="Add Medicine">Add Medicine</div>
+                </a>
+            </li>
+      
         <li class="menu-item">
             <a href="{{ route('logout') }}" class="menu-link"
             onclick="event.preventDefault();document.getElementById('logout-form').submit();">

@@ -27,7 +27,7 @@ class AuthController extends Controller
             $mobile_no = '+91' . $mobile_no;  // Add country code if not present
         }
 
-        $otp = rand(100000, 999999);  // Generate OTP
+        $otp = rand(1000, 9999);  // Generate OTP
 
         $sid = env('TWILIO_SID');
         $authToken = env('TWILIO_AUTH_TOKEN');
@@ -56,10 +56,12 @@ class AuthController extends Controller
             ]);
 
             return response()->json([
+                'status'=>true,
                 'message' => 'OTP sent successfully.',
             ]);
         } catch (\Exception $e) {
             return response()->json([
+                'status'=>false,
                 'message' => 'Failed to send OTP: ' . $e->getMessage(),
             ], 500);
         }
@@ -73,7 +75,7 @@ class AuthController extends Controller
         // Validate input
         $request->validate([
             'mobile_no' => 'required|digits_between:10,15',
-            'otp_code' => 'required|digits:6',
+            'otp_code' => 'required|digits:4',
         ]);
 
         $mobile_no = $request->mobile_no;
@@ -85,12 +87,20 @@ class AuthController extends Controller
         $user = Customers::where('mobile_no', $mobile_no)->first();
 
         if (!$user) {
-            return response()->json(['message' => 'User not found.'], 404);
+            return response()->json([
+                'status'=>false,
+                'message' => 'User not found.'
+            ], 404);
         }
 
         // Verify OTP and expiry
         if ((string) $user->otp_code !== (string) $request->otp_code || now()->gt($user->otp_expires_at)) {
-            return response()->json(['message' => 'Invalid or expired OTP.'], 400);
+            return response()->json(
+                [
+                    'status'=>false,
+                    'message' => 'Invalid or expired OTP.'
+                ],
+                 400);
         }
 
         // Update user as verified
@@ -110,7 +120,10 @@ class AuthController extends Controller
         try {
             $jwt = JWT::encode($payload, $jwtSecret, 'HS256');
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error generating token.'], 500);
+            return response()->json([
+                'status'=>true,
+                'message' => 'Error generating token.'
+            ], 500);
         }
 
         // Return response with token
@@ -125,14 +138,15 @@ class AuthController extends Controller
     }
 
     // update Customers details
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
       
         $request->validate([
             'firstName' => 'required|string|max:255',
             'lastName' => 'required|string|max:255',
         ]);
-        $customer = Customers::find($id);
+        $userId = $request->get('user_id');
+        $customer = Customers::find($userId);
     
         if (!$customer) {
             return response()->json(['message' => 'Customer not found'], 404);

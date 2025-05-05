@@ -133,7 +133,11 @@ class MedicineController extends Controller
 
         // Check if the query parameter is present
         if (!$query) {
-            return response()->json(['message' => 'Query parameter is required.'], 400);
+            return response()->json([
+                'status'=>false,
+                'message' => 'Query parameter is required.'
+            ],
+                 400);
         }
 
         // Search from Medicine
@@ -184,10 +188,12 @@ class MedicineController extends Controller
 
 
 
-    public function medicineByProductId(Request $request)
+    public function medicineByProductId(Request $request, $id)
     {
+        // echo $id;die;
         // Step 1: Check if 'id' parameter is passed
-        if (!$request->has('id') || empty($request->id)) {
+        if (empty($id)) {
+
             return response()->json([
                 'success' => false,
                 'message' => 'ID parameter is required.'
@@ -195,7 +201,7 @@ class MedicineController extends Controller
         }
 
         // Step 2: Get the product ID from the query
-        $productId = $request->query('id');
+        $productId = $id;
 
         // Step 3: Search in both medicines and otcmedicines
         $medicine = Medicine::where('product_id', $productId)->first();

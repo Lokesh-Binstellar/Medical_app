@@ -5,6 +5,7 @@ use App\Http\Controllers\LaboratoriesController;
 use App\Http\Controllers\LabtestController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicineSearchController;
+use App\Http\Controllers\AddMedicineController;
 use App\Http\Controllers\OtcController;
 use App\Http\Controllers\packageCategoryController;
 use App\Http\Controllers\PackageController;
@@ -185,6 +186,13 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/{id}', [PackageController::class, 'show'])->name('labPackage.show'); 
         Route::delete('/{id}', [PackageController::class, 'destroy'])->name('labPackage.destroy'); 
     });
+    Route::prefix('addMedicine')->group(function () {
+        Route::get('', [AddMedicineController::class, 'index'])->name('addMedicine.index'); 
+        Route::post('', [AddMedicineController::class, 'store'])->name('addMedicine.store'); 
+       
+
+       
+    });
 
 
 
@@ -203,3 +211,5 @@ Route::post('/medicines/store', [MedicineSearchController::class, 'store'])->nam
 require __DIR__ . '/auth.php';
 
 
+Route::get('/search-medicines', [AddMedicineController::class, 'searchMedicines'])->name('medicines.search');
+Route::get('/customers/select', [AddMedicineController::class, 'customerSelect'])->name('customers.select');

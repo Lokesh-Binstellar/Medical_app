@@ -6,10 +6,10 @@
                 <script>
                     document.write(new Date().getFullYear());
                 </script>
-                Crystal Event. All Rights Reserved
+                Gomeds. All Rights Reserved
             </div>
             <div class="mb-2 mb-md-0">
-                <a href="https://www.vitalconcept.co.uk/" class="footer-link m-0" target="_blank">Design and Developed by Vital Concept Limited</a>
+                <a href="https://www.vitalconcept.co.uk/" class="footer-link m-0" target="_blank">Design and Developed by Binstellar Technologies</a>
             </div>
         </div>
     </div>

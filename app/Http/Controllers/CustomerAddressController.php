@@ -31,11 +31,11 @@ class CustomerAddressController extends Controller
         $userId = $request->get('user_id');
         //echo '<pre>'; print_r(  $request->name); die;
         if ($request->filled('latlng')) {
-            //print_r("lat long present");die;
+            // print_r("lat long present");die;
 
             $latlng = $request->latlng;
             $apiKey = env('GOOGLE_MAPS_API_KEY');
-            $apiKey = "AIzaSyD4USHslEOwk41ShOTx6fXPYbzTnoWxzTE";
+
 
             $url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$latlng&key=$apiKey";
 
@@ -55,7 +55,9 @@ class CustomerAddressController extends Controller
                 $city = null;
                 $postalCode = null;
                 $state = null;
+                $formatted_address = null;
 
+                //print_r($data);die;
                 // Parse address components
                 if (!empty($data['results'])) {
                     foreach ($data['results'][0]['address_components'] as $component) {
@@ -70,23 +72,20 @@ class CustomerAddressController extends Controller
                             $postalCode = $component['long_name'];
                         }
                     }
-                    
+
                     $formatted_address = $data['results'][0]['formatted_address'];
-                    
+                    //  echo "Formatted Address: $formatted_address\n"; die;
+
                 }
 
-                //echo "City (admin area level 3): " . ($city ?? 'Not found') . "\n";
-                //echo "Postal Code: " . ($postalCode ?? 'Not found') . "\n";
-
-
-                $this->saveAddress($city, $postalCode, $userId, $request, $state,$formatted_address);
+                $this->saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address);
             }
 
             curl_close($ch);
         } else {
 
             $address_line = urlencode($request->address_line);
-            $apiKey = "AIzaSyD4USHslEOwk41ShOTx6fXPYbzTnoWxzTE";
+            $apiKey = env('GOOGLE_MAPS_API_KEY');
 
             $url = "https://maps.googleapis.com/maps/api/geocode/json?address=$address_line&key=$apiKey";
 
@@ -126,26 +125,23 @@ class CustomerAddressController extends Controller
                             $postalCode = $component['long_name'];
                         }
                     }
-                   
-
-              
-                  
-                      $formatted_address = $data['results'][0]['formatted_address'];
+                    $formatted_address = $data['results'][0]['formatted_address'];
 
                 }
 
-                $this->saveAddress($city, $postalCode, $userId, $request, $state,$formatted_address);
+                $this->saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address);
             }
-
-            return response()->json([
-                'message' => 'Address saved successfully'
-            ]);
         }
+
+        return response()->json([
+            'status'=>true,
+            'message' => 'Address saved successfully'
+        ]);
     }
 
-    public function saveAddress($city, $postalCode, $userId, $request, $state,$formatted_address)
+    public function saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address)
     {
-       
+
         // Create address
         $address = CustomerAddress::create([
 
@@ -158,6 +154,4 @@ class CustomerAddressController extends Controller
             'postal_code' => $postalCode,
         ]);
     }
-
-
 }

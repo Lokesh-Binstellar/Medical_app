@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\AddMedicineController;
 use App\Http\Controllers\AuthTokenController;
 use App\Http\Controllers\CustomerAddressController;
+use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\PharmaciesController;
 use App\Http\Controllers\PopularBrandController;
@@ -20,30 +22,30 @@ Route::post('/login', [AuthTokenController::class, 'login']);
 
 //fetch apis
 Route::middleware('check.api.key')->group(function () {
-    Route::get('/pharmacy', [PharmaciesController::class, 'getPharmacy'])->name('pharmacy.getPharmacy');
+    Route::get('/getAllPharmacy', [PharmaciesController::class, 'getPharmacy'])->name('pharmacy.getPharmacy');
     Route::get('/medicines/search', [MedicineController::class, 'search']);
-    Route::get('/medicines/searchID', [MedicineController::class, 'medicineByProductId']);
-    Route::get('/medicines/{productId}', [MedicineController::class, 'medicineByProductId']);
-    Route::get('/popular/brand', [PopularBrandController::class, 'getBrand'])->name('popular.get_brand');
-    Route::get('/popular/category', [PopularCategoryController::class, 'getCategory'])->name('popular.getCategory');
-   
-
-
+    // Route::get('/medicines/searchById', [MedicineController::class, 'medicineByProductId']);
+    Route::get('/medicines/{id}', [MedicineController::class, 'medicineByProductId']);
+    Route::get('/getAllPopularBrand', [PopularBrandController::class, 'getBrand'])->name('popular.get_brand');
+    Route::get('/getAllPopularCategory', [PopularCategoryController::class, 'getCategory'])->name('popular.getCategory');
+    Route::get('/addToCart/{id}', [AddMedicineController::class, 'getAddToCart'])->name('addtocart.getAddToCart');
+    Route::post('/upload-file', [FileUploadController::class, 'upload']);
 });
 
 // Customers apis
 Route::middleware('check.api.key')->group(function () {
 Route::post('/send-otp', [AuthController::class, 'sendOtp']);
 Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
-Route::put('/customer/{id}', [AuthController::class, 'update']);
+
 
 // routes/api.php
-
-
-
-});
-
 Route::middleware('authTest')->group(function () {
     Route::post('/customer/address', [CustomerAddressController::class, 'store']);
+    Route::put('/customerDetails', [AuthController::class, 'update']);
 });
+
+
+
+});
+
 

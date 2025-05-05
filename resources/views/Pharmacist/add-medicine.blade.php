@@ -181,7 +181,8 @@
                 placeholder: 'Search by name or salt',
                 minimumInputLength: 0,
                 ajax: {
-                    url: '{{ route('search.medicine') }}',
+                    
+                    url: "/search-medicine",
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {

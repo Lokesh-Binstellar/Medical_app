@@ -11,9 +11,12 @@ class MedicineSearchController extends Controller
 {
     public function index()
     {
+        // dd(Pharmacies::all());
         $pharmacy = Pharmacies::where('user_id',Auth::user()->id)->first();
+      
         $medicines = Phrmacymedicine::where('phrmacy_id',$pharmacy->id)->get();
-        // dd($medicines);
+        
+      
         return view('Pharmacist.add-medicine',compact('medicines'));
 
         

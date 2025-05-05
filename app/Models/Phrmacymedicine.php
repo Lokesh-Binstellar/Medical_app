@@ -11,9 +11,6 @@ class Phrmacymedicine extends Model
         'medicine','total_amount','commission_amount', 'phrmacy_id','mrp_amount'
     ];
 
-    public function pharmacy(): BelongsTo
-    {
-        return $this->belongsTo(Pharmacies::class, 'phrmacy_id', 'id');
-    }
+   
     
 }
