@@ -58,8 +58,8 @@
                             <form method="POST" action="{{ route('addMedicine.store') }}">
                                 @csrf
                                 <div class="d-flex mb-4 selectCustomer align-items-center gap-3">
-                                    <label class="font-bold">Please Select Customer :</label>
-                                    <select class="form-control customer-search " name="customer[0][customer_id]">
+                                    <label class="font-bold">Please Select Prescription :</label>
+                                    <select class="form-control customer-search " name="prescription_id">
                                         <option value="">Search customer...</option>
                                     </select>
                                 </div>
@@ -217,7 +217,7 @@
     $el.select2({
         placeholder: 'Search customer...',
         ajax: {
-            url: '{{ route("customers.select") }}',
+            url: '{{ route("prescription.select") }}',
             dataType: 'json',
             delay: 250,
             data: function (params) {

@@ -174,7 +174,7 @@
 
 
 @endsection
-@section('script')
+@section('scripts')
     <script>
         function initSelect2($el) {
             $el.select2({

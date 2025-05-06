@@ -29,6 +29,10 @@ class Customers extends Model
     {
         return $this->hasMany(CustomerAddress::class);
     }
+    public function prescription()
+    {
+        return $this->hasMany(Prescription::class);
+    }
 
 }
 

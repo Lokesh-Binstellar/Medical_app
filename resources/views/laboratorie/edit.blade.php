@@ -215,7 +215,40 @@
                             <label for="address">Address</label>
                         </div>
                     </div>
-
+                    <div id="formRepeater">
+                        @foreach ($labTests as $index => $item)
+                            <div class="row g-3 align-items-end mb-3 repeater-group">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Test</label>
+                                    <select name="test[]" class="form-select" required>
+                                        <option value="">Select Test</option>
+                                        @foreach ($allTests as $test)
+                                            <option value="{{ $test->id }}" {{ $test->id == $item['test'] ? 'selected' : '' }}>
+                                                {{ $test->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Price</label>
+                                    <input type="number" class="form-control" name="price[]" min="0" value="{{ $item['price'] ?? '' }}" placeholder="Price" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Home Price</label>
+                                    <input type="number" class="form-control" name="homeprice[]" min="0" value="{{ $item['homeprice'] ?? '' }}" placeholder="Home Price" required>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end gap-2">
+                                    <button type="button" onclick="removeField(this)" class="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                        <i class="bi bi-dash-lg"></i>
+                                    </button>
+                                    <button type="button" onclick="addField()" class="btn btn-outline-success btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                   
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                     {{-- Buttons --}}
                     <div class="card-action">
                         <button type="submit" class="btn btn-primary">Update</button>
@@ -236,4 +269,57 @@
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
+    <script>
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+                    // Initialize Parsley for the form
+                    $('#myForm').parsley();
+                });
+                
+            const testOptions = @json($allTests->map(fn($t) => ['id' => $t->id, 'name' => $t->name]));
+        
+            function addField() {
+                const repeater = document.getElementById('formRepeater');
+                const newGroup = document.createElement('div');
+                newGroup.className = 'row g-3 align-items-end mb-3 repeater-group';
+        
+                const optionsHtml = testOptions.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+        
+                newGroup.innerHTML = `
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Test</label>
+                        <select name="test[]" class="form-select" required>
+                            <option value="">Select Test</option>
+                            ${optionsHtml}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Price</label>
+                        <input type="number" class="form-control" name="price[]" min="0" placeholder="Price" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Home Price</label>
+                        <input type="number" class="form-control" name="homeprice[]" min="0" placeholder="Home Price" required>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end gap-2">
+                        <button type="button" onclick="removeField(this)" class="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                            <i class="bi bi-dash-lg"></i>
+                        </button>
+                        <button type="button" onclick="addField()" class="btn btn-outline-success btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    </div>
+                `;
+        
+                repeater.appendChild(newGroup);
+            }
+        
+            function removeField(button) {
+                const repeater = document.getElementById('formRepeater');
+                const groups = repeater.querySelectorAll('.repeater-group');
+                if (groups.length > 1) {
+                    button.closest('.repeater-group').remove();
+                }
+            }
 @endsection

@@ -196,7 +196,42 @@
                             <label for="address">Address</label>
                         </div>
                     </div>
-
+                    <div class="col-md-12 mt-4" id="formRepeater">
+                        <div class="row g-3 align-items-end mb-3 repeater-group">
+                            <div class="col-md-4">
+                                <label for="brand-select" class="form-label fw-semibold">Test</label>
+                                <select name="test[]" class="form-select p-8-4  " required>
+                                    <option value="" >Select Test</option>
+                                    @foreach ($tests as $test)
+                                        <option value="{{ $test->id }}">{{ $test->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Price</label>
+                                <input type="number" class="form-control" name="price[]" min="0"
+                                    placeholder="Price" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Home Price</label>
+                                <input type="number" class="form-control" name="homeprice[]" min="0"
+                                    placeholder="Home Price" required>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end gap-2">
+                                <!-- Remove Button -->
+                                <button type="button" onclick="removeField(this)" class="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                    <i class="bi bi-dash-lg"></i>
+                                </button>
+                            
+                                <!-- Add Button -->
+                                <button type="button" onclick="addField()" class="btn btn-outline-success btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </div>
+                            
+                        </div>
+                    </div>
                     {{-- Buttons --}}
                     <div class="card-action">
                         <button type="submit" class="btn btn-primary">Save</button>
@@ -217,4 +252,99 @@
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fields to auto-trim on blur
+            const trimFields = ['pharmacy_name', 'owner_name', 'city', 'state', 'address'];
+
+            trimFields.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('blur', function() {
+                        input.value = input.value.trim();
+                    });
+                }
+            });
+
+            // Email field - block space entirely, cursor should not move
+            const emailInput = document.getElementById('email');
+            if (emailInput) {
+                // Prevent spacebar press (keydown)
+                emailInput.addEventListener('keydown', function(e) {
+                    if (e.key === ' ' || e.keyCode === 32) {
+                        e.preventDefault(); // completely stop the space
+                    }
+                });
+
+                // Remove spaces if pasted or autofilled
+                emailInput.addEventListener('input', function() {
+                    const cursorPos = emailInput.selectionStart;
+                    const cleaned = emailInput.value.replace(/\s+/g, '');
+                    const diff = emailInput.value.length - cleaned.length;
+
+                    emailInput.value = cleaned;
+
+                    // Keep cursor in place if space was stripped
+                    if (diff > 0) {
+                        emailInput.setSelectionRange(cursorPos - diff, cursorPos - diff);
+                    }
+                });
+            }
+        });
+
+        // form repeater-group
+        function addField() {
+    const repeater = document.getElementById('formRepeater');
+    const newGroup = document.createElement('div');
+    newGroup.className = 'row g-3 align-items-end mb-3 repeater-group';
+
+    newGroup.innerHTML = `
+        <div class="col-md-4">
+            <label for="brand-select" class="form-label fw-semibold">Test</label>
+            <select name="test[]" class="form-select p-8-4" required>
+                <option value="">Select Test</option>
+                @foreach ($tests as $test)
+                    <option value="{{ $test->id }}">{{ $test->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Price</label>
+            <input type="number" class="form-control" name="price[]" min="0"
+                placeholder="Price" required>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Home Price</label>
+            <input type="number" class="form-control" name="homeprice[]" min="0"
+                placeholder="Home Price" required>
+        </div>
+        <div class="col-md-2 d-flex align-items-end gap-2">
+            <!-- Remove Button -->
+            <button type="button" onclick="removeField(this)" class="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                <i class="bi bi-dash-lg"></i>
+            </button>
+
+            <!-- Add Button -->
+            <button type="button" onclick="addField()" class="btn btn-outline-success btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+        </div>
+    `;
+
+    repeater.appendChild(newGroup);
+}
+
+function removeField(button) {
+    const repeater = document.getElementById('formRepeater');
+    const groups = repeater.querySelectorAll('.repeater-group');
+    if (groups.length > 1) {
+        const group = button.closest('.repeater-group');
+        if (group) group.remove();
+    } 
+    // else {
+    //     alert("At least one test must remain.");
+    // }
+}
+
+    </script>
 @endsection

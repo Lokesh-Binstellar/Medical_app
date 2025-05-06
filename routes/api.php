@@ -29,23 +29,27 @@ Route::middleware('check.api.key')->group(function () {
     Route::get('/getAllPopularBrand', [PopularBrandController::class, 'getBrand'])->name('popular.get_brand');
     Route::get('/getAllPopularCategory', [PopularCategoryController::class, 'getCategory'])->name('popular.getCategory');
     Route::get('/addToCart/{id}', [AddMedicineController::class, 'getAddToCart'])->name('addtocart.getAddToCart');
-    Route::post('/upload-file', [FileUploadController::class, 'upload']);
-});
+    Route::delete('/cart/{cartId}/product/{productId}', [AddMedicineController::class, 'removeProduct']);
 
-// Customers apis
-Route::middleware('check.api.key')->group(function () {
-Route::post('/send-otp', [AuthController::class, 'sendOtp']);
-Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+    Route::post('/send-otp', [AuthController::class, 'sendOtp']);
+    Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
 
 
-// routes/api.php
-Route::middleware('authTest')->group(function () {
-    Route::post('/customer/address', [CustomerAddressController::class, 'store']);
-    Route::put('/customerDetails', [AuthController::class, 'update']);
-});
-
+    // with jwt token
+    Route::middleware('authTest')->group(function () {
+        Route::post('/customer/address', [CustomerAddressController::class, 'store']);
+        Route::put('/customerDetails', [AuthController::class, 'update']);
+        Route::post('/upload-file', [FileUploadController::class, 'upload']);
+    });
 
 
 });
+
+
+
+
+
+
+
 
 

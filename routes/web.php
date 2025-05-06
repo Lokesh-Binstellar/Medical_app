@@ -12,6 +12,7 @@ use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PharmaciesController;
 use App\Http\Controllers\PopularBrandController;
 use App\Http\Controllers\PopularCategoryController;
+use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -188,10 +189,7 @@ Route::group(['middleware' => ['auth']], function () {
     });
     Route::prefix('addMedicine')->group(function () {
         Route::get('', [AddMedicineController::class, 'index'])->name('addMedicine.index'); 
-        Route::post('', [AddMedicineController::class, 'store'])->name('addMedicine.store'); 
-       
-
-       
+        Route::post('', [AddMedicineController::class, 'store'])->name('addMedicine.store');    
     });
 
 
@@ -212,4 +210,7 @@ require __DIR__ . '/auth.php';
 
 
 Route::get('/search-medicines', [AddMedicineController::class, 'searchMedicines'])->name('medicines.search');
-Route::get('/customers/select', [AddMedicineController::class, 'customerSelect'])->name('customers.select');
+Route::get('/prescription/select', [AddMedicineController::class, 'prescriptionSelect'])->name('prescription.select');
+Route::get('/prescriptions', [FileUploadController::class, 'index'])->name('prescriptions.index');
+Route::post('/prescriptions/update-status/{id}', [FileUploadController::class, 'updateStatus']);
+

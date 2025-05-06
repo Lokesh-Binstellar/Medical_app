@@ -143,7 +143,7 @@
             </li>
         @endif
 
-      
+        @if (in_array('Carts', $permissions) || $isSuperAdmin == 1)
             <li
                 class="menu-item {{ in_array(Route::current()->getName(), ['addMedicine.index']) ? 'active' : '' }}">
                 <a href="{{  route('addMedicine.index') }}" class="menu-link">
@@ -151,6 +151,17 @@
                     <div data-i18n="Add Medicine">Add Medicine</div>
                 </a>
             </li>
+            @endif
+        @if (in_array('Prescriptions', $permissions) || $isSuperAdmin == 1)
+            <li
+                class="menu-item {{ in_array(Route::current()->getName(), ['prescriptions.index']) ? 'active' : '' }}">
+                <a href="{{  route('prescriptions.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons mdi mdi-pill"></i>
+                    <div data-i18n="Prescriptions">Prescriptions</div>
+                </a>
+            </li>
+            @endif
+          
       
         <li class="menu-item">
             <a href="{{ route('logout') }}" class="menu-link"

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customers;
 use App\Models\Medicine;
 use App\Models\Otcmedicine;
+use App\Models\Prescription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 class AddMedicineController extends Controller
@@ -56,19 +57,31 @@ class AddMedicineController extends Controller
         ]);
 
     }
-    public function customerSelect(Request $request)
+    public function prescriptionSelect(Request $request)
     {
         $search = $request->input('query');
 
-        $customers = DB::table('customers')
-            ->where('firstName', 'like', "%{$search}%")
-            ->orWhere('mobile_no', 'like', "%{$search}%")
-            ->select('id', DB::raw("CONCAT(firstName, ' (', mobile_no, ')') as text"))
+        $prescriptions = Prescription::with('customers')
+            ->where('prescription_status', 0)
+            ->where('status', 1)
+            ->whereHas('customers', function ($query) use ($search) {
+                $query->where('mobile_no', 'like', "%{$search}%")
+                    ->orWhere('firstName', 'like', "%{$search}%");
+            })
             ->limit(10)
-            ->get();
+            ->get()
+            ->map(function ($prescription) {
+                return [
+                    'id' => $prescription->id,
+                    'text' => 'Prescription #' . $prescription->id . ' - ' .
+                        $prescription->customers->firstName . ' (' .
+                        $prescription->customers->mobile_no . ')',
+                ];
+            });
 
-        return response()->json(['results' => $customers]);
+        return response()->json(['results' => $prescriptions]);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -83,30 +96,49 @@ class AddMedicineController extends Controller
      */
     public function store(Request $request)
     {
+
         $validated = $request->validate([
-            'customer.0.customer_id' => 'required',
+            'prescription_id' => 'required',
             'medicine.*.medicine_id' => 'required',
             'medicine.*.is_substitute' => 'required',
         ]);
-    
-        $customerId = $request->input('customer')[0]['customer_id'];
-    
+
+        $prescriptionId = $request['prescription_id'];
+
+        // Fetch the prescription record
+        $prescription = Prescription::find($prescriptionId);
+
+        if ($prescription) {
+            $customerId = $prescription->customer_id;
+        }
+        // dd($customerId);
         $allProducts = [];
-    
+
         foreach ($validated['medicine'] as $row) {
             $allProducts[] = [
                 'product_id' => $row['medicine_id'],
                 'is_substitute' => $row['is_substitute'],
             ];
         }
-    
+
         DB::table('carts')->insert([
+            'prescription_id' => $prescriptionId,
             'customer_id' => $customerId,
             'products_details' => json_encode($allProducts),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-    
+
+        DB::table('prescriptions')
+            ->where('id', $prescriptionId)
+            ->update([
+                'status' => 0, // or whatever status means "completed"
+                'updated_at' => now()
+            ]);
+
+
+
+
         return redirect()->back()->with('success', 'All product data saved successfully ');
     }
 
@@ -137,17 +169,17 @@ class AddMedicineController extends Controller
     {
         try {
             $carts = DB::table('carts')
-                        ->where('customer_id', $id)
-                        ->orderByDesc('created_at')
-                        ->get();
-    
+                ->where('customer_id', $id)
+                ->orderByDesc('created_at')
+                ->get();
+
             if ($carts->isEmpty()) {
                 return response()->json([
                     'status' => false,
                     'message' => 'No cart records found for customer ID ' . $id
                 ], 404);
             }
-    
+
             $result = $carts->map(function ($cart) {
                 return [
                     'id' => $cart->id,
@@ -156,7 +188,7 @@ class AddMedicineController extends Controller
                     'created_at' => $cart->created_at
                 ];
             });
-    
+
             return response()->json([
                 'status' => true,
                 'data' => $result
@@ -169,7 +201,40 @@ class AddMedicineController extends Controller
             ], 500);
         }
     }
-    
+    public function removeProduct($cartId, $productId)
+    {
+
+        $cart = DB::table('carts')->where('id', $cartId)->first();
+
+        if (!$cart) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Cart not found.'
+            ], 404);
+        }
+
+        $products = json_decode($cart->products_details, true);
+
+        // Filter out the product
+        $updatedProducts = array_filter($products, function ($product) use ($productId) {
+            return $product['product_id'] != $productId;
+        });
+
+        // Reindex the array
+        $updatedProducts = array_values($updatedProducts);
+
+        DB::table('carts')->where('id', $cartId)->update([
+            'products_details' => json_encode($updatedProducts),
+            'updated_at' => now(),
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Product removed successfully.',
+            'data' => $updatedProducts
+        ]);
+    }
+
 
     /**
      * Remove the specified resource from storage.
