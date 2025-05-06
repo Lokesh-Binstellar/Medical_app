@@ -4,31 +4,48 @@
     <div class="container mt-5">
         <div class="page-inner">
             <div class="row justify-content-center">
-                <div class="col-md-12">
-                    <div class="card shadow">
-                        <div class="card-header">
-                            <h4>Edit Category</h4>
-                        </div>
+                <div class="col-12">
 
+
+
+                    <div class="card">
+                        <h5 class="card-header">Edit Category</h5>
                         <div class="card-body">
-                            <form action="{{ route('popular_category.update', $category->id) }}" method="POST" enctype="multipart/form-data">
+                            <form class="row g-3" action="{{ route('popular_category.update', $category->id) }}"
+                                method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
-
-                                <div class="form-group">
-                                    <label for="name">Category Name</label>
-                                    <input type="text" class="form-control" name="name" value="{{ $category->name }}" readonly>
+                                {{-- Pharmacy Name --}}
+                                <div class="col-md-6">
+                                    <div class="form-floating form-floating-outline">
+                                        <input value="{{ $category->name }}"  type="text" name="name"
+                                            id="name" class="form-control" placeholder="category Name" />
+                                        <label for="name">Category Name</label>
+                                    </div>
                                 </div>
-
-                                <div class="form-group">
-                                    <label for="logo">Logo</label>
-                                    <input type="file" name="logo" class="form-control-file">
+            
+                               
+                                
+                                {{-- Image --}}
+                                <div class="form-group col-md-6 d-flex justify-content-center flex-column">
                                     @if ($category->logo)
-                                        <img src="{{url('storage/category/' .$category->logo)}}" alt="logo" width="50" class="mt-2">
+                                        <div class="mb-2">
+                                            <img id="logo" src="{{url('storage/category/' .$category->logo)}}" alt="category Image" class="img-thumbnail"
+                                                style="max-height: 150px;">
+                                        </div>
                                     @endif
+                                    <input type="file" name="logo" class="form-control"
+                                        data-parsley-required="{{ $category->logo ? 'false' : 'true' }}"
+                                        data-parsley-required-message="The image field is required.">
+                                    <small class="text-muted">Leave blank to keep existing image</small>
                                 </div>
-
-                                <button type="submit" class="btn btn-primary">Update Category</button>
+            
+                                {{-- Buttons --}}
+                                <div class="card-action">
+                                    <button type="submit" class="btn btn-primary">Update</button>
+                                    <button type="button" class="btn btn-primary"
+                                        onclick="window.location='{{ route('popular_category.index') }}'">Cancel</button>
+                                </div>
                             </form>
                         </div>
                     </div>

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('phrmacymedicines', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('customer_id');
             $table->unsignedBigInteger('phrmacy_id');
             $table->json('medicine');              // Store all medicine rows as JSON
             $table->decimal('mrp_amount', 10, 2);
@@ -21,6 +22,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('phrmacy_id')->references('id')->on('pharmacies')->onDelete('cascade');
+             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade'); // ✅ Foreign key
         });
     }
 

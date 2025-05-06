@@ -1,36 +1,36 @@
 @extends('layouts.app')
 @section('styles')
-<style>
-    /* Fix column widths */
-    #medicine-table td, 
-    #medicine-table th {
-        max-width: 300px;
-        width: 300px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+    <style>
+        /* Fix column widths */
+        #medicine-table td,
+        #medicine-table th {
+            max-width: 300px;
+            width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
 
-    /* Style Select2 container for fixed width */
-    .select2-container--default .select2-selection--single {
-        width: 100% !important;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+        /* Style Select2 container for fixed width */
+        .select2-container--default .select2-selection--single {
+            width: 100% !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
 
-    /* Optional: Hide the full text tooltip on hover */
-    .select2-selection__rendered {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    .selectCustomer {
-    font-weight: 600;
-    text-wrap: nowrap;
-}
-</style>
+        /* Optional: Hide the full text tooltip on hover */
+        .select2-selection__rendered {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
 
+        .selectCustomer {
+            font-weight: 600;
+            text-wrap: nowrap;
+        }
+    </style>
 @endsection
 @section('content')
     <div class="">
@@ -43,18 +43,18 @@
                         </div>
 
                         <div class="card-body">
-                           
-                            @if(session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
-                        @endif
-                        
-                        @if(session('error'))
-                            <div class="alert alert-danger">
-                                {{ session('error') }}
-                            </div>
-                        @endif
+
+                            @if (session('success'))
+                                <div class="alert alert-success">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+
+                            @if (session('error'))
+                                <div class="alert alert-danger">
+                                    {{ session('error') }}
+                                </div>
+                            @endif
                             <form method="POST" action="{{ route('addMedicine.store') }}">
                                 @csrf
                                 <div class="d-flex mb-4 selectCustomer align-items-center gap-3">
@@ -67,8 +67,8 @@
                                     <table class="table table-bordered table-striped align-middle" id="medicine-table">
                                         <thead class="table-light text-center">
                                             <tr>
-                                                <th >Select Medicine</th>
-                                                <th>Substitute</th>                              
+                                                <th>Select Medicine</th>
+                                                <th>Substitute</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -77,8 +77,7 @@
                                                 <td class="customWidth">
                                                     <select class="form-control medicine-search"
                                                         name="medicine[0][medicine_id]">
-                                                        <option value=""
-                                                            >Search
+                                                        <option value="">Search
                                                             medicine...</option>
                                                     </select>
                                                 </td>
@@ -90,7 +89,7 @@
                                                         <option value="no">No</option>
                                                     </select>
                                                 </td>
-                                               
+
                                                 <td>
                                                     <button type="button"
                                                         class="btn btn-sm btn-outline-danger remove-row">−</button>
@@ -235,7 +234,7 @@
     });
 }
 
-initCustomerSelect2($('.customer-search'));
+            initCustomerSelect2($('.customer-search'));
 
         });
     </script>

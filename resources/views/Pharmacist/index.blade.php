@@ -18,7 +18,7 @@
                                 }
                             @endphp
                         </div>
-                       
+
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table id="add-row" class="display table table-striped table-hover data-table">
@@ -44,47 +44,64 @@
     </div>
 @endsection
 @section('scripts')
+    <script>
+        $(function() {
 
-<script>
-$(function() {
+            var table = $('.data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('pharmacist.index') }}",
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'pharmacy_name',
+                        name: 'pharmacy_name'
+                    },
+                    {
+                        data: 'owner_name',
+                        name: 'owner_name'
+                    },
+                    {
+                        data: 'email',
+                        name: 'email'
+                    },
+                    {
+                        data: 'phone',
+                        name: 'phone'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
 
-var table = $('.data-table').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('pharmacist.index') }}",
-    columns: [
-        { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-        { data: 'pharmacy_name', name: 'pharmacy_name' },
-        { data: 'owner_name', name: 'owner_name' },
-        { data: 'email', name: 'email' },
-        { data: 'phone', name: 'phone' },
-        { data: 'action', name: 'action', orderable: false, searchable: false }
-    ]
-});
-
-// Delete  function
-window.deleteUser = function(id) {
-    if (confirm('Are you sure you want to delete this pharmacist?')) {
-        $.ajax({
-            url: '{{ route('pharmacist.destroy', '') }}/' + id, // Dynamic URL with ID
-            type: 'DELETE',
-            data: {
-                _token: '{{ csrf_token() }}',  // CSRF token
-            },
-            success: function(response) {
-                alert('Pharmacist deleted successfully!');
-                table.ajax.reload();  // Refresh the table to reflect the changes
-            },
-            error: function(xhr, status, error) {
-                alert('Error: ' + error);
+            // Delete  function
+            window.deleteUser = function(id) {
+                if (confirm('Are you sure you want to delete this pharmacist?')) {
+                    $.ajax({
+                        url: '{{ route('pharmacist.destroy', '') }}/' + id, // Dynamic URL with ID
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}', // CSRF token
+                        },
+                        success: function(response) {
+                            alert('Pharmacist deleted successfully!');
+                            table.ajax.reload(); // Refresh the table to reflect the changes
+                        },
+                        error: function(xhr, status, error) {
+                            alert('Error: ' + error);
+                        }
+                    });
+                }
             }
+
         });
-    }
-}
-
-});
-
-
-
-</script>
+    </script>
 @endsection

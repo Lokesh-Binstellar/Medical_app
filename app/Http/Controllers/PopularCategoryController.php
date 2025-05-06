@@ -6,7 +6,7 @@ use App\Models\Otcmedicine;
 use App\Models\PopularCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 class PopularCategoryController extends Controller
 {
@@ -18,19 +18,31 @@ class PopularCategoryController extends Controller
         $popularCategory = Otcmedicine::all()->pluck('category')->unique();
         $AddedCategory = PopularCategory::all();
         if ($request->ajax()) {
-            $data = PopularCategory::query();
-            return Datatables::of($data)
+            $data = PopularCategory::all();
+    
+            return DataTables::of($data)
                 ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    $btn = '
-                    <div class="form-button-action d-flex gap-2">
-                          <a href="' . route('popular_category.edit', $row->id) . '" class="btn  btn-warning btn-sm" data-bs-toggle="tooltip" title="Edit"> Edit </a>
-                            <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deleteCategory">Delete</a>
-                          </div>';
-                    return $btn;
-                })
                 ->addColumn('logo', function ($product_brand) {
                     return '<img src="' . asset('storage/category/' . $product_brand->logo) . '" border="0" width="40" class="img-rounded" align="center" />';
+                })
+                
+                ->addColumn('action', function ($row) {
+                    return '
+                    <div class="dropdown">
+                      <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+                      <ul class="dropdown-menu">
+                       <li>
+                    <a href="' . route('popular_category.edit', $row->id) . '" class="dropdown-item" >Edit</a>
+                    </li>
+                        
+                        <li>
+                          <form action="' . route('popular_category.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
+                            ' . csrf_field() . method_field('DELETE') . '
+                            <button class="dropdown-item" type="submit">Delete</button>
+                          </form>
+                        </li>
+                      </ul>
+                    </div>';
                 })
                 ->rawColumns(['action','logo'])
                 ->make(true);

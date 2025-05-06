@@ -4,10 +4,10 @@
     <div class="container mt-5">
         <div class="page-inner">
             <div class="row justify-content-center">
-                <div class="col-md-12">
-                    <div class="card shadow">
+                <div class="col-12">
+                    {{-- <div class="card shadow">
                         <div class="card-header">
-                            <h4>Edit Brand</h4>
+                            <h4 class="card-title mb-0 ">Edit Brand</h4>
                         </div>
 
                         <div class="card-body">
@@ -29,6 +29,49 @@
                                 </div>
 
                                 <button type="submit" class="btn btn-primary">Update Brand</button>
+                            </form>
+                        </div>
+                    </div> --}}
+
+
+                    <div class="card">
+                        <h5 class="card-header">Edit Brand</h5>
+                        <div class="card-body">
+                            <form class="row g-3" action="{{ route('popular.update', $brand->id) }}"
+                                method="POST" enctype="multipart/form-data">
+                                @csrf
+                                @method('PUT')
+                                {{-- Pharmacy Name --}}
+                                <div class="col-md-6">
+                                    <div class="form-floating form-floating-outline">
+                                        <input value="{{ $brand->name }}"  type="text" name="name"
+                                            id="name" class="form-control" placeholder="Brand Name" />
+                                        <label for="name">Brand Name</label>
+                                    </div>
+                                </div>
+            
+                               
+                                
+                                {{-- Image --}}
+                                <div class="form-group col-md-6 d-flex justify-content-center flex-column">
+                                    @if ($brand->logo)
+                                        <div class="mb-2">
+                                            <img id="logo" src="{{url('storage/brand/' .$brand->logo)}}" alt="Brand Image" class="img-thumbnail"
+                                                style="max-height: 150px;">
+                                        </div>
+                                    @endif
+                                    <input type="file" name="logo" class="form-control"
+                                        data-parsley-required="{{ $brand->logo ? 'false' : 'true' }}"
+                                        data-parsley-required-message="The image field is required.">
+                                    <small class="text-muted">Leave blank to keep existing image</small>
+                                </div>
+            
+                                {{-- Buttons --}}
+                                <div class="card-action">
+                                    <button type="submit" class="btn btn-primary">Update</button>
+                                    <button type="button" class="btn btn-primary"
+                                        onclick="window.location='{{ route('popular.index') }}'">Cancel</button>
+                                </div>
                             </form>
                         </div>
                     </div>

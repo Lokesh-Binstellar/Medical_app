@@ -11,6 +11,11 @@ class Phrmacymedicine extends Model
         'medicine','total_amount','commission_amount', 'phrmacy_id','mrp_amount'
     ];
 
+    public function customer()
+    {
+        return $this->belongsTo(Customers::class, 'customer_id');
+    }
+
    
     
 }

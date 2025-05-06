@@ -1,109 +1,150 @@
 @extends('layouts.app')
 
-@section('style')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+@section('styles')
+{{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
 
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
 
+    <style>
+        /* Fix column widths */
+        #medicine-table td,
+        #medicine-table th {
+            max-width: 200px;
+            width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+
+        /* Style Select2 container for fixed width */
+        .select2-container--default .select2-selection--single {
+            width: 100% !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Optional: Hide the full text tooltip on hover */
+        .select2-selection__rendered {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .selectCustomer {
+            font-weight: 600;
+            text-wrap: nowrap;
+        }
+    </style>
 @endsection
 @section('content')
 
-<div class="container mt-4">
-    <div class="card shadow-sm rounded-3">
-        <!-- Blue Header Title -->
-        <div class="card-header bg-info text-white fw-bold fs-5">
-            Add Medicine
-        </div>
+    <div class="container mt-4">
+        <div class="card shadow-sm rounded-3">
+            <!-- Blue Header Title -->
+            <div class="card-header  text-white fw-bold fs-5">
+                Add Medicine
+            </div>
 
-        <div class="card-body">
-            <form method="POST" action="{{ route('medicines.store') }}">
-                @csrf
-
-                <div class="table-responsive mb-3">
-                    <table class="table table-bordered table-striped align-middle" id="medicine-table">
-                        <thead class="table-light text-center">
-                            <tr>
-                                <th>Search Medicine</th>
-                                <th>MRP</th>
-                                <th>Final Amount</th>
-                                <th>Discount %</th>
-                                <th>Available</th>
-                                <th>Substitute</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="medicine-body">
-                            <tr class="medicine-row">
-                                <td>
-                                    <select class="form-select medicine_search" name="medicine[0][medicine_id]"></select>
-                                    <input type="hidden" class="medicine_name" name="medicine[0][medicine_name]">
-                                </td>
-                                <td>
-                                    <input type="number" name="medicine[0][mrp]" class="form-control mrp" step="0.01" placeholder="MRP">
-                                </td>
-                                <td>
-                                    <input type="number" name="medicine[0][discount]" class="form-control discount" step="0.01" placeholder="Final Amount">
-                                </td>
-                                <td>
-                                    <input type="number" name="medicine[0][discount_percent]" class="form-control discount_percent" step="0.01" placeholder="%">
-                                </td>
-                                <td>
-                                    <select name="medicine[0][available]" class="form-select">
-                                        <option value="yes">Yes</option>
-                                        <option value="no">No</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <select name="medicine[0][is_substitute]" class="form-select">
-                                        <option value="yes">Yes</option>
-                                        <option value="no">No</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-outline-danger remove-row">−</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="d-flex justify-content-between flex-wrap gap-3">
-                    <div class="d-flex gap-2 justify-center align-items-center">
-                        <button type="button" id="add-row" class="btn btn-primary">+</button>
-                        <button type="submit" class="btn btn-success">Save</button>
+            <div class="card-body">
+                <form method="POST" action="{{ route('medicines.store') }}" id="medicineCreateForm">
+                    @csrf
+                    <div class="d-flex mb-4 selectCustomer align-items-center gap-3">
+                        <label class="font-bold">Please Select Customer :</label>
+                        <select class="form-control customer-search " name="customer[0][customer_id]">
+                            <option value="">Search customer...</option>
+                        </select>
+                    </div>
+                    <div class="table-responsive mb-3">
+                        <table class="table table-bordered table-striped align-middle" id="medicine-table">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th>Search Medicine</th>
+                                    <th>MRP</th>
+                                    <th>Final Amount</th>
+                                    <th>Discount %</th>
+                                    <th>Available</th>
+                                    <th>Substitute</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="medicine-body">
+                                <tr class="medicine-row">
+                                    <td>
+                                        <select class="form-select medicine_search"
+                                            name="medicine[0][medicine_id]"></select>
+                                        <input type="hidden" class="medicine_name" name="medicine[0][medicine_name]">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="medicine[0][mrp]" class="form-control mrp"
+                                            step="0.01" placeholder="MRP">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="medicine[0][discount]" class="form-control discount"
+                                            step="0.01" placeholder="Final Amount">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="medicine[0][discount_percent]"
+                                            class="form-control discount_percent" step="0.01" placeholder="%">
+                                    </td>
+                                    <td>
+                                        <select name="medicine[0][available]" class="form-select">
+                                            <option value="yes">Yes</option>
+                                            <option value="no">No</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="medicine[0][is_substitute]" class="form-select">
+                                            <option value="yes">Yes</option>
+                                            <option value="no">No</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-row">−</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
-                    <div class="d-flex flex-column text-end">
-                        <div>
-                            <input type="hidden" id="mrp_amount" name="mrp_amount">
-                            <strong>Total MRP:</strong>
-                            <span class="text-primary fw-bold mrp-amount">0.00</span>
+                    <div class="d-flex justify-content-between flex-wrap gap-3">
+                        <div class="d-flex gap-2 justify-center align-items-center">
+                            <button type="button" id="add-row" class="btn btn-primary">+</button>
+                            <button type="submit" class="btn  btn-primary">Save</button>
                         </div>
-                        <div>
-                            <input type="hidden" id="total_amount" name="total_amount">
-                            <strong>Total Final Amount:</strong>
-                            <span class="text-success fw-bold total-amount">0.00</span>
-                        </div>
-                        <div>
-                            <input type="hidden" id="commission_amount" name="commission_amount">
-                            <strong>Total Commission (5% on MRP):</strong>
-                            <span class="text-danger fw-bold commission-amount">0.00</span>
+
+                        <div class="d-flex flex-column text-end">
+                            <div>
+                                <input type="hidden" id="mrp_amount" name="mrp_amount">
+                                <strong>Total MRP:</strong>
+                                <span class="text-primary fw-bold mrp-amount">0.00</span>
+                            </div>
+                            <div>
+                                <input type="hidden" id="total_amount" name="total_amount">
+                                <strong>Total Final Amount:</strong>
+                                <span class="text-success fw-bold total-amount">0.00</span>
+                            </div>
+                            <div>
+                                <input type="hidden" id="commission_amount" name="commission_amount">
+                                <strong>Total Commission (5% on MRP):</strong>
+                                <span class="text-danger fw-bold commission-amount">0.00</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
 
     <div class="container ">
         <div class="card shadow-sm my-5">
-            <div class="card-header bg-info text-white">
+            <div class="card-header  text-white">
                 <h5 class="mb-0">Medicine Data</h5>
             </div>
-    
+
             <div class="card-body">
                 @if ($medicines->count() > 0)
                     <div class="accordion" id="medicineAccordion">
@@ -112,14 +153,19 @@
                                 $accordionId = $entry->id;
                                 $pharmacyId = $entry->phrmacy_id;
                                 $medData = json_decode($entry->medicine, true);
+                                $customer = $entry->customer;
                             @endphp
-    
+
                             <div class="accordion-item border-0 shadow-sm mb-3">
                                 <h2 class="accordion-header" id="heading{{ $accordionId }}">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#collapse{{ $accordionId }}" aria-expanded="false"
                                         aria-controls="collapse{{ $accordionId }}">
                                         Record #{{ $accordionId }} (Pharmacy ID: {{ $pharmacyId }})
+                                        <br>
+                                        Customer ID : {{ $entry->customer_id }} <br>
+                                        Customer Details : {{ $customer->firstName ?? 'N/A' }} | Phone:
+                                        {{ $customer->mobile_no ?? 'N/A' }}
                                     </button>
                                 </h2>
                                 <div id="collapse{{ $accordionId }}" class="accordion-collapse collapse"
@@ -157,7 +203,7 @@
                                         <div class="mt-2">
                                             <div><strong>Total MRP:</strong> ₹{{ $entry->mrp_amount }}</div>
                                             <div><strong>Total Final Amount:</strong> ₹{{ $entry->total_amount }}</div>
-                                            <div><strong>Commission (5%):</strong> ₹{{ $entry->commission_amount }}</div>
+                                            <div><strong>Commission Amount:</strong> ₹{{ $entry->commission_amount }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -168,7 +214,7 @@
             </div>
         </div>
     </div>
-    
+
 
 
 
@@ -181,7 +227,7 @@
                 placeholder: 'Search by name or salt',
                 minimumInputLength: 0,
                 ajax: {
-                    
+
                     url: "/search-medicine",
                     dataType: 'json',
                     delay: 250,
@@ -221,6 +267,12 @@
             $('#total_amount').val(total.toFixed(2));
             $('.total-amount').text(total.toFixed(2));
 
+            // Commission based on total MRP
+            const commission = total >= 300 ? 15 : 10;
+
+            $('#commission_amount').val(commission.toFixed(2));
+            $('.commission-amount').text(commission.toFixed(2));
+
             calculateMRPTotal(); // use this instead of calculateCommission
         }
 
@@ -234,12 +286,6 @@
 
             $('#mrp_amount').val(mrpTotal.toFixed(2));
             $('.mrp-amount').text(mrpTotal.toFixed(2));
-
-            // Commission based on total MRP
-            const commission = mrpTotal * 0.05;
-
-            $('#commission_amount').val(commission.toFixed(2));
-            $('.commission-amount').text(commission.toFixed(2));
         }
 
 
@@ -302,6 +348,184 @@
             });
 
             $(document).on('input', '.discount', calculateTotal); // final amount changes
+
+
+            function initCustomerSelect2($el) {
+                $el.select2({
+                    placeholder: 'Search customer...',
+                    ajax: {
+                        url: '{{ route('customers.select') }}',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                query: params.term
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.results
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            }
+
+
+            initCustomerSelect2($('.customer-search'));
+
+
+            // $('form').on('submit', function(e) {
+            //     let isValid = true;
+
+    
+            //     $('.medicine-error, .mrp-error, .discount-error, .discount-percent-error, .available-error, .substitute-error, .customer-error')
+            //         .remove();
+            //     $('.form-control, .form-select').css('border', '');
+            //     $('.medicine_search').next('.select2-container').css('border', '');
+
+
+            //     $('#medicine-body .medicine-row').each(function(index) {
+            //         const $row = $(this);
+
+            //         const $medicineSelect = $row.find('.medicine_search');
+            //         const medicineVal = $medicineSelect.val();
+            //         if (!medicineVal) {
+            //             isValid = false;
+            //             $medicineSelect.next('.select2-container').css('border', '1px solid red');
+            //             $row.find('td:first').append(
+            //                 '<div class="text-danger small medicine-error mt-1">Please select a medicine.</div>'
+            //                 );
+            //         }
+
+            //         const $mrp = $row.find(`input[name="medicine[${index}][mrp]"]`);
+            //         if (!$mrp.val() || parseFloat($mrp.val()) <= 0) {
+            //             isValid = false;
+            //             $mrp.css('border', '1px solid red');
+            //             $row.find('td:nth-child(2)').append(
+            //                 '<div class="text-danger small mrp-error mt-1">Please enter a valid MRP.</div>'
+            //                 );
+            //         }
+
+            //         const $discount = $row.find(`input[name="medicine[${index}][discount]"]`);
+            //         if (!$discount.val() || parseFloat($discount.val()) < 0) {
+            //             isValid = false;
+            //             $discount.css('border', '1px solid red');
+            //             $row.find('td:nth-child(3)').append(
+            //                 '<div class="text-danger small discount-error mt-1">Please enter a valid discount amount.</div>'
+            //                 );
+            //         }
+
+            //         const $discountPercent = $row.find(
+            //             `input[name="medicine[${index}][discount_percent]"]`);
+            //         const dpVal = parseFloat($discountPercent.val());
+            //         if (!$discountPercent.val() || dpVal < 0 || dpVal > 100) {
+            //             isValid = false;
+            //             $discountPercent.css('border', '1px solid red');
+            //             $row.find('td:nth-child(4)').append(
+            //                 '<div class="text-danger small discount-percent-error mt-1">Please enter a valid discount percentage (0–100).</div>'
+            //                 );
+            //         }
+
+            //         const $available = $row.find(`select[name="medicine[${index}][available]"]`);
+            //         if (!$available.val()) {
+            //             isValid = false;
+            //             $available.css('border', '1px solid red');
+            //             $row.find('td:nth-child(5)').append(
+            //                 '<div class="text-danger small available-error mt-1">Please select availability.</div>'
+            //                 );
+            //         }
+
+            //         const $substitute = $row.find(
+            //             `select[name="medicine[${index}][is_substitute]"]`);
+            //         if (!$substitute.val()) {
+            //             isValid = false;
+            //             $substitute.css('border', '1px solid red');
+            //             $row.find('td:nth-child(6)').append(
+            //                 '<div class="text-danger small substitute-error mt-1">Please select if it is a substitute.</div>'
+            //                 );
+            //         }
+            //     });
+
+
+            //     const $customerSelect = $('select[name="customer[0][customer_id]"]');
+            //     if (!$customerSelect.val()) {
+            //         isValid = false;
+            //         $customerSelect.css('border', '1px solid red');
+            //         if ($('.customer-error').length === 0) {
+            //             $customerSelect.closest('.d-flex').append(
+            //                 '<div class="text-danger small customer-error mt-1">Please select a customer.</div>'
+            //                 );
+            //         }
+            //     }
+
+            //     if (!isValid) e.preventDefault();
+            // });
+
+
+
+            // $(document).on('change input', '.medicine_search', function() {
+            //     if ($(this).val()) {
+            //         $(this).next('.select2-container').css('border', '');
+            //         $(this).closest('td').find('.medicine-error').remove();
+            //     }
+            // });
+
+            // $(document).on('input', 'input[name*="[mrp]"]', function() {
+            //     if ($(this).val() > 0) {
+            //         $(this).css('border', '');
+            //         $(this).closest('td').find('.mrp-error').remove();
+            //     }
+            // });
+
+            // $(document).on('input', 'input[name*="[discount]"]', function() {
+            //     if ($(this).val() >= 0) {
+            //         $(this).css('border', '');
+            //         $(this).closest('td').find('.discount-error').remove();
+            //     }
+            // });
+
+            // $(document).on('input', 'input[name*="[discount_percent]"]', function() {
+            //     const val = parseFloat($(this).val());
+            //     if (val >= 0 && val <= 100) {
+            //         $(this).css('border', '');
+            //         $(this).closest('td').find('.discount-percent-error').remove();
+            //     }
+            // });
+
+            // $(document).on('change', 'select[name*="[available]"]', function() {
+            //     if ($(this).val()) {
+            //         $(this).css('border', '');
+            //         $(this).closest('td').find('.available-error').remove();
+            //     }
+            // });
+
+            // $(document).on('change', 'select[name*="[is_substitute]"]', function() {
+            //     if ($(this).val()) {
+            //         $(this).css('border', '');
+            //         $(this).closest('td').find('.substitute-error').remove();
+            //     }
+            // });
+
+            // $(document).on('change', 'select.customer-search', function() {
+            //     if ($(this).val()) {
+            //         $(this).css('border', '');
+            //         $('.customer-error').remove();
+            //     }
+            // });
+
+
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script src="{{ asset('js/medicine/medicine_form.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
 @endsection
