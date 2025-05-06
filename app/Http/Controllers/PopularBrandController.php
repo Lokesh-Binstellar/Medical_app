@@ -27,7 +27,7 @@ class PopularBrandController extends Controller
                 ->addIndexColumn()
 
                 ->addColumn('logo', function ($brand) {
-                    return '<img src="' . asset('storage/category/' . $brand->logo) . '" border="0" width="40" class="img-rounded" align="center" />';
+                    return '<img src="' . asset('storage/brands/' . $brand->logo) . '" border="0" width="40" class="img-rounded" align="center" />';
                 })
                 ->addColumn('action', function ($row) {
                     return '
