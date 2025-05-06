@@ -1,3 +1,4 @@
+@section('styles')
 <style>
     .filter{
         justify-content: space-evenly;
@@ -10,6 +11,7 @@
         scroll-behavior: smooth;
     }
 </style>
+@endsection
 
 <nav class="layout-navbar navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
     <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">

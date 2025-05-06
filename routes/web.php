@@ -204,7 +204,7 @@ Route::get('/pharmacist/add-medicine', [MedicineSearchController::class, 'index'
 Route::get('/search-medicine', [MedicineSearchController::class, 'search'])->name('search.medicine');
 Route::post('/add-medicine', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
 Route::post('/medicines/store', [MedicineSearchController::class, 'store'])->name('medicines.store');
-
+Route::get('/customers/select', [MedicineSearchController::class, 'customerSelect'])->name('customers.select');
 
 });
 

@@ -178,4 +178,9 @@ class AddMedicineController extends Controller
     {
         //
     }
+
+    public function customer()
+    {
+        return $this->belongsTo(AuthController::class, 'customer_id');
+    }
 }

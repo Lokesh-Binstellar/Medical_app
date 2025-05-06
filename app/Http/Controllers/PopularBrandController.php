@@ -6,15 +6,58 @@ use App\Models\PopularBrand;
 use App\Models\Medicine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Yajra\DataTables\Facades\DataTables;
 
 class PopularBrandController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $popularBrands = Medicine::all()->pluck('marketer')->unique();
+    //     $AddedBrands = PopularBrand::all();
+
+
+    //     return view('popular.index', compact('popularBrands', 'AddedBrands'));
+    // }
+    public function index(Request $request)
     {
-        $popularBrands = Medicine::all()->pluck('marketer')->unique();
+        if ($request->ajax()) {
+            $data = PopularBrand::all();
+    
+            return DataTables::of($data)
+                ->addIndexColumn()
+
+                ->addColumn('logo', function ($brand) {
+                    return '<img src="' . asset('storage/category/' . $brand->logo) . '" border="0" width="40" class="img-rounded" align="center" />';
+                })
+                ->addColumn('action', function ($row) {
+                    return '
+                    <div class="dropdown">
+                      <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+                      <ul class="dropdown-menu">
+                       <li>
+                    <a href="' . route('popular.edit', $row->id) . '" class="dropdown-item" >Edit</a>
+                    </li>
+                        
+                        <li>
+                          <form action="' . route('popular.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
+                            ' . csrf_field() . method_field('DELETE') . '
+                            <button class="dropdown-item" type="submit">Delete</button>
+                          </form>
+                        </li>
+                      </ul>
+                    </div>';
+                })
+                ->rawColumns(['action','logo'])
+                ->make(true);
+        }
+    
+  
+        $popularBrands = Medicine::select('marketer')->distinct()->pluck('marketer');
         $AddedBrands = PopularBrand::all();
+    
         return view('popular.index', compact('popularBrands', 'AddedBrands'));
     }
+    
 
     public function store(Request $request)
     {
@@ -29,7 +72,7 @@ class PopularBrandController extends Controller
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $originalName = $file->getClientOriginalName(); // e.g. logo.png
-            $destinationPath = storage_path('app/public/brand');
+            $destinationPath = storage_path('app/public/brands');
 
             // Check if file with same name exists
             $filename = time() . '_' . $originalName;
@@ -41,7 +84,7 @@ class PopularBrandController extends Controller
             }
 
             // Save full URL and original name
-            $brand->logo = url('storage/brand/' . $filename); // Base URL + file path
+            $brand->logo = url('storage/brands/' . $filename); // Base URL + file path
             $brand->logo = $originalName; // Just original file name
         }
 
@@ -105,7 +148,7 @@ class PopularBrandController extends Controller
             return [
                 'id' => $brand->id,
                 'name' => $brand->name,
-                'logo' => $brand->logo ? url('storage/brand/' . basename($brand->logo)) : [],
+                'logo' => $brand->logo ? url('storage/brands/' . basename($brand->logo)) : [],
 
             ];
         });
