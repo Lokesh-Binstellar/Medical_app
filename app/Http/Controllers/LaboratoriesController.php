@@ -210,7 +210,7 @@ class LaboratoriesController extends Controller
             'address' => 'required|string',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
-            'username' => 'required|string',
+            // 'username' => 'required|string',
             'license' => 'required|string',
             'pickup' => 'required|string',
             'gstno' => 'nullable|string',
@@ -222,15 +222,15 @@ class LaboratoriesController extends Controller
         ]);
 
         // Update related user
-        $user = User::find($laboratorie->user_id);
-        if ($user) {
-            $user->name = $request->username;
-            $user->email = $request->email;
-            if ($request->filled('password')) {
-                $user->password = Hash::make($request->password);
-            }
-            $user->save();
-        }
+        // $user = User::find($laboratorie->user_id);
+        // if ($user) {
+        //     $user->name = $request->username;
+        //     $user->email = $request->email;
+        //     if ($request->filled('password')) {
+        //         $user->password = Hash::make($request->password);
+        //     }
+        //     $user->save();
+        // }
 
 
         $data = $request->only([

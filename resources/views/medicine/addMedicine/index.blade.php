@@ -73,6 +73,7 @@
                                         <thead >
                                             <tr>
                                                 <th>Select Medicine</th>
+                                                <th>Packaging</th>
                                                 <th>Substitute</th>
                                                 <th>Action</th>
                                             </tr>
@@ -86,7 +87,10 @@
                                                             medicine...</option>
                                                     </select>
                                                 </td>
-
+                                                <td>
+                                                    <input type="text" name="medicine[0][packaging_detail]"
+                                                        class="form-control packaging-info" readonly>
+                                                </td>
 
                                                 <td>
                                                     <select name="medicine[0][is_substitute]" class="form-select">
@@ -144,13 +148,35 @@
                 });
             }
 
+            function initCustomerSelect2($el) {
+                $el.select2({
+                    placeholder: 'Search customer...',
+                    ajax: {
+                        url: '{{ route('prescription.select') }}',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                query: params.term
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.results
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            }
+
             let index = 1;
             initSelect2($('.medicine-search'));
+            initCustomerSelect2($('.customer-search'));
 
             $('#add-row').on('click', function() {
                 const $newRow = $('.medicine-row').first().clone();
 
-                // Clear input/select values
                 $newRow.find('input').val('');
                 $newRow.find('select').not('.medicine-search').val('yes');
 
@@ -163,19 +189,15 @@
                     }
                 });
 
-                // Remove the old Select2 container and select
                 $newRow.find('.select2-container').remove();
                 $newRow.find('.medicine-search').remove();
 
-                // Create a new select and append
-                const $newSelect = $(`
-        <select class="form-control medicine-search" style="width: 100%;" name="medicine[${index}][medicine_id]">
-            <option value="">Search medicine...</option>
-        </select>
-    `);
+                const $newSelect = $(`<select class="form-control medicine-search" style="width: 100%;" name="medicine[${index}][medicine_id]">
+                <option value="">Search medicine...</option>
+            </select>`);
+
                 $newRow.find('td:first').append($newSelect);
                 initSelect2($newSelect);
-
                 $('#medicine-body').append($newRow);
                 index++;
             });
@@ -186,24 +208,19 @@
                 }
             });
 
-
             $('form').on('submit', function(e) {
                 let isValid = true;
-
-                // Remove previous error messages and red borders
                 $('.medicine-error').remove();
                 $('.medicine-search').next('.select2-container').css('border', '');
 
-                $('#medicine-body .medicine-row').each(function(index) {
+                $('#medicine-body .medicine-row').each(function() {
                     const $medicineSelect = $(this).find('.medicine-search');
                     const medicineVal = $medicineSelect.val();
 
                     if (!medicineVal) {
                         isValid = false;
-
                         $medicineSelect.next('.select2-container').css('border', '1px solid red');
 
-                        // Show inline error
                         if ($(this).find('.medicine-error').length === 0) {
                             $(this).find('td:first').append(
                                 '<div class="text-danger small medicine-error mt-1">Please select a medicine.</div>'
@@ -238,8 +255,31 @@
                     }
                 });
             }
+            // Fetch packaging detail on medicine select
+            $(document).on('change', '.medicine-search', function() {
+                var id = $(this).val();
+                var $row = $(this).closest('tr');
 
-            initCustomerSelect2($('.customer-search'));
+                if (id) {
+                    $.ajax({
+                        url: '{{ route('medicine.strip', ':id') }}'.replace(':id', id),
+                        type: 'GET',
+                        success: function(response) {
+                            if (response.status) {
+                                $row.find('.packaging-info').val(response.packaging_detail ||
+                                    '');
+                            } else {
+                                $row.find('.packaging-info').val('');
+                            }
+                        },
+                        error: function() {
+                            $row.find('.packaging-info').val('');
+                        }
+                    });
+                } else {
+                    $row.find('.packaging-info').val('');
+                }
+            });
 
         });
     </script>

@@ -223,13 +223,13 @@
                             </div>
                             <div class="col-md-2 d-flex align-items-end gap-2">
                                 <!-- Remove Button -->
-                                <button type="button" onclick="removeField(this)" class="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                    <i class="bi bi-dash-lg"></i>
+                                <button type="button" onclick="removeField(this)" class="btn rounded-pill btn-outline-danger waves-effect">
+                                   Remove
                                 </button>
                             
                                 <!-- Add Button -->
-                                <button type="button" onclick="addField()" class="btn btn-outline-success btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                                    <i class="bi bi-plus-lg"></i>
+                                <button type="button" onclick="addField()" class="btn rounded-pill btn-outline-primary waves-effect" >
+                                 Add
                                 </button>
                             </div>
                             
@@ -324,13 +324,13 @@
         </div>
         <div class="col-md-2 d-flex align-items-end gap-2">
             <!-- Remove Button -->
-            <button type="button" onclick="removeField(this)" class="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                <i class="bi bi-dash-lg"></i>
+            <button type="button" onclick="removeField(this)"  class="btn rounded-pill btn-outline-danger waves-effect">
+               Remove
             </button>
 
             <!-- Add Button -->
-            <button type="button" onclick="addField()" class="btn btn-outline-success btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                <i class="bi bi-plus-lg"></i>
+            <button type="button" onclick="addField()" class="btn rounded-pill btn-outline-primary waves-effect">
+               Add
             </button>
         </div>
     `;

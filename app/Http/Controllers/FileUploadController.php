@@ -59,30 +59,27 @@ class FileUploadController extends Controller
                         return '<span class="badge bg-success">Completed</span>';
                     }
                 })
-                ->addColumn('action', function ($row) {
-                    return '
-                        <div class="dropdown">
-                          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
-          <ul class="dropdown-menu">
-                            <li>
-                             <a href="' . route('laboratorie.show', $row->id) . '"class="dropdown-item" >View
-            </a>
-                            </li>
+        //         ->addColumn('action', function ($row) {
+        //             return '
+        //                 <div class="dropdown">
+        //                   <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+        //   <ul class="dropdown-menu">
+                    
         
-                            <li>
-                            <a href="' . route('laboratorie.edit', $row->id) . '" class="dropdown-item" >Edit</a>
-                            </li>
+        //                     <li>
+        //                     <a href="' . route('laboratorie.edit', $row->id) . '" class="dropdown-item" >Edit</a>
+        //                     </li>
                             
-                            <li>
-                              <form action="' . route('laboratorie.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-                                ' . csrf_field() . method_field('DELETE') . '
-                                <button class="dropdown-item " type="submit">Delete</button>
-                              </form>
-                            </li>
-                          </ul>
-                        </div>';
-                })
-                ->rawColumns(['action', 'prescription_file', 'prescription_status', 'status'])
+        //                     <li>
+        //                       <form action="' . route('laboratorie.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
+        //                         ' . csrf_field() . method_field('DELETE') . '
+        //                         <button class="dropdown-item " type="submit">Delete</button>
+        //                       </form>
+        //                     </li>
+        //                   </ul>
+        //                 </div>';
+        //         })
+                ->rawColumns([ 'prescription_file', 'prescription_status', 'status'])
                 ->make(true);
         }
         return view('prescriptions.index');

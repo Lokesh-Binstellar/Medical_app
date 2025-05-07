@@ -53,7 +53,7 @@
                                             <th>Prescription</th>
                                             <th>Valid</th>
                                             <th>Status</th>
-                                            <th style="width: 10%">Action</th>
+                                            {{-- <th style="width: 10%">Action</th> --}}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -105,12 +105,12 @@
                         data: 'status',
                         name: 'status'
                     },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
+                    // {
+                    //     data: 'action',
+                    //     name: 'action',
+                    //     orderable: false,
+                    //     searchable: false
+                    // }
                 ]
             });
 

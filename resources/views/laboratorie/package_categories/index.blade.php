@@ -109,29 +109,45 @@
             $('body').on('click', '.deleteCategory', function() {
                 var category_id = $(this).data("id");
 
-                if (!confirm("Are you sure you want to delete?")) {
-                    return;
-                }
-
-                $.ajax({
-                    type: "DELETE",
-                    url: "/packageCategory/" + category_id,
-                    data: {
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(response) {
-                        if (typeof table !== 'undefined') {
-                            table.draw();
-                        }
-                        alert('Category deleted successfully');
-                    },
-                    error: function(xhr) {
-                        console.log('Error:', xhr.responseText);
-                        alert('Failed to delete category.');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: "DELETE",
+                            url: "/packageCategory/" + category_id,
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                if (typeof table !== 'undefined') {
+                                    table.draw();
+                                }
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: 'Category deleted successfully',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                            },
+                            error: function(xhr) {
+                                console.log('Error:', xhr.responseText);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Failed to delete category!',
+                                });
+                            }
+                        });
                     }
                 });
-
-
             });
 
 

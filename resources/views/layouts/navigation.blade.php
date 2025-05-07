@@ -156,7 +156,7 @@
             <li
                 class="menu-item {{ in_array(Route::current()->getName(), ['prescriptions.index']) ? 'active' : '' }}">
                 <a href="{{  route('prescriptions.index') }}" class="menu-link">
-                    <i class="menu-icon tf-icons mdi mdi-pill"></i>
+                    <i class="menu-icon tf-icons mdi mdi-prescription "></i>
                     <div data-i18n="Prescriptions">Prescriptions</div>
                 </a>
             </li>
