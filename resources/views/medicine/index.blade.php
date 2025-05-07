@@ -1,18 +1,24 @@
 @extends('layouts.app')
+@section('styles')
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
+ 
+@endsection
 @section('content')
-    <div class="">
+    <div class="container">
         <div class=" page-inner px-0">
             <div class="row justify-content-center">
-                <div class="col-md-10">
+                <div class="col-md-12">
                     <div class="card shadow">
-                        <div class="card-header d-flex justify-content-between align-items-center rounded-top"
-                            >
+                        <div class="card-header d-flex justify-content-between align-items-center rounded-top">
                             <h4 class="card-title mb-0 text-white">Medicine</h4>
                             <form action="{{ route('medicine.import') }}" id="importForm" method="POST"
-                                enctype="multipart/form-data">
+                                enctype="multipart/form-data" class="d-flex  align-items-center gap-2">
                                 @csrf
-                                <input type="file" name="file" required>
-                                <button type="submit" class="btn btn-primary addButton">+ Import Medicine</button>
+                                <input type="file" name="file" class="form-control" id="file">
+
+                                <button type="submit" class="btn btn-primary addButton text-nowrap px-5">+ Import Medicine</button>
+                                
                             </form>
                         </div>
 
@@ -73,4 +79,13 @@
 
         });
     </script>
+<script src="{{ asset('js/medicine/medicine_form.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
 @endsection
+

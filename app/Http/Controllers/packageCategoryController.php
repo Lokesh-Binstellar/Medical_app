@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PackageCategory;
 use Illuminate\Http\Request;
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 class packageCategoryController extends Controller
 {
@@ -18,12 +18,25 @@ class packageCategoryController extends Controller
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '
-                    <div class="form-button-action d-flex gap-2">
-                          <a href="' . route('packageCategory.edit', $row->id) . '" class="btn  btn-warning btn-sm" data-bs-toggle="tooltip" title="Edit"> Edit </a>
-                            <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deleteCategory">Delete</a>
-                          </div>';
-                    return $btn;
+                    return '
+                    <div class="dropdown">
+                      <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+                      <ul class="dropdown-menu">
+                       <li>
+                    <a href="' . route('packageCategory.edit', $row->id) . '" class="dropdown-item" >Edit</a>
+                    </li>
+                        
+                        <li>
+                          <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="dropdown-item deleteCategory">Delete</a>
+                        </li>
+                      </ul>
+                    </div>';
+                    // $btn = '
+                    // <div class="form-button-action d-flex gap-2">
+                    //       <a href="' . route('packageCategory.edit', $row->id) . '" class="btn  btn-warning btn-sm" data-bs-toggle="tooltip" title="Edit"> Edit </a>
+                    //         <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deleteCategory">Delete</a>
+                    //       </div>';
+                    // return $btn;
                 })
                 ->addColumn('package_image', function ($product_brand) {
                     return '<img src="' . asset('assets/package_image/' . $product_brand->package_image) . '" border="0" width="40" class="img-rounded" align="center" />';

@@ -6,7 +6,7 @@ use App\Imports\LabTestImport;
 use App\Models\LabTest;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 class LabtestController extends Controller
 {
@@ -24,11 +24,16 @@ class LabtestController extends Controller
             return Datatables::of($data)
                     ->addIndexColumn()
                     ->addColumn('action', function($row){
-       
-                        $btn = '<a href="' . route('labtest.show', $row->id) . '" class="btn btn-primary btn-border btn-round">View</a>';
-
-      
-                            return $btn;
+                        return '
+                        <div class="dropdown">
+                          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+                          <ul class="dropdown-menu">
+                           <li>
+                        <a href="' . route('labtest.show', $row->id) . '" class="dropdown-item">View</a>
+                        </li>
+                              
+                          </ul>
+                        </div>';
                     })
                     ->rawColumns(['action'])
                     ->make(true);

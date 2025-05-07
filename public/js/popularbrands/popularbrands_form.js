@@ -14,8 +14,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const fv = FormValidation.formValidation(importForm, {
         fields: {
-            file: {
-                validators: getFileValidators('image')
+            name: {
+                validators: {
+                    notEmpty: {
+                        message: 'Please select a brand.'
+                    }
+                }
+            },
+            logo: {
+                validators: getFileValidators('file')
             }
         },
         plugins: {

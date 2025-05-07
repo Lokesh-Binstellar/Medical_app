@@ -56,7 +56,7 @@
 
     <style>
         body {
-            background: #000000;
+            background: #fefefe;
         }
 
         .btn-primary {

@@ -29,14 +29,19 @@
         .selectCustomer {
             font-weight: 600;
             text-wrap: nowrap;
+
+        }
+
+        body>span.select2-container.select2-container--default.select2-container--open {
+            width: auto !important;
         }
     </style>
 @endsection
 @section('content')
-    <div class="">
+    <div class="container">
         <div class=" page-inner px-0">
             <div class="row justify-content-center">
-                <div class="col-md-10">
+                <div class="col-md-12">
                     <div class="card shadow">
                         <div class="card-header d-flex justify-content-between align-items-center rounded-top">
                             <h4 class="card-title mb-0 text-white">Add Medicine to Cart</h4>
@@ -55,17 +60,17 @@
                                     {{ session('error') }}
                                 </div>
                             @endif
-                            <form method="POST" action="{{ route('addMedicine.store') }}">
+                            <form method="POST" action="{{ route('addMedicine.store') }}" class="d-flex flex-column gap-3">
                                 @csrf
-                                <div class="d-flex mb-4 selectCustomer align-items-center gap-3">
+                                <div class="d-flex selectCustomer align-items-center gap-3">
                                     <label class="font-bold">Please Select Prescription :</label>
                                     <select class="form-control customer-search " name="prescription_id">
                                         <option value="">Search customer...</option>
                                     </select>
                                 </div>
-                                <div class="table-responsive mb-3">
-                                    <table class="table table-bordered table-striped align-middle" id="medicine-table">
-                                        <thead class="table-light text-center">
+                                <div class="table-responsive">
+                                    <table class="display table table-striped table-hover data-table" id="medicine-table">
+                                        <thead >
                                             <tr>
                                                 <th>Select Medicine</th>
                                                 <th>Substitute</th>
@@ -102,7 +107,7 @@
                                 <div class="d-flex justify-content-between flex-wrap gap-3">
                                     <div class="d-flex gap-2 justify-center align-items-center">
                                         <button type="button" id="add-row" class="btn btn-primary">+</button>
-                                        <button type="submit" class="btn btn-success">Save</button>
+                                        <button type="submit" class="btn btn-primary">Save</button>
                                     </div>
                                 </div>
                             </form>
@@ -213,26 +218,26 @@
             });
 
             function initCustomerSelect2($el) {
-    $el.select2({
-        placeholder: 'Search customer...',
-        ajax: {
-            url: '{{ route("prescription.select") }}',
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                return {
-                    query: params.term
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data.results
-                };
-            },
-            cache: true
-        }
-    });
-}
+                $el.select2({
+                    placeholder: 'Search customer...',
+                    ajax: {
+                        url: '{{ route('prescription.select') }}',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                query: params.term
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.results
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            }
 
             initCustomerSelect2($('.customer-search'));
 

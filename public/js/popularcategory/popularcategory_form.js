@@ -3,7 +3,7 @@ const getFileValidators = (label = 'file') => ({
         message: `Please upload your ${label}.`
     },
     file: {
-        extension: 'csv,xlsx,xls,pdf,doc,docx,zip', // or leave out extension if no restrictions
+        extension: 'csv,xlsx,xls,pdf,doc,docx,zip', 
         maxSize: 5 * 1024 * 1024, // example: 5MB
         message: 'Please upload a valid file (max 5MB).'
     }
@@ -14,8 +14,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const fv = FormValidation.formValidation(importForm, {
         fields: {
-            file: {
-                validators: getFileValidators('image')
+            name: {
+                validators: {
+                    notEmpty: {
+                        message: 'Please select a category.'
+                    }
+                }
+            },
+            logo: {
+                validators: getFileValidators('file')
             }
         },
         plugins: {

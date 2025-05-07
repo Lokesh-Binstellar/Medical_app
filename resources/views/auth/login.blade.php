@@ -50,7 +50,7 @@
                         <x-input-error :messages="$errors->get('password')" class="mt-2" style="color: red;" />
                     </div>
                 </div>
-                <div class="mb-3 d-flex justify-content-between">
+                {{-- <div class="mb-3 d-flex justify-content-between">
                     <div class="form-check">
                          <input autocomplete="off" class="form-check-input" type="checkbox" id="remember-me" name="remember"
                             {{ old('remember', request()->cookie('remember')) ? 'checked' : '' }} />
@@ -59,9 +59,9 @@
                     <a href="{{ route('password.request') }}" class="float-end mb-1">
                         <span>Forgot Password?</span>
                     </a>
-                </div>
+                </div> --}}
                 <div class="mb-3">
-                    <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
+                    <button class="btn btn-primary d-grid w-100 addButton" type="submit">Sign in</button>
                 </div>
             </form>
  

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Prescription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
 
 class FileUploadController extends Controller
 {

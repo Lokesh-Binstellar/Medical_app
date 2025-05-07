@@ -1,5 +1,11 @@
 @extends('layouts.app')
+@section('styles')
 
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
+
+@endsection
 @section('content')
     <div class="container mt-5">
         <div class="page-inner">
@@ -38,7 +44,7 @@
                         <h5 class="card-header">Edit Brand</h5>
                         <div class="card-body">
                             <form class="row g-3" action="{{ route('popular.update', $brand->id) }}"
-                                method="POST" enctype="multipart/form-data">
+                                method="POST" enctype="multipart/form-data" id="importForm">
                                 @csrf
                                 @method('PUT')
                                 {{-- Pharmacy Name --}}
@@ -79,4 +85,16 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+<script src="{{ asset('js/popularbrands/popularbrands_form.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 @endsection

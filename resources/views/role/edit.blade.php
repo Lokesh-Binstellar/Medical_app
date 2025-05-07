@@ -4,6 +4,7 @@
 @section('styels')
 @endsection
 @section('content')
+<div class="container">
     <div class="row">
         <div class="col-xl">
             <div class="card mb-4">
@@ -150,11 +151,10 @@
                         </div>
                         <div class="row mt-4">
                             <div class="col-6">
-                                <a href="{{ route('roles.index') }}" class="btn btn-primary">Back</a>
+                                <button href="{{ route('roles.index') }}" class="btn btn-primary">Back</button>
                             </div>
                             <div class="col-6 mb-4 text-end">
-                                <button type="submit" class="btn btn-primary">Update<i
-                                        class="material-icons right"></i></button>
+                                <button type="submit" class="btn btn-primary">Update</button>
                             </div>
                         </div>
                     </form>
@@ -162,6 +162,7 @@
             </div>
         </div>
     </div>
+</div>
 @endsection
 @section('scripts')
     <script>

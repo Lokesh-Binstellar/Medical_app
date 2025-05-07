@@ -5,7 +5,7 @@
     <div class="card shadow rounded">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Lab Test Details</h5>
-            <a href="{{ route('labtest.index') }}" class="btn btn-light btn-sm">← Back to List</a>
+            <a href="{{ route('labtest.index') }}" class="btn addButton btn-sm">← Back to List</a>
         </div>
 
         <div class="card-body">

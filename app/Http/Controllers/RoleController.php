@@ -8,6 +8,7 @@ use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator as FacadesValidator;
+use Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 // use Spatie\Permission\Models\Role;

@@ -15921,6 +15921,9 @@ html:not([dir=rtl]) .card .card-separator {
 .mt-5 {
     margin-top: 3rem !important;
 }
+.mt-10 {
+    margin-top: 2.5rem !important;
+}
 
 .mt-auto {
     margin-top: auto !important;

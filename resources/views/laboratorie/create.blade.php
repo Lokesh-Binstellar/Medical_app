@@ -5,6 +5,9 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
 @endsection
 @section('content')
+<div class="container">
+
+
     <div class="col-12">
         <div class="card">
             <h5 class="card-header">Laboratory Registration Form</h5>
@@ -242,6 +245,7 @@
             </div>
         </div>
     </div>
+</div>
 @endsection
 @section('scripts')
     <script src="{{ asset('js/laboratorie/laboratorie_form.js') }}"></script>

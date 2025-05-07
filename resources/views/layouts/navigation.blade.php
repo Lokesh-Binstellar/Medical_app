@@ -66,7 +66,7 @@
             <li
                 class="menu-item {{ in_array(Route::current()->getName(), ['add.medicine']) ? 'active' : '' }}">
                 <a href="{{ route('add.medicine')}}" class="menu-link">
-                    <i class="menu-icon tf-icons mdi mdi-pill-plus"></i>
+                    <i class="menu-icon tf-icons mdi mdi-pill"></i>
                     <div data-i18n="Add Medicine">Add Medicine</div>
                 </a>
             </li>

@@ -37,6 +37,9 @@
             font-weight: 600;
             text-wrap: nowrap;
         }
+        body>span.select2-container.select2-container--default.select2-container--open {
+            width: auto !important;
+        }
     </style>
 @endsection
 @section('content')
@@ -58,8 +61,8 @@
                         </select>
                     </div>
                     <div class="table-responsive mb-3">
-                        <table class="table table-bordered table-striped align-middle" id="medicine-table">
-                            <thead class="table-light text-center">
+                        <table class="display table table-striped table-hover data-table" id="medicine-table">
+                            <thead >
                                 <tr>
                                     <th>Search Medicine</th>
                                     <th>MRP</th>
@@ -376,156 +379,156 @@
             initCustomerSelect2($('.customer-search'));
 
 
-            // $('form').on('submit', function(e) {
-            //     let isValid = true;
+            $('form').on('submit', function(e) {
+                let isValid = true;
 
     
-            //     $('.medicine-error, .mrp-error, .discount-error, .discount-percent-error, .available-error, .substitute-error, .customer-error')
-            //         .remove();
-            //     $('.form-control, .form-select').css('border', '');
-            //     $('.medicine_search').next('.select2-container').css('border', '');
+                $('.medicine-error, .mrp-error, .discount-error, .discount-percent-error, .available-error, .substitute-error, .customer-error')
+                    .remove();
+                $('.form-control, .form-select').css('border', '');
+                $('.medicine_search').next('.select2-container').css('border', '');
 
 
-            //     $('#medicine-body .medicine-row').each(function(index) {
-            //         const $row = $(this);
+                $('#medicine-body .medicine-row').each(function(index) {
+                    const $row = $(this);
 
-            //         const $medicineSelect = $row.find('.medicine_search');
-            //         const medicineVal = $medicineSelect.val();
-            //         if (!medicineVal) {
-            //             isValid = false;
-            //             $medicineSelect.next('.select2-container').css('border', '1px solid red');
-            //             $row.find('td:first').append(
-            //                 '<div class="text-danger small medicine-error mt-1">Please select a medicine.</div>'
-            //                 );
-            //         }
+                    const $medicineSelect = $row.find('.medicine_search');
+                    const medicineVal = $medicineSelect.val();
+                    if (!medicineVal) {
+                        isValid = false;
+                        $medicineSelect.next('.select2-container').css('border', '1px solid red');
+                        $row.find('td:first').append(
+                            '<div class="text-danger small medicine-error mt-1">Please select a medicine.</div>'
+                            );
+                    }
 
-            //         const $mrp = $row.find(`input[name="medicine[${index}][mrp]"]`);
-            //         if (!$mrp.val() || parseFloat($mrp.val()) <= 0) {
-            //             isValid = false;
-            //             $mrp.css('border', '1px solid red');
-            //             $row.find('td:nth-child(2)').append(
-            //                 '<div class="text-danger small mrp-error mt-1">Please enter a valid MRP.</div>'
-            //                 );
-            //         }
+                    const $mrp = $row.find(`input[name="medicine[${index}][mrp]"]`);
+                    if (!$mrp.val() || parseFloat($mrp.val()) <= 0) {
+                        isValid = false;
+                        $mrp.css('border', '1px solid red');
+                        $row.find('td:nth-child(2)').append(
+                            '<div class="text-danger small mrp-error mt-1">Please enter a valid MRP.</div>'
+                            );
+                    }
 
-            //         const $discount = $row.find(`input[name="medicine[${index}][discount]"]`);
-            //         if (!$discount.val() || parseFloat($discount.val()) < 0) {
-            //             isValid = false;
-            //             $discount.css('border', '1px solid red');
-            //             $row.find('td:nth-child(3)').append(
-            //                 '<div class="text-danger small discount-error mt-1">Please enter a valid discount amount.</div>'
-            //                 );
-            //         }
+                    const $discount = $row.find(`input[name="medicine[${index}][discount]"]`);
+                    if (!$discount.val() || parseFloat($discount.val()) < 0) {
+                        isValid = false;
+                        $discount.css('border', '1px solid red');
+                        $row.find('td:nth-child(3)').append(
+                            '<div class="text-danger small discount-error mt-1">Please enter a valid discount amount.</div>'
+                            );
+                    }
 
-            //         const $discountPercent = $row.find(
-            //             `input[name="medicine[${index}][discount_percent]"]`);
-            //         const dpVal = parseFloat($discountPercent.val());
-            //         if (!$discountPercent.val() || dpVal < 0 || dpVal > 100) {
-            //             isValid = false;
-            //             $discountPercent.css('border', '1px solid red');
-            //             $row.find('td:nth-child(4)').append(
-            //                 '<div class="text-danger small discount-percent-error mt-1">Please enter a valid discount percentage (0–100).</div>'
-            //                 );
-            //         }
+                    const $discountPercent = $row.find(
+                        `input[name="medicine[${index}][discount_percent]"]`);
+                    const dpVal = parseFloat($discountPercent.val());
+                    if (!$discountPercent.val() || dpVal < 0 || dpVal > 100) {
+                        isValid = false;
+                        $discountPercent.css('border', '1px solid red');
+                        $row.find('td:nth-child(4)').append(
+                            '<div class="text-danger small discount-percent-error mt-1">Please enter a valid discount percentage (0–100).</div>'
+                            );
+                    }
 
-            //         const $available = $row.find(`select[name="medicine[${index}][available]"]`);
-            //         if (!$available.val()) {
-            //             isValid = false;
-            //             $available.css('border', '1px solid red');
-            //             $row.find('td:nth-child(5)').append(
-            //                 '<div class="text-danger small available-error mt-1">Please select availability.</div>'
-            //                 );
-            //         }
+                    const $available = $row.find(`select[name="medicine[${index}][available]"]`);
+                    if (!$available.val()) {
+                        isValid = false;
+                        $available.css('border', '1px solid red');
+                        $row.find('td:nth-child(5)').append(
+                            '<div class="text-danger small available-error mt-1">Please select availability.</div>'
+                            );
+                    }
 
-            //         const $substitute = $row.find(
-            //             `select[name="medicine[${index}][is_substitute]"]`);
-            //         if (!$substitute.val()) {
-            //             isValid = false;
-            //             $substitute.css('border', '1px solid red');
-            //             $row.find('td:nth-child(6)').append(
-            //                 '<div class="text-danger small substitute-error mt-1">Please select if it is a substitute.</div>'
-            //                 );
-            //         }
-            //     });
-
-
-            //     const $customerSelect = $('select[name="customer[0][customer_id]"]');
-            //     if (!$customerSelect.val()) {
-            //         isValid = false;
-            //         $customerSelect.css('border', '1px solid red');
-            //         if ($('.customer-error').length === 0) {
-            //             $customerSelect.closest('.d-flex').append(
-            //                 '<div class="text-danger small customer-error mt-1">Please select a customer.</div>'
-            //                 );
-            //         }
-            //     }
-
-            //     if (!isValid) e.preventDefault();
-            // });
+                    const $substitute = $row.find(
+                        `select[name="medicine[${index}][is_substitute]"]`);
+                    if (!$substitute.val()) {
+                        isValid = false;
+                        $substitute.css('border', '1px solid red');
+                        $row.find('td:nth-child(6)').append(
+                            '<div class="text-danger small substitute-error mt-1">Please select if it is a substitute.</div>'
+                            );
+                    }
+                });
 
 
+                const $customerSelect = $('select[name="customer[0][customer_id]"]');
+                if (!$customerSelect.val()) {
+                    isValid = false;
+                    $customerSelect.css('border', '1px solid red');
+                    if ($('.customer-error').length === 0) {
+                        $customerSelect.closest('.d-flex').append(
+                            '<div class="text-danger small customer-error mt-1">Please select a customer.</div>'
+                            );
+                    }
+                }
 
-            // $(document).on('change input', '.medicine_search', function() {
-            //     if ($(this).val()) {
-            //         $(this).next('.select2-container').css('border', '');
-            //         $(this).closest('td').find('.medicine-error').remove();
-            //     }
-            // });
+                if (!isValid) e.preventDefault();
+            });
 
-            // $(document).on('input', 'input[name*="[mrp]"]', function() {
-            //     if ($(this).val() > 0) {
-            //         $(this).css('border', '');
-            //         $(this).closest('td').find('.mrp-error').remove();
-            //     }
-            // });
 
-            // $(document).on('input', 'input[name*="[discount]"]', function() {
-            //     if ($(this).val() >= 0) {
-            //         $(this).css('border', '');
-            //         $(this).closest('td').find('.discount-error').remove();
-            //     }
-            // });
 
-            // $(document).on('input', 'input[name*="[discount_percent]"]', function() {
-            //     const val = parseFloat($(this).val());
-            //     if (val >= 0 && val <= 100) {
-            //         $(this).css('border', '');
-            //         $(this).closest('td').find('.discount-percent-error').remove();
-            //     }
-            // });
+            $(document).on('change input', '.medicine_search', function() {
+                if ($(this).val()) {
+                    $(this).next('.select2-container').css('border', '');
+                    $(this).closest('td').find('.medicine-error').remove();
+                }
+            });
 
-            // $(document).on('change', 'select[name*="[available]"]', function() {
-            //     if ($(this).val()) {
-            //         $(this).css('border', '');
-            //         $(this).closest('td').find('.available-error').remove();
-            //     }
-            // });
+            $(document).on('input', 'input[name*="[mrp]"]', function() {
+                if ($(this).val() > 0) {
+                    $(this).css('border', '');
+                    $(this).closest('td').find('.mrp-error').remove();
+                }
+            });
 
-            // $(document).on('change', 'select[name*="[is_substitute]"]', function() {
-            //     if ($(this).val()) {
-            //         $(this).css('border', '');
-            //         $(this).closest('td').find('.substitute-error').remove();
-            //     }
-            // });
+            $(document).on('input', 'input[name*="[discount]"]', function() {
+                if ($(this).val() >= 0) {
+                    $(this).css('border', '');
+                    $(this).closest('td').find('.discount-error').remove();
+                }
+            });
 
-            // $(document).on('change', 'select.customer-search', function() {
-            //     if ($(this).val()) {
-            //         $(this).css('border', '');
-            //         $('.customer-error').remove();
-            //     }
-            // });
+            $(document).on('input', 'input[name*="[discount_percent]"]', function() {
+                const val = parseFloat($(this).val());
+                if (val >= 0 && val <= 100) {
+                    $(this).css('border', '');
+                    $(this).closest('td').find('.discount-percent-error').remove();
+                }
+            });
+
+            $(document).on('change', 'select[name*="[available]"]', function() {
+                if ($(this).val()) {
+                    $(this).css('border', '');
+                    $(this).closest('td').find('.available-error').remove();
+                }
+            });
+
+            $(document).on('change', 'select[name*="[is_substitute]"]', function() {
+                if ($(this).val()) {
+                    $(this).css('border', '');
+                    $(this).closest('td').find('.substitute-error').remove();
+                }
+            });
+
+            $(document).on('change', 'select.customer-search', function() {
+                if ($(this).val()) {
+                    $(this).css('border', '');
+                    $('.customer-error').remove();
+                }
+            });
 
 
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <script src="{{ asset('js/medicine/medicine_form.js') }}"></script>
+    <script src="{{ asset('js/addmedicinePharma/medicine_form.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script> --}}
 @endsection

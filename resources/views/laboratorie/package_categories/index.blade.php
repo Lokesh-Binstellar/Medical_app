@@ -1,33 +1,35 @@
 @extends('layouts.app')
 
 @section('styles')
-    <style>
-        /* Add any custom styles here */
-    </style>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
+
 @endsection
 
 @section('content')
-    <div class="container mt-5">
+    <div class="container">
         <div class="page-inner">
             <div class="row justify-content-center">
                 <div class="col-md-12">
                     <div class="card shadow-lg">
                         <div class="card-header bg-primary text-white">
-                            <h4 class="card-title">Package Category</h4>
+                            <h4 class="card-title mb-0">Package Category</h4>
                         </div>
 
                         <div class="card-body">
                             <!-- Form for adding a new package category -->
-                            <div class="mb-4 ">
+                            <div class="">
                                 @if ($errors->any())
                                     {{ implode('', $errors->all('<div>:message</div>')) }}
                                 @endif
                                 <form action="{{ route('packageCategory.store') }}" method="POST"
-                                    enctype="multipart/form-data" class="row g-3">
+                                    enctype="multipart/form-data" class="row g-3 align-items-center" id="importForm">
                                     @csrf
                                     <div class="col-md-4">
                                         <label for="name" class="form-label">Package Category Name</label>
-                                        <input type="text" name="name" class="form-control" id="name" required
+                                        <input type="text" name="name" class="form-control" id="name" 
                                             placeholder="Enter category name">
                                     </div>
 
@@ -37,8 +39,8 @@
                                         <input type="file" name="package_image" class="form-control" id="package_image">
                                     </div>
 
-                                    <div class="col-md-4 mt-4">
-                                        <button type="submit" class="btn btn-primary w-100">Add Package Category</button>
+                                    <div class="col-md-4 mt-10">
+                                        <button type="submit" class="btn btn-primary w-100 ">Add Package Category</button>
                                     </div>
                                 </form>
                             </div>
@@ -54,7 +56,6 @@
                                     <table id="add-row" class="display table table-striped table-hover data-table">
                                         <thead>
                                             <tr>
-                                                <th>#</th>
                                                 <th>ID</th>
                                                 <th>Name</th>
                                                 <th>Package Image</th>
@@ -75,7 +76,7 @@
     </div>
 @endsection
 
-@section('script')
+@section('scripts')
     <script>
         $(function() {
 
@@ -87,10 +88,7 @@
                         data: 'DT_RowIndex',
                         name: 'id'
                     },
-                    {
-                        data: 'id',
-                        name: 'id'
-                    },
+                    
                     {
                         data: 'name',
                         name: 'name'
@@ -139,4 +137,12 @@
 
         });
     </script>
+    <script src="{{ asset('js/packagecategory/packagecategory_form.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
 @endsection

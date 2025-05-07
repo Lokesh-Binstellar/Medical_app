@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const fv = FormValidation.formValidation(importForm, {
         fields: {
             file: {
-                validators: getFileValidators('image')
+                validators: getFileValidators('file')
             }
         },
         plugins: {
