@@ -190,7 +190,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::prefix('addMedicine')->group(function () {
         Route::get('', [AddMedicineController::class, 'index'])->name('addMedicine.index'); 
         Route::post('', [AddMedicineController::class, 'store'])->name('addMedicine.store');
-        Route::get('/get-medicine-strip/{id}', [MedicineController::class, 'getMedicineStrip'])->name('medicine.strip');
+        Route::get('/get-medicine-strip/{id}', [AddMedicineController::class, 'getMedicineStrip'])->name('medicine.strip');
 
     
     });

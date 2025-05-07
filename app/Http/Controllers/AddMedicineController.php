@@ -84,22 +84,49 @@ class AddMedicineController extends Controller
     }
 
     public function getMedicineStrip($id)
-    {
-        dd($id);
-        $medicine = Medicine::find($id);
-    
-        if ($medicine) {
+{
+    try {
+        if (Str::startsWith($id, 'otc_')) {
+            $realId = Str::after($id, 'otc_'); // Remove 'otc_' prefix
+            $medicine = Otcmedicine::find($realId);
+
+            if (!$medicine) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'OTC Medicine not found'
+                ], 404);
+            }
+
             return response()->json([
                 'status' => true,
-                'packaging_detail' => $medicine->packaging_detail ?? '',
+                'packaging_detail' => $medicine->packaging ?? ''
+            ]);
+        } else {
+            $medicine = Medicine::find($id);
+
+            if (!$medicine) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Medicine not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => true,
+                'packaging_detail' => $medicine->packaging_detail ?? ''
             ]);
         }
-    
+    } catch (\Exception $e) {
         return response()->json([
             'status' => false,
-            'packaging_detail' => '',
-        ]);
+            'message' => 'Something went wrong',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
+
+    
+    
 
 
     /**
@@ -119,6 +146,8 @@ class AddMedicineController extends Controller
         $validated = $request->validate([
             'prescription_id' => 'required',
             'medicine.*.medicine_id' => 'required',
+            'medicine.*.packaging_detail' => 'required',
+            'medicine.*.quantity' => 'required',
             'medicine.*.is_substitute' => 'required',
         ]);
 
@@ -150,6 +179,8 @@ class AddMedicineController extends Controller
                 if (!in_array($row['medicine_id'], $existingProductIds)) {
                     $mergedProducts[] = [
                         'product_id' => $row['medicine_id'],
+                        'packaging_detail' => $row['packaging_detail'],
+                        'quantity' => $row['quantity'],
                         'is_substitute' => $row['is_substitute'],
                     ];
                 }
@@ -172,6 +203,8 @@ class AddMedicineController extends Controller
             foreach ($incomingProducts as $row) {
                 $productsToInsert[] = [
                     'product_id' => $row['medicine_id'],
+                    'packaging_detail' => $row['packaging_detail'],
+                    'quantity' => $row['quantity'],
                     'is_substitute' => $row['is_substitute'],
                 ];
             }
@@ -235,13 +268,15 @@ class AddMedicineController extends Controller
             $result = $carts->map(function ($cart) {
                 $productDetails = json_decode($cart->products_details, true);
                 $detailedProducts = [];
-
+            
                 if (is_array($productDetails)) {
                     foreach ($productDetails as $product) {
-                        $productId = $product['product_id'];
+                        $productId = $product['product_id'] ?? null;
                         $medicine = null;
                         $type = null;
-
+            
+                        if (!$productId) continue;
+            
                         if (Str::startsWith($productId, 'otc_')) {
                             $type = 'otc';
                             $numericId = str_replace('otc_', '', $productId);
@@ -250,41 +285,42 @@ class AddMedicineController extends Controller
                             $type = 'medicine';
                             $medicine = \App\Models\Medicine::find($productId);
                         }
-
+            
                         if ($medicine) {
                             $name = $type === 'medicine'
                                 ? ($medicine->product_name ?? '')
                                 : ($medicine->name ?? '');
-
-
+            
+                            // ✅ If not in JSON, fallback to DB value
+                            $packageDetail = $product['packaging_detail'] ?? $medicine->packaging ?? $medicine->packaging_detail ?? '';
+                            $quantity = $product['quantity'] ?? $medicine->qty ?? 1;
+            
                             // Prepare image URLs
-
                             $imageUrls = [];
                             if (!empty($medicine->image_url)) {
                                 $images = is_array($medicine->image_url)
                                     ? $medicine->image_url
                                     : (json_decode($medicine->image_url, true) ?: explode(',', $medicine->image_url));
-
+            
                                 $imageUrls = array_map(function ($img) {
                                     $img = trim($img);
-                                    // If path already contains 'medicines/', don't prepend again
                                     return Str::startsWith($img, 'medicines/')
                                         ? asset('storage/' . $img)
                                         : asset('storage/medicines/' . $img);
                                 }, $images);
                             }
-
+            
                             $detailedProducts[] = [
-                                'product_id' => $productId, // e.g., otc_9
+                                'product_id' => $productId,
                                 'type' => $type,
                                 'name' => $name,
                                 'prescription_required' => ($medicine->prescription_required === 'Prescription Required') ? true : false,
-                                'qty' => $medicine->qty,
                                 'image_url' => $imageUrls,
+                                'packaging_detail' => $packageDetail,
+                                'quantity' => $quantity,
                                 'is_substitute' => $product['is_substitute'] ?? 'no',
                             ];
                         }
-
                     }
                 }
 
