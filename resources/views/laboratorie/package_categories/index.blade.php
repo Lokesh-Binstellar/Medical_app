@@ -39,8 +39,8 @@
                                         <input type="file" name="package_image" class="form-control" id="package_image">
                                     </div>
 
-                                    <div class="col-md-4 mt-10">
-                                        <button type="submit" class="btn btn-primary w-100 ">Add Package Category</button>
+                                    <div class="col-md-4">
+                                        <button type="submit" class="btn btn-primary  ">+ Add Package Category</button>
                                     </div>
                                 </form>
                             </div>

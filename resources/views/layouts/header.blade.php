@@ -1,16 +1,18 @@
 @section('styles')
-<style>
-    .filter{
-        justify-content: space-evenly;
-        margin-bottom: 8px;
-    }
-    .filter button{
-        font-size: x-small;
-    }
-    html {
-        scroll-behavior: smooth;
-    }
-</style>
+    <style>
+        .filter {
+            justify-content: space-evenly;
+            margin-bottom: 8px;
+        }
+
+        .filter button {
+            font-size: x-small;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
 @endsection
 
 <nav class="layout-navbar navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
@@ -26,29 +28,28 @@
             <div class="navbar-nav align-items-center">
                 <div class="nav-item navbar-search-wrapper mb-0 mt-4 ">
                     @auth
-                    <h3>Welcome @if (Auth::user()->laboratories)
-                        {{ Auth::user()->laboratories->lab_name }}
-                    @elseif(Auth::user()->pharmacies)
-                        {{ Auth::user()->pharmacies->pharmacy_name }}
+                        <h3 class="fw-bold text-primary">Welcome @if (Auth::user()->laboratories)
+                                {{ Auth::user()->laboratories->lab_name }}
+                            @elseif(Auth::user()->pharmacies)
+                                {{ Auth::user()->pharmacies->pharmacy_name }}
+                            @else
+                                {{ auth()->user()->name }}
+                            @endif !</h3>
                     @else
-                    {{ auth()->user()->name }}
-                    @endif !</h3>
-                    
-                @else
-                <span class="fw-bold text-primary">
-                    Welcome, Guest!
-                </span>
-            @endauth
+                        <span class="fw-bold text-primary">
+                            Welcome, Guest!
+                        </span>
+                    @endauth
 
-            @auth
-        @if (Auth::user()->pharmacies)
-        <span class="fw-bold text-primary">
-            Address :
-                {{ Auth::user()->pharmacies->address}}
-        
-        </span>
-@endif
-    @endauth
+                    @auth
+                        @if (Auth::user()->pharmacies)
+                            <span class="fw-bold text-primary">
+                                Address :
+                                {{ Auth::user()->pharmacies->address }}
+
+                            </span>
+                        @endif
+                    @endauth
 
                 </div>
 
@@ -65,8 +66,8 @@
                     <i class="mdi mdi-bell-outline mdi-24px"></i>
                     <span
                         class="position-absolute top-0 start-50 translate-middle-y badge badge-dot bg-danger mt-2 border unread-notification-count"> --}}
-                        {{-- {{ auth()->user()->unreadNotifications->count() }} --}}
-                    {{-- </span>
+            {{-- {{ auth()->user()->unreadNotifications->count() }} --}}
+            {{-- </span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end py-0" id="notificationDropdown" style="height: 538px">
                     <li class="dropdown-menu-header border-bottom py-50">
@@ -103,61 +104,61 @@
             </li>
         </ul> --}}
 
-        <!--/ Notification -->
-        <!-- User -->
-        <li class="nav-item navbar-dropdown dropdown-user dropdown profile">
-            <a class="nav-link dropdown-toggle hide-arrow pr" href="javascript:void(0);" data-bs-toggle="dropdown">
-                <div class="avatar">
-                    <img src="{{ asset('assets/img/profile.jpg') }}" alt
-                        class="w-px-40 h-px-40 rounded-circle" />
-                    {{-- <img src="{{ asset('assets/img/branding/main-logo.png') }}"
+            <!--/ Notification -->
+            <!-- User -->
+            <li class="nav-item navbar-dropdown dropdown-user dropdown profile">
+                <a class="nav-link dropdown-toggle hide-arrow pr" href="javascript:void(0);" data-bs-toggle="dropdown">
+                    <div class="avatar">
+                        <img src="{{ asset('assets/img/profile.jpg') }}" alt class="w-px-40 h-px-40 rounded-circle" />
+                        {{-- <img src="{{ asset('assets/img/branding/main-logo.png') }}"
                             class="w-px-40 h-auto rounded-circle"> --}}
 
-                </div>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                    <a class="dropdown-item" href="{{ route('dashboard') }}">
-                        <div class="d-flex">
-                            <div class="flex-shrink-0 me-3">
-                                <div class="avatar ">
-                                    <img src="{{ asset('upload/user-profile/' . Auth::user()->picture) }}"
-                                        class="w-px-40 h-auto rounded-circle" />
-                                    {{-- <img src="{{ asset('assets/img/branding/main-logo.png') }}"
+                    </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" href="{{ route('dashboard') }}">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0 me-3">
+                                    <div class="avatar ">
+                                        <img src="{{ asset('upload/user-profile/' . Auth::user()->picture) }}"
+                                            class="w-px-40 h-auto rounded-circle" />
+                                        {{-- <img src="{{ asset('assets/img/branding/main-logo.png') }}"
                                             class="w-px-40 h-auto rounded-circle"> --}}
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <span class="fw-medium d-block">
+                                        @if (Auth::user()->laboratories)
+                                            {{ Auth::user()->laboratories->owner_name }}
+                                        @elseif(Auth::user()->pharmacies)
+                                            {{ Auth::user()->pharmacies->owner_name }}
+                                        @else
+                                            {{ Auth::user()->name }}
+                                        @endif
+                                    </span>
+                                    <small
+                                        class="text-muted">{{ Auth::user()->role ? Auth::user()->role->name : '' }}</small>
                                 </div>
                             </div>
-                            <div class="flex-grow-1">
-                                <span class="fw-medium d-block"> @if (Auth::user()->laboratories)
-                                    {{ Auth::user()->laboratories->owner_name }}
-                                @elseif(Auth::user()->pharmacies)
-                                    {{ Auth::user()->pharmacies->owner_name }}
-                                @else
-                                    {{ Auth::user()->name }}
-                                @endif
-                            </span>
-                                <small
-                                    class="text-muted">{{ Auth::user()->role ? Auth::user()->role->name : '' }}</small>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-                <li>
-                    <div class="dropdown-divider"></div>
-                </li>
-                <li>
-                    <a class="dropdown-item" href="{{ route('profile.custom')}}">
-                        <i class="mdi mdi-account-outline me-2"></i>
-                        <span class="align-middle">My Profile</span>
-                    </a>
-                </li>
-                {{-- <li>
+                        </a>
+                    </li>
+                    <li>
+                        <div class="dropdown-divider"></div>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ route('profile.custom') }}">
+                            <i class="mdi mdi-account-outline me-2"></i>
+                            <span class="align-middle">My Profile</span>
+                        </a>
+                    </li>
+                    {{-- <li>
                     <a class="dropdown-item" href="{{ route('profile.updatePassword') }}">
                         <i class="mdi mdi-key-outline me-2"></i>
                         <span class="align-middle">Change Password</span>
                     </a>
                 </li> --}}
-                {{-- <li>
+                    {{-- <li>
                         <a class="dropdown-item" href="pages-account-settings-billing.html">
                             <span class="d-flex align-items-center align-middle">
                                 <i class="flex-shrink-0 mdi mdi-credit-card-outline me-2"></i>
@@ -182,28 +183,28 @@
                             <span class="align-middle">Pricing</span>
                         </a>
                     </li> --}}
-                <li>
-                    <div class="dropdown-divider"></div>
-                </li>
-                <li>
-                    <a class="dropdown-item" href="{{ route('logout') }}"
-                    onclick="event.preventDefault();  document.getElementById('logout-form').submit();">
-                        <i class="mdi mdi-logout me-2"></i>
-                        <span class="align-middle">Log Out</span>
+                    <li>
+                        <div class="dropdown-divider"></div>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ route('logout') }}"
+                            onclick="event.preventDefault();  document.getElementById('logout-form').submit();">
+                            <i class="mdi mdi-logout me-2"></i>
+                            <span class="align-middle">Log Out</span>
 
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                            @csrf
-                        </form>
-                    </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                @csrf
+                            </form>
+                        </a>
 
-                    {{-- <a class="dropdown-item" href="auth-login-cover.html" target="_blank">
+                        {{-- <a class="dropdown-item" href="auth-login-cover.html" target="_blank">
                             <i class="mdi mdi-logout me-2"></i>
                             <span class="align-middle">Log Out</span>
                         </a> --}}
-                </li>
-            </ul>
-        </li>
-        <!--/ User -->
+                    </li>
+                </ul>
+            </li>
+            <!--/ User -->
         </ul>
     </div>
 
@@ -222,7 +223,7 @@
     $(document).ready(function() {
         fetchNotifications('all'); --}}
 
-        {{-- // Fetch notifications when filter changes
+{{-- // Fetch notifications when filter changes
         // $("#notificationFilter").on("change", function() {
         //     let filter = $(this).val();
         //     fetchNotifications(filter);

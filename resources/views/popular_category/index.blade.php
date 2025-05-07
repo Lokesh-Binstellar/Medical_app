@@ -20,7 +20,7 @@
             <div class="row justify-content-center">
                 <div class="col-md-12">
                     <div class="card shadow">
-                        <div class="card-header d-flex justify-content-between align-items-center">
+                        <div class="card-header d-flex justify-content-between align-items-center ">
                             <h4 class="card-title mb-0 ">Popular Category </h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <form action="{{ route('popular_category.store') }}" method="POST" enctype="multipart/form-data"

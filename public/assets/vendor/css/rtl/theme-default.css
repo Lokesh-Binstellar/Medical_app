@@ -315,6 +315,11 @@ button.list-group-item-primary.active {
     background-color: #033a62 !important;
     border-color: #fefefe !important;
 }
+.signButton{
+    color: #fefefe !important;
+    background-color: #033a62 !important;
+    border-color: #fefefe !important;
+}
 .btn-primary:hover {
     color: #fefefe ;
     background-color: #033a62 ;
@@ -326,7 +331,11 @@ button.list-group-item-primary.active {
     /* border-color: #fefefe !important; */
 }
 
-
+.signButton:hover {
+    color: #033a62 !important;
+    background-color: #fefefe !important;
+    border-color: #033a62 !important;
+}
 .btn-check:focus+.btn-primary,
 .btn-primary:focus,
 .btn-primary.focus {

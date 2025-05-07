@@ -109,9 +109,9 @@
     <!-- Content -->
 
     <div class="position-relative main-container">
-        <div class="authentication-wrapper authentication-basic container-p-y">
-            <div class="authentication-inner py-4 text-center">
-                <img src="{{ asset('assets/img/gomeds.png') }}" class="main-logo" alt="">
+        <div class="authentication-wrapper authentication-basic">
+            <div class="authentication-inner text-center">
+                {{-- <img src="{{ asset('assets/img/gomeds.png') }}" class="main-logo" alt=""> --}}
                 @yield('content')
             </div>
         </div>
