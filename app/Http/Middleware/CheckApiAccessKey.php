@@ -19,6 +19,14 @@ class CheckApiAccessKey
     
         $clientKey = $request->header('ACCESS-KEY');
 
+
+        if (!$clientKey) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized. API key is missing.'
+            ], 401);
+        }
+        
         if ($clientKey !== env('API_ACCESS_KEY')) {
             return response()->json([
                 'status' => false,

@@ -22,15 +22,19 @@
                                 <form action="{{ route('popular.store') }}" method="POST" enctype="multipart/form-data"
                                     class="d-flex gap-2 align-items-center" id="importForm">
                                     @csrf
-                                    <select name="name" class="form-control select2" id="brand-select"  >
-                                        <option value="">Select Brand</option>
-                                        @foreach ($popularBrands as $item)
-                                            <option value="{{ $item }}">{{ $item }}</option>
-                                        @endforeach
-                                    </select>
-                                    
-                                    <input type="file" name="logo" class="form-control" id="logo">
+                                    <div class="error-msg">
+                                        <select name="name" class="form-control select2 " id="brand-select"  >
+                                            <option value="">Select Brand</option>
+                                            @foreach ($popularBrands as $item)
+                                                <option value="{{ $item }}">{{ $item }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="error-msg">
+                                        <input type="file" name="logo" class="form-control" id="logo">
+                                    </div>
                                     <button type="submit" class="btn btn-primary addButton text-nowrap px-5">+ Add Brand</button>
+                                    
                                 </form>
                             </div>
 

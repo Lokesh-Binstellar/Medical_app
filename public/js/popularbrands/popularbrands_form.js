@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
             trigger: new FormValidation.plugins.Trigger(),
             bootstrap5: new FormValidation.plugins.Bootstrap5({
                 eleValidClass: '',
-                rowSelector: '.col-md-6, .col-md-12'
+                rowSelector: ' .error-msg'
             }),
             submitButton: new FormValidation.plugins.SubmitButton(),
             defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         init: instance => {
             instance.on('plugins.message.placed', function (e) {
+                // e.messageElement.style.minHeight = '1.5rem';
                 if (e.element.parentElement.classList.contains('input-group')) {
                     e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
                 }

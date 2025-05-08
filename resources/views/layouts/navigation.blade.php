@@ -103,6 +103,18 @@
             </li>
         @endif
 
+
+        @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
+        <li class="menu-item {{ in_array(Route::current()->getName(), ['popular_lab_test.index']) ? 'active' : '' }}">
+            <a href="{{ route('popular_lab_test.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons mdi mdi-flask"></i>
+                <div data-i18n="Popular Lab Test">Popular Lab Test</div>
+            </a>
+        </li>
+    @endif
+    
+
+        
         @if (in_array('PopularBrand', $permissions) || $isSuperAdmin == 1)
             <li
                 class="menu-item {{ in_array(Route::current()->getName(), ['popular.index']) ? 'active' : '' }}">
@@ -112,6 +124,7 @@
                 </a>
             </li>
         @endif
+        
 
         @if (in_array('PopularCategory', $permissions) || $isSuperAdmin == 1)
             <li
@@ -122,6 +135,8 @@
                 </a>
             </li>
         @endif
+
+     
 
         @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
             <li

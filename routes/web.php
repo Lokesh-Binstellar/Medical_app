@@ -13,6 +13,7 @@ use App\Http\Controllers\PharmaciesController;
 use App\Http\Controllers\PopularBrandController;
 use App\Http\Controllers\PopularCategoryController;
 use App\Http\Controllers\FileUploadController;
+use App\Http\Controllers\PopularLabTestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -217,3 +218,9 @@ Route::get('/prescription/select', [AddMedicineController::class, 'prescriptionS
 Route::get('/prescriptions', [FileUploadController::class, 'index'])->name('prescriptions.index');
 Route::post('/prescriptions/update-status/{id}', [FileUploadController::class, 'updateStatus']);
 
+
+
+
+Route::get('/popular-lab-tests', [PopularLabTestController::class, 'index'])->name('popular_lab_test.index');
+Route::post('/popular-lab-tests', [PopularLabTestController::class, 'store'])->name('popular_lab_test.store');
+Route::delete('/popular-lab-tests/{id}', [PopularLabTestController::class, 'destroy'])->name('popular_lab_test.destroy');

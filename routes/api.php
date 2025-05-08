@@ -9,6 +9,7 @@ use App\Http\Controllers\PharmaciesController;
 use App\Http\Controllers\PopularBrandController;
 use App\Http\Controllers\PopularCategoryController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PopularLabTestController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,9 @@ Route::middleware('check.api.key')->group(function () {
     Route::get('/getAllPopularCategory', [PopularCategoryController::class, 'getCategory'])->name('popular.getCategory');
     Route::get('/addToCart/{id}', [AddMedicineController::class, 'getAddToCart'])->name('addtocart.getAddToCart');
     
+    Route::get('/popular-lab-tests', [PopularLabTestController::class, 'getAll']);
+
+
     Route::delete('/cart/{cartId}/product/{productId}', [AddMedicineController::class, 'removeProduct']);
 
     Route::post('/send-otp', [AuthController::class, 'sendOtp']);
