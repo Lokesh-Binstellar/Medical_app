@@ -7,6 +7,10 @@
         .select2 {
             width: 300px !important;
         }
+
+        body>span.select2-container.select2-container--default.select2-container--open {
+            width: auto !important;
+        }
     </style>
 @endsection
 
@@ -23,14 +27,15 @@
                                 <form action="{{ route('popular_lab_test.store') }}" method="POST"
                                     enctype="multipart/form-data" class="d-flex gap-2 align-items-center" id="importForm">
                                     @csrf
-                                    <select name="name" class="form-control select2" id="lab-test-select">
+                                    <div class="error-msg">
+                                    <select name="name" class="form-control select2" id="lab-test-select" required>
                                         <option value="">Select Lab Test</option>
                                         @foreach ($labTests as $item)
                                             <option value="{{ $item->id }}" data-contains="{{ $item->contains }}">
                                                 {{ $item->name }}</option>
                                         @endforeach
                                     </select>
-
+                                </div>
                                     {{-- <input type="file" name="logo" class="form-control" id="logo"> --}}
                                     <button type="submit" class="btn btn-primary addButton text-nowrap px-5">+ Add
                                         Lab Test</button>
@@ -41,10 +46,16 @@
 
                         <div class="card-body">
                             @if (session('success'))
-                                <div class="alert alert-success">{{ session('success') }}</div>
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    {{ session('success') }}
+                                </div>
                             @endif
 
-
+                            @if (session('error'))
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    {{ session('error') }}
+                                </div>
+                            @endif
 
                             <div class="table-responsive">
                                 <table id="add-row" class="display table table-striped table-hover data-table">
@@ -70,60 +81,80 @@
 @endsection
 
 @section('scripts')
-<script>
-    $(function() {
-        // Initialize DataTable for Popular Lab Test
-        var table = $('.data-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('popular_lab_test.index') }}",
-            columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'name', name: 'name' },
-                { data: 'contains', name: 'contains' },
-                { data: 'action', name: 'action', orderable: false, searchable: false }
-            ]
-        });
-
-        // Initialize Select2
-        $('#lab-test-select').select2({
-            placeholder: "Select Lab Test",
-            allowClear: true
-        });
-
-        // Auto-show contains when a lab test is selected (optional)
-        $('#lab-test-select').on('change', function () {
-            const selectedOption = $(this).find(':selected');
-            const contains = selectedOption.data('contains');
-
-            // Optional: display contains value somewhere on the form
-            // Example: set value in a hidden or readonly input
-            $('#contains-field').val(contains);
-        });
-
-        // Delete Lab Test
-        window.deleteTest = function(id) {
-            if (confirm('Are you sure you want to delete this Lab Test?')) {
-                $.ajax({
-                    url: '{{ route('popular_lab_test.destroy', '') }}/' + id,
-                    type: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}',
+    <script>
+        $(function() {
+            // Initialize DataTable for Popular Lab Test
+            var table = $('.data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('popular_lab_test.index') }}",
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
                     },
-                    success: function(response) {
-                        alert('Popular Lab Test deleted successfully!');
-                        table.ajax.reload();
+                    {
+                        data: 'name',
+                        name: 'name'
                     },
-                    error: function(xhr, status, error) {
-                        alert('Error: ' + error);
+                    {
+                        data: 'contains',
+                        name: 'contains'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
                     }
-                });
-            }
-        }
-    });
-</script>
+                ]
+            });
 
-    {{-- <script src="{{ asset('js/popularcategory/popularcategory_form.js') }}"></script>
+            // Initialize Select2
+            $('#lab-test-select').select2({
+                placeholder: "Select Lab Test",
+                allowClear: true
+            });
+
+            // Auto-show contains when a lab test is selected (optional)
+            $('#lab-test-select').on('change', function() {
+                const selectedOption = $(this).find(':selected');
+                const contains = selectedOption.data('contains');
+
+                // Optional: display contains value somewhere on the form
+                // Example: set value in a hidden or readonly input
+                $('#contains-field').val(contains);
+            });
+
+            // Delete Lab Test
+            window.deleteTest = function(id) {
+                if (confirm('Are you sure you want to delete this Lab Test?')) {
+                    $.ajax({
+                        url: '{{ route('popular_lab_test.destroy', '') }}/' + id,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                        },
+                        success: function(response) {
+                            alert('Popular Lab Test deleted successfully!');
+                            table.ajax.reload();
+                        },
+                        error: function(xhr, status, error) {
+                            alert('Error: ' + error);
+                        }
+                    });
+                }
+            }
+
+
+            setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 3000);
+        });
+    </script>
+
+    {{-- <script src="{{ asset('js/popularlabtest/popularlabtest_form.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>

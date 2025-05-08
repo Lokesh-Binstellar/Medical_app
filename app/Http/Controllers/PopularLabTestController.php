@@ -36,7 +36,7 @@ class PopularLabTestController extends Controller
                     </div>';
                 })
                 ->rawColumns(['action'])
-                ->make(true);
+                ->make(true);   
         }
 
         $labTests = LabTest::all(['id', 'name', 'contains']);
@@ -45,14 +45,22 @@ class PopularLabTestController extends Controller
 
     public function store(Request $request)
     {
-        $labTest = LabTest::findOrFail($request->name); // name contains lab_test id
+        $labTest = LabTest::findOrFail($request->name);
+
+        $exists = PopularLabTest::where('name', $labTest->name)->exists();
+    
+        if ($exists) {
+            return redirect()->back()->with('error', 'This lab test is already in the popular list.');
+        }
+    
         PopularLabTest::create([
             'name' => $labTest->name,
             'contains' => $labTest->contains,
         ]);
-
+    
         return redirect()->back()->with('success', 'Popular Lab Test added!');
     }
+    
 
     public function destroy(string $id)
     {

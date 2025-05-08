@@ -8,6 +8,9 @@
 .select2 {
         width: 300px !important;
     }
+    body>span.select2-container.select2-container--default.select2-container--open {
+            width: auto !important;
+        }
     </style>
 @endsection
 @section('content')
