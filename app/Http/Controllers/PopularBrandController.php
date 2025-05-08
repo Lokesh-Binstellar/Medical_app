@@ -154,7 +154,7 @@ class PopularBrandController extends Controller
         });
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $brandsData
         ], 200);
     }
