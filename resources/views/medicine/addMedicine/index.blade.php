@@ -74,6 +74,7 @@
                                             <tr>
                                                 <th>Select Medicine</th>
                                                 <th>Packaging</th>
+                                                <th>Quantity</th>
                                                 <th>Substitute</th>
                                                 <th>Action</th>
                                             </tr>
@@ -90,6 +91,10 @@
                                                 <td>
                                                     <input type="text" name="medicine[0][packaging_detail]"
                                                         class="form-control packaging-info" readonly>
+                                                </td>
+                                                <td>
+                                                    <input type="number" name="medicine[0][quantity]"
+                                                        class="form-control" >
                                                 </td>
 
                                                 <td>
@@ -259,6 +264,7 @@
             $(document).on('change', '.medicine-search', function() {
                 var id = $(this).val();
                 var $row = $(this).closest('tr');
+                
 
                 if (id) {
                     $.ajax({
