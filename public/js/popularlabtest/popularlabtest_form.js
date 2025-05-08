@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         init: instance => {
             instance.on('plugins.message.placed', function (e) {
-                e.messageElement.style.minHeight = '1.5rem';
+                // e.messageElement.style.minHeight = '1.5rem';
                 if (e.element.parentElement.classList.contains('input-group')) {
                     e.element.parentElement.insertAdjacentElement('afterend', e.messageElement);
                 }
