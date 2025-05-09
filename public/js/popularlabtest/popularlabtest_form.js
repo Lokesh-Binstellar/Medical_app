@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 validators: {
                     notEmpty: {
                         message: 'Please select a lab test.'
-                    }
+                    }``
                 }
             }
         },
