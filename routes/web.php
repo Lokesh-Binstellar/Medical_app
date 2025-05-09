@@ -217,6 +217,7 @@ require __DIR__ . '/auth.php';
 
 Route::get('/search-medicines', [AddMedicineController::class, 'searchMedicines'])->name('medicines.search');
 Route::get('/prescription/select', [AddMedicineController::class, 'prescriptionSelect'])->name('prescription.select');
+Route::get('/prescriptions/{customerId}/prescriptions', [AddMedicineController::class, 'getPrescriptionsByCustomer']);
 Route::get('/prescriptions', [FileUploadController::class, 'index'])->name('prescriptions.index');
 Route::post('/prescriptions/update-status/{id}', [FileUploadController::class, 'updateStatus']);
 

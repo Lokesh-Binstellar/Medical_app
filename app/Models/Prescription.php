@@ -10,6 +10,8 @@ class Prescription extends Model
         'customer_id',
         'prescription_file',
         'prescription_status',
+        'status',
+        'reason'
     ];
     public function customers()
     {

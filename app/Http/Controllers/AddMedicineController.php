@@ -60,11 +60,11 @@ class AddMedicineController extends Controller
         ]);
     }
 
-
     public function prescriptionSelect(Request $request)
     {
         $search = $request->input('query');
 
+        // Get prescriptions that match the search query (e.g., based on mobile_no or firstName)
         $prescriptions = Prescription::with('customers')
             ->where('prescription_status', 0)
             ->where('status', 1)
@@ -85,6 +85,7 @@ class AddMedicineController extends Controller
 
         return response()->json(['results' => $prescriptions]);
     }
+ 
 
     public function getMedicineStrip(Request $request)
     {
@@ -280,7 +281,8 @@ class AddMedicineController extends Controller
                 if (is_array($productDetails)) {
                     foreach ($productDetails as $product) {
                         $productId = $product['product_id'] ?? null;
-                        if (!$productId) continue;
+                        if (!$productId)
+                            continue;
 
                         $type = null;
                         $medicine = \App\Models\Medicine::where('product_id', $productId)->first();
@@ -318,13 +320,13 @@ class AddMedicineController extends Controller
 
                             $detailedProducts[] = [
                                 "product_id" => $type === 'medicine' ? $medicine->product_id : $medicine->otc_id,
-                                'type'        => $type,
-                                'name'        => $name,
+                                'type' => $type,
+                                'name' => $name,
                                 'prescription_required' => ($medicine->prescription_required === 'Prescription Required'),
-                                'image_url'   => $imageUrls,
                                 'packaging_detail' => $packageDetail,
                                 'quantity' => $quantity,
                                 'is_substitute' => $product['is_substitute'] ?? 'no',
+                                'image_url' => $imageUrls,
                             ];
                         }
                     }

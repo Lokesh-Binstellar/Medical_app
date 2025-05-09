@@ -15,6 +15,10 @@
             background-position-x: calc(100% - 10px);
             background-position-y: center;
         }
+        .swal2-deny btn btn-outline-secondary{
+            display:none !important;
+
+        }
     </style>
 @endsection
 @section('content')
@@ -119,35 +123,90 @@
 
         function updateStatus(select, id) {
             let value = select.value;
+            let prevValue = select.getAttribute('data-prev');
 
-            fetch('/prescriptions/update-status/' + id, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        prescription_status: value
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-            if (data.status) {
+            if (value === "1") {
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Updated!',
-                    text: 'Prescription status updated successfully',
-                    timer: 1500,
-                    showConfirmButton: false
+                    title: 'Reason Required',
+                    input: 'text',
+                    inputLabel: 'Please enter a reason for rejection',
+                    inputPlaceholder: 'Type reason here...',
+                   
+                    // showCancelButton: false, // No cancel button
+                    confirmButtonText: 'Submit', // Custom text for the confirm button
+                    showConfirmButton: true, // Make sure confirm button shows up
+                    onBeforeOpen: () => {
+                        // Hide the submit button initially
+                        const submitButton = document.querySelector('.swal2-confirm');
+                        if (submitButton) {
+                            showCancelButton.style.display = 'none !important';
+                        }
+                    },
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'Reason is required!'; // If empty, show validation message
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const reason = result.value;
+
+                        fetch('/prescriptions/update-status/' + id, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({
+                                    prescription_status: value,
+                                    reason: reason
+                                })
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.status) {
+                                    // Disable the dropdown if "No" is selected and saved
+                                    select.disabled = true;
+
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Updated!',
+                                        text: 'Prescription status updated successfully',
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    });
+                                }
+                            });
+                    } else {
+                        // If cancelled, revert to previous value
+                        select.value = prevValue;
+                    }
                 });
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops!',
-                    text: 'Failed to update status'
-                });
+                // For "Yes" just update
+                fetch('/prescriptions/update-status/' + id, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            prescription_status: value
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Updated!',
+                                text: 'Prescription status updated successfully',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        }
+                    });
             }
-        });
         }
     </script>
 @endsection

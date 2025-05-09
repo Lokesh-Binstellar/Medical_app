@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('customer_id');
             $table->text('prescription_file');
-            $table->boolean('prescription_status')->default(1);
+            $table->boolean('prescription_status')->nullable()->default(null); // Allow null for "Please select"
             $table->boolean('status')->default(1);
+            $table->text('reason')->nullable();
             $table->timestamps();
-
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
+            
         });
     }
 

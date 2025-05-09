@@ -29,8 +29,7 @@ Route::middleware('check.api.key')->group(function () {
     Route::get('/medicines/{id}', [MedicineController::class, 'medicineByProductId']);
     Route::get('/getAllPopularBrand', [PopularBrandController::class, 'getBrand'])->name('popular.get_brand');
     Route::get('/getAllPopularCategory', [PopularCategoryController::class, 'getCategory'])->name('popular.getCategory');
-    
-    
+
     
     Route::get('/popular-lab-tests', [PopularLabTestController::class, 'getAll']);
     
@@ -50,6 +49,7 @@ Route::middleware('check.api.key')->group(function () {
         Route::get('/getUserCart', [AddMedicineController::class, 'getAddToCart'])->name('getUserCart.getAddToCart');
     });
     
+
 
 });
 

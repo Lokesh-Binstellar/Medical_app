@@ -47,39 +47,50 @@ class FileUploadController extends Controller
                     }
                 })
                 ->editColumn('prescription_status', function ($row) {
-                    return '<select class="form-control custom-dropdown rounded" onchange="updateStatus(this, ' . $row->id . ')">
-                                    <option value="0" ' . ($row->prescription_status == 0 ? 'selected' : '') . '>Yes</option>
-                                    <option value="1" ' . ($row->prescription_status == 1 ? 'selected' : '') . '>No</option>
-                                </select>';
+                    $selectedValue = $row->prescription_status;
+                
+                    // Check if the prescription status is "No" (rejected) and disable the select
+                    $disabled = $selectedValue === 1 ? 'disabled' : '';
+                
+                    return '<select class="form-control custom-dropdown rounded"
+                                    onchange="updateStatus(this, ' . $row->id . ')"
+                                    onfocus="this.setAttribute(\'data-prev\', this.value)"
+                                    ' . $disabled . '>
+                                <option value="" disabled ' . (is_null($selectedValue) ? 'selected' : '') . '>Please select</option>
+                                <option value="0" ' . ($selectedValue === 0 ? 'selected' : '') . '>Yes</option>
+                                <option value="1" ' . ($selectedValue === 1 ? 'selected' : '') . '>No</option>
+                            </select>';
                 })
                 ->editColumn('status', function ($row) {
                     if ($row->status == 1) {
                         return '<span class="badge bg-warning">Pending</span>';
-                    } else {
+                    } elseif($row->status == 0) {
                         return '<span class="badge bg-success">Completed</span>';
+                    }else{
+                        return '<span class="badge bg-danger">Rejected</span>';
                     }
                 })
-        //         ->addColumn('action', function ($row) {
-        //             return '
-        //                 <div class="dropdown">
-        //                   <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
-        //   <ul class="dropdown-menu">
-                    
-        
-        //                     <li>
-        //                     <a href="' . route('laboratorie.edit', $row->id) . '" class="dropdown-item" >Edit</a>
-        //                     </li>
-                            
-        //                     <li>
-        //                       <form action="' . route('laboratorie.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-        //                         ' . csrf_field() . method_field('DELETE') . '
-        //                         <button class="dropdown-item " type="submit">Delete</button>
-        //                       </form>
-        //                     </li>
-        //                   </ul>
-        //                 </div>';
-        //         })
-                ->rawColumns([ 'prescription_file', 'prescription_status', 'status'])
+                //         ->addColumn('action', function ($row) {
+                //             return '
+                //                 <div class="dropdown">
+                //                   <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+                //   <ul class="dropdown-menu">
+
+
+                //                     <li>
+                //                     <a href="' . route('laboratorie.edit', $row->id) . '" class="dropdown-item" >Edit</a>
+                //                     </li>
+
+                //                     <li>
+                //                       <form action="' . route('laboratorie.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
+                //                         ' . csrf_field() . method_field('DELETE') . '
+                //                         <button class="dropdown-item " type="submit">Delete</button>
+                //                       </form>
+                //                     </li>
+                //                   </ul>
+                //                 </div>';
+                //         })
+                ->rawColumns(['prescription_file', 'prescription_status', 'status'])
                 ->make(true);
         }
         return view('prescriptions.index');
@@ -87,46 +98,63 @@ class FileUploadController extends Controller
     public function upload(Request $request)
     {
         $userId = $request->get('user_id');
-        // echo $userId;die;
 
-        //print_r( $request->file);die;
-
-
-
-
-        // Save the file in storage/app/public/uploads
+        // Check if file exists in the request
         if ($request->hasFile('file')) {
+
+            // Store the uploaded file
             $path = $request->file('file')->store('uploads', 'public');
 
-            $prescription = Prescription::create([
+            $prescription_status = $request->get('prescription_status', null);
 
+
+            $prescription = Prescription::create([
                 'customer_id' => $userId,
                 'prescription_file' => asset('storage/' . $path),
-                'prescription_status' => 1,
+                'prescription_status' => $prescription_status,
             ]);
 
-
+            // Return response
             return response()->json([
                 'status' => true,
                 'message' => 'File uploaded successfully',
                 'path' => asset('storage/' . $path)
             ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'No file found in request',
+            ], 400);
         }
-
-        return response()->json([
-            'status' => false,
-            'message' => 'File not uploaded'
-        ]);
     }
+
+
 
     public function updateStatus(Request $request, $id)
     {
+
+        $request->validate([
+            'prescription_status' => 'required|in:0,1',
+            'reason' => 'required_if:prescription_status,1|string|nullable',
+        ]);
         $prescription = Prescription::findOrFail($id);
         $prescription->prescription_status = $request->prescription_status;
+        if ($request->prescription_status == 1) {
+            $prescription->status = -1;
+            $prescription->reason = $request->reason ?? null;
+        } else {
+            $prescription->status = 1;
+            $prescription->reason = null;
+        }
         $prescription->save();
 
-        return response()->json(['status' => true, 'message' => 'Status updated']);
+        return response()->json([
+            'status' => true,
+            'message' => 'Status updated successfully.'
+        ]);
     }
+
+
 
 
 }

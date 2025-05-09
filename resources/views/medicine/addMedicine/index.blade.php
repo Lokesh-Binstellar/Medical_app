@@ -313,6 +313,7 @@
             });
 
         });
+<<<<<<< Updated upstream
 
 
         $('#prescription-select').on('select2:select', function (e) {
@@ -351,5 +352,10 @@
 });
 
 
+=======
+        
+        
+        
+>>>>>>> Stashed changes
     </script>
 @endsection
