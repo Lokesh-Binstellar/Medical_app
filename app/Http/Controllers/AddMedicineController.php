@@ -86,7 +86,7 @@ class AddMedicineController extends Controller
     public function getMedicineStrip(Request $request)
     {
         $id = $request->input('id');
-    
+
         try {
             if (!$id) {
                 return response()->json([
@@ -94,7 +94,7 @@ class AddMedicineController extends Controller
                     'message' => 'Medicine ID is required.'
                 ], 400);
             }
-    
+
             // Try to find in prescription medicines first
             $medicine = Medicine::where('product_id', $id)->first();
             if ($medicine) {
@@ -103,7 +103,7 @@ class AddMedicineController extends Controller
                     'packaging_detail' => $medicine->packaging_detail ?? ''
                 ]);
             }
-    
+
             // If not found, try OTC medicines
             $otcMedicine = Otcmedicine::where('otc_id', $id)->first();
             if ($otcMedicine) {
@@ -112,7 +112,7 @@ class AddMedicineController extends Controller
                     'packaging_detail' => $otcMedicine->packaging ?? ''
                 ]);
             }
-    
+
             return response()->json([
                 'status' => false,
                 'message' => 'Medicine not found'
@@ -125,7 +125,7 @@ class AddMedicineController extends Controller
             ], 500);
         }
     }
-    
+
 
 
 
@@ -227,7 +227,7 @@ class AddMedicineController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Products added to cart successfully (skipping duplicates).');
-    } 
+    }
 
     /**
      * Display the specified resource.
@@ -270,38 +270,32 @@ class AddMedicineController extends Controller
             $result = $carts->map(function ($cart) {
                 $productDetails = json_decode($cart->products_details, true);
                 $detailedProducts = [];
+    
                 if (is_array($productDetails)) {
                     foreach ($productDetails as $product) {
                         $productId = $product['product_id'] ?? null;
-                        print_r($productId);
-                        die;
-                        $medicine = null;
+                        if (!$productId) continue;
+    
                         $type = null;
-    
-                        if (!$productId)
-                            continue;
-    
-                        // Check if it's an OTC product based on product_id
-                        if (is_numeric($productId)) {
-                            $type = 'medicine';
-                            // Use the product_id column in the Medicine table
-                            $medicine = Medicine::where('product_id', $productId)->first();
-                        } else {
-                            $type = 'otc';
-                            // Use the otc_id column in the Otcmedicine table
-                            $medicine = Otcmedicine::where('otc_id', $productId)->first();
-                        }
+                        $medicine = \App\Models\Medicine::where('product_id', $productId)->first();
     
                         if ($medicine) {
+                            $type = 'medicine';
+                        } else {
+                            $medicine = \App\Models\Otcmedicine::where('otc_id', $productId)->first();
+                            if ($medicine) {
+                                $type = 'otc';
+                            }
+                        }
+    
+                        if ($medicine && $type) {
                             $name = $type === 'medicine'
                                 ? ($medicine->product_name ?? '')
                                 : ($medicine->name ?? '');
     
-                            // ✅ If not in JSON, fallback to DB value
                             $packageDetail = $product['packaging_detail'] ?? $medicine->packaging ?? $medicine->packaging_detail ?? '';
                             $quantity = $product['quantity'] ?? $medicine->qty ?? 1;
     
-                            // Prepare image URLs
                             $imageUrls = [];
                             if (!empty($medicine->image_url)) {
                                 $images = is_array($medicine->image_url)
@@ -317,11 +311,12 @@ class AddMedicineController extends Controller
                             }
     
                             $detailedProducts[] = [
-                                'product_id' => $productId,
-                                'type' => $type,
-                                'name' => $name,
-                                'prescription_required' => ($medicine->prescription_required === 'Prescription Required') ? true : false,
-                                'image_url' => $imageUrls,
+                                'product_id' => $type === 'medicine' ? $medicine->product_id : null,
+                                'otc_id'      => $type === 'otc' ? $medicine->otc_id : null,
+                                'type'        => $type,
+                                'name'        => $name,
+                                'prescription_required' => ($medicine->prescription_required === 'Prescription Required'),
+                                'image_url'   => $imageUrls,
                                 'packaging_detail' => $packageDetail,
                                 'quantity' => $quantity,
                                 'is_substitute' => $product['is_substitute'] ?? 'no',
