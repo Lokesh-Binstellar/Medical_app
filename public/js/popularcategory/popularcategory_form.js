@@ -3,7 +3,7 @@ const getFileValidators = (label = 'file') => ({
         message: `Please upload your ${label}.`
     },
     file: {
-        extension: 'csv,xlsx,xls,pdf,doc,docx,zip', 
+        extension: 'png,jpeg,jpg', 
         maxSize: 5 * 1024 * 1024, // example: 5MB
         message: 'Please upload a valid file (max 5MB).'
     }

@@ -191,7 +191,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::prefix('addMedicine')->group(function () {
         Route::get('', [AddMedicineController::class, 'index'])->name('addMedicine.index'); 
         Route::post('', [AddMedicineController::class, 'store'])->name('addMedicine.store');
-        Route::get('/get-medicine-strip/{id}', [AddMedicineController::class, 'getMedicineStrip'])->name('medicine.strip');
+       // web.php or api.php (depending on where you're calling it from)
+        Route::get('/get-medicine-strip', [AddMedicineController::class, 'getMedicineStrip'])->name('medicine.strip');
+
 
     
     });

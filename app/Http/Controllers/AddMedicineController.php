@@ -24,40 +24,40 @@ class AddMedicineController extends Controller
 
     public function searchMedicines(Request $request)
     {
-
         $query = $request->input('query');
 
-        // Search in medicines table
+        // Search in medicines table using product_id
         $medicines = Medicine::where('product_name', 'like', "%{$query}%")
             ->orWhere('salt_composition', 'like', "%{$query}%")
             ->get()
             ->map(function ($item) {
                 return [
-                    'id' => $item->id,
+                    'id' => $item->product_id, // use product_id instead of id
                     'text' => "{$item->product_name} + {$item->salt_composition}",
                     'type' => 'prescription',
                 ];
             });
 
-        // Search in otcmedicines table
+        // Search in otcmedicines table using otc_id
         $otcmedicines = Otcmedicine::where('name', 'like', "%{$query}%")
             ->get()
             ->map(function ($item) {
                 return [
-                    'id' => 'otc_' . $item->id, // Prefix to distinguish
+                    'id' => $item->otc_id, // use otc_id instead of id
                     'text' => $item->name,
                     'type' => 'otc',
                 ];
             });
 
         // Combine both
-        $results = $medicines->concat($otcmedicines)->values(); // use concat instead of merge to keep Collection
+        $results = $medicines->concat($otcmedicines)->values();
 
         return response()->json([
             'results' => $results
         ]);
-
     }
+
+
     public function prescriptionSelect(Request $request)
     {
         $search = $request->input('query');
@@ -83,50 +83,52 @@ class AddMedicineController extends Controller
         return response()->json(['results' => $prescriptions]);
     }
 
-    public function getMedicineStrip($id)
-{
-    try {
-        if (Str::startsWith($id, 'otc_')) {
-            $realId = Str::after($id, 'otc_'); // Remove 'otc_' prefix
-            $medicine = Otcmedicine::find($realId);
-
-            if (!$medicine) {
+    public function getMedicineStrip(Request $request)
+    {
+        $id = $request->input('id');
+    
+        try {
+            if (!$id) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'OTC Medicine not found'
-                ], 404);
+                    'message' => 'Medicine ID is required.'
+                ], 400);
             }
-
-            return response()->json([
-                'status' => true,
-                'packaging_detail' => $medicine->packaging ?? ''
-            ]);
-        } else {
-            $medicine = Medicine::find($id);
-
-            if (!$medicine) {
+    
+            // Try to find in prescription medicines first
+            $medicine = Medicine::where('product_id', $id)->first();
+            if ($medicine) {
                 return response()->json([
-                    'status' => false,
-                    'message' => 'Medicine not found'
-                ], 404);
+                    'status' => true,
+                    'packaging_detail' => $medicine->packaging_detail ?? ''
+                ]);
             }
-
+    
+            // If not found, try OTC medicines
+            $otcMedicine = Otcmedicine::where('otc_id', $id)->first();
+            if ($otcMedicine) {
+                return response()->json([
+                    'status' => true,
+                    'packaging_detail' => $otcMedicine->packaging ?? ''
+                ]);
+            }
+    
             return response()->json([
-                'status' => true,
-                'packaging_detail' => $medicine->packaging_detail ?? ''
-            ]);
+                'status' => false,
+                'message' => 'Medicine not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage()
+            ], 500);
         }
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Something went wrong',
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
+    
 
-    
-    
+
+
 
 
     /**
@@ -225,7 +227,7 @@ class AddMedicineController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Products added to cart successfully (skipping duplicates).');
-    }
+    } 
 
     /**
      * Display the specified resource.
@@ -257,51 +259,55 @@ class AddMedicineController extends Controller
                 ->where('customer_id', $id)
                 ->orderByDesc('created_at')
                 ->get();
-
+    
             if ($carts->isEmpty()) {
                 return response()->json([
                     'status' => false,
                     'message' => 'No cart records found for customer ID ' . $id
                 ], 404);
             }
-
+    
             $result = $carts->map(function ($cart) {
                 $productDetails = json_decode($cart->products_details, true);
                 $detailedProducts = [];
-            
                 if (is_array($productDetails)) {
                     foreach ($productDetails as $product) {
                         $productId = $product['product_id'] ?? null;
+                        print_r($productId);
+                        die;
                         $medicine = null;
                         $type = null;
-            
-                        if (!$productId) continue;
-            
-                        if (Str::startsWith($productId, 'otc_')) {
-                            $type = 'otc';
-                            $numericId = str_replace('otc_', '', $productId);
-                            $medicine = \App\Models\Otcmedicine::find($numericId);
-                        } else {
+    
+                        if (!$productId)
+                            continue;
+    
+                        // Check if it's an OTC product based on product_id
+                        if (is_numeric($productId)) {
                             $type = 'medicine';
-                            $medicine = \App\Models\Medicine::find($productId);
+                            // Use the product_id column in the Medicine table
+                            $medicine = Medicine::where('product_id', $productId)->first();
+                        } else {
+                            $type = 'otc';
+                            // Use the otc_id column in the Otcmedicine table
+                            $medicine = Otcmedicine::where('otc_id', $productId)->first();
                         }
-            
+    
                         if ($medicine) {
                             $name = $type === 'medicine'
                                 ? ($medicine->product_name ?? '')
                                 : ($medicine->name ?? '');
-            
+    
                             // ✅ If not in JSON, fallback to DB value
                             $packageDetail = $product['packaging_detail'] ?? $medicine->packaging ?? $medicine->packaging_detail ?? '';
                             $quantity = $product['quantity'] ?? $medicine->qty ?? 1;
-            
+    
                             // Prepare image URLs
                             $imageUrls = [];
                             if (!empty($medicine->image_url)) {
                                 $images = is_array($medicine->image_url)
                                     ? $medicine->image_url
                                     : (json_decode($medicine->image_url, true) ?: explode(',', $medicine->image_url));
-            
+    
                                 $imageUrls = array_map(function ($img) {
                                     $img = trim($img);
                                     return Str::startsWith($img, 'medicines/')
@@ -309,7 +315,7 @@ class AddMedicineController extends Controller
                                         : asset('storage/medicines/' . $img);
                                 }, $images);
                             }
-            
+    
                             $detailedProducts[] = [
                                 'product_id' => $productId,
                                 'type' => $type,
@@ -323,7 +329,7 @@ class AddMedicineController extends Controller
                         }
                     }
                 }
-
+    
                 return [
                     'id' => $cart->id,
                     'customer_id' => $cart->customer_id,
@@ -331,7 +337,7 @@ class AddMedicineController extends Controller
                     'created_at' => \Carbon\Carbon::parse($cart->created_at)->toDateTimeString(),
                 ];
             });
-
+    
             return response()->json([
                 'status' => true,
                 'data' => $result
@@ -344,6 +350,7 @@ class AddMedicineController extends Controller
             ], 500);
         }
     }
+    
 
 
 
@@ -390,5 +397,5 @@ class AddMedicineController extends Controller
         //
     }
 
-  
+
 }

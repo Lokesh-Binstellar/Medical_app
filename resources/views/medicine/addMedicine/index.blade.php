@@ -70,7 +70,7 @@
                                 </div>
                                 <div class="table-responsive">
                                     <table class="display table table-striped table-hover data-table" id="medicine-table">
-                                        <thead >
+                                        <thead>
                                             <tr>
                                                 <th>Select Medicine</th>
                                                 <th>Packaging</th>
@@ -93,8 +93,7 @@
                                                         class="form-control packaging-info" readonly>
                                                 </td>
                                                 <td>
-                                                    <input type="number" name="medicine[0][quantity]"
-                                                        class="form-control" >
+                                                    <input type="number" name="medicine[0][quantity]" class="form-control">
                                                 </td>
 
                                                 <td>
@@ -264,12 +263,14 @@
             $(document).on('change', '.medicine-search', function() {
                 var id = $(this).val();
                 var $row = $(this).closest('tr');
-                
 
                 if (id) {
                     $.ajax({
-                        url: '{{ route('medicine.strip', ':id') }}'.replace(':id', id),
+                        url: '{{ route('medicine.strip') }}',
                         type: 'GET',
+                        data: {
+                            id: id
+                        },
                         success: function(response) {
                             if (response.status) {
                                 $row.find('.packaging-info').val(response.packaging_detail ||
@@ -286,6 +287,8 @@
                     $row.find('.packaging-info').val('');
                 }
             });
+
+
 
         });
     </script>

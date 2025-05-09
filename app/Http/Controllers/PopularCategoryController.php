@@ -166,13 +166,13 @@ class PopularCategoryController extends Controller
             return [
                 'id' => $category->id,
                 'name' => $category->name,
-                'logo' => $category->logo ? url('storage/brand/' . basename($category->logo)) : [],
+                'logo' => $category->logo ? url('storage/category/' . basename($category->logo)) : [],
 
             ];
         });
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $categoryData
         ], 200);
     }
