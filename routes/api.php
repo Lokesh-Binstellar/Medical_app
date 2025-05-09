@@ -29,9 +29,8 @@ Route::middleware('check.api.key')->group(function () {
     Route::get('/medicines/{id}', [MedicineController::class, 'medicineByProductId']);
     Route::get('/getAllPopularBrand', [PopularBrandController::class, 'getBrand'])->name('popular.get_brand');
     Route::get('/getAllPopularCategory', [PopularCategoryController::class, 'getCategory'])->name('popular.getCategory');
-    Route::get('/addToCart/{id}', [AddMedicineController::class, 'getAddToCart'])->name('addtocart.getAddToCart');
     
-
+    
     
     Route::get('/popular-lab-tests', [PopularLabTestController::class, 'getAll']);
     
@@ -48,6 +47,7 @@ Route::middleware('check.api.key')->group(function () {
         Route::put('/customerDetails', [AuthController::class, 'update']);
         Route::post('/upload-file', [FileUploadController::class, 'upload']);
         Route::post('/add-to-cart', [AddMedicineController::class, 'frontendAddToCart']);
+        Route::get('/getUserCart', [AddMedicineController::class, 'getAddToCart'])->name('getUserCart.getAddToCart');
     });
     
 

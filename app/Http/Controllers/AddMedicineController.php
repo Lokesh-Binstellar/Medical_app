@@ -255,8 +255,11 @@ class AddMedicineController extends Controller
     {
         //
     }
-    public function getAddToCart($id)
+    public function getAddToCart(Request $request)
+
     {
+        $id = $request->get('user_id');
+
         try {
             $carts = DB::table('carts')
                 ->where('customer_id', $id)
