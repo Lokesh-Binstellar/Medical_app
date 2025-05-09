@@ -85,7 +85,7 @@ class AddMedicineController extends Controller
 
         return response()->json(['results' => $prescriptions]);
     }
- 
+
 
     public function getMedicineStrip(Request $request)
     {
@@ -257,7 +257,6 @@ class AddMedicineController extends Controller
         //
     }
     public function getAddToCart(Request $request)
-
     {
         $id = $request->get('user_id');
 
@@ -496,25 +495,46 @@ class AddMedicineController extends Controller
     public function fetchCustomerCart(Request $request)
     {
         $prescriptionId = $request->input('prescription_id');
-    
+
         // Step 1: Get prescription with customer_id
         $prescription = Prescription::find($prescriptionId);
         if (!$prescription) {
             return response()->json(['status' => 'error', 'message' => 'Prescription not found']);
         }
-    
+
         $customerId = $prescription->customer_id;
-    
+
         // Step 2: Find Cart using customer_id
         $cart = Carts::where('customer_id', $customerId)->first();
         if (!$cart || !$cart->products_details) {
             return response()->json(['status' => 'error', 'message' => 'No cart found']);
         }
-    
+
         // Step 3: Decode product_details JSON
         $products = json_decode($cart->products_details, true);
-    
+
         return response()->json(['status' => 'success', 'data' => $products]);
     }
-    
+//prescritption files
+    public function fetchPrescriptionFile(Request $request)
+    {
+        $prescriptionId = $request->input('prescription_id');
+
+        $prescription = Prescription::find($prescriptionId);
+
+        if (!$prescription || !$prescription->prescription_file) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Prescription file not found'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'file_url' => asset('storage/' . $prescription->prescription_file)
+        ]);
+    }
+
+
+
 }

@@ -35,6 +35,62 @@
         body>span.select2-container.select2-container--default.select2-container--open {
             width: auto !important;
         }
+
+        .header {
+            padding: 16px;
+            background-color: #2c3e50;
+            color: #fff;
+            font-size: 1.5rem;
+            border-radius: 6px 6px 0 0;
+            margin-bottom: 20px;
+        }
+
+        .pdf-wrapper {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pdf-box {
+            flex: 1 1 45%;
+            min-width: 300px;
+        }
+
+        .pdf-title {
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            color: #34495e;
+            text-align: center;
+        }
+
+        .pdf-viewer {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .footer a {
+            text-decoration: none;
+            color: #2980b9;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 900px) {
+            .pdf-box {
+                flex: 1 1 100%;
+            }
+
+            .pdf-viewer {
+                height: 500px;
+            }
+        }
     </style>
 @endsection
 @section('content')
@@ -71,12 +127,41 @@
                                         <option value="">Search customer...</option>
                                     </select>
                                 </div>
+                                <div>
+                                    <div class="header">Side-by-Side PDF Preview</div>
 
+                                    <div class="pdf-wrapper">
+                                        <div class="pdf-box">
+                                            <div class="pdf-title">Document 1</div>
+                                            <iframe class="pdf-viewer"
+                                                src="{{ asset('storage/uploads/28zt9dH6onJC90zzC5WAW03I98DuA6BOJIYq9643.pdf') }}">
+                                                This browser does not support PDFs. <a
+                                                    href="{{ asset('storage/uploads/28zt9dH6onJC90zzC5WAW03I98DuA6BOJIYq9643.pdf') }}">Download
+                                                    PDF</a>.
+                                            </iframe>
+                                        </div>
+
+                                        <div class="pdf-box">
+                                            <div class="pdf-title">Document 2</div>
+                                            <iframe class="pdf-viewer"
+                                                src="{{ asset('storage/uploads/28zt9dH6onJC90zzC5WAW03I98DuA6BOJIYq9643.pdf') }}">
+                                                This browser does not support PDFs. <a
+                                                    href="{{ asset('storage/uploads/28zt9dH6onJC90zzC5WAW03I98DuA6BOJIYq9643.pdf') }}">Download
+                                                    PDF</a>.
+                                            </iframe>
+                                        </div>
+                                    </div>
+
+                                    <div class="footer">
+                                        <a href="pdfs/file1.pdf" download>Download File 1</a>
+                                        <a href="pdfs/file2.pdf" download>Download File 2</a>
+                                    </div>
+                                </div>
                                 <div id="cart-details" style="display:none;" class="mt-3">
                                     <h5>Customer Cart Details</h5>
-                                    <table class="table table-bordered">
+                                    <table class="table table-bordered ">
                                         <thead>
-                                            <tr>
+                                            <tr class="table-dark">
                                                 <th>Product ID</th>
                                                 <th>Packaging Detail</th>
                                                 <th>Quantity</th>
@@ -87,13 +172,13 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                
+
 
 
 
 
                                 <div class="table-responsive">
-                                    <table class="display table table-striped table-hover data-table" id="medicine-table">
+                                    <table class="display table table-striped table-hover data-table " id="medicine-table">
                                         <thead>
                                             <tr>
                                                 <th>Select Medicine</th>
@@ -313,49 +398,43 @@
             });
 
         });
-<<<<<<< Updated upstream
 
 
-        $('#prescription-select').on('select2:select', function (e) {
-    var prescriptionId = e.params.data.id;
+        $('#prescription-select').on('select2:select', function(e) {
+            var prescriptionId = e.params.data.id;
 
-    $.ajax({
-        url: '/fetch-customer-cart',
-        method: 'GET',
-        data: { prescription_id: prescriptionId },
-        success: function (response) {
-            if (response.status === 'success') {
-                let products = response.data;
-                let html = '';
+            $.ajax({
+                url: '/fetch-customer-cart',
+                method: 'GET',
+                data: {
+                    prescription_id: prescriptionId
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        let products = response.data;
+                        let html = '';
 
-                products.forEach(function (product) {
-                    html += `<tr>
+                        products.forEach(function(product) {
+                            html += `<tr>
                         <td>${product.product_id}</td>
                         <td>${product.packaging_detail}</td>
                         <td>${product.quantity}</td>
                         <td>${product.is_substitute}</td>
                     </tr>`;
-                });
+                        });
 
-                $('#cart-product-body').html(html);
-                $('#cart-details').show();
-            } else {
-                $('#cart-product-body').html('');
-                $('#cart-details').hide();
-            }
-        },
-        error: function () {
-            $('#cart-product-body').html('');
-            $('#cart-details').hide();
-        }
-    });
-});
-
-
-=======
-        
-        
-        
->>>>>>> Stashed changes
+                        $('#cart-product-body').html(html);
+                        $('#cart-details').show();
+                    } else {
+                        $('#cart-product-body').html('');
+                        $('#cart-details').hide();
+                    }
+                },
+                error: function() {
+                    $('#cart-product-body').html('');
+                    $('#cart-details').hide();
+                }
+            });
+        });
     </script>
 @endsection
