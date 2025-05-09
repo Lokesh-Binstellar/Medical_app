@@ -309,10 +309,9 @@ class AddMedicineController extends Controller
                                         : asset('storage/medicines/' . $img);
                                 }, $images);
                             }
-    
+                            
                             $detailedProducts[] = [
-                                'product_id' => $type === 'medicine' ? $medicine->product_id : null,
-                                'otc_id'      => $type === 'otc' ? $medicine->otc_id : null,
+                                "product_id" => $type === 'medicine' ? $medicine->product_id : $medicine->otc_id,
                                 'type'        => $type,
                                 'name'        => $name,
                                 'prescription_required' => ($medicine->prescription_required === 'Prescription Required'),
@@ -391,6 +390,9 @@ class AddMedicineController extends Controller
     {
         //
     }
+
+
+
 
 
 }
