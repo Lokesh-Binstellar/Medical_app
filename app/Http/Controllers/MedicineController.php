@@ -238,4 +238,9 @@ class MedicineController extends Controller
             'source' => $medicine ? 'medicines' : 'otcmedicines'
         ], 200);
     }
+
+
+
+
+
 }
