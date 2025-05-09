@@ -62,12 +62,36 @@
                             @endif
                             <form method="POST" action="{{ route('addMedicine.store') }}" class="d-flex flex-column gap-3">
                                 @csrf
+                                <!-- Prescription Dropdown -->
+                                <!-- Prescription Dropdown (Already using select2) -->
                                 <div class="d-flex selectCustomer align-items-center gap-3">
                                     <label class="font-bold">Please Select Prescription :</label>
-                                    <select class="form-control customer-search " name="prescription_id">
+                                    <select class="form-control customer-search" name="prescription_id"
+                                        id="prescription-select">
                                         <option value="">Search customer...</option>
                                     </select>
                                 </div>
+
+                                <div id="cart-details" style="display:none;" class="mt-3">
+                                    <h5>Customer Cart Details</h5>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Product ID</th>
+                                                <th>Packaging Detail</th>
+                                                <th>Quantity</th>
+                                                <th>Is Substitute</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="cart-product-body">
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+
+
+
+
                                 <div class="table-responsive">
                                     <table class="display table table-striped table-hover data-table" id="medicine-table">
                                         <thead>
@@ -288,8 +312,44 @@
                 }
             });
 
-
-
         });
+
+
+        $('#prescription-select').on('select2:select', function (e) {
+    var prescriptionId = e.params.data.id;
+
+    $.ajax({
+        url: '/fetch-customer-cart',
+        method: 'GET',
+        data: { prescription_id: prescriptionId },
+        success: function (response) {
+            if (response.status === 'success') {
+                let products = response.data;
+                let html = '';
+
+                products.forEach(function (product) {
+                    html += `<tr>
+                        <td>${product.product_id}</td>
+                        <td>${product.packaging_detail}</td>
+                        <td>${product.quantity}</td>
+                        <td>${product.is_substitute}</td>
+                    </tr>`;
+                });
+
+                $('#cart-product-body').html(html);
+                $('#cart-details').show();
+            } else {
+                $('#cart-product-body').html('');
+                $('#cart-details').hide();
+            }
+        },
+        error: function () {
+            $('#cart-product-body').html('');
+            $('#cart-details').hide();
+        }
+    });
+});
+
+
     </script>
 @endsection

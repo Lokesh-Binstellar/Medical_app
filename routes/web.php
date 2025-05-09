@@ -226,3 +226,6 @@ Route::post('/prescriptions/update-status/{id}', [FileUploadController::class, '
 Route::get('/popular-lab-tests', [PopularLabTestController::class, 'index'])->name('popular_lab_test.index');
 Route::post('/popular-lab-tests', [PopularLabTestController::class, 'store'])->name('popular_lab_test.store');
 Route::delete('/popular-lab-tests/{id}', [PopularLabTestController::class, 'destroy'])->name('popular_lab_test.destroy');
+
+Route::get('/fetch-customer-cart', [AddMedicineController::class, 'fetchCustomerCart']);
+
