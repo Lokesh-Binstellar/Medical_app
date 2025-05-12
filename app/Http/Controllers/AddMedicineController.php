@@ -549,23 +549,62 @@ class AddMedicineController extends Controller
 
 
 
-    //prescritption files
-    public function fetchPrescriptionFile(Request $request)
-    {
-        $prescriptionId = $request->input('prescription_id');
 
+    //prescritption files
+
+    public function fetchPrescriptionFiles(Request $request)
+    {
+        // Get the prescription ID from the request
+        $prescriptionId = $request->input('prescriptionId');
+
+        // Step 1: Find the prescription based on the prescription ID
         $prescription = Prescription::find($prescriptionId);
 
-        if (!$prescription || !$prescription->prescription_file) {
+        if (!$prescription) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Prescription file not found'
+                'message' => 'Prescription not found'
+            ]);
+        }
+
+        // Step 2: Get the customer_id associated with this prescription
+        $customerId = $prescription->customer_id;
+
+        // Step 3: Fetch all prescriptions for the customer, to get all files
+        $prescriptions = Prescription::where('customer_id', $customerId)->get();
+
+        if ($prescriptions->isEmpty()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No prescriptions found for this customer'
+            ]);
+        }
+
+        $fileUrls = [];
+
+        // Step 4: Loop through all prescriptions to get their files
+        foreach ($prescriptions as $prescription) {
+            // Assuming `prescription_file` holds a comma-separated string of file names
+            $files = explode(',', $prescription->prescription_file); // Split the file names into an array
+
+            // Step 5: Generate full URLs for each file
+            foreach ($files as $file) {
+                // Trim any extra spaces and generate a full URL
+                $fileUrls[] = asset('storage/uploads/' . trim($file));
+            }
+        }
+
+        // Step 6: Return the list of file URLs
+        if (empty($fileUrls)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No files found for this customer'
             ]);
         }
 
         return response()->json([
             'status' => 'success',
-            'file_url' => asset('storage/' . $prescription->prescription_file)
+            'files' => $fileUrls
         ]);
     }
 }

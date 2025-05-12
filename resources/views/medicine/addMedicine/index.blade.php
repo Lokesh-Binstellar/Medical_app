@@ -128,36 +128,13 @@
                                     </select>
                                 </div>
 
-
                                 <div>
-                                    <div class="header">Prescription Preview</div>
-
-                                    <!-- Display first 2 -->
-                                    <div class="pdf-wrapper d-flex flex-wrap gap-3" id="preview-files"></div>
-
-                                    <!-- View All Button -->
-                                    <button id="view-all-btn" class="btn btn-primary mt-3" style="display:none;"
-                                        data-bs-toggle="modal" data-bs-target="#allFilesModal">
-                                        View All
-                                    </button>
-
-                                    <!-- Modal for all files -->
-                                    <div class="modal fade" id="allFilesModal" tabindex="-1">
-                                        <div class="modal-dialog modal-xl">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">All Prescription Files</h5>
-                                                    <button type="button" class="btn-close"
-                                                        data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body d-flex flex-wrap gap-3" id="all-files-container">
-                                                    <!-- Files appended dynamically -->
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <div class="header">Side-by-Side PDF Preview</div>
+                                
+                                    <div class="pdf-wrapper" id="prescription-preview"></div>
+                                
+                                    <div class="footer" id="download-links"></div>
                                 </div>
-
 
                                 <div id="cart-details" style="display:none;" class="mt-3">
                                     <h5>Customer Cart Details</h5>
@@ -472,44 +449,57 @@
         });
 
 
-        function loadPrescriptionFiles(prescriptionId) {
+
+
+
+
+
+
+
+
+       // $(document).on('change', '.customer-search', function() {
+        $('#prescription-select').on('select2:select', function(e) {
+    //$('.customer-search').on('select2:select', function(e) {
+       
+    var prescriptionId = e.params.data.id; // Assuming customer_id is available
+
+
     $.ajax({
         url: '/fetch-prescription-files',
         method: 'GET',
-        data: { prescription_id: prescriptionId },
+        data: {
+            prescriptionId: prescriptionId
+        },
         success: function(response) {
+            //console.log(response.files);
             if (response.status === 'success') {
-                const preview = $('#preview-files');
-                const modal = $('#all-files-container');
-                preview.empty();
-                modal.empty();
-
-                const files = response.files;
-
-                files.forEach((file, index) => {
-                    const viewer = createViewer(file);
-                    if (index < 2) preview.append(viewer);
-                    modal.append(viewer.clone());
+                let html = '';
+                var fileUrl = response.files;
+                response.files.forEach(function(fileUrl, index) {
+                    html += `
+                        <div class="pdf-box">
+                            <div class="pdf-title">Document ${index + 1}</div>
+                            <iframe class="pdf-viewer" src="${fileUrl}">
+                                This browser does not support PDFs. 
+                                <a href="assets/storage/uploads${fileUrl}" download>Download PDF</a>.
+                            </iframe>
+                        </div>
+                    `;
                 });
 
-                $('#view-all-btn').toggle(files.length > 2);
+                $('.pdf-wrapper').html(html); // Inject the generated HTML into the container
+                $('#pdf-details').show();
+            } else {
+                $('.pdf-wrapper').html('No files available.');
+                $('#pdf-details').hide();
             }
+        },
+        error: function() {
+            $('.pdf-wrapper').html('Error loading files.');
+            $('#pdf-details').hide();
         }
     });
-}
-
-function createViewer(fileUrl) {
-    const isPdf = fileUrl.toLowerCase().endsWith('.pdf');
-    return $(`
-        <div class="pdf-box" style="width:48%;">
-            <div class="pdf-title">${isPdf ? 'PDF' : 'Image'}</div>
-            ${isPdf 
-                ? `<iframe src="${fileUrl}" class="pdf-viewer" style="width:100%; height:300px;"></iframe>`
-                : `<img src="${fileUrl}" style="width:100%; height:300px; object-fit:contain;" />`
-            }
-        </div>
-    `);
-}
+});
 
     </script>
 @endsection

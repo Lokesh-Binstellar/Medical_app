@@ -231,5 +231,6 @@ Route::delete('/popular-lab-tests/{id}', [PopularLabTestController::class, 'dest
 Route::get('/fetch-customer-cart', [AddMedicineController::class, 'fetchCustomerCart']);
 
 
-Route::post('/delete-cart-product', [AddMedicineController::class, 'deleteCartProduct']);
-Route::get('/fetch-prescription-files', [AddMedicineController::class, 'fetchPrescriptionFile']);
+Route::get('/fetch-prescription-files', [AddMedicineController::class, 'fetchPrescriptionFiles']);
+
+

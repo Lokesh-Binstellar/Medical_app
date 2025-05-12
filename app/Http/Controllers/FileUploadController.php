@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Prescription;
@@ -31,27 +32,27 @@ class FileUploadController extends Controller
 
                     // Check if the file is an image
                     if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-                        return '<a href="' . $fileUrl . '" target="_blank">
-                                        <img src="' . $fileUrl . '" alt="Prescription Image" style="max-width: 60px; height: auto;" class="img-thumbnail">
+                        return '<a href="' .asset('storage/uploads/' . $fileUrl). '" target="_blank">
+                                        <img src="' . asset('storage/uploads/' . $fileUrl). '" alt="Prescription Image" style="max-width: 60px; height: auto;" class="img-thumbnail">
                                     </a>';
                     }
                     // Check if the file is a PDF
                     elseif (strtolower($extension) === 'pdf') {
-                        return '<a href="' . $fileUrl . '" target="_blank">
+                        return '<a href="' . asset('storage/uploads/' . $fileUrl) . '" target="_blank">
                                         <img src="' . asset('assets/pdf-icon.png') . '" style="width: 40px;" alt="PDF Preview">
                                     </a>';
                     }
                     // For other file types
                     else {
-                        return '<a href="' . $fileUrl . '" target="_blank">View File</a>';
+                        return '<a href="' . asset('storage/uploads/' . $fileUrl). '" target="_blank">View File</a>';
                     }
                 })
                 ->editColumn('prescription_status', function ($row) {
                     $selectedValue = $row->prescription_status;
-                
+
                     // Check if the prescription status is "No" (rejected) and disable the select
                     $disabled = $selectedValue === 1 ? 'disabled' : '';
-                
+
                     return '<select class="form-control custom-dropdown rounded"
                                     onchange="updateStatus(this, ' . $row->id . ')"
                                     onfocus="this.setAttribute(\'data-prev\', this.value)"
@@ -64,9 +65,9 @@ class FileUploadController extends Controller
                 ->editColumn('status', function ($row) {
                     if ($row->status == 1) {
                         return '<span class="badge bg-warning">Pending</span>';
-                    } elseif($row->status == 0) {
+                    } elseif ($row->status == 0) {
                         return '<span class="badge bg-success">Completed</span>';
-                    }else{
+                    } else {
                         return '<span class="badge bg-danger">Rejected</span>';
                     }
                 })
@@ -102,23 +103,27 @@ class FileUploadController extends Controller
         // Check if file exists in the request
         if ($request->hasFile('file')) {
 
-            // Store the uploaded file
-            $path = $request->file('file')->store('uploads', 'public');
+            // Get the original file name
+            $originalFileName = $request->file('file')->getClientOriginalName();
 
+            // Store the uploaded file in the 'uploads' directory
+            $path = $request->file('file')->storeAs('uploads', $originalFileName, 'public');
+
+            // Get the prescription status from the request
             $prescription_status = $request->get('prescription_status', null);
 
-
+            // Create a new prescription record, storing only the file name
             $prescription = Prescription::create([
                 'customer_id' => $userId,
-                'prescription_file' => asset('storage/' . $path),
+                'prescription_file' => $originalFileName,  // Store only file name
                 'prescription_status' => $prescription_status,
             ]);
 
-            // Return response
+            // Return response with file name
             return response()->json([
                 'status' => true,
                 'message' => 'File uploaded successfully',
-                'path' => asset('storage/' . $path)
+                'file_name' => $originalFileName, // Return the file name
             ]);
         } else {
             return response()->json([
@@ -127,6 +132,7 @@ class FileUploadController extends Controller
             ], 400);
         }
     }
+
 
 
 
@@ -153,8 +159,4 @@ class FileUploadController extends Controller
             'message' => 'Status updated successfully.'
         ]);
     }
-
-
-
-
 }
