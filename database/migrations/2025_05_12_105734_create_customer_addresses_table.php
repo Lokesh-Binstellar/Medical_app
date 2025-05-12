@@ -16,7 +16,11 @@ return new class extends Migration
             $table->unsignedBigInteger('customer_id');
             $table->string('name');
             $table->string('mobile_no');
+            $table->string('address_type');
+            $table->string('house_number');
             $table->text('address_line');
+            $table->text('lat');
+            $table->text('lng');
             $table->string('city');
             $table->string('state');
             $table->string('postal_code');
