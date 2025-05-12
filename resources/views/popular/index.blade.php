@@ -23,7 +23,7 @@
                             <h4 class="card-title mb-0 ">Popular Brands </h4>
                             <div class="d-flex justify-content-between align-items-center">
                                 <form action="{{ route('popular.store') }}" method="POST" enctype="multipart/form-data"
-                                    class="d-flex gap-2 align-items-center" id="importForm">
+                                    class="d-flex gap-2 " id="importForm">
                                     @csrf
                                     <div class="error-msg">
                                         <select name="name" class="form-control select2 " id="brand-select"  >
@@ -36,7 +36,10 @@
                                     <div class="error-msg">
                                         <input type="file" name="logo" class="form-control" id="logo">
                                     </div>
-                                    <button type="submit" class="btn btn-primary addButton text-nowrap px-5">+ Add Brand</button>
+                                    <div>
+
+                                        <button type="submit" class="btn btn-primary addButton text-nowrap px-5">+ Add Brand</button>
+                                    </div>
                                     
                                 </form>
                             </div>

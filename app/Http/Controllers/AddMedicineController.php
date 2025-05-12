@@ -515,7 +515,41 @@ class AddMedicineController extends Controller
 
         return response()->json(['status' => 'success', 'data' => $products]);
     }
-//prescritption files
+
+
+
+    public function deleteCartProduct(Request $request)
+    {
+        $prescriptionId = $request->input('prescription_id');
+        $productId = $request->input('product_id');
+
+        $prescription = Prescription::find($prescriptionId);
+        if (!$prescription) {
+            return response()->json(['status' => 'error', 'message' => 'Prescription not found']);
+        }
+
+        $customerId = $prescription->customer_id;
+        $cart = Carts::where('customer_id', $customerId)->first();
+
+        if (!$cart || !$cart->products_details) {
+            return response()->json(['status' => 'error', 'message' => 'Cart not found']);
+        }
+
+        $products = json_decode($cart->products_details, true);
+        $updatedProducts = array_filter($products, function ($product) use ($productId) {
+            return $product['product_id'] != $productId;
+        });
+
+        $cart->products_details = json_encode(array_values($updatedProducts));
+        $cart->save();
+
+        return response()->json(['status' => 'success']);
+    }
+
+
+
+
+    //prescritption files
     public function fetchPrescriptionFile(Request $request)
     {
         $prescriptionId = $request->input('prescription_id');
@@ -534,7 +568,4 @@ class AddMedicineController extends Controller
             'file_url' => asset('storage/' . $prescription->prescription_file)
         ]);
     }
-
-
-
 }

@@ -127,36 +127,38 @@
                                         <option value="">Search customer...</option>
                                     </select>
                                 </div>
+
+
                                 <div>
-                                    <div class="header">Side-by-Side PDF Preview</div>
+                                    <div class="header">Prescription Preview</div>
 
-                                    <div class="pdf-wrapper">
-                                        <div class="pdf-box">
-                                            <div class="pdf-title">Document 1</div>
-                                            <iframe class="pdf-viewer"
-                                                src="{{ asset('storage/uploads/28zt9dH6onJC90zzC5WAW03I98DuA6BOJIYq9643.pdf') }}">
-                                                This browser does not support PDFs. <a
-                                                    href="{{ asset('storage/uploads/28zt9dH6onJC90zzC5WAW03I98DuA6BOJIYq9643.pdf') }}">Download
-                                                    PDF</a>.
-                                            </iframe>
+                                    <!-- Display first 2 -->
+                                    <div class="pdf-wrapper d-flex flex-wrap gap-3" id="preview-files"></div>
+
+                                    <!-- View All Button -->
+                                    <button id="view-all-btn" class="btn btn-primary mt-3" style="display:none;"
+                                        data-bs-toggle="modal" data-bs-target="#allFilesModal">
+                                        View All
+                                    </button>
+
+                                    <!-- Modal for all files -->
+                                    <div class="modal fade" id="allFilesModal" tabindex="-1">
+                                        <div class="modal-dialog modal-xl">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">All Prescription Files</h5>
+                                                    <button type="button" class="btn-close"
+                                                        data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body d-flex flex-wrap gap-3" id="all-files-container">
+                                                    <!-- Files appended dynamically -->
+                                                </div>
+                                            </div>
                                         </div>
-
-                                        <div class="pdf-box">
-                                            <div class="pdf-title">Document 2</div>
-                                            <iframe class="pdf-viewer"
-                                                src="{{ asset('storage/uploads/28zt9dH6onJC90zzC5WAW03I98DuA6BOJIYq9643.pdf') }}">
-                                                This browser does not support PDFs. <a
-                                                    href="{{ asset('storage/uploads/28zt9dH6onJC90zzC5WAW03I98DuA6BOJIYq9643.pdf') }}">Download
-                                                    PDF</a>.
-                                            </iframe>
-                                        </div>
-                                    </div>
-
-                                    <div class="footer">
-                                        <a href="pdfs/file1.pdf" download>Download File 1</a>
-                                        <a href="pdfs/file2.pdf" download>Download File 2</a>
                                     </div>
                                 </div>
+
+
                                 <div id="cart-details" style="display:none;" class="mt-3">
                                     <h5>Customer Cart Details</h5>
                                     <table class="table table-bordered ">
@@ -166,6 +168,7 @@
                                                 <th>Packaging Detail</th>
                                                 <th>Quantity</th>
                                                 <th>Is Substitute</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="cart-product-body">
@@ -415,11 +418,12 @@
                         let html = '';
 
                         products.forEach(function(product) {
-                            html += `<tr>
+                            html += `<tr data-product-id="${product.product_id}">
                         <td>${product.product_id}</td>
                         <td>${product.packaging_detail}</td>
                         <td>${product.quantity}</td>
                         <td>${product.is_substitute}</td>
+                         <td><button class="btn btn-primary delete-row">Delete</button></td>
                     </tr>`;
                         });
 
@@ -436,5 +440,76 @@
                 }
             });
         });
+
+        // Handle delete button click
+        $(document).on('click', '.delete-row', function() {
+            let row = $(this).closest('tr');
+            let productId = row.data('product-id');
+            let prescriptionId = $('#prescription-select').val(); // Get selected prescription ID
+
+            if (confirm('Are you sure you want to delete this product from the cart?')) {
+                $.ajax({
+                    url: '/delete-cart-product',
+                    method: 'POST',
+                    data: {
+                        product_id: productId,
+                        prescription_id: prescriptionId,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            row.remove(); // Remove from table
+                            alert('Product deleted successfully!');
+                        } else {
+                            alert('Failed to delete product');
+                        }
+                    },
+                    error: function() {
+                        alert('Error deleting product');
+                    }
+                });
+            }
+        });
+
+
+        function loadPrescriptionFiles(prescriptionId) {
+    $.ajax({
+        url: '/fetch-prescription-files',
+        method: 'GET',
+        data: { prescription_id: prescriptionId },
+        success: function(response) {
+            if (response.status === 'success') {
+                const preview = $('#preview-files');
+                const modal = $('#all-files-container');
+                preview.empty();
+                modal.empty();
+
+                const files = response.files;
+
+                files.forEach((file, index) => {
+                    const viewer = createViewer(file);
+                    if (index < 2) preview.append(viewer);
+                    modal.append(viewer.clone());
+                });
+
+                $('#view-all-btn').toggle(files.length > 2);
+            }
+        }
+    });
+}
+
+function createViewer(fileUrl) {
+    const isPdf = fileUrl.toLowerCase().endsWith('.pdf');
+    return $(`
+        <div class="pdf-box" style="width:48%;">
+            <div class="pdf-title">${isPdf ? 'PDF' : 'Image'}</div>
+            ${isPdf 
+                ? `<iframe src="${fileUrl}" class="pdf-viewer" style="width:100%; height:300px;"></iframe>`
+                : `<img src="${fileUrl}" style="width:100%; height:300px; object-fit:contain;" />`
+            }
+        </div>
+    `);
+}
+
     </script>
 @endsection

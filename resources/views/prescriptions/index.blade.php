@@ -15,8 +15,9 @@
             background-position-x: calc(100% - 10px);
             background-position-y: center;
         }
-        .swal2-deny btn btn-outline-secondary{
-            display:none !important;
+
+        .swal2-deny btn btn-outline-secondary {
+            display: none !important;
 
         }
     </style>
@@ -129,12 +130,16 @@
                 Swal.fire({
                     title: 'Reason Required',
                     input: 'text',
-                    inputLabel: 'Please enter a reason for rejection',
-                    inputPlaceholder: 'Type reason here...',
-                   
-                    // showCancelButton: false, // No cancel button
-                    confirmButtonText: 'Submit', // Custom text for the confirm button
-                    showConfirmButton: true, // Make sure confirm button shows up
+                    inputAttributes: {
+                        autocapitalize: 'off'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Submit',
+                    showLoaderOnConfirm: true,
+                    customClass: {
+                        confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+                        cancelButton: 'btn btn-outline-danger waves-effect'
+                    },
                     onBeforeOpen: () => {
                         // Hide the submit button initially
                         const submitButton = document.querySelector('.swal2-confirm');
