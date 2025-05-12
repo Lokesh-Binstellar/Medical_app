@@ -131,7 +131,7 @@
                 class="menu-item {{ in_array(Route::current()->getName(), ['popular_category.index']) ? 'active' : '' }}">
                 <a href="{{ route('popular_category.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-view-grid"></i>
-                    <div data-i18n="Popular categories">Popular categories</div>
+                    <div data-i18n="Popular Categories">Popular Categories</div>
                 </a>
             </li>
         @endif

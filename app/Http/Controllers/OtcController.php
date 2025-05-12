@@ -93,6 +93,39 @@ class OtcController extends Controller
 
         return back()->with('success', 'OtcMedicine imported successfully.');
     }
+public function productListByCategory($categoryName)
+{
+    // Find all OTC medicines by category_name
+    $products = Otcmedicine::where('category', $categoryName)->get();
+
+    if ($products->isEmpty()) {
+        return response()->json([
+            'status' => false,
+            'message' => 'No products found in this category.'
+        ], 404);
+    }
+
+   $formatted = $products->map(function ($item) {
+        return [
+            'product_id' => $item->otc_id,
+            'product_name' => $item->name,
+            'category' => $item->category,
+            'packaging' => $item->packaging,
+            'imageUrls' => $item->image_url
+                ? collect(explode(',', $item->image_url))->map(fn($img) => url('storage/medicines/' . trim(basename($img))))
+                : [],
+        ];
+    });
+
+    return response()->json([
+        'status' => true,
+        'category' => $categoryName,
+        'products' => $formatted
+    ]);
+}
+
+
+
 
     /**
      * Remove the specified resource from storage.

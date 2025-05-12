@@ -39,8 +39,8 @@
                                             <th>#</th>
                                             <th>ID</th>
                                             <th>Name</th>
-                                            <th>breadcrumbs</th>
-                                            <th>Package</th>
+                                            <th>Breadcrumbs</th>
+                                            <th>Manufacturer</th>
                                             <th style="width: 10%">Action</th>
                                         </tr>
                                     </thead>

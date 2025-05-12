@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthTokenController;
 use App\Http\Controllers\CustomerAddressController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\OtcController;
 use App\Http\Controllers\PharmaciesController;
 use App\Http\Controllers\PopularBrandController;
 use App\Http\Controllers\PopularCategoryController;
@@ -49,6 +50,9 @@ Route::middleware('check.api.key')->group(function () {
         Route::get('/getUserCart', [AddMedicineController::class, 'getAddToCart'])->name('getUserCart.getAddToCart');
     });
     
+Route::get('/productListByCategory/{categoryName}', [OtcController::class, 'productListByCategory']);
+Route::get('/productListByBrand/{brandName}', [PopularBrandController::class, 'productListByBrand']);
+
 
 
 });

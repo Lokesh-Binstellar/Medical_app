@@ -109,26 +109,7 @@ class MedicineController extends Controller
 
     // search medicine 
     public function search(Request $request)
-    {
-        // // Check if the request has a Bearer token
-        // if (!$request->bearerToken()) {
-
-        //     // Return a JSON response if no token is provided
-        //     return response()->json(['message' => 'Unauthorized. No token provided.'], 401);
-        // }
-
-        // // Attempt to authenticate the user using the token
-        // $user = Auth::guard('sanctum')->user();
-
-        // // Check if the user is authenticated
-        // if (!$user) {
-        //     // Return a JSON response if the token is invalid
-        //     return response()->json(['message' => 'Unauthorized. Invalid token.'], 401);
-        // }
-
-
-
-
+    {    
         $query = $request->query('query');
 
         // Check if the query parameter is present
@@ -155,17 +136,27 @@ class MedicineController extends Controller
             });
 
         // Search from OtcMedicine
-        $otc = Otcmedicine::where('name', 'LIKE', "%$query%")
-            ->select('id', 'otc_id', 'name', 'packaging', 'image_url')
-            ->get()
-            ->map(function ($item) {
-                $baseUrl = url('storage/otcmedicines');
-                $item->image_url = $item->image_url
-                    ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
-                    : [];
-                $item->type = 'otc';
-                return $item;
-            });
+      $otc = Otcmedicine::where('name', 'LIKE', "%$query%")
+    ->select('id', 'otc_id', 'name', 'packaging', 'image_url')
+    ->get()
+    ->map(function ($item) {
+        $baseUrl = url('storage/medicines');
+        $item->image_url = $item->image_url
+            ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
+            : [];
+
+        // Remap fields to match Medicine structure
+        $item->product_id = $item->otc_id;
+        $item->product_name = $item->name;
+        $item->packaging_detail = $item->packaging;
+        $item->type = 'otc';
+
+        // Optionally remove unnecessary original fields
+        unset($item->otc_id, $item->name, $item->packaging);
+
+        return $item;
+    });
+
 
         // Merge both collections
         $results = $medicines->merge($otc);
@@ -175,18 +166,6 @@ class MedicineController extends Controller
             'data' => $results
         ]);
     }
-
-
-
-
-    //     public function search($salt_composition){
-    // return ['result'=>'serching working '.$salt_composition];
-    //     }
-
-
-
-
-
 
     public function medicineByProductId(Request $request, $id)
     {

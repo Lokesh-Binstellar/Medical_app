@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Otcmedicine;
 use App\Models\PopularBrand;
 use App\Models\Medicine;
 use Illuminate\Http\Request;
@@ -10,54 +11,52 @@ use Yajra\DataTables\Facades\DataTables;
 
 class PopularBrandController extends Controller
 {
-    // public function index()
-    // {
-    //     $popularBrands = Medicine::all()->pluck('marketer')->unique();
-    //     $AddedBrands = PopularBrand::all();
-
-
-    //     return view('popular.index', compact('popularBrands', 'AddedBrands'));
-    // }
+   
     public function index(Request $request)
     {
         if ($request->ajax()) {
             $data = PopularBrand::all();
-    
+
             return DataTables::of($data)
                 ->addIndexColumn()
-
                 ->addColumn('logo', function ($brand) {
                     return '<img src="' . asset('storage/brands/' . $brand->logo) . '" border="0" width="40" class="img-rounded" align="center" />';
                 })
                 ->addColumn('action', function ($row) {
                     return '
-                    <div class="dropdown">
-                      <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
-                      <ul class="dropdown-menu">
-                       <li>
-                    <a href="' . route('popular.edit', $row->id) . '" class="dropdown-item" >Edit</a>
-                    </li>
-                        
-                        <li>
-                          <form action="' . route('popular.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-                            ' . csrf_field() . method_field('DELETE') . '
-                            <button class="dropdown-item" type="submit">Delete</button>
-                          </form>
-                        </li>
-                      </ul>
-                    </div>';
+                <div class="dropdown">
+                  <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+                  <ul class="dropdown-menu">
+                   <li>
+                    <a href="' . route('popular.edit', $row->id) . '" class="dropdown-item">Edit</a>
+                   </li>
+                   <li>
+                      <form action="' . route('popular.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
+                        ' . csrf_field() . method_field('DELETE') . '
+                        <button class="dropdown-item" type="submit">Delete</button>
+                      </form>
+                   </li>
+                  </ul>
+                </div>';
                 })
-                ->rawColumns(['action','logo'])
+                ->rawColumns(['action', 'logo'])
                 ->make(true);
         }
-    
-  
-        $popularBrands = Medicine::select('marketer')->distinct()->pluck('marketer');
+
+        // Get marketers from Medicine table
+        $medicineMarketers = Medicine::select('marketer')->whereNotNull('marketer')->distinct()->pluck('marketer');
+
+        $otcManufacturers = Otcmedicine::select('manufacturers')->whereNotNull('manufacturers')->distinct()->pluck('manufacturers');
+
+        $popularBrands = $medicineMarketers->merge($otcManufacturers)->unique()->values();
+        // dd($medicineMarketers);
+        // Get all added brands
         $AddedBrands = PopularBrand::all();
-    
+
         return view('popular.index', compact('popularBrands', 'AddedBrands'));
     }
-    
+
+
 
     public function store(Request $request)
     {
@@ -71,30 +70,27 @@ class PopularBrandController extends Controller
 
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
-            $originalName = $file->getClientOriginalName(); // e.g. logo.png
+            $originalName = $file->getClientOriginalName(); 
             $destinationPath = storage_path('app/public/brands');
 
             // Check if file with same name exists
             $filename = time() . '_' . $originalName;
             if (file_exists($destinationPath . '/' . $originalName)) {
-                $file->move($destinationPath, $filename); // Unique name
+                $file->move($destinationPath, $filename); 
             } else {
-                $file->move($destinationPath, $originalName); // Same name
+                $file->move($destinationPath, $originalName); 
                 $filename = $originalName;
             }
 
             // Save full URL and original name
-            $brand->logo = url('storage/brands/' . $filename); // Base URL + file path
-            $brand->logo = $originalName; // Just original file name
+            $brand->logo = url('storage/brands/' . $filename); 
+            $brand->logo = $originalName; 
         }
 
         $brand->save();
 
         return redirect()->route('popular.index')->with('success', 'Brand added successfully.');
     }
-
-
-
     public function edit($id)
     {
         // Fetch the brand data for editing
@@ -159,6 +155,55 @@ class PopularBrandController extends Controller
         ], 200);
     }
 
+    public function productListByBrand($brandName)
+    {
+        if (!$brandName) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Brand parameter is required.'
+            ], 400);
+        }
+
+        $medicines = Medicine::where('marketer', '=', $brandName)
+            ->select('id', 'product_id', 'product_name', 'salt_composition', 'packaging_detail', 'image_url', 'marketer')
+            ->get()
+            ->map(function ($item) {
+                $baseUrl = url('storage/medicines');
+                $item->image_url = $item->image_url
+                    ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
+                    : [];
+
+                $item->type = 'medicine';
+                $item->brand = $item->marketer ?? '';
+                unset($item->marketer);
+                return $item;
+            });
+
+        $otc = Otcmedicine::where('manufacturers', '=', $brandName)
+            ->select('id', 'otc_id', 'name', 'packaging', 'image_url', 'manufacturers')
+            ->get()
+            ->map(function ($item) {
+                $item->product_id = $item->otc_id;
+                $item->product_name = $item->name;
+                $item->packaging_detail = $item->packaging;
+                $item->type = 'otc';
+                $item->brand = $item->manufacturers ?? '';
+                $baseUrl = url('storage/medicines');
+                $item->image_url = $item->image_url
+                    ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
+                    : [];
+
+                unset($item->otc_id, $item->name, $item->packaging, $item->manufacturers);
+                return $item;
+            });
+
+        $results = $medicines->merge($otc);
+
+        return response()->json([
+            'success' => true,
+            'data' => $results
+        ]);
+    }
 
     public function destroy($id)
     {
