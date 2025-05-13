@@ -109,23 +109,24 @@ class MedicineController extends Controller
 
     // search medicine 
     public function search(Request $request)
-    {    
+    {
         $query = $request->query('query');
-
-        // Check if the query parameter is present
+        $perPage = $request->query('per_page', 5);
         if (!$query) {
-            return response()->json([
-                'status'=>false,
-                'message' => 'Query parameter is required.'
-            ],
-                 400);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Query parameter is required.'
+                ],
+                400
+            );
         }
 
         // Search from Medicine
         $medicines = Medicine::where('salt_composition', 'LIKE', "%$query%")
             ->orWhere('product_name', 'LIKE', "%$query%")
             ->select('id', 'product_id', 'product_name', 'salt_composition', 'packaging_detail', 'image_url')
-            ->get()
+            ->paginate($perPage)
             ->map(function ($item) {
                 $baseUrl = url('storage/medicines');
                 $item->image_url = $item->image_url
@@ -136,33 +137,29 @@ class MedicineController extends Controller
             });
 
         // Search from OtcMedicine
-      $otc = Otcmedicine::where('name', 'LIKE', "%$query%")
-    ->select('id', 'otc_id', 'name', 'packaging', 'image_url')
-    ->get()
-    ->map(function ($item) {
-        $baseUrl = url('storage/medicines');
-        $item->image_url = $item->image_url
-            ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
-            : [];
+        $otc = Otcmedicine::where('name', 'LIKE', "%$query%")
+            ->select('id', 'otc_id', 'name', 'packaging', 'image_url')
+            ->paginate($perPage)
+            ->map(function ($item) {
+                $baseUrl = url('storage/medicines');
+                $item->image_url = $item->image_url
+                    ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
+                    : [];
+                $item->product_id = $item->otc_id;
+                $item->product_name = $item->name;
+                $item->packaging_detail = $item->packaging;
+                $item->type = 'otc';
+                unset($item->otc_id, $item->name, $item->packaging);
 
-        // Remap fields to match Medicine structure
-        $item->product_id = $item->otc_id;
-        $item->product_name = $item->name;
-        $item->packaging_detail = $item->packaging;
-        $item->type = 'otc';
-
-        // Optionally remove unnecessary original fields
-        unset($item->otc_id, $item->name, $item->packaging);
-
-        return $item;
-    });
+                return $item;
+            });
 
 
         // Merge both collections
         $results = $medicines->merge($otc);
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $results
         ]);
     }
@@ -170,7 +167,6 @@ class MedicineController extends Controller
     public function medicineByProductId(Request $request, $id)
     {
         // echo $id;die;
-        // Step 1: Check if 'id' parameter is passed
         if (empty($id)) {
 
             return response()->json([
@@ -178,11 +174,7 @@ class MedicineController extends Controller
                 'message' => 'ID parameter is required.'
             ], 400);
         }
-
-        // Step 2: Get the product ID from the query
         $productId = $id;
-
-        // Step 3: Search in both medicines and otcmedicines
         $medicine = Medicine::where('product_id', $productId)->first();
         $otc = Otcmedicine::where('otc_id', $productId)->first();
 
@@ -194,10 +186,8 @@ class MedicineController extends Controller
             ], 404);
         }
 
-        // Step 5: Prepare base URL
         $baseUrl = url('storage/medicines');
 
-        // Step 6: Format image URLs if present
         if ($medicine) {
             $medicine->image_url = $medicine->image_url
                 ? collect(explode(',', $medicine->image_url))->map(fn($img) => $baseUrl . '/' . trim(basename($img)))->toArray()
@@ -217,9 +207,5 @@ class MedicineController extends Controller
             'source' => $medicine ? 'medicines' : 'otcmedicines'
         ], 200);
     }
-
-
-
-
 
 }
