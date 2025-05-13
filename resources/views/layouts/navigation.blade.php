@@ -32,9 +32,8 @@
             </a>
         </li>
 
-        @if (in_array('Roles', $permissions) || $isSuperAdmin == 1) 
-            <li
-                class="menu-item {{ in_array(Route::current()->getName(), ['roles.index']) ? 'active' : '' }}">
+        @if (in_array('Roles', $permissions) || $isSuperAdmin == 1)
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['roles.index']) ? 'active' : '' }}">
                 <a href="{{ route('roles.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-shield-account"></i>
                     <div data-i18n="Role">Role</div>
@@ -42,20 +41,18 @@
             </li>
         @endif
 
-        @if (in_array('Users', $permissions) || $isSuperAdmin == 1) 
-            <li
-                class="menu-item {{ in_array(Route::current()->getName(), ['user.index']) ? 'active' : '' }}">
+        @if (in_array('Users', $permissions) || $isSuperAdmin == 1)
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['user.index']) ? 'active' : '' }}">
                 <a href="{{ route('user.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-account-outline"></i>
                     <div data-i18n="User">User</div>
                 </a>
-            </li>  
+            </li>
         @endif
 
         @if (in_array('Pharmacies', $permissions) || $isSuperAdmin == 1)
-            <li
-                class="menu-item {{ in_array(Route::current()->getName(), ['pharmacist.index']) ? 'active' : '' }}">
-                <a href="{{  route('pharmacist.index')  }}" class="menu-link">
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['pharmacist.index']) ? 'active' : '' }}">
+                <a href="{{ route('pharmacist.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-medical-bag"></i>
                     <div data-i18n="Pharmacies">Pharmacies</div>
                 </a>
@@ -63,9 +60,8 @@
         @endif
 
         @if (in_array('Pharmacies', $permissions))
-            <li
-                class="menu-item {{ in_array(Route::current()->getName(), ['add.medicine']) ? 'active' : '' }}">
-                <a href="{{ route('add.medicine')}}" class="menu-link">
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['add.medicine']) ? 'active' : '' }}">
+                <a href="{{ route('add.medicine') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-pill"></i>
                     <div data-i18n="Add Medicine">Add Medicine</div>
                 </a>
@@ -73,8 +69,7 @@
         @endif
 
         @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
-            <li
-                class="menu-item {{ in_array(Route::current()->getName(), ['laboratorie.index']) ? 'active' : '' }}">
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['laboratorie.index']) ? 'active' : '' }}">
                 <a href="{{ route('laboratorie.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-flask"></i>
                     <div data-i18n="Laboratories">Laboratories</div>
@@ -83,10 +78,9 @@
         @endif
 
 
-        @if (in_array('Medicines', $permissions) || $isSuperAdmin == 1) 
-            <li
-                class="menu-item {{ in_array(Route::current()->getName(), ['medicine.index']) ? 'active' : '' }}">
-                <a href="{{  route('medicine.index') }}" class="menu-link">
+        @if (in_array('Medicines', $permissions) || $isSuperAdmin == 1)
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['medicine.index']) ? 'active' : '' }}">
+                <a href="{{ route('medicine.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-pill"></i>
                     <div data-i18n="Medicine">Medicine</div>
                 </a>
@@ -94,9 +88,8 @@
         @endif
 
         @if (in_array('Otcmedicines', $permissions) || $isSuperAdmin == 1)
-            <li
-                class="menu-item {{ in_array(Route::current()->getName(), ['otcmedicine.index']) ? 'active' : '' }}">
-                <a href="{{route('otcmedicine.index') }}" class="menu-link">
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['otcmedicine.index']) ? 'active' : '' }}">
+                <a href="{{ route('otcmedicine.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-pill"></i>
                     <div data-i18n="OTC">OTC</div>
                 </a>
@@ -105,26 +98,26 @@
 
 
         @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
-        <li class="menu-item {{ in_array(Route::current()->getName(), ['popular_lab_test.index']) ? 'active' : '' }}">
-            <a href="{{ route('popular_lab_test.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons mdi mdi-flask"></i>
-                <div data-i18n="Popular Lab Test">Popular Lab Test</div>
-            </a>
-        </li>
-    @endif
-    
-
-        
-        @if (in_array('PopularBrand', $permissions) || $isSuperAdmin == 1)
             <li
-                class="menu-item {{ in_array(Route::current()->getName(), ['popular.index']) ? 'active' : '' }}">
+                class="menu-item {{ in_array(Route::current()->getName(), ['popular_lab_test.index']) ? 'active' : '' }}">
+                <a href="{{ route('popular_lab_test.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons mdi mdi-flask"></i>
+                    <div data-i18n="Popular Lab Test">Popular Lab Test</div>
+                </a>
+            </li>
+        @endif
+
+
+
+        @if (in_array('PopularBrand', $permissions) || $isSuperAdmin == 1)
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['popular.index']) ? 'active' : '' }}">
                 <a href="{{ route('popular.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-star"></i>
                     <div data-i18n="Popular Brands">Popular Brands</div>
                 </a>
             </li>
         @endif
-        
+
 
         @if (in_array('PopularCategory', $permissions) || $isSuperAdmin == 1)
             <li
@@ -136,12 +129,11 @@
             </li>
         @endif
 
-     
+
 
         @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
-            <li
-                class="menu-item {{ in_array(Route::current()->getName(), ['labtest.index']) ? 'active' : '' }}">
-                <a href="{{route('labtest.index') }}" class="menu-link">
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['labtest.index']) ? 'active' : '' }}">
+                <a href="{{ route('labtest.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-flask"></i>
                     <div data-i18n="Lab Test">Lab Test</div>
                 </a>
@@ -151,7 +143,7 @@
         @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
             <li
                 class="menu-item {{ in_array(Route::current()->getName(), ['packageCategory.index']) ? 'active' : '' }}">
-                <a href="{{  route('packageCategory.index') }}" class="menu-link">
+                <a href="{{ route('packageCategory.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-package-variant"></i>
                     <div data-i18n="Package Category">Package Category</div>
                 </a>
@@ -159,28 +151,41 @@
         @endif
 
         @if (in_array('Carts', $permissions) || $isSuperAdmin == 1)
-            <li
-                class="menu-item {{ in_array(Route::current()->getName(), ['addMedicine.index']) ? 'active' : '' }}">
-                <a href="{{  route('addMedicine.index') }}" class="menu-link">
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['addMedicine.index']) ? 'active' : '' }}">
+                <a href="{{ route('addMedicine.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-pill"></i>
                     <div data-i18n="Add Medicine">Add Medicine</div>
                 </a>
             </li>
-            @endif
+        @endif
         @if (in_array('Prescriptions', $permissions) || $isSuperAdmin == 1)
-            <li
-                class="menu-item {{ in_array(Route::current()->getName(), ['prescriptions.index']) ? 'active' : '' }}">
-                <a href="{{  route('prescriptions.index') }}" class="menu-link">
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['prescriptions.index']) ? 'active' : '' }}">
+                <a href="{{ route('prescriptions.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-prescription "></i>
                     <div data-i18n="Prescriptions">Prescriptions</div>
                 </a>
             </li>
-            @endif
-          
-      
+        @endif
+        @if (in_array('Home Banners', $permissions) || $isSuperAdmin == 1)
+            <li class="menu-item {{ in_array(Route::currentRouteName(), ['homebanner.index']) ? 'active' : '' }}">
+                <a href="{{ route('homebanner.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons mdi mdi-image-area"></i>
+                    <div data-i18n="Home Banners">Add HomeScreen Banner</div>
+                </a>
+            </li>
+        @endif
+
+        @if (in_array('Medicine Banners', $permissions) || $isSuperAdmin == 1)
+            <li class="menu-item {{ in_array(Route::currentRouteName(), ['medicinebanner.index']) ? 'active' : '' }}">
+                <a href="{{ route('medicinebanner.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons mdi mdi-image-area"></i>
+                    <div data-i18n="Medicine Banners">Add MedicineScreen Banner</div>
+                </a>
+            </li>
+        @endif
         <li class="menu-item">
             <a href="{{ route('logout') }}" class="menu-link"
-            onclick="event.preventDefault();document.getElementById('logout-form').submit();">
+                onclick="event.preventDefault();document.getElementById('logout-form').submit();">
                 <i class="menu-icon tf-icons mdi mdi-logout"></i>
                 <div data-i18n="Logout">Logout</div>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">

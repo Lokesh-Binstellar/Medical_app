@@ -13,10 +13,14 @@ use App\Http\Controllers\PharmaciesController;
 use App\Http\Controllers\PopularBrandController;
 use App\Http\Controllers\PopularCategoryController;
 use App\Http\Controllers\FileUploadController;
+use App\Http\Controllers\HomeBannerController;
+use App\Http\Controllers\MedicineBannerController;
 use App\Http\Controllers\PopularLabTestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Models\HomeBanner;
+use App\Models\MedicineBanner;
 use Illuminate\Support\Facades\Route;
 
 
@@ -234,3 +238,51 @@ Route::get('/fetch-customer-cart', [AddMedicineController::class, 'fetchCustomer
 Route::get('/fetch-prescription-files', [AddMedicineController::class, 'fetchPrescriptionFiles']);
 
 
+
+
+
+
+Route::prefix('homebanners')->group(function () {
+    Route::get('', [HomeBannerController::class, 'index'])->name('homebanner.index');
+
+    Route::group(['middleware' => 'permission:homebanners,create'], function () {
+        Route::post('/store', [HomeBannerController::class, 'store'])->name('homebanner.store');
+    });
+
+    Route::group(['middleware' => 'permission:homebanners,update'], function () {
+        Route::get('/{id}/edit', [HomeBannerController::class, 'edit'])->name('homebanner.edit');
+        Route::put('/{id}', [HomeBannerController::class, 'update'])->name('homebanner.update');
+    });
+
+    Route::group(['middleware' => 'permission:homebanners,delete'], function () {
+        Route::delete('/{id}', [HomeBannerController::class, 'destroy'])->name('homebanner.destroy');
+    });
+
+    Route::group(['middleware' => 'permission:homebanners,read'], function () {
+        Route::get('/{id}', [HomeBannerController::class, 'show'])->name('homebanner.show');
+    });
+});
+
+
+
+
+Route::prefix('medicinebanners')->group(function () {
+    Route::get('', [MedicineBannerController::class, 'index'])->name('medicinebanner.index');
+
+    Route::group(['middleware' => 'permission:medicinebanners,create'], function () {
+        Route::post('/store', [MedicineBannerController::class, 'store'])->name('medicinebanner.store');
+    });
+
+    Route::group(['middleware' => 'permission:medicinebanners,update'], function () {
+        Route::get('/{id}/edit', [MedicineBannerController::class, 'edit'])->name('medicinebanner.edit');
+        Route::put('/{id}', [MedicineBannerController::class, 'update'])->name('medicinebanner.update');
+    });
+
+    Route::group(['middleware' => 'permission:medicinebanners,delete'], function () {
+        Route::delete('/{id}', [MedicineBannerController::class, 'destroy'])->name('medicinebanner.destroy');
+    });
+
+    Route::group(['middleware' => 'permission:medicinebanners,read'], function () {
+        Route::get('/{id}', [MedicineBannerController::class, 'show'])->name('medicinebanner.show');
+    });
+});

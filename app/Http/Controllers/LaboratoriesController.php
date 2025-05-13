@@ -17,13 +17,13 @@ class LaboratoriesController extends Controller
      */
     public function index(Request $request)
     {
-        
+
         if ($request->ajax()) {
             $data = Laboratories::query();
             return DataTables::of($data)
-                    ->addIndexColumn()
-                    ->addColumn('action', function($row){
-                        return '
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    return '
                         <div class="dropdown">
                           <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
           <ul class="dropdown-menu">
@@ -44,9 +44,9 @@ class LaboratoriesController extends Controller
                             </li>
                           </ul>
                         </div>';
-                    })
-                    ->rawColumns(['action'])
-                    ->make(true);
+                })
+                ->rawColumns(['action'])
+                ->make(true);
         }
         // $tests = LabTest::all();
         return view('laboratorie.index');
@@ -142,38 +142,38 @@ class LaboratoriesController extends Controller
 
     /**
      * Display the specified resource.
-     */public function show($id)
-{
-    // Fetch the laboratory details
-    $lab = Laboratories::findOrFail($id);
+     */ public function show($id)
+    {
+        // Fetch the laboratory details
+        $lab = Laboratories::findOrFail($id);
 
-    // Decode the JSON data from the 'test' column
-    $testData = json_decode($lab->test, true); // Decode the JSON into an array
+        // Decode the JSON data from the 'test' column
+        $testData = json_decode($lab->test, true); // Decode the JSON into an array
 
-    // Prepare the lab tests with their names and prices
-    $labTests = [];
+        // Prepare the lab tests with their names and prices
+        $labTests = [];
 
-    foreach ($testData as $test) {
-        // Fetch the test name from lab_tests table based on test ID
-        $testInfo = \DB::table('lab_tests')
-            ->where('id', $test['test']) // Match test ID
-            ->select('name as test_name')
-            ->first();
+        foreach ($testData as $test) {
+            // Fetch the test name from lab_tests table based on test ID
+            $testInfo = \DB::table('lab_tests')
+                ->where('id', $test['test']) // Match test ID
+                ->select('name as test_name')
+                ->first();
 
-        // Append the test info to the labTests array
-        $labTests[] = [
-            'test_name' => $testInfo ? $testInfo->test_name : 'Unknown',
-            'price' => $test['price'],
-            'homeprice' => $test['homeprice'],
-        ];
+            // Append the test info to the labTests array
+            $labTests[] = [
+                'test_name' => $testInfo ? $testInfo->test_name : 'Unknown',
+                'price' => $test['price'],
+                'homeprice' => $test['homeprice'],
+            ];
+        }
+
+        // Pass the laboratory details and the parsed tests to the view
+        return view('laboratorie.show', compact('lab', 'labTests'));
     }
 
-    // Pass the laboratory details and the parsed tests to the view
-    return view('laboratorie.show', compact('lab', 'labTests'));
-}
 
-    
-    
+
 
     /**
      * Show the form for editing the specified resource.
