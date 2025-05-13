@@ -8,29 +8,12 @@ use Illuminate\Support\Facades\Validator;
 
 class CustomerAddressController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
+   
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-
-
         $userId = $request->get('user_id');
         if ($request->filled('latlng')) {
             // print_r("lat long present");die;
@@ -72,6 +55,8 @@ class CustomerAddressController extends Controller
                     foreach ($data['results'][0]['address_components'] as $component) {
                         if (in_array('administrative_area_level_3', $component['types'])) {
                             $city = $component['long_name'];
+                            // print_r($city);
+                            // die;
                         }
 
                         if (in_array('administrative_area_level_1', $component['types'])) {
@@ -90,11 +75,17 @@ class CustomerAddressController extends Controller
                     // echo $lat;die;
 
                 }
+                if (empty($city) || empty($postalCode) || empty($state) || empty($formatted_address)) {
 
+                    return response([
+                        "status" => false,
+                        "message" => " not found"
+
+                    ]);
+                }
                 //echo '<pre>'; print_r(   $request->latlng); die;
                 $this->saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address, $lat, $lng);
             }
-
             curl_close($ch);
         } else {
 
@@ -136,11 +127,6 @@ class CustomerAddressController extends Controller
                         if (in_array('administrative_area_level_3', $component['types'])) {
                             $city = $component['long_name'];
                         }
-
-                        // if (in_array('administrative_area_level_3', $component['types'])) {
-                        //     $city = $component['long_name'];
-                        // }
-
                         if (in_array('administrative_area_level_1', $component['types'])) {
                             $state = $component['long_name'];
                         }
@@ -155,7 +141,14 @@ class CustomerAddressController extends Controller
                     $lat = $data['results'][0]['geometry']['location']['lat'];
                     $lng = $data['results'][0]['geometry']['location']['lng'];
                     // echo $lat;die;
+                }
+                if (empty($city) || empty($postalCode) || empty($state) || empty($formatted_address)) {
 
+                    return response([
+                        "status" => false,
+                        "message" => " not found"
+
+                    ]);
 
                 }
 
@@ -169,69 +162,93 @@ class CustomerAddressController extends Controller
         ]);
     }
 
-   public function saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address, $lat, $lng)
-{
-    $validator = Validator::make($request->all(), [
-        'name' => 'required',
-        'mobile_no' => 'required',
-        'address_type' => 'required|in:home,work,other',
-        'house_number' => 'required',
-        'latlng' => 'required_without:address_line|string|nullable',
-        'address_line' => 'required_without:latlng|string|nullable',
-    ]);
+    public function saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address, $lat, $lng)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'mobile_no' => 'required',
+            'address_type' => 'required|in:home,work,other',
+            'house_number' => 'required',
+            'latlng' => 'required_without:address_line|string|nullable',
+            'address_line' => 'required_without:latlng|string|nullable',
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json([
-            'status' => false,
-            'errors' => $validator->errors()
-        ], 422);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Check if user already has this address_type
+        $existing = CustomerAddress::where('customer_id', $userId)
+            ->where('address_type', $request->address_type)
+            ->first();
+
+        if ($existing) {
+            // Update existing address
+            $existing->update([
+                'name' => $request->name,
+                'mobile_no' => $request->mobile_no,
+                'house_number' => $request->house_number,
+                'address_line' => $formatted_address,
+                'lat' => $lat,
+                'lng' => $lng,
+                'city' => $city,
+                'state' => $state,
+                'postal_code' => $postalCode,
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Address updated successfully',
+                'data' => $existing
+            ]);
+        } else {
+            // Create new address
+            $address = CustomerAddress::create([
+                'customer_id' => $userId,
+                'name' => $request->name,
+                'mobile_no' => $request->mobile_no,
+                'address_type' => $request->address_type,
+                'house_number' => $request->house_number,
+                'address_line' => $formatted_address,
+                'lat' => $lat,
+                'lng' => $lng,
+                'city' => $city,
+                'state' => $state,
+                'postal_code' => $postalCode,
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Address saved successfully',
+                'data' => $address
+            ]);
+        }
     }
 
-    // Check if user already has this address_type
-    $existing = CustomerAddress::where('customer_id', $userId)
-        ->where('address_type', $request->address_type)
-        ->first();
+    public function getAddress(Request $request)
+    {
+        $userId = $request->get('user_id');
+        if (!$userId) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User ID is required.'
+            ], 400);
+        }
+        $addresses = CustomerAddress::where('customer_id', $userId)->get();
 
-    if ($existing) {
-        // Update existing address
-        $existing->update([
-            'name' => $request->name,
-            'mobile_no' => $request->mobile_no,
-            'house_number' => $request->house_number,
-            'address_line' => $formatted_address,
-            'lat' => $lat,
-            'lng' => $lng,
-            'city' => $city,
-            'state' => $state,
-            'postal_code' => $postalCode,
-        ]);
-
+        if ($addresses->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No address found for this user.'
+            ], 404);
+        }
         return response()->json([
             'status' => true,
-            'message' => 'Address updated successfully',
-            'data' => $existing
-        ]);
-    } else {
-        // Create new address
-        $address = CustomerAddress::create([
-            'customer_id' => $userId,
-            'name' => $request->name,
-            'mobile_no' => $request->mobile_no,
-            'address_type' => $request->address_type,
-            'house_number' => $request->house_number,
-            'address_line' => $formatted_address,
-            'lat' => $lat,
-            'lng' => $lng,
-            'city' => $city,
-            'state' => $state,
-            'postal_code' => $postalCode,
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Address saved successfully',
-            'data' => $address
+            'data' => $addresses
         ]);
     }
-}
+
 }

@@ -13,6 +13,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeBannerController;
 use App\Http\Controllers\MedicineBannerController;
 use App\Http\Controllers\PopularLabTestController;
+use App\Http\Controllers\RequestQuoteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,10 +47,12 @@ Route::middleware('check.api.key')->group(function () {
     // with jwt token
     Route::middleware('authTest')->group(function () {
         Route::post('/customer/address', [CustomerAddressController::class, 'store']);
+        Route::get('/customerAddressFetch', [CustomerAddressController::class, 'getAddress']);
         Route::put('/customerDetails', [AuthController::class, 'update']);
         Route::post('/upload-file', [FileUploadController::class, 'upload']);
         Route::post('/add-to-cart', [AddMedicineController::class, 'frontendAddToCart']);
         Route::get('/getUserCart', [AddMedicineController::class, 'getAddToCart'])->name('getUserCart.getAddToCart');
+        Route::post('/requestAQuote', [RequestQuoteController::class, 'requestAQuote']);
     });
 
     Route::get('/productListByCategory/{categoryName}', [OtcController::class, 'productListByCategory']);
