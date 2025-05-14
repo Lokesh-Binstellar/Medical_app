@@ -4,6 +4,29 @@
     data-theme="theme-default" data-assets-path="../../assets/" data-template="vertical-menu-template">
 
 <head>
+    <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
+    <script>
+        // Enable pusher logging - don't do this in production
+        Pusher.logToConsole = true;
+
+        var pusher = new Pusher('cd369e4edb5bd3da7d2e', {
+            cluster: 'eu'
+        });
+
+        var channel = pusher.subscribe('my-channel');
+
+        channel.bind('my-event', function(data) {
+            console.log('Event received:', data);
+            alert('New Event: ' + JSON.stringify(data));
+        });
+
+        // Optional: global event listener for debugging
+        /*
+        pusher.bind_global((eventName, data) => {
+            console.log("Global Event =>", eventName, data);
+        });
+        */
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
@@ -13,6 +36,8 @@
     {{-- <title>Dashboard - {{ config('app.name', 'Laravel') }}</title> --}}
 
     <meta name="description" content="" />
+
+    
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="assets/img/kaiadmin/favicon.ico" />
@@ -369,6 +394,11 @@
                 .catch(error => console.error('Error:', error));
         }
     </script> --}}
+
+
+
+
+   
 </body>
 
 </html>

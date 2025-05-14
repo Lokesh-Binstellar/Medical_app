@@ -183,6 +183,18 @@
                 </a>
             </li>
         @endif
+
+
+        @if (in_array('Join', $permissions) || $isSuperAdmin == 1)
+        <li class="menu-item {{ in_array(Route::currentRouteName(), ['joinus.index']) ? 'active' : '' }}">
+            <a href="{{ route('joinus.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons mdi mdi-account-plus"></i>
+                <div data-i18n="Join Us">Join Us</div>
+            </a>
+        </li>
+    @endif
+    
+
         <li class="menu-item">
             <a href="{{ route('logout') }}" class="menu-link"
                 onclick="event.preventDefault();document.getElementById('logout-form').submit();">

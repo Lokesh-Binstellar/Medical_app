@@ -11,6 +11,7 @@ use App\Http\Controllers\PopularBrandController;
 use App\Http\Controllers\PopularCategoryController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeBannerController;
+use App\Http\Controllers\JoinUsController;
 use App\Http\Controllers\MedicineBannerController;
 use App\Http\Controllers\PopularLabTestController;
 use App\Http\Controllers\RequestQuoteController;
@@ -61,4 +62,7 @@ Route::middleware('check.api.key')->group(function () {
 
     Route::get('/homebanners', [HomeBannerController::class, 'getAllBanners']);
     Route::get('/medicinebanners', [MedicineBannerController::class, 'getAllBanners']);
+
+    Route::post('/join-us', [JoinUsController::class, 'store']);
+
 });

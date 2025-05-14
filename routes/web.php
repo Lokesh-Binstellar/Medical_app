@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\MyEvent;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaboratoriesController;
 use App\Http\Controllers\LabtestController;
@@ -14,14 +15,18 @@ use App\Http\Controllers\PopularBrandController;
 use App\Http\Controllers\PopularCategoryController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\HomeBannerController;
+use App\Http\Controllers\JoinUsController;
 use App\Http\Controllers\MedicineBannerController;
 use App\Http\Controllers\PopularLabTestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Broadcast;
 use App\Models\HomeBanner;
 use App\Models\MedicineBanner;
 use Illuminate\Support\Facades\Route;
+
 
 
 Route::get('/', function () {
@@ -285,4 +290,19 @@ Route::prefix('medicinebanners')->group(function () {
     Route::group(['middleware' => 'permission:medicinebanners,read'], function () {
         Route::get('/{id}', [MedicineBannerController::class, 'show'])->name('medicinebanner.show');
     });
+
+
+});
+
+Route::get('/join-us', [JoinUsController::class, 'index'])->name('joinus.index');
+Route::post('/join-us', [JoinUsController::class, 'store'])->name('joinus.store');
+Route::delete('/join-us/{id}', [JoinUsController::class, 'destroy'])->name('joinus.destroy');
+Route::get('/settings', [JoinUsController::class, 'edit'])->name('joinus');
+// Route::post('/settings', [JoinUsController::class, 'update'])->name('joinus.update');
+Route::post('/settings/update-emails', [JoinUsController::class, 'updateEmails'])->name('joinus.updateEmails');
+
+
+Route::get('/fire-event', function () {
+    event(new MyEvent('hello world'));
+    // return 'Event Fired!';
 });
