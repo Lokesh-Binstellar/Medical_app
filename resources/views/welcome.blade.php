@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
@@ -174,3 +174,35 @@
         </div>
     </body>
 </html>
+
+ --}}
+
+<!DOCTYPE html>
+
+<head>
+    <title>Pusher Test</title>
+    <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
+    <script>
+        // Enable pusher logging - don't include this in production
+        Pusher.logToConsole = true;
+
+        var pusher = new Pusher('7ba4a23b60749764133c', {
+            cluster: 'ap1'
+        });
+
+        var channel = pusher.subscribe('my-channel');
+        channel.bind('my-event', function(data) {
+            alert('1231211');
+            location.reload(); // 🔄 Reloads the page when event is received
+        });
+    </script>
+</head>
+
+<body>
+    <h1>Pusher Test</h1>
+    <p>
+        Try publishing an event to channel <code>my-channel</code>
+        with event name <code>my-event</code>.
+    </p>
+    <p>Status: <span id="status">1</span></p>
+</body>

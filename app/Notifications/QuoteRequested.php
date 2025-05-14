@@ -2,20 +2,25 @@
 
 namespace App\Notifications;
 
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class QuoteRequested extends Notification
+
+class QuoteRequested extends Notification  
 {
-   protected $user;
+
+    use Queueable;
+   protected $customer;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($user)
+    public function __construct($customer)
     {
-     $this->user=$user;
+     $this->customer=$customer;
+    //  dd($user);
     }
 
     /**
@@ -25,7 +30,7 @@ class QuoteRequested extends Notification
      */
     public function via(object $notifiable): array
     {
-         return ['log'];
+         return ['database'];
     }
 
     /**
@@ -44,11 +49,14 @@ class QuoteRequested extends Notification
      *
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
+  public function toArray(object $notifiable): array
     {
         return [
-            'message' => 'You have received a new quote request from user: ' . $this->user->name,
-            'user_id' => $this->user->id
+            'message' => 'You have received a new quote request from customer: ' . $this->customer->firstName,
+            'user_id' => $this->customer->id
         ];
     }
+ 
+    
+
 }

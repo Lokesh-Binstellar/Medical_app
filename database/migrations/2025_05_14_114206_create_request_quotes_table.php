@@ -12,11 +12,11 @@ return new class extends Migration {
     {
         Schema::create('request_quotes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('customer_id');
             $table->unsignedBigInteger('pharmacy_id');
             $table->timestamps();
             // Foreign keys
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
             $table->foreign('pharmacy_id')->references('user_id')->on('pharmacies')->onDelete('cascade');
 
         });

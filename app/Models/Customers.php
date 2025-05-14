@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 class Customers extends Model
 {
-
+    use Notifiable;
     protected $fillable = [
         'mobile_no',
         'otp_code',

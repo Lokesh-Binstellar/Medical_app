@@ -223,6 +223,7 @@
             }
         }
     </style>
+     @livewireStyles
 
     @yield('styles')
 
@@ -318,11 +319,11 @@
     defer
   ></script> --}}
 
-  
+     
   
 
     @yield('scripts')
-
+ @livewireScripts
     <script>
         $(document).ready(function() {
 

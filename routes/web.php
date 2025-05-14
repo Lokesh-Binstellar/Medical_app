@@ -19,6 +19,7 @@ use App\Http\Controllers\JoinUsController;
 use App\Http\Controllers\MedicineBannerController;
 use App\Http\Controllers\PopularLabTestController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RequestQuoteController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Event;
@@ -28,10 +29,12 @@ use App\Models\MedicineBanner;
 use Illuminate\Support\Facades\Route;
 
 
-
 Route::get('/', function () {
-    return view('auth.login');
+    return view('welcome');
 });
+/* Route::get('/', function () {
+    return view('auth.login');
+}); */
 
 // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified', 'permission:pharmacies,create']);
 

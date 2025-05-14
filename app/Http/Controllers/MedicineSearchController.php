@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Events\MyEvent;
 use App\Models\Customers;
 use App\Models\Pharmacies;
 use App\Models\Phrmacymedicine;
@@ -11,7 +12,9 @@ use Illuminate\Support\Facades\DB;
 class MedicineSearchController extends Controller
 {
     public function index()
-    {
+    {   
+       
+        //  echo 'fdfg';die;
         // dd(Pharmacies::all());
         $pharmacy = Pharmacies::where('user_id',Auth::user()->id)->first();
       

@@ -55,6 +55,7 @@ class CustomerAddressController extends Controller
                     foreach ($data['results'][0]['address_components'] as $component) {
                         if (in_array('administrative_area_level_3', $component['types'])) {
                             $city = $component['long_name'];
+                            // echo $lat;die;
                             // print_r($city);
                             // die;
                         }
@@ -64,18 +65,18 @@ class CustomerAddressController extends Controller
                         }
                         if (in_array('postal_code', $component['types'])) {
                             $postalCode = $component['long_name'];
+                            //echo "Formatted Address: $postalCode\n"; die;
                         }
                     }
 
                     $formatted_address = $data['results'][0]['formatted_address'];
-                    //  echo "Formatted Address: $formatted_address\n"; die;
-
+                    
                     $lat = $data['results'][0]['geometry']['location']['lat'];
                     $lng = $data['results'][0]['geometry']['location']['lng'];
-                    // echo $lat;die;
-
+                    
                 }
-                if (empty($city) || empty($postalCode) || empty($state) || empty($formatted_address)) {
+                
+                if (empty($city) || empty($state) || empty($formatted_address)) {
 
                     return response([
                         "status" => false,
@@ -142,7 +143,7 @@ class CustomerAddressController extends Controller
                     $lng = $data['results'][0]['geometry']['location']['lng'];
                     // echo $lat;die;
                 }
-                if (empty($city) || empty($postalCode) || empty($state) || empty($formatted_address)) {
+                if (empty($city) || empty($state) || empty($formatted_address)) {
 
                     return response([
                         "status" => false,
@@ -164,21 +165,21 @@ class CustomerAddressController extends Controller
 
     public function saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address, $lat, $lng)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'mobile_no' => 'required',
-            'address_type' => 'required|in:home,work,other',
-            'house_number' => 'required',
-            'latlng' => 'required_without:address_line|string|nullable',
-            'address_line' => 'required_without:latlng|string|nullable',
-        ]);
+        // $validator = Validator::make($request->all(), [
+        //     'name' => 'required|nullable',
+        //     'mobile_no' => 'required|nullable',
+        //     'address_type' => 'required|in:home,work,other',
+        //     'house_number' => 'required|nullable',
+        //     'latlng' => 'required_without:address_line|string|nullable',
+        //     'address_line' => 'required_without:latlng|string|nullable',
+        // ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'errors' => $validator->errors()
+        //     ], 422);
+        // }
 
         // Check if user already has this address_type
         $existing = CustomerAddress::where('customer_id', $userId)

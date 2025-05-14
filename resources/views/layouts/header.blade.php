@@ -21,7 +21,7 @@
             <i class="mdi mdi-menu mdi-24px"></i>
         </a>
     </div>
-
+ {{-- @livewire('notifications') --}}
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         @if (Route::current()->getName() == 'dashboard')
             <!-- Welcome Text -->
@@ -58,107 +58,170 @@
             <!-- /Welcome Text -->
         @endif
         <ul class="navbar-nav flex-row align-items-center ms-auto">
-            <!-- Notification -->
-            {{-- <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-2 me-xl-1">
-                <a class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow"
-                    href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside"
-                    aria-expanded="false">
-                    <i class="mdi mdi-bell-outline mdi-24px"></i>
-                    <span
-                        class="position-absolute top-0 start-50 translate-middle-y badge badge-dot bg-danger mt-2 border unread-notification-count"> --}}
-            {{-- {{ auth()->user()->unreadNotifications->count() }} --}}
-            {{-- </span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end py-0" id="notificationDropdown" style="height: 538px">
-                    <li class="dropdown-menu-header border-bottom py-50">
-                        <div class="dropdown-header d-flex align-items-center py-2">
-                            <h6 class="mb-0 me-auto">Notifications</h6>
-                            <div class="d-flex align-items-center">
-                                <span class="badge rounded-pill bg-label-primary fs-xsmall me-2" id="unread-count">0
-                                    New</span>
-                                <button type="button" aria-label="Mark all as read" data-bs-toggle="tooltip" data-bs-original-title="Mark all as read" id="markAllRead"
-                                    class="btn btn-text-secondary rounded-pill btn-icon dropdown-notifications-all">
-                                    <i class="ri-mail-open-line text-heading ri-20px"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <form id="filter-form">
-                            <div class="form-floating w-auto d-flex filter">
-                                <button type="button" class="btn btn-primary waves-effect waves-light" onclick="fetchNotifications('all')">
-                                    All
-                                  </button>
-                                <button type="button" class="btn btn-primary waves-effect waves-light" onclick="fetchNotifications('read')">
-                                    Read
-                                  </button>
-                                <button type="button" class="btn btn-primary waves-effect waves-light" onclick="fetchNotifications('unread')">
-                                    Unread
-                                  </button>
+         
 
-                            </div>
-                        </form>
+            <!-- Notification -->
+            <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-2 me-xl-1">
+                @auth
+                    @php
+
+                        $notificationCount = 0;
+
+                        if (Auth::check() && Auth::user()->pharmacies) {
+                            $pharmacyUserId = Auth::user()->pharmacies->user_id;
+
+                            $notificationCount = DB::table('notifications')
+                                ->where('notifiable_id', $pharmacyUserId)
+                                ->where('notifiable_type', 'App\\Models\\User') // Adjust if needed
+                                ->whereNull('read_at') // Only unread notifications
+                                ->count();
+                        }
+                    @endphp
+                  
+                    <a class="nav-link btn btn-text-secondary btn-icon dropdown-toggle hide-arrow"
+                        href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+                        aria-expanded="false">
+                        <i class="mdi mdi-bell-outline mdi-24px"></i>
+
+                        @if ($notificationCount > 0)
+                            <span id="notification-dot"
+                                class="position-absolute top-0 start-50 translate-middle-y badge rounded-pill bg-danger mt-2 border"
+                                style="font-size: 10px; padding: 4px 6px;transform: translateY(-30%) !important;">
+                                {{ $notificationCount }}
+                            </span>
+                        @endif
+                    </a>
+                @endauth
+
+                <ul class="dropdown-menu dropdown-menu-end py-0">
+                    <li class="dropdown-menu-header border-bottom">
+                        <div class="dropdown-header d-flex align-items-center py-3">
+                            <h6 class="fw-normal mb-0 me-auto" style="color: black">Notification</h6>
+                            @auth
+                                @if (Auth::user()->pharmacies)
+                                    @php
+                                        $pharmacyUserId = Auth::user()->pharmacies->user_id;
+                                        $notificationCount = \DB::table('notifications')
+                                            ->where('notifiable_id', $pharmacyUserId)
+                                            ->where('notifiable_type', 'App\\Models\\User') // Adjust if your model namespace is different
+                                            ->count();
+                                    @endphp
+                                @endif
+                            @endauth
+
+                            <span class="badge rounded-pill bg-label-primary">{{ $notificationCount }} New</span>
+                        </div>
                     </li>
                     <li class="dropdown-notifications-list scrollable-container">
-                        <ul class="list-group list-group-flush" id="notificationList"></ul>
+                        <ul class="list-group list-group-flush">
+                            @auth
+                                @if (Auth::user()->pharmacies)
+                                    @php
+                                        $pharmacyUserId = Auth::user()->pharmacies->user_id;
+
+                                        $notifications = \DB::table('notifications')
+                                            ->where('notifiable_id', $pharmacyUserId)
+                                            ->where('notifiable_type', 'App\\Models\\User')
+                                            ->orderBy('created_at', 'desc')
+                                            ->take(10)
+                                            ->get();
+                                    @endphp
+
+                                    @foreach ($notifications as $notification)
+                                        @php
+                                            $data = json_decode($notification->data, true);
+                                        @endphp
+
+                                        <li class="list-group-item list-group-item-action dropdown-notifications-item">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="flex-shrink-0">
+                                                    <div class="avatar me-1">
+                                                        <img src="{{ asset('assets/img/quote.png') }}" alt="avatar"
+                                                            class="w-px-40 h-auto rounded-circle">
+                                                    </div>
+                                                </div>
+
+                                                <div class="d-flex flex-column flex-grow-1 overflow-hidden">
+                                                    <h6 class="mb-1 text-truncate text-dark">New Quote Request 🎉</h6>
+                                                    <small class="text-truncate text-body">
+                                                        {{ $data['message'] ?? 'No message available' }}
+                                                    </small>
+                                                    <small class="text-muted mt-1">
+                                                        {{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                @endif
+                            @endauth
+                        </ul>
+                    </li>
+                    <li class="dropdown-menu-footer border-top p-2">
+                        <a href="javascript:void(0);" class="btn btn-primary d-flex justify-content-center">
+                            View all notifications
+                        </a>
                     </li>
                 </ul>
             </li>
-        </ul> --}}
 
-            <!--/ Notification -->
-            <!-- User -->
-            <li class="nav-item navbar-dropdown dropdown-user dropdown profile">
-                <a class="nav-link dropdown-toggle hide-arrow pr" href="javascript:void(0);" data-bs-toggle="dropdown">
-                    <div class="avatar">
-                        <img src="{{ asset('assets/img/profile.jpg') }}" alt class="w-px-40 h-px-40 rounded-circle" />
-                        {{-- <img src="{{ asset('assets/img/branding/main-logo.png') }}"
+        </ul>
+        </li>
+        <!--/ Notification -->
+        <li class="nav-item navbar-dropdown dropdown-user dropdown profile">
+
+            <a class="nav-link dropdown-toggle hide-arrow pr" href="javascript:void(0);" data-bs-toggle="dropdown">
+                <div class="avatar">
+                    <img src="{{ asset('assets/img/profile.jpg') }}" alt class="w-px-40 h-px-40 rounded-circle" />
+                    {{-- <img src="{{ asset('assets/img/branding/main-logo.png') }}"
                             class="w-px-40 h-auto rounded-circle"> --}}
 
-                    </div>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
-                        <a class="dropdown-item" href="{{ route('dashboard') }}">
-                            <div class="d-flex">
-                                <div class="flex-shrink-0 me-3">
-                                    <div class="avatar ">
-                                        <img src="{{ asset('upload/user-profile/' . Auth::user()->picture) }}"
-                                            class="w-px-40 h-auto rounded-circle" />
-                                        {{-- <img src="{{ asset('assets/img/branding/main-logo.png') }}"
+                </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <a class="dropdown-item" href="{{ route('dashboard') }}">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0 me-3">
+                                <div class="avatar ">
+                                    <img src="{{ asset('upload/user-profile/' . Auth::user()->picture) }}"
+                                        class="w-px-40 h-auto rounded-circle" />
+                                    {{-- <img src="{{ asset('assets/img/branding/main-logo.png') }}"
                                             class="w-px-40 h-auto rounded-circle"> --}}
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <span class="fw-medium d-block">
-                                        @if (Auth::user()->laboratories)
-                                            {{ Auth::user()->laboratories->owner_name }}
-                                        @elseif(Auth::user()->pharmacies)
-                                            {{ Auth::user()->pharmacies->owner_name }}
-                                        @else
-                                            {{ Auth::user()->name }}
-                                        @endif
-                                    </span>
-                                    <small
-                                        class="text-muted">{{ Auth::user()->role ? Auth::user()->role->name : '' }}</small>
                                 </div>
                             </div>
-                        </a>
-                    </li>
-                    <li>
-                        <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="{{ route('profile.custom') }}">
-                            <i class="mdi mdi-account-outline me-2"></i>
-                            <span class="align-middle">My Profile</span>
-                        </a>
-                    </li>
-                    {{-- <li>
+                            <div class="flex-grow-1">
+                                <span class="fw-medium d-block">
+                                    @if (Auth::user()->laboratories)
+                                        {{ Auth::user()->laboratories->owner_name }}
+                                    @elseif(Auth::user()->pharmacies)
+                                        {{ Auth::user()->pharmacies->owner_name }}
+                                    @else
+                                        {{ Auth::user()->name }}
+                                    @endif
+                                </span>
+                                <small
+                                    class="text-muted">{{ Auth::user()->role ? Auth::user()->role->name : '' }}</small>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <div class="dropdown-divider"></div>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{{ route('profile.custom') }}">
+                        <i class="mdi mdi-account-outline me-2"></i>
+                        <span class="align-middle">My Profile</span>
+                    </a>
+                </li>
+                {{-- <li>
                     <a class="dropdown-item" href="{{ route('profile.updatePassword') }}">
                         <i class="mdi mdi-key-outline me-2"></i>
                         <span class="align-middle">Change Password</span>
                     </a>
                 </li> --}}
-                    {{-- <li>
+                {{-- <li>
                         <a class="dropdown-item" href="pages-account-settings-billing.html">
                             <span class="d-flex align-items-center align-middle">
                                 <i class="flex-shrink-0 mdi mdi-credit-card-outline me-2"></i>
@@ -183,28 +246,28 @@
                             <span class="align-middle">Pricing</span>
                         </a>
                     </li> --}}
-                    <li>
-                        <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="{{ route('logout') }}"
-                            onclick="event.preventDefault();  document.getElementById('logout-form').submit();">
-                            <i class="mdi mdi-logout me-2"></i>
-                            <span class="align-middle">Log Out</span>
+                <li>
+                    <div class="dropdown-divider"></div>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{{ route('logout') }}"
+                        onclick="event.preventDefault();  document.getElementById('logout-form').submit();">
+                        <i class="mdi mdi-logout me-2"></i>
+                        <span class="align-middle">Log Out</span>
 
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                @csrf
-                            </form>
-                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
+                    </a>
 
-                        {{-- <a class="dropdown-item" href="auth-login-cover.html" target="_blank">
+                    {{-- <a class="dropdown-item" href="auth-login-cover.html" target="_blank">
                             <i class="mdi mdi-logout me-2"></i>
                             <span class="align-middle">Log Out</span>
                         </a> --}}
-                    </li>
-                </ul>
-            </li>
-            <!--/ User -->
+                </li>
+            </ul>
+        </li>
+        <!--/ User -->
         </ul>
     </div>
 
@@ -215,113 +278,6 @@
         <i class="mdi mdi-close search-toggler cursor-pointer"></i>
     </div>
 </nav>
+{{-- @section('scripts') --}}
 
-{{-- @section('script') --}}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-{{-- 
-<script>
-    $(document).ready(function() {
-        fetchNotifications('all'); --}}
-
-{{-- // Fetch notifications when filter changes
-        // $("#notificationFilter").on("change", function() {
-        //     let filter = $(this).val();
-        //     fetchNotifications(filter);
-        // });
-
-        // Mark notification as read
-        $(document).on("click", ".mark-as-read", function() {
-            let notificationId = $(this).data("id");
-            $.ajax({
-                url: "{{ route('notifications.markAsRead','') }}/" + notificationId,
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function() {
-                    fetchNotifications($("#notificationFilter").val());
-                }
-            });
-        });
-
-        // Mark all notifications as read
-        $("#markAllRead").on("click", function() {
-            $.ajax({
-                url: "{{ route('notifications.markAllRead') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function() {
-                    fetchNotifications($("#notificationFilter").val());
-                }
-            });
-        });
-
-        fetchNotifications();
-    });
-
-    function fetchNotifications(filter = 'all') {
-        $.ajax({
-            url: "{{ route('notifications.filter') }}",
-            type: "GET",
-            data: {
-                filter: filter
-            },
-            success: function(response) {
-
-                let notifications = response.notifications;
-                let unreadCount = response.unread_count;
-
-                let notificationList = $("#notificationList");
-                let unreadCountBadge = $("#unread-count");
-                let unread = $(".unread-notification-count");
-
-                notificationList.empty();
-                unreadCountBadge.text(unreadCount + " New");
-                if (unreadCount === 0) {
-                    unread.addClass('d-none');
-                } else {
-                    unread.removeClass('d-none');
-                }
-
-                if (notifications.length === 0) {
-                    notificationList.append(
-                        '<li class="list-group-item text-center">No notifications</li>');
-                    return;
-                }
-
-                notifications.forEach(notification => {
-                    let isUnread = notification.read_at === null;
-                    let badge = isUnread ?
-                        '<span class="badge" style="position: absolute; bottom: 42px; left: 16px; background-color: red; color: white; padding: 2px 8px; font-size: 12px; border-radius: 12px;">New</span>' :
-                        '';
-                    let readButton = isUnread ?
-                        `<a href="javascript:void(0);" class="mark-as-read" data-id="${notification.id}"><i class="fa-solid fa-xmark"></i></a>` :
-                        '';
-
-                    notificationList.append(`
-        <li class="list-group-item list-group-item-action dropdown-notifications-item">
-            <div class="d-flex gap-2">
-                <div class="flex-shrink-0" style="margin-top: 25px;">
-                    <div class="avatar me-1">
-                        <img src="../../assets/img/avatars/2.png" class="w-px-40 h-auto rounded-circle" />
-                        </div>
-                        <div>
-                            ${badge}
-                            </div>
-                </div>
-                <div class="d-flex flex-column flex-grow-1 overflow-hidden" style="padding: 12px;">
-                    <h6 class="mb-1 text-truncate">${notification.data.module ?? 'Notification'} - ${notification.data.header ?? 'Low Stock'}</h6>
-                    <small class="text-truncate text-body">${notification.data.message}</small>
-                </div>
-                <div class="flex-shrink-0" style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%);">${readButton}</div>
-            </div>
-        </li>
-    `);
-                });
-            }
-        });
-    }
-</script> --}}
-{{-- @endsection --}}
+ 

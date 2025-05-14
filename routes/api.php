@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\MyEvent;
 use App\Http\Controllers\AddMedicineController;
 use App\Http\Controllers\AuthTokenController;
 use App\Http\Controllers\CustomerAddressController;
@@ -66,3 +67,16 @@ Route::middleware('check.api.key')->group(function () {
     Route::post('/join-us', [JoinUsController::class, 'store']);
 
 });
+
+
+Route::post('/submit-quote', function (Request $request) {
+    
+ 
+    // Trigger the event
+    event(new MyEvent('hello world'));
+
+    // dd('ok');
+ 
+    return response()->json(['success' => true, 'message' => 'Event triggered']);
+});
+ 

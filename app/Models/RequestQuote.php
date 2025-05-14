@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class RequestQuote extends Model
 {
     protected $fillable = [
-        'user_id',
+        'customer_id',
         'pharmacy_id'
     ];
 }

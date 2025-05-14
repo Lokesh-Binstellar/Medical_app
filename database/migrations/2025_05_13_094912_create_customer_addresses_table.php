@@ -14,16 +14,16 @@ return new class extends Migration
         Schema::create('customer_addresses', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('customer_id');
-            $table->string('name');
-            $table->string('mobile_no');
-            $table->string('address_type');
-            $table->string('house_number');
-            $table->text('address_line');
+            $table->string('name')->nullable();
+            $table->string('mobile_no')->nullable();
+            $table->string('address_type')->nullable();
+            $table->string('house_number')->nullable();
+            $table->text('address_line')->nullable();
             $table->text('lat');
             $table->text('lng');
-            $table->string('city');
-            $table->string('state');
-            $table->string('postal_code');
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+            $table->string('postal_code')->nullable();
             $table->timestamps();
 
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
