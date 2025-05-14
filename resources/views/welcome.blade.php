@@ -182,20 +182,30 @@
 <head>
     <title>Pusher Test</title>
     <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
-    <script>
-        // Enable pusher logging - don't include this in production
+  {{-- <script>
         Pusher.logToConsole = true;
 
+        // Initialize Pusher
         var pusher = new Pusher('7ba4a23b60749764133c', {
             cluster: 'ap1'
         });
 
+        // Subscribe to the channel
         var channel = pusher.subscribe('my-channel');
+
+        // Bind to the event
         channel.bind('my-event', function(data) {
-            alert('1231211');
-            location.reload(); // 🔄 Reloads the page when event is received
+            alert('Received data:'); // Debugging line
+
         });
-    </script>
+
+        // Debugging line
+        pusher.connection.bind('connected', function() {
+           alert('Pusher connected');
+        });
+    </script> --}}
+  
+
 </head>
 
 <body>

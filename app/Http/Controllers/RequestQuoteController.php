@@ -33,10 +33,9 @@ class RequestQuoteController extends Controller
 
     public function requestAQuote(Request $request)
     {
-          event(new MyEvent('hello world'));
-       
+        
         $addressType = $request->input('address_type');
-
+        
         $userId = $request->get('user_id');
         $apiKey = env('GOOGLE_MAPS_API_KEY');
         $address = CustomerAddress::where('customer_id', $userId)
@@ -98,10 +97,11 @@ class RequestQuoteController extends Controller
             // dd($userId);
             $customer = Customers::find($userId); // assuming $userId is the customer
             $pharmacyUser->notify(new QuoteRequested($customer));
-           
+            
+            event(new MyEvent('lokesh'));
 
             // Notification::send($pharmacyUser, new QuoteRequested($requestingUser));
-
+            
             if (!$exists) {
                 // Save quote request
                 RequestQuote::create([
@@ -113,7 +113,7 @@ class RequestQuoteController extends Controller
                 $pharmacyUser = User::where('id', $pharmacy->user_id)->first();
                 // Get the user who is requesting the quote
                 $requestingUser = User::find($userId);
-
+                
                 dd($pharmacyUser);
                 // Send notification
                 if ($pharmacyUser && $requestingUser) {
