@@ -9,13 +9,13 @@ use App\Models\Pharmacies;
 use App\Models\RequestQuote;
 use App\Models\User;
 use App\Notifications\QuoteRequested;
+use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Notification;
 
 class RequestQuoteController extends Controller
 {
-
-
     public function getRoadDistance($lat1, $lon1, $lat2, $lon2, $apiKey)
     {
         $url = "https://maps.googleapis.com/maps/api/directions/json?origin=$lat1,$lon1&destination=$lat2,$lon2&key=$apiKey";
@@ -33,34 +33,33 @@ class RequestQuoteController extends Controller
 
     public function requestAQuote(Request $request)
     {
-          event(new MyEvent('hello world'));
-       
+
         $addressType = $request->input('address_type');
 
         $userId = $request->get('user_id');
         $apiKey = env('GOOGLE_MAPS_API_KEY');
         $address = CustomerAddress::where('customer_id', $userId)
-        ->where('address_type', $addressType)
-        ->first();
-        
+            ->where('address_type', $addressType)
+            ->first();
+
         if (!$address) {
             return response()->json([
                 'status' => false,
                 'message' => 'Work address not found.'
             ], 404);
         }
-        
+
         if (!$address || !$address->lat || !$address->lng) {
             return response()->json([
                 'status' => false,
                 'message' => 'Customer location not found.'
             ], 404);
         }
-        
+
         $nearby = [];
-        
+
         $pharmacies = Pharmacies::all();
-        
+
         foreach ($pharmacies as $pharmacy) {
             if ($pharmacy->latitude && $pharmacy->longitude) {
                 $distance = $this->getRoadDistance(
@@ -70,14 +69,13 @@ class RequestQuoteController extends Controller
                     $pharmacy->longitude,
                     $apiKey
                 );
-                
+
                 if ($distance !== false && $distance <= 10) {
                     $pharmacy->road_distance_km = round($distance, 2);
                     $nearby[] = $pharmacy;
                 }
             }
         }
-        
         if (empty($nearby)) {
             return response()->json([
                 'status' => false,
@@ -86,32 +84,21 @@ class RequestQuoteController extends Controller
         }
         foreach ($nearby as $pharmacy) {
             $exists = RequestQuote::where('customer_id', $userId)
-            ->where('pharmacy_id', $pharmacy->user_id)
-            ->exists();
-            
-            // echo  $userId ;
-            //    die;
-            // Get the user record for the pharmacy
+                ->where('pharmacy_id', $pharmacy->user_id)
+                ->exists();
+
             $pharmacyUser = User::where('id', $pharmacy->user_id)->first();
-            // Get the user who is requesting the quote
-            $requestingUser = CustomerAddress::find($userId);
-            // dd($userId);
             $customer = Customers::find($userId); // assuming $userId is the customer
             $pharmacyUser->notify(new QuoteRequested($customer));
-           
 
-            // Notification::send($pharmacyUser, new QuoteRequested($requestingUser));
-
+            //Event call for refresh the page
+            event(new MyEvent('message'));
             if (!$exists) {
-                // Save quote request
                 RequestQuote::create([
                     'customer_id' => $userId,
                     'pharmacy_id' => $pharmacy->user_id,
                 ]);
-
-                // Get the user record for the pharmacy
                 $pharmacyUser = User::where('id', $pharmacy->user_id)->first();
-                // Get the user who is requesting the quote
                 $requestingUser = User::find($userId);
 
                 // dd($pharmacyUser);
@@ -120,30 +107,32 @@ class RequestQuoteController extends Controller
                     // $pharmacyUser->notify(new QuoteRequested($requestingUser));
                     Notification::send($pharmacyUser, new QuoteRequested($requestingUser));
                 }
-                   
+
             }
         }
-
-
-
-
-        $pharmacyIds = collect($nearby)->pluck('user_id');
-
-
-
         return response()->json([
             'status' => true
         ]);
-        // Return only lat/lng
-        // return response()->json([
-        //     'status' => true,
-        //     'lat' => $address->lat,
-        //     'lng' => $address->lng
-        // ]);
-
     }
 
 
- 
+public function markAsRead($id)
+{
+      $notification = DatabaseNotification::find($id);
+
+    if ($notification && $notification->notifiable_id == Auth::user()->pharmacies->user_id) {
+        $notification->markAsRead();
+        return response()->json(['success' => true]);
+
+    }
+    event(new MyEvent('remove'));
+    return response()->json(['success' => false], 404);
+}
+
+
+
+
+
+
 
 }

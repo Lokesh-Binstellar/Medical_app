@@ -29,12 +29,12 @@ use App\Models\MedicineBanner;
 use Illuminate\Support\Facades\Route;
 
 
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 Route::get('/', function () {
-    return view('welcome');
-});
-/* Route::get('/', function () {
     return view('auth.login');
-}); */
+});
 
 // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified', 'permission:pharmacies,create']);
 
@@ -137,6 +137,7 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('/{id}', [MedicineController::class, 'show'])->name('medicine.show');
         });
     });
+
     //PopularCategory
     Route::prefix('popularCategory')->group(function () {
         Route::get('/', [PopularCategoryController::class, 'index'])->name('popular_category.index');
@@ -144,20 +145,22 @@ Route::group(['middleware' => ['auth']], function () {
             Route::post('/store', [PopularCategoryController::class, 'store'])->name('popular_category.store');
         });
         Route::group(['middleware' => 'permission:PopularCategory,update'], function () {
-            Route::get('{id}/edit', [PopularCategoryController::class, 'edit'])->name('popular_category.edit');  
+            Route::get('{id}/edit', [PopularCategoryController::class, 'edit'])->name('popular_category.edit');
             Route::put('{id}', [PopularCategoryController::class, 'update'])->name('popular_category.update');
         });
         Route::group(['middleware' => 'permission:PopularCategory,delete'], function () {
-            Route::delete('{id}', [PopularCategoryController::class, 'destroy'])->name('popular_category.destroy'); 
+            Route::delete('{id}', [PopularCategoryController::class, 'destroy'])->name('popular_category.destroy');
         });
     });
 
+//Otc Medicine
     Route::prefix('otcmedicine')->group(function () {
         Route::get('', [OtcController::class, 'index'])->name('otcmedicine.index');
         Route::post('import', [OtcController::class, 'import'])->name('otcmedicine.import');
         Route::get('/{id}', [OtcController::class, 'show'])->name('otcmedicine.show');
     });
 
+//Popular Brand
     Route::prefix('popular')->group(function () {
         Route::get('/', [PopularBrandController::class, 'index'])->name('popular.index');
         Route::group(['middleware' => 'permission:PopularBrand,create'], function () {
@@ -174,53 +177,50 @@ Route::group(['middleware' => ['auth']], function () {
 
     });
 
+    // Lab Test
     Route::prefix('labtest')->group(function () {
         Route::get('', [LabtestController::class, 'index'])->name('labtest.index');
         Route::post('import', [LabtestController::class, 'import'])->name('labtest.import');
         Route::get('/{id}', [LabtestController::class, 'show'])->name('labtest.show');
     });
 
-
+//Package Category
     Route::prefix('packageCategory')->group(function () {
         Route::get('', [packageCategoryController::class, 'index'])->name('packageCategory.index');
-        Route::get('/create', [packageCategoryController::class, 'create'])->name('packageCategory.create'); 
-        Route::post('/', [packageCategoryController::class, 'store'])->name('packageCategory.store');   
-        Route::get('/{id}/edit', [packageCategoryController::class, 'edit'])->name('packageCategory.edit'); 
-        Route::put('/{id}', [packageCategoryController::class, 'update'])->name('packageCategory.update');  
-        Route::delete('/{id}', [packageCategoryController::class, 'destroy'])->name('packageCategory.destroy'); 
+        Route::get('/create', [packageCategoryController::class, 'create'])->name('packageCategory.create');
+        Route::post('/', [packageCategoryController::class, 'store'])->name('packageCategory.store');
+        Route::get('/{id}/edit', [packageCategoryController::class, 'edit'])->name('packageCategory.edit');
+        Route::put('/{id}', [packageCategoryController::class, 'update'])->name('packageCategory.update');
+        Route::delete('/{id}', [packageCategoryController::class, 'destroy'])->name('packageCategory.destroy');
     });
 
+
+    //Add Lab Packages
     Route::prefix('labPackage')->group(function () {
-        Route::get('', [PackageController::class, 'index'])->name('labPackage.index'); 
+        Route::get('', [PackageController::class, 'index'])->name('labPackage.index');
         Route::post('/', [PackageController::class, 'store'])->name('labPackage.store');
-        Route::get('/create', [PackageController::class, 'create'])->name('labPackage.create');   
-        Route::post('import', [PackageController::class, 'import'])->name('labPackage.import');  
-        Route::get('/{id}/edit', [PackageController::class, 'edit'])->name('labPackage.edit'); 
-        Route::put('/{id}', [PackageController::class, 'update'])->name('labPackage.update');  
-        Route::get('/{id}', [PackageController::class, 'show'])->name('labPackage.show'); 
-        Route::delete('/{id}', [PackageController::class, 'destroy'])->name('labPackage.destroy'); 
+        Route::get('/create', [PackageController::class, 'create'])->name('labPackage.create');
+        Route::post('import', [PackageController::class, 'import'])->name('labPackage.import');
+        Route::get('/{id}/edit', [PackageController::class, 'edit'])->name('labPackage.edit');
+        Route::put('/{id}', [PackageController::class, 'update'])->name('labPackage.update');
+        Route::get('/{id}', [PackageController::class, 'show'])->name('labPackage.show');
+        Route::delete('/{id}', [PackageController::class, 'destroy'])->name('labPackage.destroy');
     });
+
+    //Add Medicine
     Route::prefix('addMedicine')->group(function () {
-        Route::get('', [AddMedicineController::class, 'index'])->name('addMedicine.index'); 
+        Route::get('', [AddMedicineController::class, 'index'])->name('addMedicine.index');
         Route::post('', [AddMedicineController::class, 'store'])->name('addMedicine.store');
-       // web.php or api.php (depending on where you're calling it from)
+        // web.php or api.php (depending on where you're calling it from)
         Route::get('/get-medicine-strip', [AddMedicineController::class, 'getMedicineStrip'])->name('medicine.strip');
-
-
-    
     });
 
-
-
-
-
-
-// Route::post('/add-medicine/store', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
-Route::get('/pharmacist/add-medicine', [MedicineSearchController::class, 'index'])->name('add.medicine');
-Route::get('/search-medicine', [MedicineSearchController::class, 'search'])->name('search.medicine');
-Route::post('/add-medicine', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
-Route::post('/medicines/store', [MedicineSearchController::class, 'store'])->name('medicines.store');
-Route::get('/customers/select', [MedicineSearchController::class, 'customerSelect'])->name('customers.select');
+    // Route::post('/add-medicine/store', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
+    Route::get('/pharmacist/add-medicine', [MedicineSearchController::class, 'index'])->name('add.medicine');
+    Route::get('/search-medicine', [MedicineSearchController::class, 'search'])->name('search.medicine');
+    Route::post('/add-medicine', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
+    Route::post('/medicines/store', [MedicineSearchController::class, 'store'])->name('medicines.store');
+    Route::get('/customers/select', [MedicineSearchController::class, 'customerSelect'])->name('customers.select');
 
 // Route::get('/fetch-customer-cart', [MedicineSearchController::class, 'fetchCustomerCart']);
 Route::get('/fetch-cart-by-customer', [MedicineSearchController::class, 'fetchCartByCustomer']);
@@ -238,23 +238,19 @@ Route::get('/prescriptions/{customerId}/prescriptions', [AddMedicineController::
 Route::get('/prescriptions', [FileUploadController::class, 'index'])->name('prescriptions.index');
 Route::post('/prescriptions/update-status/{id}', [FileUploadController::class, 'updateStatus']);
 
+//popular Lab test
 
+Route::prefix('popular-lab-tests')->group(function () {
+Route::get(' ', [PopularLabTestController::class, 'index'])->name('popular_lab_test.index');
+Route::post('/store', [PopularLabTestController::class, 'store'])->name('popular_lab_test.store');
+Route::delete('/{id}', [PopularLabTestController::class, 'destroy'])->name('popular_lab_test.destroy');
+});
 
-
-Route::get('/popular-lab-tests', [PopularLabTestController::class, 'index'])->name('popular_lab_test.index');
-Route::post('/popular-lab-tests', [PopularLabTestController::class, 'store'])->name('popular_lab_test.store');
-Route::delete('/popular-lab-tests/{id}', [PopularLabTestController::class, 'destroy'])->name('popular_lab_test.destroy');
-
+ //fetch-customer-cart
 Route::get('/fetch-customer-cart', [AddMedicineController::class, 'fetchCustomerCart']);
-
-
 Route::get('/fetch-prescription-files', [AddMedicineController::class, 'fetchPrescriptionFiles']);
 
-
-
-
-
-
+//HomeBanners
 Route::prefix('homebanners')->group(function () {
     Route::get('', [HomeBannerController::class, 'index'])->name('homebanner.index');
 
@@ -278,6 +274,7 @@ Route::prefix('homebanners')->group(function () {
 
 
 
+//Medicine Banners
 
 Route::prefix('medicinebanners')->group(function () {
     Route::get('', [MedicineBannerController::class, 'index'])->name('medicinebanner.index');
@@ -299,18 +296,22 @@ Route::prefix('medicinebanners')->group(function () {
         Route::get('/{id}', [MedicineBannerController::class, 'show'])->name('medicinebanner.show');
     });
 
+});
+
+//Joins uS
+Route::prefix('join-us')->group(function () {
+    Route::get('', [JoinUsController::class, 'index'])->name('joinus.index');
+    Route::post('/store', [JoinUsController::class, 'store'])->name('joinus.store');
+    Route::delete('/{id}', [JoinUsController::class, 'destroy'])->name('joinus.destroy');
+    Route::get('/settings', [JoinUsController::class, 'edit'])->name('joinus');
+    // Route::post('/settings', [JoinUsController::class, 'update'])->name('joinus.update');
+    Route::post('/settings/update-emails', [JoinUsController::class, 'updateEmails'])->name('joinus.updateEmails');
+
 
 });
 
-Route::get('/join-us', [JoinUsController::class, 'index'])->name('joinus.index');
-Route::post('/join-us', [JoinUsController::class, 'store'])->name('joinus.store');
-Route::delete('/join-us/{id}', [JoinUsController::class, 'destroy'])->name('joinus.destroy');
-Route::get('/settings', [JoinUsController::class, 'edit'])->name('joinus');
-// Route::post('/settings', [JoinUsController::class, 'update'])->name('joinus.update');
-Route::post('/settings/update-emails', [JoinUsController::class, 'updateEmails'])->name('joinus.updateEmails');
+//notification
+Route::prefix('notifications')->group(function () {
+    Route::post('/read/{id}', [RequestQuoteController::class, 'markAsRead'])->name('notifications.read');
 
-
-Route::get('/fire-event', function () {
-    event(new MyEvent('hello world'));
-    // return 'Event Fired!';
 });

@@ -21,7 +21,7 @@
             <i class="mdi mdi-menu mdi-24px"></i>
         </a>
     </div>
- {{-- @livewire('notifications') --}}
+    {{-- @livewire('notifications') --}}
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         @if (Route::current()->getName() == 'dashboard')
             <!-- Welcome Text -->
@@ -58,7 +58,7 @@
             <!-- /Welcome Text -->
         @endif
         <ul class="navbar-nav flex-row align-items-center ms-auto">
-         
+
 
             <!-- Notification -->
             <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-2 me-xl-1">
@@ -77,7 +77,7 @@
                                 ->count();
                         }
                     @endphp
-                  
+
                     <a class="nav-link btn btn-text-secondary btn-icon dropdown-toggle hide-arrow"
                         href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside"
                         aria-expanded="false">
@@ -112,7 +112,7 @@
                             <span class="badge rounded-pill bg-label-primary">{{ $notificationCount }} New</span>
                         </div>
                     </li>
-                    <li class="dropdown-notifications-list scrollable-container">
+                    <li class="dropdown-notifications-list scrollable-container notification-item">
                         <ul class="list-group list-group-flush">
                             @auth
                                 @if (Auth::user()->pharmacies)
@@ -122,6 +122,7 @@
                                         $notifications = \DB::table('notifications')
                                             ->where('notifiable_id', $pharmacyUserId)
                                             ->where('notifiable_type', 'App\\Models\\User')
+                                            ->whereNull('read_at')
                                             ->orderBy('created_at', 'desc')
                                             ->take(10)
                                             ->get();
@@ -132,7 +133,8 @@
                                             $data = json_decode($notification->data, true);
                                         @endphp
 
-                                        <li class="list-group-item list-group-item-action dropdown-notifications-item">
+                                        <li class="list-group-item list-group-item-action dropdown-notifications-item"
+                                            id="notification-{{ $notification->id }}">
                                             <div class="d-flex align-items-center gap-2">
                                                 <div class="flex-shrink-0">
                                                     <div class="avatar me-1">
@@ -149,6 +151,8 @@
                                                     <small class="text-muted mt-1">
                                                         {{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}
                                                     </small>
+                                                    <button class="btn btn-sm btn-outline-primary mt-1 mark-read-btn"
+                                                        data-id="{{ $notification->id }}">Mark as read</button>
                                                 </div>
                                             </div>
                                         </li>
@@ -157,6 +161,7 @@
                             @endauth
                         </ul>
                     </li>
+
                     <li class="dropdown-menu-footer border-top p-2">
                         <a href="javascript:void(0);" class="btn btn-primary d-flex justify-content-center">
                             View all notifications
@@ -215,37 +220,7 @@
                         <span class="align-middle">My Profile</span>
                     </a>
                 </li>
-                {{-- <li>
-                    <a class="dropdown-item" href="{{ route('profile.updatePassword') }}">
-                        <i class="mdi mdi-key-outline me-2"></i>
-                        <span class="align-middle">Change Password</span>
-                    </a>
-                </li> --}}
-                {{-- <li>
-                        <a class="dropdown-item" href="pages-account-settings-billing.html">
-                            <span class="d-flex align-items-center align-middle">
-                                <i class="flex-shrink-0 mdi mdi-credit-card-outline me-2"></i>
-                                <span class="flex-grow-1 align-middle">Billing</span>
-                                <span
-                                    class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
-                            </span>
-                        </a>
-                    </li>
-                    <li>
-                        <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="pages-faq.html">
-                            <i class="mdi mdi-help-circle-outline me-2"></i>
-                            <span class="align-middle">FAQ</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="pages-pricing.html">
-                            <i class="mdi mdi-currency-usd me-2"></i>
-                            <span class="align-middle">Pricing</span>
-                        </a>
-                    </li> --}}
+
                 <li>
                     <div class="dropdown-divider"></div>
                 </li>
@@ -260,10 +235,6 @@
                         </form>
                     </a>
 
-                    {{-- <a class="dropdown-item" href="auth-login-cover.html" target="_blank">
-                            <i class="mdi mdi-logout me-2"></i>
-                            <span class="align-middle">Log Out</span>
-                        </a> --}}
                 </li>
             </ul>
         </li>
@@ -278,6 +249,33 @@
         <i class="mdi mdi-close search-toggler cursor-pointer"></i>
     </div>
 </nav>
-{{-- @section('scripts') --}}
+<script>
+      const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+if (!csrfTokenMeta) {
+    console.error("CSRF token meta tag not found!");
+} else {
+    const csrfToken = csrfTokenMeta.getAttribute('content');
 
- 
+    document.querySelectorAll('.mark-read-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const id = this.dataset.id;
+
+            fetch(`/notifications/read/${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    this.closest('.notification-item').remove();
+                   
+                }
+            });
+        });
+    });
+}
+
+</script>

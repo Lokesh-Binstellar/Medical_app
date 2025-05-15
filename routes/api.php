@@ -73,7 +73,7 @@ Route::post('/submit-quote', function (Request $request) {
     
  
     // Trigger the event
-    event(new MyEvent('hello world'));
+    // event(new MyEvent('lokesh'));
 
     // dd('ok');
  
