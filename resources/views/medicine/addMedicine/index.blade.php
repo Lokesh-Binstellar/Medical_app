@@ -130,9 +130,9 @@
 
                                 <div>
                                     <div class="header">Side-by-Side PDF Preview</div>
-                                
+
                                     <div class="pdf-wrapper" id="prescription-preview"></div>
-                                
+
                                     <div class="footer" id="download-links"></div>
                                 </div>
 
@@ -457,26 +457,26 @@
 
 
 
-       // $(document).on('change', '.customer-search', function() {
+        // $(document).on('change', '.customer-search', function() {
         $('#prescription-select').on('select2:select', function(e) {
-    //$('.customer-search').on('select2:select', function(e) {
-       
-    var prescriptionId = e.params.data.id; // Assuming customer_id is available
+            //$('.customer-search').on('select2:select', function(e) {
+
+            var prescriptionId = e.params.data.id; // Assuming customer_id is available
 
 
-    $.ajax({
-        url: '/fetch-prescription-files',
-        method: 'GET',
-        data: {
-            prescriptionId: prescriptionId
-        },
-        success: function(response) {
-            //console.log(response.files);
-            if (response.status === 'success') {
-                let html = '';
-                var fileUrl = response.files;
-                response.files.forEach(function(fileUrl, index) {
-                    html += `
+            $.ajax({
+                url: '/fetch-prescription-files',
+                method: 'GET',
+                data: {
+                    prescriptionId: prescriptionId
+                },
+                success: function(response) {
+                    //console.log(response.files);
+                    if (response.status === 'success') {
+                        let html = '';
+                        var fileUrl = response.files;
+                        response.files.forEach(function(fileUrl, index) {
+                            html += `
                         <div class="pdf-box">
                             <div class="pdf-title">Document ${index + 1}</div>
                             <iframe class="pdf-viewer" src="${fileUrl}">
@@ -485,21 +485,20 @@
                             </iframe>
                         </div>
                     `;
-                });
+                        });
 
-                $('.pdf-wrapper').html(html); // Inject the generated HTML into the container
-                $('#pdf-details').show();
-            } else {
-                $('.pdf-wrapper').html('No files available.');
-                $('#pdf-details').hide();
-            }
-        },
-        error: function() {
-            $('.pdf-wrapper').html('Error loading files.');
-            $('#pdf-details').hide();
-        }
-    });
-});
-
+                        $('.pdf-wrapper').html(html); // Inject the generated HTML into the container
+                        $('#pdf-details').show();
+                    } else {
+                        $('.pdf-wrapper').html('No files available.');
+                        $('#pdf-details').hide();
+                    }
+                },
+                error: function() {
+                    $('.pdf-wrapper').html('Error loading files.');
+                    $('#pdf-details').hide();
+                }
+            });
+        });
     </script>
 @endsection

@@ -1,10 +1,11 @@
 @extends('layouts.app')
 
 @section('styles')
-{{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
+    {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
 
-<link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <style>
         /* Fix column widths */
@@ -16,7 +17,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        
+
 
         /* Style Select2 container for fixed width */
         .select2-container--default .select2-selection--single {
@@ -37,6 +38,7 @@
             font-weight: 600;
             text-wrap: nowrap;
         }
+
         body>span.select2-container.select2-container--default.select2-container--open {
             width: auto !important;
         }
@@ -56,13 +58,34 @@
                     @csrf
                     <div class="d-flex mb-4 selectCustomer align-items-center gap-3">
                         <label class="font-bold">Please Select Customer :</label>
-                        <select class="form-control customer-search " name="customer[0][customer_id]">
+                        <select class="form-control customer-search " name="customer[0][customer_id]" id="customer-search">
                             <option value="">Search customer...</option>
                         </select>
                     </div>
+
+
+                    <div id="cart-details" style="display:none;" class="m-3">
+                        <h5 class="text-black">Customer Cart Details</h5>
+                        <table class="table table-bordered ">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th>Product ID</th>
+                                    <th>Product Name</th>
+                                    <th>Packaging Detail</th>
+                                    <th>Quantity</th>
+                                    <th>Is Substitute</th>
+                                    {{-- <th>Action</th> --}}
+                                </tr>
+                            </thead>
+                            <tbody id="cart-product-body">
+                            </tbody>
+                        </table>
+                    </div>
+
+
                     <div class="table-responsive mb-3">
                         <table class="display table table-striped table-hover data-table" id="medicine-table">
-                            <thead >
+                            <thead>
                                 <tr>
                                     <th>Search Medicine</th>
                                     <th>MRP</th>
@@ -382,7 +405,7 @@
             $('form').on('submit', function(e) {
                 let isValid = true;
 
-    
+
                 $('.medicine-error, .mrp-error, .discount-error, .discount-percent-error, .available-error, .substitute-error, .customer-error')
                     .remove();
                 $('.form-control, .form-select').css('border', '');
@@ -399,7 +422,7 @@
                         $medicineSelect.next('.select2-container').css('border', '1px solid red');
                         $row.find('td:first').append(
                             '<div class="text-danger small medicine-error mt-1">Please select a medicine.</div>'
-                            );
+                        );
                     }
 
                     const $mrp = $row.find(`input[name="medicine[${index}][mrp]"]`);
@@ -408,7 +431,7 @@
                         $mrp.css('border', '1px solid red');
                         $row.find('td:nth-child(2)').append(
                             '<div class="text-danger small mrp-error mt-1">Please enter a valid MRP.</div>'
-                            );
+                        );
                     }
 
                     const $discount = $row.find(`input[name="medicine[${index}][discount]"]`);
@@ -417,7 +440,7 @@
                         $discount.css('border', '1px solid red');
                         $row.find('td:nth-child(3)').append(
                             '<div class="text-danger small discount-error mt-1">Please enter a valid discount amount.</div>'
-                            );
+                        );
                     }
 
                     const $discountPercent = $row.find(
@@ -428,7 +451,7 @@
                         $discountPercent.css('border', '1px solid red');
                         $row.find('td:nth-child(4)').append(
                             '<div class="text-danger small discount-percent-error mt-1">Please enter a valid discount percentage (0–100).</div>'
-                            );
+                        );
                     }
 
                     const $available = $row.find(`select[name="medicine[${index}][available]"]`);
@@ -437,7 +460,7 @@
                         $available.css('border', '1px solid red');
                         $row.find('td:nth-child(5)').append(
                             '<div class="text-danger small available-error mt-1">Please select availability.</div>'
-                            );
+                        );
                     }
 
                     const $substitute = $row.find(
@@ -447,7 +470,7 @@
                         $substitute.css('border', '1px solid red');
                         $row.find('td:nth-child(6)').append(
                             '<div class="text-danger small substitute-error mt-1">Please select if it is a substitute.</div>'
-                            );
+                        );
                     }
                 });
 
@@ -459,7 +482,7 @@
                     if ($('.customer-error').length === 0) {
                         $customerSelect.closest('.d-flex').append(
                             '<div class="text-danger small customer-error mt-1">Please select a customer.</div>'
-                            );
+                        );
                     }
                 }
 
@@ -520,15 +543,52 @@
 
 
         });
-    </script>
-    {{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <script src="{{ asset('js/addmedicinePharma/medicine_form.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script> --}}
+
+
+
+        // fetch-cart-by-customer products_details
+
+        $(document).ready(function() {
+            $('#customer-search').on('select2:select', function(e) {
+                const customerId = e.params.data.id;
+
+                $.ajax({
+                    url: '/fetch-cart-by-customer',
+                    method: 'GET',
+                    data: {
+                        customer_id: customerId
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            const products = response.data;
+                            let html = '';
+
+                            products.forEach(product => {
+                                html += `<tr>
+                            <td>${product.product_id}</td>
+                             <td>${product.name}</td>
+                            <td>${product.packaging_detail}</td>
+                            <td>${product.quantity}</td>
+                            <td>${product.is_substitute}</td>
+                       
+                        </tr>`;
+                            });
+
+                            $('#cart-product-body').html(html);
+                            $('#cart-details').show();
+                        } else {
+                            $('#cart-product-body').html('');
+                            $('#cart-details').hide();
+                        }
+                    },
+                    error: function() {
+                        $('#cart-product-body').html('');
+                        $('#cart-details').hide();
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
 @endsection

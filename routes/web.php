@@ -38,8 +38,8 @@ Route::get('/', function () {
 
 // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified', 'permission:pharmacies,create']);
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified']);
-// Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified']);
+// Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified']);
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified']);
 
 Auth::routes();
 Route::group(['middleware' => ['auth']], function () {
@@ -221,6 +221,11 @@ Route::get('/search-medicine', [MedicineSearchController::class, 'search'])->nam
 Route::post('/add-medicine', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
 Route::post('/medicines/store', [MedicineSearchController::class, 'store'])->name('medicines.store');
 Route::get('/customers/select', [MedicineSearchController::class, 'customerSelect'])->name('customers.select');
+
+// Route::get('/fetch-customer-cart', [MedicineSearchController::class, 'fetchCustomerCart']);
+Route::get('/fetch-cart-by-customer', [MedicineSearchController::class, 'fetchCartByCustomer']);
+
+
 
 });
 

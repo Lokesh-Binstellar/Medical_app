@@ -1,8 +1,12 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Events\MyEvent;
+use App\Models\Carts;
 use App\Models\Customers;
+use App\Models\Medicine;
+use App\Models\Otcmedicine;
 use App\Models\Pharmacies;
 use App\Models\Phrmacymedicine;
 use Illuminate\Http\Request;
@@ -12,19 +16,16 @@ use Illuminate\Support\Facades\DB;
 class MedicineSearchController extends Controller
 {
     public function index()
-    {   
-       
+    {
+
         //  echo 'fdfg';die;
         // dd(Pharmacies::all());
-        $pharmacy = Pharmacies::where('user_id',Auth::user()->id)->first();
-      
-        $medicines = Phrmacymedicine::where('phrmacy_id',$pharmacy->id)->get();
+        $pharmacy = Pharmacies::where('user_id', Auth::user()->id)->first();
 
-        
-      
-        return view('Pharmacist.add-medicine',compact('medicines'));
+        $medicines = Phrmacymedicine::where('phrmacy_id', $pharmacy->id)->get();
 
-        
+
+        return view('Pharmacist.add-medicine', compact('medicines'));
     }
 
     public function search(Request $request)
@@ -35,7 +36,7 @@ class MedicineSearchController extends Controller
             ->select('id', 'product_name', 'salt_composition')
             ->when($term, function ($query, $term) {
                 return $query->where('product_name', 'like', "%$term%")
-                             ->orWhere('salt_composition', 'like', "%$term%");
+                    ->orWhere('salt_composition', 'like', "%$term%");
             })
             ->get()
             ->map(function ($item) {
@@ -60,7 +61,7 @@ class MedicineSearchController extends Controller
         // return response()->json($medicines);
         return response()->json($medicines->merge($otc));
     }
-    
+
 
     public function store(Request $request)
     {
@@ -68,10 +69,10 @@ class MedicineSearchController extends Controller
         $user = Auth::user();
         // Validate basic structure (you can add more rules as needed)
         // dd($data['customer'][0]['customer_id']);
-        
-        $pharmacy = Pharmacies::where('user_id',$user->id)->first();
-        
-        
+
+        $pharmacy = Pharmacies::where('user_id', $user->id)->first();
+
+
         // Store in database
         // 'customer_id' => $customerId,
         $medicine = new Phrmacymedicine(); // your model
@@ -82,22 +83,106 @@ class MedicineSearchController extends Controller
         $medicine->phrmacy_id = $pharmacy->id;
         $medicine->customer_id = $data['customer'][0]['customer_id'];
         $medicine->save();
-    
+
         return redirect()->back()->with('success', 'Medicine added successfully!');
     }
-    
+
 
     public function customerSelect(Request $request)
     {
         $search = $request->input('query');
 
-        $customers = DB::table('customers')
-            ->where('firstName', 'like', "%{$search}%")
-            ->orWhere('mobile_no', 'like', "%{$search}%")
-            ->select('id', DB::raw("CONCAT(firstName, ' (', mobile_no, ')') as text"))
+        // Step 1: Get matching customers from request_quotes + customers
+        $customers = DB::table('request_quotes')
+            ->join('customers', 'request_quotes.customer_id', '=', 'customers.id')
+            ->where(function ($query) use ($search) {
+                $query->where('customers.firstName', 'like', "%{$search}%")
+                    ->orWhere('customers.mobile_no', 'like', "%{$search}%");
+            })
+            ->select('customers.id', DB::raw("CONCAT(customers.firstName, ' (', customers.mobile_no, ')') as text"))
+            ->distinct()
             ->limit(10)
             ->get();
 
-        return response()->json(['results' => $customers]);
+        // Step 2: (Optional) Get cart for the first matched customer
+        $firstCustomerId = $customers->first()?->id;
+        $product = null;
+
+        if ($firstCustomerId) {
+            $cart = Carts::where('customer_id', $firstCustomerId)->first();
+            if ($cart && $cart->products_details) {
+                $product = json_decode($cart->products_details, true);
+            }
+        }
+
+        return response()->json([
+            'results' => $customers,
+            'product' => $product
+        ]);
     }
+
+public function fetchCartByCustomer(Request $request)
+{
+    $customerId = $request->input('customer_id');
+
+    $cart = Carts::where('customer_id', $customerId)->first();
+
+    if (!$cart || !$cart->products_details) {
+        return response()->json(['status' => 'error', 'message' => 'Cart not found']);
+    }
+
+    $products = json_decode($cart->products_details, true);
+    $result = [];
+    
+    foreach ($products as $item) {
+        $productId = $item['product_id'];
+        $isSubstitute = $item['is_substitute'] ?? 0;
+        $packagingDetail = $item['packaging_detail'] ?? '';
+        $quantity = $item['quantity'] ?? 1;
+        
+        $medicine = Medicine::where('product_id', $productId)->first();
+        $medName = $medicine->product_name .' + '. $medicine->salt_composition;
+        $type = 'medicine';
+        
+        // If not found in medicines, try otcmedicines
+        if (!$medicine) {
+            $medicine = Otcmedicine::where('otc_id', $productId)->first();
+            $medName = $medicine->name;
+            $type = 'otc';
+        }
+        
+        if ($medicine) {
+            $result[] = [
+                'product_id' => $productId,
+                'type' => $type,
+                'name' => $medName ?? 'N/A',
+                'packaging_detail' => $packagingDetail,
+                'quantity' => $quantity,
+                'is_substitute' => $isSubstitute,
+            ];
+        }
+    }
+    // dd($result);
+
+    return response()->json(['status' => 'success', 'data' => $result]);
+}
+
+
+    // public function getCustomerCart($customer_id)
+    // {
+    //     $cart = DB::table('carts')
+    //         ->where('customer_id', $customer_id)
+    //         ->first();
+
+    //     if (!$cart) {
+    //         return response()->json(['status' => false, 'message' => 'No cart found']);
+    //     }
+
+    //     $products = json_decode($cart->product_details, true); // assuming JSON
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'data' => $products
+    //     ]);
+    // }
 }

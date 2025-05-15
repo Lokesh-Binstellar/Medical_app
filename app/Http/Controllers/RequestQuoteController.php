@@ -114,7 +114,7 @@ class RequestQuoteController extends Controller
                 // Get the user who is requesting the quote
                 $requestingUser = User::find($userId);
 
-                dd($pharmacyUser);
+                // dd($pharmacyUser);
                 // Send notification
                 if ($pharmacyUser && $requestingUser) {
                     // $pharmacyUser->notify(new QuoteRequested($requestingUser));
