@@ -137,11 +137,12 @@
                                 </div>
 
                                 <div id="cart-details" style="display:none;" class="mt-3">
-                                    <h5>Customer Cart Details</h5>
+                                    <h5 class="text-black">Customer Cart Details</h5>
                                     <table class="table table-bordered ">
                                         <thead>
                                             <tr class="table-dark">
                                                 <th>Product ID</th>
+                                                <th>Product Name</th>
                                                 <th>Packaging Detail</th>
                                                 <th>Quantity</th>
                                                 <th>Is Substitute</th>
@@ -397,6 +398,7 @@
                         products.forEach(function(product) {
                             html += `<tr data-product-id="${product.product_id}">
                         <td>${product.product_id}</td>
+                        <td>${product.name}</td>
                         <td>${product.packaging_detail}</td>
                         <td>${product.quantity}</td>
                         <td>${product.is_substitute}</td>

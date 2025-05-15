@@ -512,9 +512,39 @@ class AddMedicineController extends Controller
         
         // Step 3: Decode product_details JSON
         $products = json_decode($cart->products_details, true);
-        dd($products);
+        $result = [];
+    
+    foreach ($products as $item) {
+        $productId = $item['product_id'];
+        $isSubstitute = $item['is_substitute'] ?? 0;
+        $packagingDetail = $item['packaging_detail'] ?? '';
+        $quantity = $item['quantity'] ?? 1;
+        
+        $medicine = Medicine::where('product_id', $productId)->first();
+        $medName = $medicine->product_name .' + '. $medicine->salt_composition;
+        $type = 'medicine';
+        
+        // If not found in medicines, try otcmedicines
+        if (!$medicine) {
+            $medicine = Otcmedicine::where('otc_id', $productId)->first();
+            $medName = $medicine->name;
+            $type = 'otc';
+        }
+        
+        if ($medicine) {
+            $result[] = [
+                'product_id' => $productId,
+                'type' => $type,
+                'name' => $medName ?? 'N/A',
+                'packaging_detail' => $packagingDetail,
+                'quantity' => $quantity,
+                'is_substitute' => $isSubstitute,
+            ];
+        }
+    }
+    // dd($result);
 
-        return response()->json(['status' => 'success', 'data' => $products]);
+    return response()->json(['status' => 'success', 'data' => $result]);
     }
 
 

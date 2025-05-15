@@ -168,21 +168,4 @@ public function fetchCartByCustomer(Request $request)
 }
 
 
-    // public function getCustomerCart($customer_id)
-    // {
-    //     $cart = DB::table('carts')
-    //         ->where('customer_id', $customer_id)
-    //         ->first();
-
-    //     if (!$cart) {
-    //         return response()->json(['status' => false, 'message' => 'No cart found']);
-    //     }
-
-    //     $products = json_decode($cart->product_details, true); // assuming JSON
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'data' => $products
-    //     ]);
-    // }
 }
