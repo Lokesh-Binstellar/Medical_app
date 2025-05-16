@@ -104,60 +104,69 @@
                         </div>
                     </div>
 
-                    <div class="card">
-                        <h5 class="card-header bg-white text-black">Add Medicine</h5>
-                        <div class="table-responsive text-nowrap">
-                            <table class="table display table-striped " id="medicine-table">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Search Medicine</th>
-                                        <th>MRP</th>
-                                        <th>Final Amount</th>
-                                        <th>Discount %</th>
-                                        <th>Available</th>
-                                        <th>Substitute</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="medicine-body" class="cart-medicine-body">
-                                    <tr class="medicine-row">
-                                        <td>
-                                            <select class="form-select medicine_search medicineDropdown"
-                                                name="medicine[0][medicine_id]"></select>
-                                            <input type="hidden" class="medicine_name " name="medicine[0][medicine_name]">
-                                        </td>
-                                        <td>
-                                            <input type="number" name="medicine[0][mrp]" class="form-control mrp"
-                                                step="0.01" placeholder="MRP">
-                                        </td>
-                                        <td>
-                                            <input type="number" name="medicine[0][discount]" class="form-control discount"
-                                                step="0.01" placeholder="Final Amount">
-                                        </td>
-                                        <td>
-                                            <input type="number" name="medicine[0][discount_percent]"
-                                                class="form-control discount_percent" step="0.01" placeholder="%">
-                                        </td>
-                                        <td>
-                                            <select name="medicine[0][available]" class="form-select">
-                                                <option value="yes">Yes</option>
-                                                <option value="no">No</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <select name="medicine[0][is_substitute]" class="form-select">
-                                                <option value="yes">Yes</option>
-                                                <option value="no">No</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <button type="button"
-                                                class="btn btn-sm btn-outline-danger remove-row">−</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+
+                    <div class="table-responsive mb-3">
+                        <table class="display table table-striped table-hover data-table" id="medicine-table">
+                            <thead>
+                                <div
+                                    style="border-left: 5px solid #f44336; background-color: #ffe6e6; padding: 10px 15px; margin-bottom: 10px; border-radius: 6px; font-family: Arial, sans-serif;">
+                                    <strong style="color: #d32f2f;">Note :</strong> <br><strong>Please make sure to enter the
+                                        total price manually, not the per unit price based on the quantity
+                                    requested by the customer.</strong>
+                                    <br>
+                                    <strong>
+                                    If requested quantity is not available,
+                                    kindly mark the medicine as not available</strong>.
+                                </div>
+
+                               
+                                <tr>
+                                    <th>Search Medicine</th>
+                                    <th>MRP</th>
+                                    <th>Final Amount</th>
+                                    <th>Discount %</th>
+                                    <th>Available</th>
+                                    <th>Substitute</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="medicine-body" class="cart-medicine-body">
+                                <tr class="medicine-row">
+                                    <td>
+                                        <select class="form-select medicine_search medicineDropdown"
+                                            name="medicine[0][medicine_id]"></select>
+                                        <input type="hidden" class="medicine_name " name="medicine[0][medicine_name]">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="medicine[0][mrp]" class="form-control mrp"
+                                            step="0.01" placeholder="MRP">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="medicine[0][discount]" class="form-control discount"
+                                            step="0.01" placeholder="Final Amount">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="medicine[0][discount_percent]"
+                                            class="form-control discount_percent" step="0.01" placeholder="%">
+                                    </td>
+                                    <td>
+                                        <select name="medicine[0][available]" class="form-select">
+                                            <option value="yes">Yes</option>
+                                            <option value="no">No</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="medicine[0][is_substitute]" class="form-select">
+                                            <option value="yes">Yes</option>
+                                            <option value="no">No</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-row">−</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <div class="d-flex justify-content-between flex-wrap gap-3">

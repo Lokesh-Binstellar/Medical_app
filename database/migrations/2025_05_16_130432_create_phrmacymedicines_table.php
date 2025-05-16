@@ -21,7 +21,7 @@ return new class extends Migration
             $table->decimal('commission_amount', 10, 2);
             $table->timestamps();
 
-            $table->foreign('phrmacy_id')->references('id')->on('pharmacies')->onDelete('cascade');
+            $table->foreign('phrmacy_id')->references('user_id')->on('pharmacies')->onDelete('cascade');
              $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade'); // ✅ Foreign key
         });
     }

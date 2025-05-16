@@ -16,6 +16,8 @@ class Phrmacymedicine extends Model
         return $this->belongsTo(Customers::class, 'customer_id');
     }
 
-   
-    
+  public function pharmacy()
+    {
+        return $this->belongsTo(Pharmacies::class, 'phrmacy_id', 'user_id');
+    }
 }
