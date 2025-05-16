@@ -14,6 +14,36 @@ use Illuminate\Support\Facades\Log;
 
 class JoinUsController extends Controller
 {
+
+
+
+    public function index(Request $request)
+    {
+        if ($request->ajax()) {
+            return datatables()->of(JoinUs::latest()->get())
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    return '
+                        <div class="dropdown">
+                          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+                          <ul class="dropdown-menu">
+                            <li>
+                              <form action="' . route('joinus.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
+                                ' . csrf_field() . method_field('DELETE') . '
+                                <button class="dropdown-item " type="submit">Delete</button>
+                              </form>
+                            </li>
+                          </ul>
+                        </div>';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+        $settings = AdminSetting::where('user_id', Auth::user()->id)->first();
+        $existingEmails = array_filter(explode(',', $settings->notification_emails ?? ''));
+        // dd($existingEmails);
+        return view('joinus.index', compact('settings', 'existingEmails'));
+    }
     // Method to handle the "Join Us" request form submission
     public function store(Request $request)
     {
@@ -45,27 +75,19 @@ class JoinUsController extends Controller
         }
 
         try {
-            $data = $request->all();
-            $join = JoinUs::create($data);
+            // Save the form submission
+        $join = JoinUs::create($request->all());
 
-            // Fetch admin emails from the admin_settings table
-            $adminSetting = AdminSetting::first();  // Assumes there's only one record with the email settings
-            $adminEmails = explode(',', $adminSetting->notification_emails);  // Assuming emails are stored as comma-separated values
+        // 🔄 Defer email sending to after the response
+        $this->sendJoinUsEmailsAfterResponse($join);
 
-            // Send notifications to all the admin emails
-            foreach ($adminEmails as $email) {
-                Notification::route('mail', trim($email))->notify(new JoinUsNotification($join));
-            }
-
-            // Notify the user who submitted the form
-            // Notification::route('mail', $join->email)->notify(new JoinUsNotification($join));
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Request submitted successfully.'
-            ]);
-        } catch (Exception $e) {
-            Log::error('JoinUs Error: ' . $e->getMessage());
+        // ✅ Respond immediately
+        return response()->json([
+            'status' => true,
+            'message' => 'Request submitted successfully.'
+        ]);
+        } catch (\Exception $e) {
+            \Log::error('JoinUs Error: ' . $e->getMessage());
 
             return response()->json([
                 'status' => false,
@@ -73,6 +95,30 @@ class JoinUsController extends Controller
             ], 500);
         }
     }
+
+    protected function sendJoinUsEmailsAfterResponse($join)
+{
+    // Run AFTER response is sent to client
+    app()->terminating(function () use ($join) {
+        try {
+            $adminSetting = AdminSetting::first();
+            $adminEmails = explode(',', $adminSetting->notification_emails);
+
+            foreach ($adminEmails as $email) {
+                $email = trim($email);
+                if (!empty($email)) {
+                    Notification::route('mail', $email)
+                        ->notify(new JoinUsNotification($join));
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Email sending failed (JoinUs): ' . $e->getMessage());
+        }
+    });
+}
+
+
+
 
 
     public function updateEmails(Request $request)
@@ -105,33 +151,6 @@ class JoinUsController extends Controller
 
 
 
-    public function index(Request $request)
-    {
-        if ($request->ajax()) {
-            return datatables()->of(JoinUs::latest()->get())
-                ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    return '
-                        <div class="dropdown">
-                          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
-                          <ul class="dropdown-menu">
-                            <li>
-                              <form action="' . route('joinus.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-                                ' . csrf_field() . method_field('DELETE') . '
-                                <button class="dropdown-item " type="submit">Delete</button>
-                              </form>
-                            </li>
-                          </ul>
-                        </div>';
-                })
-                ->rawColumns(['action'])
-                ->make(true);
-        }
-        $settings = AdminSetting::where('user_id', Auth::user()->id)->first();
-        $existingEmails = array_filter(explode(',', $settings->notification_emails ?? ''));
-        // dd($existingEmails);
-        return view('joinus.index', compact('settings', 'existingEmails'));
-    }
 
     public function destroy($id)
     {

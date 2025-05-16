@@ -19,11 +19,11 @@
       cluster: 'ap1'
     });
  
-    var channel = pusher.subscribe('my-channel');
-    channel.bind('my-event', function(data) {
-        // alert('qwedfgh');
-      location.reload(); // 🔄 Reloads the page when event is received
-    });
+    // var channel = pusher.subscribe('my-channel');
+    // channel.bind('my-event', function(data) {
+    //     // alert('qwedfgh');
+    //   location.reload(); // 🔄 Reloads the page when event is received
+    // });
   </script>
 
     @yield('token')

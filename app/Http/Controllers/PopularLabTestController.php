@@ -65,9 +65,7 @@ class PopularLabTestController extends Controller
     public function destroy(string $id)
     {
         $labtest = PopularLabTest::findOrFail($id);
-    
-        // (Optional) If there are associated files like reports or logos to delete, handle them here.
-    
+        
         $labtest->delete();
     
         return redirect()->route('popular_lab_test.index')->with('success', 'Popular Lab Test deleted successfully.');

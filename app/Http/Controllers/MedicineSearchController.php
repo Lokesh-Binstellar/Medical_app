@@ -28,6 +28,33 @@ class MedicineSearchController extends Controller
         return view('Pharmacist.add-medicine', compact('medicines'));
     }
 
+
+
+
+    public function store(Request $request)
+    {
+        $data = $request->all();
+        $user = Auth::user();
+        // Validate basic structure (you can add more rules as needed)
+        // dd($data['customer'][0]['customer_id']);
+
+        $pharmacy = Pharmacies::where('user_id', $user->id)->first();
+
+
+        // Store in database
+        // 'customer_id' => $customerId,
+        $medicine = new Phrmacymedicine(); // your model
+        $medicine->medicine = json_encode($data['medicine']);
+        $medicine->total_amount = $data['total_amount'];
+        $medicine->mrp_amount = $data['mrp_amount'];
+        $medicine->commission_amount = $data['commission_amount'];
+        $medicine->phrmacy_id = $pharmacy->id;
+        $medicine->customer_id = $data['customer'][0]['customer_id'];
+        $medicine->save();
+
+        return redirect()->back()->with('success', 'Medicine added successfully!');
+    }
+    
     public function search(Request $request)
     {
         $term = $request->get('q');
@@ -62,32 +89,6 @@ class MedicineSearchController extends Controller
         return response()->json($medicines->merge($otc));
     }
 
-
-    public function store(Request $request)
-    {
-        $data = $request->all();
-        $user = Auth::user();
-        // Validate basic structure (you can add more rules as needed)
-        // dd($data['customer'][0]['customer_id']);
-
-        $pharmacy = Pharmacies::where('user_id', $user->id)->first();
-
-
-        // Store in database
-        // 'customer_id' => $customerId,
-        $medicine = new Phrmacymedicine(); // your model
-        $medicine->medicine = json_encode($data['medicine']);
-        $medicine->total_amount = $data['total_amount'];
-        $medicine->mrp_amount = $data['mrp_amount'];
-        $medicine->commission_amount = $data['commission_amount'];
-        $medicine->phrmacy_id = $pharmacy->id;
-        $medicine->customer_id = $data['customer'][0]['customer_id'];
-        $medicine->save();
-
-        return redirect()->back()->with('success', 'Medicine added successfully!');
-    }
-
-
     public function customerSelect(Request $request)
     {
         $search = $request->input('query');
@@ -121,51 +122,49 @@ class MedicineSearchController extends Controller
         ]);
     }
 
-public function fetchCartByCustomer(Request $request)
-{
-    $customerId = $request->input('customer_id');
+    public function fetchCartByCustomer(Request $request)
+    {
+        $customerId = $request->input('customer_id');
 
-    $cart = Carts::where('customer_id', $customerId)->first();
+        $cart = Carts::where('customer_id', $customerId)->first();
 
-    if (!$cart || !$cart->products_details) {
-        return response()->json(['status' => 'error', 'message' => 'Cart not found']);
-    }
-
-    $products = json_decode($cart->products_details, true);
-    $result = [];
-    
-    foreach ($products as $item) {
-        $productId = $item['product_id'];
-        $isSubstitute = $item['is_substitute'] ?? 0;
-        $packagingDetail = $item['packaging_detail'] ?? '';
-        $quantity = $item['quantity'] ?? 1;
-        
-        $medicine = Medicine::where('product_id', $productId)->first();
-        $medName = $medicine->product_name .' + '. $medicine->salt_composition;
-        $type = 'medicine';
-        
-        // If not found in medicines, try otcmedicines
-        if (!$medicine) {
-            $medicine = Otcmedicine::where('otc_id', $productId)->first();
-            $medName = $medicine->name;
-            $type = 'otc';
+        if (!$cart || !$cart->products_details) {
+            return response()->json(['status' => 'error', 'message' => 'Cart not found']);
         }
-        
-        if ($medicine) {
-            $result[] = [
-                'product_id' => $productId,
-                'type' => $type,
-                'name' => $medName ?? 'N/A',
-                'packaging_detail' => $packagingDetail,
-                'quantity' => $quantity,
-                'is_substitute' => $isSubstitute,
-            ];
+
+        $products = json_decode($cart->products_details, true);
+        $result = [];
+
+        foreach ($products as $item) {
+            $productId = $item['product_id'];
+            $isSubstitute = $item['is_substitute'] ?? 0;
+            $packagingDetail = $item['packaging_detail'] ?? '';
+            $quantity = $item['quantity'] ?? 1;
+
+            $medicine = Medicine::where('product_id', $productId)->first();
+            $medName = $medicine->product_name . ' + ' . $medicine->salt_composition;
+            $type = 'medicine';
+
+            // If not found in medicines, try otcmedicines
+            if (!$medicine) {
+                $medicine = Otcmedicine::where('otc_id', $productId)->first();
+                $medName = $medicine->name;
+                $type = 'otc';
+            }
+
+            if ($medicine) {
+                $result[] = [
+                    'product_id' => $productId,
+                    'type' => $type,
+                    'name' => $medName ?? 'N/A',
+                    'packaging_detail' => $packagingDetail,
+                    'quantity' => $quantity,
+                    'is_substitute' => $isSubstitute,
+                ];
+            }
         }
+        // dd($result);
+
+        return response()->json(['status' => 'success', 'data' => $result]);
     }
-    // dd($result);
-
-    return response()->json(['status' => 'success', 'data' => $result]);
-}
-
-
 }

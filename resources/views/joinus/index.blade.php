@@ -289,6 +289,42 @@
                 });
             });
         });
+        
+
+        function submitJoinUsForm(event) {
+    event.preventDefault();
+
+    var formData = {
+        type: $('#type').val(),
+        first_name: $('#first_name').val(),
+        last_name: $('#last_name').val(),
+        email: $('#email').val(),
+        phone_number: $('#phone_number').val(),
+        message: $('#message').val(),
+    };
+
+    $.ajax({
+        url: '/api/join-us',
+        type: 'POST',
+        data: JSON.stringify(formData),
+        contentType: 'application/json',
+        dataType: 'json',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+            'Accept': 'application/json'
+        },
+        success: function (response) {
+            alert(response.message); // You can use toast here too
+        },
+        error: function (xhr) {
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                alert(xhr.responseJSON.message);
+            } else {
+                alert('Something went wrong. Please try again later.');
+            }
+        }
+    });
+}
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
 @endsection
