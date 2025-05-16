@@ -44,7 +44,9 @@ class JoinUsController extends Controller
         // dd($existingEmails);
         return view('joinus.index', compact('settings', 'existingEmails'));
     }
-    // Method to handle the "Join Us" request form submission
+ 
+
+
     public function store(Request $request)
     {
         $validator = \Validator::make($request->all(), [
@@ -76,16 +78,16 @@ class JoinUsController extends Controller
 
         try {
             // Save the form submission
-        $join = JoinUs::create($request->all());
+            $join = JoinUs::create($request->all());
 
-        // 🔄 Defer email sending to after the response
-        $this->sendJoinUsEmailsAfterResponse($join);
+            // 🔄 Defer email sending to after the response
+            $this->sendJoinUsEmailsAfterResponse($join);
 
-        // ✅ Respond immediately
-        return response()->json([
-            'status' => true,
-            'message' => 'Request submitted successfully.'
-        ]);
+            // ✅ Respond immediately
+            return response()->json([
+                'status' => true,
+                'message' => 'Request submitted successfully.'
+            ]);
         } catch (\Exception $e) {
             \Log::error('JoinUs Error: ' . $e->getMessage());
 
@@ -97,25 +99,25 @@ class JoinUsController extends Controller
     }
 
     protected function sendJoinUsEmailsAfterResponse($join)
-{
-    // Run AFTER response is sent to client
-    app()->terminating(function () use ($join) {
-        try {
-            $adminSetting = AdminSetting::first();
-            $adminEmails = explode(',', $adminSetting->notification_emails);
+    {
+        // Run AFTER response is sent to client
+        app()->terminating(function () use ($join) {
+            try {
+                $adminSetting = AdminSetting::first();
+                $adminEmails = explode(',', $adminSetting->notification_emails);
 
-            foreach ($adminEmails as $email) {
-                $email = trim($email);
-                if (!empty($email)) {
-                    Notification::route('mail', $email)
-                        ->notify(new JoinUsNotification($join));
+                foreach ($adminEmails as $email) {
+                    $email = trim($email);
+                    if (!empty($email)) {
+                        Notification::route('mail', $email)
+                            ->notify(new JoinUsNotification($join));
+                    }
                 }
+            } catch (\Exception $e) {
+                Log::error('Email sending failed (JoinUs): ' . $e->getMessage());
             }
-        } catch (\Exception $e) {
-            Log::error('Email sending failed (JoinUs): ' . $e->getMessage());
-        }
-    });
-}
+        });
+    }
 
 
 

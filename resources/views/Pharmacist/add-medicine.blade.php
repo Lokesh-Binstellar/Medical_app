@@ -176,11 +176,12 @@
                 @if ($medicines->count() > 0)
                     <div class="accordion" id="medicineAccordion">
                         @foreach ($medicines as $entry)
-                            @php
+                        @php
                                 $accordionId = $entry->id;
                                 $pharmacyId = $entry->phrmacy_id;
                                 $medData = json_decode($entry->medicine, true);
                                 $customer = $entry->customer;
+                                
                             @endphp
 
                             <div class="accordion-item border-0 shadow-sm mb-3">

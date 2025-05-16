@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Events\MyEvent;
-use App\Events\Pharmacymedicine;
 use App\Models\Carts;
 use App\Models\Customers;
 use App\Models\Medicine;
@@ -35,6 +34,8 @@ class MedicineSearchController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
+        // dd($request->all());
+
         $user = Auth::user();
         // Validate basic structure (you can add more rules as needed)
         // dd($data['customer'][0]['customer_id']);
@@ -46,6 +47,7 @@ class MedicineSearchController extends Controller
         // 'customer_id' => $customerId,
         $medicine = new Phrmacymedicine(); // your model
         $medicine->medicine = json_encode($data['medicine']);
+
         $medicine->total_amount = $data['total_amount'];
         $medicine->mrp_amount = $data['mrp_amount'];
         $medicine->commission_amount = $data['commission_amount'];
@@ -55,13 +57,13 @@ class MedicineSearchController extends Controller
 
         return redirect()->back()->with('success', 'Medicine added successfully!');
     }
-    
+
     public function search(Request $request)
     {
         $term = $request->get('q');
 
         $medicines = DB::table('medicines')
-            ->select('id', 'product_name', 'salt_composition')
+            ->select('product_id', 'product_name', 'salt_composition')  // select product_id instead of id
             ->when($term, function ($query, $term) {
                 return $query->where('product_name', 'like', "%$term%")
                     ->orWhere('salt_composition', 'like', "%$term%");
@@ -69,26 +71,27 @@ class MedicineSearchController extends Controller
             ->get()
             ->map(function ($item) {
                 return [
-                    'id' => $item->id,
+                    'id' => $item->product_id,  // use product_id here
                     'text' => $item->product_name . ' + ' . $item->salt_composition,
                 ];
             });
 
         $otc = DB::table('otcmedicines')
-            ->select('id', 'name')
+            ->select('otc_id', 'name')  // select otc_id instead of id
             ->when($term, function ($query, $term) {
                 return $query->where('name', 'like', "%$term%");
             })
             ->get()
             ->map(function ($item) {
                 return [
-                    'id' => 'otc-' . $item->id,
+                    'id' => 'otc-' . $item->otc_id,  // use otc_id here
                     'text' => $item->name,
                 ];
             });
-        // return response()->json($medicines);
+
         return response()->json($medicines->merge($otc));
     }
+
 
     public function customerSelect(Request $request)
     {
@@ -168,47 +171,4 @@ class MedicineSearchController extends Controller
 
         return response()->json(['status' => 'success', 'data' => $result]);
     }
-
-   public function customerGetMedicine()
-{
-    try {
-        $getMedicine = Phrmacymedicine::all();
-
-        if ($getMedicine->isEmpty()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'No medicine data found.',
-                'data' => []
-            ], 404);
-        }
-        $formatted = $getMedicine->map(function ($not) {
-            try {
-                // Only decode if it's a JSON string
-                if (is_string($not->medicine)) {
-                    return json_decode($not->medicine, true);
-                }
-
-                return $not->medicine;
-            } catch (\Exception $e) {
-                return ['error' => 'Invalid JSON format'];
-            }
-        });
-        return response()->json([
-            'status' => true,
-            'pharmacy_id' => $getMedicine->first()->phrmacy_id ?? null,
-            'medicine' => $formatted
-        ], 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Something went wrong.',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
-
-
-
-
 }
