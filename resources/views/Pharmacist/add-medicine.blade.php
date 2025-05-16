@@ -58,7 +58,8 @@
                     @csrf
                     <div class="d-flex mb-4 selectCustomer align-items-center gap-3">
                         <label class="font-bold">Please Select Customer :</label>
-                        <select class="form-control customer-search " name="customer[0][customer_id]" id="customer-search">
+                        <select class="form-control customer-search customerDropdown" name="customer[0][customer_id]"
+                            id="customer-search">
                             <option value="">Search customer...</option>
                         </select>
                     </div>
@@ -96,12 +97,12 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="medicine-body">
+                            <tbody id="medicine-body" class="cart-medicine-body">
                                 <tr class="medicine-row">
                                     <td>
-                                        <select class="form-select medicine_search"
+                                        <select class="form-select medicine_search medicineDropdown"
                                             name="medicine[0][medicine_id]"></select>
-                                        <input type="hidden" class="medicine_name" name="medicine[0][medicine_name]">
+                                        <input type="hidden" class="medicine_name " name="medicine[0][medicine_name]">
                                     </td>
                                     <td>
                                         <input type="number" name="medicine[0][mrp]" class="form-control mrp"
@@ -154,7 +155,7 @@
                             </div>
                             <div>
                                 <input type="hidden" id="commission_amount" name="commission_amount">
-                                <strong>Total Commission (5% on MRP):</strong>
+                                <strong>Total Commission :</strong>
                                 <span class="text-danger fw-bold commission-amount">0.00</span>
                             </div>
                         </div>
@@ -472,6 +473,7 @@
                             '<div class="text-danger small substitute-error mt-1">Please select if it is a substitute.</div>'
                         );
                     }
+
                 });
 
 
@@ -589,6 +591,10 @@
                 });
             });
         });
+
+
+
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
 @endsection

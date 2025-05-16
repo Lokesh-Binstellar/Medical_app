@@ -81,9 +81,7 @@ Route::group(['middleware' => ['auth']], function () {
         });
         Route::group(['middleware' => 'permission:Users,delete'], function () {
             Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('user.destroy');
-
         });
-
     });
 
 
@@ -93,7 +91,6 @@ Route::group(['middleware' => ['auth']], function () {
         Route::group(['middleware' => 'permission:Pharmacies,create'], function () {
             Route::get('/create', [PharmaciesController::class, 'create'])->name('pharmacist.create');
             Route::post('/store', [PharmaciesController::class, 'store'])->name('pharmacist.store');
-
         });
         Route::group(['middleware' => 'permission:Pharmacies,update'], function () {
             Route::get('{id}/edit', [PharmaciesController::class, 'edit'])->name('pharmacist.edit');
@@ -124,9 +121,7 @@ Route::group(['middleware' => ['auth']], function () {
         });
         Route::group(['middleware' => 'permission:Laboratories,read'], function () {
             Route::get('/{id}', [LaboratoriesController::class, 'show'])->name('laboratorie.show');
-
         });
-
     });
 
     //Medicine
@@ -153,14 +148,14 @@ Route::group(['middleware' => ['auth']], function () {
         });
     });
 
-//Otc Medicine
+    //Otc Medicine
     Route::prefix('otcmedicine')->group(function () {
         Route::get('', [OtcController::class, 'index'])->name('otcmedicine.index');
         Route::post('import', [OtcController::class, 'import'])->name('otcmedicine.import');
         Route::get('/{id}', [OtcController::class, 'show'])->name('otcmedicine.show');
     });
 
-//Popular Brand
+    //Popular Brand
     Route::prefix('popular')->group(function () {
         Route::get('/', [PopularBrandController::class, 'index'])->name('popular.index');
         Route::group(['middleware' => 'permission:PopularBrand,create'], function () {
@@ -173,8 +168,6 @@ Route::group(['middleware' => ['auth']], function () {
         Route::group(['middleware' => 'permission:PopularBrand,delete'], function () {
             Route::delete('/{id}', [PopularBrandController::class, 'destroy'])->name('popular.destroy');
         });
-
-
     });
 
     // Lab Test
@@ -184,7 +177,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/{id}', [LabtestController::class, 'show'])->name('labtest.show');
     });
 
-//Package Category
+    //Package Category
     Route::prefix('packageCategory')->group(function () {
         Route::get('', [packageCategoryController::class, 'index'])->name('packageCategory.index');
         Route::get('/create', [packageCategoryController::class, 'create'])->name('packageCategory.create');
@@ -222,10 +215,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/medicines/store', [MedicineSearchController::class, 'store'])->name('medicines.store');
     Route::get('/customers/select', [MedicineSearchController::class, 'customerSelect'])->name('customers.select');
 
-// Route::get('/fetch-customer-cart', [MedicineSearchController::class, 'fetchCustomerCart']);
-Route::get('/fetch-cart-by-customer', [MedicineSearchController::class, 'fetchCartByCustomer']);
-
-
+    Route::get('/fetch-cart-by-customer', [MedicineSearchController::class, 'fetchCartByCustomer']);
 
 });
 
@@ -246,8 +236,7 @@ Route::prefix('popular-lab-tests')->group(function () {
     Route::delete('/{id}', [PopularLabTestController::class, 'destroy'])->name('popular_lab_test.destroy');
 });
 
-
- //fetch-customer-cart
+//fetch-customer-cart
 Route::get('/fetch-customer-cart', [AddMedicineController::class, 'fetchCustomerCart']);
 Route::get('/fetch-prescription-files', [AddMedicineController::class, 'fetchPrescriptionFiles']);
 
@@ -296,7 +285,6 @@ Route::prefix('medicinebanners')->group(function () {
     Route::group(['middleware' => 'permission:medicinebanners,read'], function () {
         Route::get('/{id}', [MedicineBannerController::class, 'show'])->name('medicinebanner.show');
     });
-
 });
 
 //Joins uS
@@ -307,13 +295,10 @@ Route::prefix('join-us')->group(function () {
     Route::get('/settings', [JoinUsController::class, 'edit'])->name('joinus');
     // Route::post('/settings', [JoinUsController::class, 'update'])->name('joinus.update');
     Route::post('/settings/update-emails', [JoinUsController::class, 'updateEmails'])->name('joinus.updateEmails');
-
-
 });
 
 //notification
 Route::prefix('notifications')->group(function () {
     Route::get('/', [RequestQuoteController::class, 'index'])->name('notification.index');
     Route::post('/read/{id}', [RequestQuoteController::class, 'markAsRead'])->name('notifications.read');
-
 });

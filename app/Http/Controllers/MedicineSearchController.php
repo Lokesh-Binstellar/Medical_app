@@ -29,6 +29,33 @@ class MedicineSearchController extends Controller
         return view('Pharmacist.add-medicine', compact('medicines'));
     }
 
+
+
+
+    public function store(Request $request)
+    {
+        $data = $request->all();
+        $user = Auth::user();
+        // Validate basic structure (you can add more rules as needed)
+        // dd($data['customer'][0]['customer_id']);
+
+        $pharmacy = Pharmacies::where('user_id', $user->id)->first();
+
+
+        // Store in database
+        // 'customer_id' => $customerId,
+        $medicine = new Phrmacymedicine(); // your model
+        $medicine->medicine = json_encode($data['medicine']);
+        $medicine->total_amount = $data['total_amount'];
+        $medicine->mrp_amount = $data['mrp_amount'];
+        $medicine->commission_amount = $data['commission_amount'];
+        $medicine->phrmacy_id = $pharmacy->id;
+        $medicine->customer_id = $data['customer'][0]['customer_id'];
+        $medicine->save();
+
+        return redirect()->back()->with('success', 'Medicine added successfully!');
+    }
+    
     public function search(Request $request)
     {
         $term = $request->get('q');
@@ -62,32 +89,6 @@ class MedicineSearchController extends Controller
         // return response()->json($medicines);
         return response()->json($medicines->merge($otc));
     }
-
-
-    public function store(Request $request)
-    {
-        $data = $request->all();
-        $user = Auth::user();
-        // Validate basic structure (you can add more rules as needed)
-        // dd($data['customer'][0]['customer_id']);
-
-        $pharmacy = Pharmacies::where('user_id', $user->id)->first();
-
-
-        // Store in database
-        // 'customer_id' => $customerId,
-        $medicine = new Phrmacymedicine(); // your model
-        $medicine->medicine = json_encode($data['medicine']);
-        $medicine->total_amount = $data['total_amount'];
-        $medicine->mrp_amount = $data['mrp_amount'];
-        $medicine->commission_amount = $data['commission_amount'];
-        $medicine->phrmacy_id = $pharmacy->id;
-        $medicine->customer_id = $data['customer'][0]['customer_id'];
-        $medicine->save();
-
-        return redirect()->back()->with('success', 'Medicine added successfully!');
-    }
-
 
     public function customerSelect(Request $request)
     {
