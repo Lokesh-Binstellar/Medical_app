@@ -87,7 +87,7 @@
 
 
                     <div class="card-action">
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary">Update</button>
                         <button type="button" class="btn btn-primary" onclick="window.location='{{ route('user.index') }}'">Cancel</button>
 
                     </div>

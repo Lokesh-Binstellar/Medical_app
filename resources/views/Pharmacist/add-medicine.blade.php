@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('styles')
+
     {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
 
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
@@ -42,21 +43,39 @@
         body>span.select2-container.select2-container--default.select2-container--open {
             width: auto !important;
         }
+
+        .accordion-item:nth-child(odd) .accordion-button {
+            background-color: #ffffff;
+            /* border: 1px solid #e8ebee; */
+            /* white */
+        }
+
+        .accordion-item:nth-child(even) .accordion-button {
+            background-color: #e8ebee;
+            /* border: 1px solid #ffffff; */
+            border-radius: 0px !important;
+            /* light gray */
+        }
+/* .card{
+    border: 1px solid #033a62;
+} */
     </style>
 @endsection
 @section('content')
 
+
     <div class="container mt-4">
-        <div class="card shadow-sm rounded-3">
+        <div class="card shadow-xl rounded-3">
             <!-- Blue Header Title -->
             <div class="card-header  text-white fw-bold fs-5">
                 Add Medicine
             </div>
 
             <div class="card-body">
-                <form method="POST" action="{{ route('medicines.store') }}" id="medicineCreateForm">
+                <form method="POST" action="{{ route('medicines.store') }}" id="medicineCreateForm"
+                    class="d-flex flex-column gap-4">
                     @csrf
-                    <div class="d-flex mb-4 selectCustomer align-items-center gap-3">
+                    <div class="d-flex selectCustomer align-items-center gap-5">
                         <label class="font-bold">Please Select Customer :</label>
                         <select class="form-control customer-search customerDropdown" name="customer[0][customer_id]"
                             id="customer-search">
@@ -64,76 +83,81 @@
                         </select>
                     </div>
 
-
-                    <div id="cart-details" style="display:none;" class="m-3">
-                        <h5 class="text-black">Customer Cart Details</h5>
-                        <table class="table table-bordered ">
-                            <thead>
-                                <tr class="table-dark">
-                                    <th>Product ID</th>
-                                    <th>Product Name</th>
-                                    <th>Packaging Detail</th>
-                                    <th>Quantity</th>
-                                    <th>Is Substitute</th>
-                                    {{-- <th>Action</th> --}}
-                                </tr>
-                            </thead>
-                            <tbody id="cart-product-body">
-                            </tbody>
-                        </table>
+                    <div class="card " style="display:none;" id="cart-details">
+                        <h5 class="card-header ">Customer Cart Details</h5>
+                        <div class="card-body">
+                            <div class="table-responsive text-nowrap">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Product ID</th>
+                                            <th>Product Name</th>
+                                            <th>Packaging Detail</th>
+                                            <th>Quantity</th>
+                                            <th>Is Substitute</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cart-product-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
 
-
-                    <div class="table-responsive mb-3">
-                        <table class="display table table-striped table-hover data-table" id="medicine-table">
-                            <thead>
-                                <tr>
-                                    <th>Search Medicine</th>
-                                    <th>MRP</th>
-                                    <th>Final Amount</th>
-                                    <th>Discount %</th>
-                                    <th>Available</th>
-                                    <th>Substitute</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="medicine-body" class="cart-medicine-body">
-                                <tr class="medicine-row">
-                                    <td>
-                                        <select class="form-select medicine_search medicineDropdown"
-                                            name="medicine[0][medicine_id]"></select>
-                                        <input type="hidden" class="medicine_name " name="medicine[0][medicine_name]">
-                                    </td>
-                                    <td>
-                                        <input type="number" name="medicine[0][mrp]" class="form-control mrp"
-                                            step="0.01" placeholder="MRP">
-                                    </td>
-                                    <td>
-                                        <input type="number" name="medicine[0][discount]" class="form-control discount"
-                                            step="0.01" placeholder="Final Amount">
-                                    </td>
-                                    <td>
-                                        <input type="number" name="medicine[0][discount_percent]"
-                                            class="form-control discount_percent" step="0.01" placeholder="%">
-                                    </td>
-                                    <td>
-                                        <select name="medicine[0][available]" class="form-select">
-                                            <option value="yes">Yes</option>
-                                            <option value="no">No</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select name="medicine[0][is_substitute]" class="form-select">
-                                            <option value="yes">Yes</option>
-                                            <option value="no">No</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-outline-danger remove-row">−</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="card">
+                        <h5 class="card-header bg-white text-black">Add Medicine</h5>
+                        <div class="table-responsive text-nowrap">
+                            <table class="table display table-striped " id="medicine-table">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Search Medicine</th>
+                                        <th>MRP</th>
+                                        <th>Final Amount</th>
+                                        <th>Discount %</th>
+                                        <th>Available</th>
+                                        <th>Substitute</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="medicine-body" class="cart-medicine-body">
+                                    <tr class="medicine-row">
+                                        <td>
+                                            <select class="form-select medicine_search medicineDropdown"
+                                                name="medicine[0][medicine_id]"></select>
+                                            <input type="hidden" class="medicine_name " name="medicine[0][medicine_name]">
+                                        </td>
+                                        <td>
+                                            <input type="number" name="medicine[0][mrp]" class="form-control mrp"
+                                                step="0.01" placeholder="MRP">
+                                        </td>
+                                        <td>
+                                            <input type="number" name="medicine[0][discount]" class="form-control discount"
+                                                step="0.01" placeholder="Final Amount">
+                                        </td>
+                                        <td>
+                                            <input type="number" name="medicine[0][discount_percent]"
+                                                class="form-control discount_percent" step="0.01" placeholder="%">
+                                        </td>
+                                        <td>
+                                            <select name="medicine[0][available]" class="form-select">
+                                                <option value="yes">Yes</option>
+                                                <option value="no">No</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select name="medicine[0][is_substitute]" class="form-select">
+                                                <option value="yes">Yes</option>
+                                                <option value="no">No</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button type="button"
+                                                class="btn btn-sm btn-outline-danger remove-row">−</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <div class="d-flex justify-content-between flex-wrap gap-3">
@@ -160,6 +184,7 @@
                             </div>
                         </div>
                     </div>
+
                 </form>
             </div>
         </div>
@@ -167,24 +192,24 @@
 
 
     <div class="container ">
-        <div class="card shadow-sm my-5">
+        <div class="card shadow-xl my-5">
             <div class="card-header  text-white">
                 <h5 class="mb-0">Medicine Data</h5>
             </div>
 
-            <div class="card-body">
+            <div class="card-body px-0">
                 @if ($medicines->count() > 0)
                     <div class="accordion" id="medicineAccordion">
                         @foreach ($medicines as $entry)
-                        @php
+                            @php
                                 $accordionId = $entry->id;
                                 $pharmacyId = $entry->phrmacy_id;
                                 $medData = json_decode($entry->medicine, true);
                                 $customer = $entry->customer;
-                                
+
                             @endphp
 
-                            <div class="accordion-item border-0 shadow-sm mb-3">
+                            <div class="accordion-item border-0 shadow-sm mb-3 ">
                                 <h2 class="accordion-header" id="heading{{ $accordionId }}">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#collapse{{ $accordionId }}" aria-expanded="false"
@@ -201,7 +226,7 @@
                                     <div class="accordion-body">
                                         <div class="table-responsive">
                                             <table class="table table-bordered table-striped">
-                                                <thead class="table-light">
+                                                <thead >
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Medicine Name</th>
@@ -592,10 +617,7 @@
                 });
             });
         });
-
-
-
-
     </script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+    
 @endsection

@@ -25,57 +25,57 @@ class RoleController extends Controller
             $data = Role::latest()->get();
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->addColumn('action', function($row){
-                    $btn = '<a href="'.route('roles.edit', $row->id).'" class="btn btn-sm btn-warning">Edit</a>';
-                    $btn .= ' <form action="'.route('roles.destroy', $row->id).'" method="POST" style="display:inline-block;">
-                                '.csrf_field().'
-                                '.method_field("DELETE").'
+                ->addColumn('action', function ($row) {
+                    $btn = '<a href="' . route('roles.edit', $row->id) . '" class="btn btn-sm btn-warning">Edit</a>';
+                    $btn .= ' <form action="' . route('roles.destroy', $row->id) . '" method="POST" style="display:inline-block;">
+                                ' . csrf_field() . '
+                                ' . method_field("DELETE") . '
                                 <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm(\'Are you sure?\')">Delete</button>
                               </form>';
                     return $btn;
                 })
                 ->addColumn('action', function ($row) {
                     $html = "";
-                
+
                     $updateCheck = Permission::checkCRUDPermissionToUser("Items", "update");
                     $deleteCheck = Permission::checkCRUDPermissionToUser("Items", "delete");
                     $isSuperAdmin = Permission::isSuperAdmin();
-                
+
                     if (!$isSuperAdmin && !$updateCheck && !$deleteCheck) {
                         return '';
                     }
-                
+
                     if ($updateCheck) {
                         $html .= '<li><a class="dropdown-item dropdown-trigger-17500btn waves-effect" href="' . route('roles.edit', $row->id) . '">Edit</a></li>';
                     }
-                
+
                     if ($isSuperAdmin || $deleteCheck) {
                         $html .= '<li>
-                            <form action="' . route('roles.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure you want to delete this record?\');" style="margin:0;">
-                                ' . csrf_field() . '
-                                ' . method_field('DELETE') . '
-                                <button type="submit" class="dropdown-item dropdown-trigger-17500btn waves-effect" >
-                                    Delete
-                                </button>
-                            </form>
-                        </li>';
+            <button type="button"
+                class="dropdown-item btn-delete-role"
+                data-id="' . $row->id . '"
+                data-url="' . route('roles.destroy', $row->id) . '">
+                Delete
+            </button>
+        </li>';
                     }
-                
+
                     return '
-                        <div class="dropdown">
-                            <button type="button" class="btn btn-primary px-3 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                Action
-                            </button>
-                            <ul class="dropdown-menu">
-                                ' . $html . '
-                            </ul>
-                        </div>';
+        <div class="dropdown">
+            <button type="button" class="btn btn-primary px-3 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                Action
+            </button>
+            <ul class="dropdown-menu">
+                ' . $html . '
+            </ul>
+        </div>';
                 })
-                
+
+
                 ->rawColumns(['action'])
                 ->make(true);
         }
-    
+
         return view('role.index');
     }
 
@@ -86,7 +86,7 @@ class RoleController extends Controller
     {
         $tables = DB::select('SHOW TABLES');
         $fillArr = [];
-            // dd($table);    
+        // dd($table);    
         return view('role.create');
     }
 
@@ -97,17 +97,18 @@ class RoleController extends Controller
     {
         $params = $request->all();
 
-        $validation = FacadesValidator::make($params,[
+        $validation = FacadesValidator::make($params, [
             'name' => 'required|string|unique:roles,name',
-            
+
         ]);
-        
+
         $params['guard_name'] = 'web';
         // dd($params);
         $role = Role::create($params);
 
-        return redirect()->route('roles.edit',$role->id)->with('success', 'Role created successfully!');
+        return redirect()->route('roles.edit', $role->id)->with('success', 'Role created successfully!');
     }
+    
 
     /**
      * Display the specified resource.
@@ -134,7 +135,7 @@ class RoleController extends Controller
                 if ($host == 'localhost') {
                     $tablesArr[$table->Tables_in_mineology_server] = $table->Tables_in_mineology_server;
                 } else {
-                   
+
                     $tablesArr[$table->{'Tables_in_' . env('DB_DATABASE')}] = $table->{'Tables_in_' . env('DB_DATABASE')};
                 }
             }
@@ -245,13 +246,29 @@ class RoleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id, Request $request)
     {
-        $role=Role::findOrFail($id);
-        // dd( $pharmacies);
-        $role->delete();
+        try {
+            $role = Role::findOrFail($id);
+            $role->delete();
 
-       return redirect()->route('roles.index')
-                        ->with('success','Role deleted successfully');
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Role deleted successfully'
+                ]);
+            }
+
+            return redirect()->route('roles.index')->with('success', 'Role deleted successfully');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Failed to delete role. Error: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->route('roles.index')->with('error', 'Failed to delete role');
+        }
     }
 }

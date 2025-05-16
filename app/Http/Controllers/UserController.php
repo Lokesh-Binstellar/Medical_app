@@ -25,21 +25,19 @@ class UserController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     return '
-                <div class="dropdown">
-                  <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
-  <ul class="dropdown-menu">
-                    <li>
-                      <a class="dropdown-item" href="' . route('user.edit', $row->id) . '">Edit</a>
-                    </li>
-                    <li>
-                      <form action="' . route('user.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-                        ' . csrf_field() . method_field('DELETE') . '
-                        <button class="dropdown-item " type="submit">Delete</button>
-                      </form>
-                    </li>
-                  </ul>
-                </div>';
+    <div class="dropdown">
+        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+        <ul class="dropdown-menu">
+            <li>
+                <a class="dropdown-item" href="' . route('user.edit', $row->id) . '">Edit</a>
+            </li>
+            <li>
+                <button class="dropdown-item btn-delete-user" data-id="' . $row->id . '" data-url="' . route('user.destroy', $row->id) . '">Delete</button>
+            </li>
+        </ul>
+    </div>';
                 })
+
                 ->rawColumns(['action'])
                 ->make(true);
         }
@@ -146,13 +144,29 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id, Request $request)
     {
-        $user = User::find($id);
-        // dd( $user->delete());
-        $user->delete();
+        try {
+            $user = User::findOrFail($id);
+            $user->delete();
 
-        return redirect()->route('user.index')
-            ->with('success', 'user deleted successfully');
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'User deleted successfully'
+                ]);
+            }
+
+            return redirect()->route('user.index')->with('success', 'User deleted successfully');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Failed to delete user. Error: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->route('user.index')->with('error', 'Failed to delete user');
+        }
     }
 }

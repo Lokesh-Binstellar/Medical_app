@@ -26,30 +26,23 @@ class PharmaciesController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    
+    return '
+    <div class="dropdown">
+        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown" aria-expanded="false">
+            Action
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="' . route('pharmacist.show', $row->id) . '" class="dropdown-item">View</a></li>
+            <li><a href="' . route('pharmacist.edit', $row->id) . '" class="dropdown-item">Edit</a></li>
+            <li>
+                <button class="dropdown-item btn-delete-pharmacist" data-id="' . $row->id . '" data-url="' . route('pharmacist.destroy', $row->id) . '">
+                    Delete
+                </button>
+            </li>
+        </ul>
+    </div>';
+})
 
-                return '
-                <div class="dropdown">
-                  <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
-  <ul class="dropdown-menu">
-                    <li>
-                     <a href="' . route('pharmacist.show', $row->id) . '"class="dropdown-item" >View
-    </a>
-                    </li>
-
-                    <li>
-                    <a href="' . route('pharmacist.edit', $row->id) . '" class="dropdown-item" >Edit</a>
-                    </li>
-                    
-                    <li>
-                      <form action="' . route('pharmacist.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-                        ' . csrf_field() . method_field('DELETE') . '
-                        <button class="dropdown-item " type="submit">Delete</button>
-                      </form>
-                    </li>
-                  </ul>
-                </div>';
-            })
                 ->rawColumns(['action'])
                 ->make(true);
         }
@@ -244,13 +237,30 @@ class PharmaciesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
-    {
-        $pharmacies = Pharmacies::findOrFail($id);
-        // dd( $pharmacies);
-        $pharmacies->delete();
+   public function destroy($id, Request $request)
+{
+    try {
+        $pharmacist = Pharmacies::findOrFail($id);
+        $pharmacist->delete();
 
-        return redirect()->route('pharmacist.index')
-            ->with('success', 'Pharmacist deleted successfully');
+        if ($request->ajax()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Pharmacist deleted successfully'
+            ]);
+        }
+
+        return redirect()->route('pharmacist.index')->with('success', 'Pharmacist deleted successfully');
+    } catch (\Exception $e) {
+        if ($request->ajax()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to delete pharmacist. Error: ' . $e->getMessage()
+            ], 500);
+        }
+
+        return redirect()->route('pharmacist.index')->with('error', 'Failed to delete pharmacist');
     }
+}
+
 }

@@ -23,28 +23,27 @@ class LaboratoriesController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    return '
-                        <div class="dropdown">
-                          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
-          <ul class="dropdown-menu">
-                            <li>
-                             <a href="' . route('laboratorie.show', $row->id) . '"class="dropdown-item" >View
-            </a>
-                            </li>
-        
-                            <li>
-                            <a href="' . route('laboratorie.edit', $row->id) . '" class="dropdown-item" >Edit</a>
-                            </li>
-                            
-                            <li>
-                              <form action="' . route('laboratorie.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-                                ' . csrf_field() . method_field('DELETE') . '
-                                <button class="dropdown-item " type="submit">Delete</button>
-                              </form>
-                            </li>
-                          </ul>
-                        </div>';
-                })
+    return '
+    <div class="dropdown">
+        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown" aria-expanded="false">
+            Action
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="' . route('laboratorie.show', $row->id) . '" class="dropdown-item">View</a></li>
+            <li><a href="' . route('laboratorie.edit', $row->id) . '" class="dropdown-item">Edit</a></li>
+            <li>
+                <button 
+                    class="dropdown-item btn-delete-laboratory" 
+                    data-id="' . $row->id . '" 
+                    data-url="' . route('laboratorie.destroy', $row->id) . '"
+                >
+                    Delete
+                </button>
+            </li>
+        </ul>
+    </div>';
+})
+
                 ->rawColumns(['action'])
                 ->make(true);
         }
@@ -325,13 +324,30 @@ class LaboratoriesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
-    {
-        $laboratorie = Laboratories::findOrFail($id);
-        // dd( $laboratorie);
-        $laboratorie->delete();
+   public function destroy($id, Request $request)
+{
+    try {
+        $laboratory = Laboratories::findOrFail($id);
+        $laboratory->delete();
 
-        return redirect()->route('laboratorie.index')
-            ->with('success', 'laboratorie deleted successfully');
+        if ($request->ajax()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Laboratory deleted successfully'
+            ]);
+        }
+
+        return redirect()->route('laboratorie.index')->with('success', 'Laboratory deleted successfully');
+    } catch (\Exception $e) {
+        if ($request->ajax()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to delete laboratory: ' . $e->getMessage()
+            ], 500);
+        }
+
+        return redirect()->route('laboratorie.index')->with('error', 'Failed to delete laboratory');
     }
+}
+
 }

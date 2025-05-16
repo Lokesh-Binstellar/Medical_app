@@ -21,18 +21,18 @@ class PopularLabTestController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    return '
+    return '
         <div class="dropdown">
             <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
             <ul class="dropdown-menu">
                 <li>
-                    <a href="javascript:void(0);" onclick="deleteTest(' . $row->id . ')" class="dropdown-item">
-                        Delete
-                    </a>
+                    <a href="javascript:void(0);" onclick="deleteTest(' . $row->id . ')" class="dropdown-item">Delete</a>
                 </li>
             </ul>
         </div>
-    '; })
+    ';
+})
+
                 ->rawColumns(['action'])
                 ->make(true);
         }
@@ -60,16 +60,24 @@ class PopularLabTestController extends Controller
     }
 
 
-    public function destroy(string $id)
-    {
-
+   public function destroy(string $id, Request $request)
+{
+    try {
         $labtest = PopularLabTest::findOrFail($id);
-        // (Optional) If there are associated files like reports or logos to delete, handle them here.
-
         $labtest->delete();
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
         return redirect()->route('popular_lab_test.index')->with('success', 'Popular Lab Test deleted successfully.');
+    } catch (\Exception $e) {
+        if ($request->ajax()) {
+            return response()->json(['success' => false, 'message' => 'Failed to delete.'], 500);
+        }
+        return redirect()->route('popular_lab_test.index')->with('error', 'Failed to delete popular lab test.');
     }
+}
 
 
 
