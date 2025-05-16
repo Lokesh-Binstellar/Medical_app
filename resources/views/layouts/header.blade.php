@@ -57,6 +57,10 @@
             </div>
             <!-- /Welcome Text -->
         @endif
+
+        </li>
+        <!--/ Notification -->
+
         <ul class="navbar-nav flex-row align-items-center ms-auto">
 
 
@@ -163,7 +167,8 @@
                     </li>
 
                     <li class="dropdown-menu-footer border-top p-2">
-                        <a href="javascript:void(0);" class="btn btn-primary d-flex justify-content-center">
+                        <a href="{{ route('notification.index') }}"
+                            class="btn btn-primary d-flex justify-content-center">
                             View all notifications
                         </a>
                     </li>
@@ -171,8 +176,6 @@
             </li>
 
         </ul>
-        </li>
-        <!--/ Notification -->
         <li class="nav-item navbar-dropdown dropdown-user dropdown profile">
 
             <a class="nav-link dropdown-toggle hide-arrow pr" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -249,33 +252,53 @@
         <i class="mdi mdi-close search-toggler cursor-pointer"></i>
     </div>
 </nav>
+<script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
 <script>
-      const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-if (!csrfTokenMeta) {
-    console.error("CSRF token meta tag not found!");
-} else {
-    const csrfToken = csrfTokenMeta.getAttribute('content');
+    const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfTokenMeta) {
+        console.error("CSRF token meta tag not found!");
+    } else {
+        const csrfToken = csrfTokenMeta.getAttribute('content');
 
-    document.querySelectorAll('.mark-read-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            const id = this.dataset.id;
+        document.querySelectorAll('.mark-read-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.dataset.id;
 
-            fetch(`/notifications/read/${id}`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    this.closest('.notification-item').remove();
-                   
-                }
+                fetch(`/notifications/read/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            this.closest('.notification-item').remove();
+
+                        }
+                    });
             });
         });
-    });
-}
-
+    }
 </script>
+{{-- <script>
+    // Enable Pusher logging - disable in production!
+    Pusher.logToConsole = true;
+
+   
+
+        var pusher = new Pusher('7ba4a23b60749764133c', {
+            cluster: 'ap1'
+        });
+
+        var channel = pusher.subscribe('my-channel');
+
+        channel.bind('my-event', function() {
+            console.log('Pusher callback called');
+
+            // Optional: prevent multiple reloads in a short time
+           location.reload(true);
+        });
+    
+</script> --}}

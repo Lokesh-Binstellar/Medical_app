@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthTokenController;
 use App\Http\Controllers\CustomerAddressController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\MedicineSearchController;
 use App\Http\Controllers\OtcController;
 use App\Http\Controllers\PharmaciesController;
 use App\Http\Controllers\PopularBrandController;
@@ -66,17 +67,10 @@ Route::middleware('check.api.key')->group(function () {
 
     Route::post('/join-us', [JoinUsController::class, 'store']);
 
+    Route::get('/pharamcyAddMedicine',[MedicineSearchController::class,'customerGetMedicine']);
+
 });
 
 
-Route::post('/submit-quote', function (Request $request) {
-    
- 
-    // Trigger the event
-    // event(new MyEvent('lokesh'));
 
-    // dd('ok');
- 
-    return response()->json(['success' => true, 'message' => 'Event triggered']);
-});
  

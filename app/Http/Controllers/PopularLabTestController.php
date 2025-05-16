@@ -14,29 +14,27 @@ class PopularLabTestController extends Controller
     // Show page with dropdown
     public function index(Request $request)
     {
+
+        // dd($request);
         if ($request->ajax()) {
             $data = PopularLabTest::latest()->get();
-            return DataTables :: of($data)
+            return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-       
                     return '
-                    <div class="dropdown">
-                      <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
-                      <ul class="dropdown-menu">
-                       
-                        
-                        <li>
-                          <form action="' . route('popular_lab_test.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-                            ' . csrf_field() . method_field('DELETE') . '
-                            <button class="dropdown-item" type="submit">Delete</button>
-                          </form>
-                        </li>
-                      </ul>
-                    </div>';
-                })
+        <div class="dropdown">
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="javascript:void(0);" onclick="deleteTest(' . $row->id . ')" class="dropdown-item">
+                        Delete
+                    </a>
+                </li>
+            </ul>
+        </div>
+    '; })
                 ->rawColumns(['action'])
-                ->make(true);   
+                ->make(true);
         }
 
         $labTests = LabTest::all(['id', 'name', 'contains']);
@@ -48,28 +46,28 @@ class PopularLabTestController extends Controller
         $labTest = LabTest::findOrFail($request->name);
 
         $exists = PopularLabTest::where('name', $labTest->name)->exists();
-    
+
         if ($exists) {
             return redirect()->back()->with('error', 'This lab test is already in the popular list.');
         }
-    
+
         PopularLabTest::create([
             'name' => $labTest->name,
             'contains' => $labTest->contains,
         ]);
-    
+
         return redirect()->back()->with('success', 'Popular Lab Test added!');
     }
-    
+
 
     public function destroy(string $id)
     {
+
         $labtest = PopularLabTest::findOrFail($id);
-    
         // (Optional) If there are associated files like reports or logos to delete, handle them here.
-    
+
         $labtest->delete();
-    
+
         return redirect()->route('popular_lab_test.index')->with('success', 'Popular Lab Test deleted successfully.');
     }
 
@@ -92,5 +90,5 @@ class PopularLabTestController extends Controller
             ], 500);
         }
     }
-    
+
 }

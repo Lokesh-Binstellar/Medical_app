@@ -89,7 +89,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     //Pharmacist
     Route::prefix('pharmacy')->group(function () {
-        Route::get('/', [PharmaciesController::class, 'index'])->name('pharmacist.index');
+        Route::get('/', [PharmaciesController::class,'index'])->name('pharmacist.index');
         Route::group(['middleware' => 'permission:Pharmacies,create'], function () {
             Route::get('/create', [PharmaciesController::class, 'create'])->name('pharmacist.create');
             Route::post('/store', [PharmaciesController::class, 'store'])->name('pharmacist.store');
@@ -241,10 +241,11 @@ Route::post('/prescriptions/update-status/{id}', [FileUploadController::class, '
 //popular Lab test
 
 Route::prefix('popular-lab-tests')->group(function () {
-Route::get(' ', [PopularLabTestController::class, 'index'])->name('popular_lab_test.index');
-Route::post('/store', [PopularLabTestController::class, 'store'])->name('popular_lab_test.store');
-Route::delete('/{id}', [PopularLabTestController::class, 'destroy'])->name('popular_lab_test.destroy');
+    Route::get('/', [PopularLabTestController::class, 'index'])->name('popular_lab_test.index');
+    Route::post('/store', [PopularLabTestController::class, 'store'])->name('popular_lab_test.store');
+    Route::delete('/{id}', [PopularLabTestController::class, 'destroy'])->name('popular_lab_test.destroy');
 });
+
 
  //fetch-customer-cart
 Route::get('/fetch-customer-cart', [AddMedicineController::class, 'fetchCustomerCart']);
@@ -312,6 +313,7 @@ Route::prefix('join-us')->group(function () {
 
 //notification
 Route::prefix('notifications')->group(function () {
+    Route::get('/', [RequestQuoteController::class, 'index'])->name('notification.index');
     Route::post('/read/{id}', [RequestQuoteController::class, 'markAsRead'])->name('notifications.read');
 
 });

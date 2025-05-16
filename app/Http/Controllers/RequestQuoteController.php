@@ -12,10 +12,31 @@ use App\Notifications\QuoteRequested;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
 
 class RequestQuoteController extends Controller
 {
+
+    //view all Notification
+
+    public function index()
+    {
+        $notifications = DatabaseNotification::all();
+
+        $formattedNotifications = $notifications->map(function ($not) {
+           $data = $not->data;
+            return [
+                'title' => $data['title'] ?? 'Notification',
+                'message' => $data['message'] ?? '',
+                'datetime' => Carbon::parse($not->created_at)->format('d M Y, h:i A'),
+            ];
+        });
+
+        return view('view_notifications.index', compact('formattedNotifications'));
+    }
+
+
     public function getRoadDistance($lat1, $lon1, $lat2, $lon2, $apiKey)
     {
         $url = "https://maps.googleapis.com/maps/api/directions/json?origin=$lat1,$lon1&destination=$lat2,$lon2&key=$apiKey";
@@ -92,7 +113,7 @@ class RequestQuoteController extends Controller
             $pharmacyUser->notify(new QuoteRequested($customer));
 
             //Event call for refresh the page
-            event(new MyEvent('message'));
+            event(new MyEvent('hello world'));
             if (!$exists) {
                 RequestQuote::create([
                     'customer_id' => $userId,
@@ -116,18 +137,18 @@ class RequestQuoteController extends Controller
     }
 
 
-public function markAsRead($id)
-{
-      $notification = DatabaseNotification::find($id);
+    public function markAsRead($id)
+    {
+        $notification = DatabaseNotification::find($id);
 
-    if ($notification && $notification->notifiable_id == Auth::user()->pharmacies->user_id) {
-        $notification->markAsRead();
-        return response()->json(['success' => true]);
+        if ($notification && $notification->notifiable_id == Auth::user()->pharmacies->user_id) {
+            $notification->markAsRead();
+            return response()->json(['success' => true]);
 
+        }
+        // event(new MyEvent('remove'));
+        return response()->json(['success' => false], 404);
     }
-    event(new MyEvent('remove'));
-    return response()->json(['success' => false], 404);
-}
 
 
 

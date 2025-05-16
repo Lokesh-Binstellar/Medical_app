@@ -28,14 +28,14 @@
                                     enctype="multipart/form-data" class="d-flex gap-2 align-items-center" id="importForm">
                                     @csrf
                                     <div class="error-msg">
-                                    <select name="name" class="form-control select2" id="lab-test-select" required>
-                                        <option value="">Select Lab Test</option>
-                                        @foreach ($labTests as $item)
-                                            <option value="{{ $item->id }}" data-contains="{{ $item->contains }}">
-                                                {{ $item->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                        <select name="name" class="form-control select2" id="lab-test-select" required>
+                                            <option value="">Select Lab Test</option>
+                                            @foreach ($labTests as $item)
+                                                <option value="{{ $item->id }}" data-contains="{{ $item->contains }}">
+                                                    {{ $item->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                     {{-- <input type="file" name="logo" class="form-control" id="logo"> --}}
                                     <button type="submit" class="btn btn-primary addButton text-nowrap px-5">+ Add
                                         Lab Test</button>
@@ -131,21 +131,23 @@
             window.deleteTest = function(id) {
                 if (confirm('Are you sure you want to delete this Lab Test?')) {
                     $.ajax({
-                        url: '{{ route('popular_lab_test.destroy', '') }}/' + id,
-                        type: 'DELETE',
+                        url: url('popular_lab_test') . '/' + id, // Use `url()` for clean dynamic URL
+                        type: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
+                            _method: 'DELETE'
                         },
                         success: function(response) {
                             alert('Popular Lab Test deleted successfully!');
                             table.ajax.reload();
                         },
-                        error: function(xhr, status, error) {
-                            alert('Error: ' + error);
+                        error: function(xhr) {
+                            alert('Error: ' + xhr.responseText);
                         }
                     });
                 }
             }
+
 
 
             setTimeout(function() {

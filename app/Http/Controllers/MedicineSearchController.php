@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\MyEvent;
+use App\Events\Pharmacymedicine;
 use App\Models\Carts;
 use App\Models\Customers;
 use App\Models\Medicine;
@@ -121,51 +122,92 @@ class MedicineSearchController extends Controller
         ]);
     }
 
-public function fetchCartByCustomer(Request $request)
+    public function fetchCartByCustomer(Request $request)
+    {
+        $customerId = $request->input('customer_id');
+
+        $cart = Carts::where('customer_id', $customerId)->first();
+
+        if (!$cart || !$cart->products_details) {
+            return response()->json(['status' => 'error', 'message' => 'Cart not found']);
+        }
+
+        $products = json_decode($cart->products_details, true);
+        $result = [];
+
+        foreach ($products as $item) {
+            $productId = $item['product_id'];
+            $isSubstitute = $item['is_substitute'] ?? 0;
+            $packagingDetail = $item['packaging_detail'] ?? '';
+            $quantity = $item['quantity'] ?? 1;
+
+            $medicine = Medicine::where('product_id', $productId)->first();
+            $medName = $medicine->product_name . ' + ' . $medicine->salt_composition;
+            $type = 'medicine';
+
+            // If not found in medicines, try otcmedicines
+            if (!$medicine) {
+                $medicine = Otcmedicine::where('otc_id', $productId)->first();
+                $medName = $medicine->name;
+                $type = 'otc';
+            }
+
+            if ($medicine) {
+                $result[] = [
+                    'product_id' => $productId,
+                    'type' => $type,
+                    'name' => $medName ?? 'N/A',
+                    'packaging_detail' => $packagingDetail,
+                    'quantity' => $quantity,
+                    'is_substitute' => $isSubstitute,
+                ];
+            }
+        }
+        // dd($result);
+
+        return response()->json(['status' => 'success', 'data' => $result]);
+    }
+
+   public function customerGetMedicine()
 {
-    $customerId = $request->input('customer_id');
+    try {
+        $getMedicine = Phrmacymedicine::all();
 
-    $cart = Carts::where('customer_id', $customerId)->first();
-
-    if (!$cart || !$cart->products_details) {
-        return response()->json(['status' => 'error', 'message' => 'Cart not found']);
-    }
-
-    $products = json_decode($cart->products_details, true);
-    $result = [];
-    
-    foreach ($products as $item) {
-        $productId = $item['product_id'];
-        $isSubstitute = $item['is_substitute'] ?? 0;
-        $packagingDetail = $item['packaging_detail'] ?? '';
-        $quantity = $item['quantity'] ?? 1;
-        
-        $medicine = Medicine::where('product_id', $productId)->first();
-        $medName = $medicine->product_name .' + '. $medicine->salt_composition;
-        $type = 'medicine';
-        
-        // If not found in medicines, try otcmedicines
-        if (!$medicine) {
-            $medicine = Otcmedicine::where('otc_id', $productId)->first();
-            $medName = $medicine->name;
-            $type = 'otc';
+        if ($getMedicine->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No medicine data found.',
+                'data' => []
+            ], 404);
         }
-        
-        if ($medicine) {
-            $result[] = [
-                'product_id' => $productId,
-                'type' => $type,
-                'name' => $medName ?? 'N/A',
-                'packaging_detail' => $packagingDetail,
-                'quantity' => $quantity,
-                'is_substitute' => $isSubstitute,
-            ];
-        }
-    }
-    // dd($result);
+        $formatted = $getMedicine->map(function ($not) {
+            try {
+                // Only decode if it's a JSON string
+                if (is_string($not->medicine)) {
+                    return json_decode($not->medicine, true);
+                }
 
-    return response()->json(['status' => 'success', 'data' => $result]);
+                return $not->medicine;
+            } catch (\Exception $e) {
+                return ['error' => 'Invalid JSON format'];
+            }
+        });
+        return response()->json([
+            'status' => true,
+            'pharmacy_id' => $getMedicine->first()->phrmacy_id ?? null,
+            'medicine' => $formatted
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
 }
+
+
 
 
 }
