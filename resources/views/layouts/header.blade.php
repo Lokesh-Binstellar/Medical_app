@@ -65,7 +65,7 @@
 
 
             <!-- Notification -->
-            <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-2 me-xl-1">
+            {{-- <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-2 me-xl-1">
                 @auth
                     @php
 
@@ -173,7 +173,7 @@
                         </a>
                     </li>
                 </ul>
-            </li>
+            </li> --}}
 
         </ul>
         <li class="nav-item navbar-dropdown dropdown-user dropdown profile">
