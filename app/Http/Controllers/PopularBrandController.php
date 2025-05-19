@@ -11,7 +11,6 @@ use Yajra\DataTables\Facades\DataTables;
 
 class PopularBrandController extends Controller
 {
-   
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -24,37 +23,38 @@ class PopularBrandController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     return '
-                <div class="dropdown">
-                  <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
-                  <ul class="dropdown-menu">
-                   <li>
-                    <a href="' . route('popular.edit', $row->id) . '" class="dropdown-item">Edit</a>
-                   </li>
-                   <li>
-                      <form action="' . route('popular.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-                        ' . csrf_field() . method_field('DELETE') . '
-                        <button class="dropdown-item" type="submit">Delete</button>
-                      </form>
-                   </li>
-                  </ul>
-                </div>';
+                    <div class="dropdown">
+                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="' . route('popular.edit', $row->id) . '" class="dropdown-item">Edit</a>
+                            </li>
+                            <li>
+                                <button type="button" onclick="deleteUser(' . $row->id . ')" class="dropdown-item text-danger">Delete</button>
+                            </li>
+                        </ul>
+                    </div>';
                 })
                 ->rawColumns(['action', 'logo'])
                 ->make(true);
         }
 
-        // Get marketers from Medicine table
-        $medicineMarketers = Medicine::select('marketer')->whereNotNull('marketer')->distinct()->pluck('marketer');
+        $medicineMarketers = Medicine::select('marketer')
+            ->whereNotNull('marketer')
+            ->distinct()
+            ->pluck('marketer');
 
-        $otcManufacturers = Otcmedicine::select('manufacturers')->whereNotNull('manufacturers')->distinct()->pluck('manufacturers');
+        $otcManufacturers = Otcmedicine::select('manufacturers')
+            ->whereNotNull('manufacturers')
+            ->distinct()
+            ->pluck('manufacturers');
 
         $popularBrands = $medicineMarketers->merge($otcManufacturers)->unique()->values();
-        // dd($medicineMarketers);
-        // Get all added brands
         $AddedBrands = PopularBrand::all();
 
         return view('popular.index', compact('popularBrands', 'AddedBrands'));
     }
+
 
 
 
@@ -70,27 +70,27 @@ class PopularBrandController extends Controller
 
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
-            $originalName = $file->getClientOriginalName(); 
+            $originalName = $file->getClientOriginalName();
             $destinationPath = storage_path('app/public/brands');
 
-            // Check if file with same name exists
             $filename = time() . '_' . $originalName;
             if (file_exists($destinationPath . '/' . $originalName)) {
-                $file->move($destinationPath, $filename); 
+                $file->move($destinationPath, $filename);
             } else {
-                $file->move($destinationPath, $originalName); 
+                $file->move($destinationPath, $originalName);
                 $filename = $originalName;
             }
 
-            // Save full URL and original name
-            $brand->logo = url('storage/brands/' . $filename); 
-            $brand->logo = $originalName; 
+            // ✅ Save only the filename
+            $brand->logo = $filename; // ← make sure this ends with ;
         }
+
 
         $brand->save();
 
         return redirect()->route('popular.index')->with('success', 'Brand added successfully.');
     }
+
     public function edit($id)
     {
         // Fetch the brand data for editing
@@ -136,6 +136,7 @@ class PopularBrandController extends Controller
 
         return response()->json($brands);
     }
+
     public function getBrand()
     {
         $brands = PopularBrand::all();
@@ -209,14 +210,13 @@ class PopularBrandController extends Controller
     {
         $brand = PopularBrand::findOrFail($id);
 
-        // Delete the logo from storage if it exists
-        if ($brand->logo && Storage::disk('public')->exists($brand->logo)) {
-            Storage::disk('public')->delete($brand->logo);
+        // Delete logo from storage if exists
+        if ($brand->logo && Storage::disk('public')->exists('brands/' . $brand->logo)) {
+            Storage::disk('public')->delete('brands/' . $brand->logo);
         }
 
-        // Delete the brand from the database
         $brand->delete();
 
-        return redirect()->route('popular.index')->with('success', 'Brand deleted successfully.');
+        return response()->json(['status' => true, 'message' => 'Brand deleted successfully.']);
     }
 }

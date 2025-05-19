@@ -21,7 +21,7 @@ class PopularLabTestController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-    return '
+                    return '
         <div class="dropdown">
             <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
             <ul class="dropdown-menu">
@@ -31,7 +31,7 @@ class PopularLabTestController extends Controller
             </ul>
         </div>
     ';
-})
+                })
 
                 ->rawColumns(['action'])
                 ->make(true);
@@ -60,24 +60,24 @@ class PopularLabTestController extends Controller
     }
 
 
-   public function destroy(string $id, Request $request)
-{
-    try {
-        $labtest = PopularLabTest::findOrFail($id);
-        $labtest->delete();
+    public function destroy(string $id, Request $request)
+    {
+        try {
+            $labtest = PopularLabTest::findOrFail($id);
+            $labtest->delete();
 
-        if ($request->ajax()) {
-            return response()->json(['success' => true]);
-        }
+            if ($request->ajax()) {
+                return response()->json(['success' => true]);
+            }
 
-        return redirect()->route('popular_lab_test.index')->with('success', 'Popular Lab Test deleted successfully.');
-    } catch (\Exception $e) {
-        if ($request->ajax()) {
-            return response()->json(['success' => false, 'message' => 'Failed to delete.'], 500);
+            return redirect()->route('popular_lab_test.index')->with('success', 'Popular Lab Test deleted successfully.');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Failed to delete.'], 500);
+            }
+            return redirect()->route('popular_lab_test.index')->with('error', 'Failed to delete popular lab test.');
         }
-        return redirect()->route('popular_lab_test.index')->with('error', 'Failed to delete popular lab test.');
     }
-}
 
 
 
@@ -98,5 +98,4 @@ class PopularLabTestController extends Controller
             ], 500);
         }
     }
-
 }

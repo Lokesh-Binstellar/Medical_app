@@ -18,31 +18,19 @@ class HomeBannerController extends Controller
                     return '<img src="' . asset('storage/banners/' . $row->image) . '" width="100">';
                 })
                 ->addColumn('action', function ($row) {
-                    // return '
-                    //     <button onclick="editBanner(' . $row->id . ')" class="btn btn-info btn-sm">Edit</button>
-                    //     <button onclick="deleteBanner(' . $row->id . ')" class="btn btn-danger btn-sm">Delete</button>
-                    // ';
-                    return '
-                        <div class="dropdown">
-                          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+    return '
+        <div class="dropdown">
+          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
           <ul class="dropdown-menu">
-                             <li>
-                            <a href="' . route('homebanner.show', $row->id) . '" class="dropdown-item" >View</a>
-                            </li>
-        
-                            <li>
-                            <a href="' . route('homebanner.edit', $row->id) . '" class="dropdown-item" >Edit</a>
-                            </li>
-                            
-                            <li>
-                              <form action="' . route('homebanner.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-                                ' . csrf_field() . method_field('DELETE') . '
-                                <button class="dropdown-item " type="submit">Delete</button>
-                              </form>
-                            </li>
-                          </ul>
-                        </div>';
-                })
+            <li><a href="' . route('homebanner.show', $row->id) . '" class="dropdown-item">View</a></li>
+            <li><a href="' . route('homebanner.edit', $row->id) . '" class="dropdown-item">Edit</a></li>
+            <li>
+              <button onclick="deleteBanner(' . $row->id . ')" class="dropdown-item text-danger">Delete</button>
+            </li>
+          </ul>
+        </div>';
+})
+
                 ->rawColumns(['image', 'action'])
                 ->make(true);
         }
@@ -114,22 +102,19 @@ class HomeBannerController extends Controller
         return redirect()->route('homebanner.index')->with('success', 'Banner updated successfully!');
     }
 
-    public function destroy($id)
-    {
-        $banner = HomeBanner::findOrFail($id);
+   public function destroy($id)
+{
+    $banner = HomeBanner::findOrFail($id);
 
-
-        if ($banner->image && Storage::exists('public/banners/' . $banner->image)) {
-            Storage::delete('public/banners/' . $banner->image);
-        }
-
-        $banner->delete();
-
-        // return response()->json(['success' => 'Deleted successfully']);
-
-        return redirect()->route('homebanner.index')
-            ->with('success', 'homebanner deleted successfully');
+    if ($banner->image && Storage::exists('public/banners/' . $banner->image)) {
+        Storage::delete('public/banners/' . $banner->image);
     }
+
+    $banner->delete();
+
+    return response()->json(['success' => true, 'message' => 'Banner deleted successfully']);
+}
+
 
     public function getAllBanners()
     {

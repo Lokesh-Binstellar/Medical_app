@@ -18,31 +18,23 @@ class MedicineBannerController extends Controller
                     return '<img src="' . asset('storage/banners/' . $row->image) . '" width="100">';
                 })
                 ->addColumn('action', function ($row) {
-                    // return '
-                    //     <button onclick="editBanner(' . $row->id . ')" class="btn btn-info btn-sm">Edit</button>
-                    //     <button onclick="deleteBanner(' . $row->id . ')" class="btn btn-danger btn-sm">Delete</button>
-                    // ';
-                    return '
-                        <div class="dropdown">
-                          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
-          <ul class="dropdown-menu">
-                             <li>
-                            <a href="' . route('medicinebanner.show', $row->id) . '" class="dropdown-item" >View</a>
-                            </li>
-        
-                            <li>
-                            <a href="' . route('medicinebanner.edit', $row->id) . '" class="dropdown-item" >Edit</a>
-                            </li>
-                            
-                            <li>
-                              <form action="' . route('medicinebanner.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-                                ' . csrf_field() . method_field('DELETE') . '
-                                <button class="dropdown-item " type="submit">Delete</button>
-                              </form>
-                            </li>
-                          </ul>
-                        </div>';
-                })
+    return '
+        <div class="dropdown">
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="' . route('medicinebanner.show', $row->id) . '" class="dropdown-item">View</a>
+                </li>
+                <li>
+                    <a href="' . route('medicinebanner.edit', $row->id) . '" class="dropdown-item">Edit</a>
+                </li>
+                <li>
+                    <button class="dropdown-item text-danger" onclick="deleteBanner(' . $row->id . ')">Delete</button>
+                </li>
+            </ul>
+        </div>';
+})
+
                 ->rawColumns(['image', 'action'])
                 ->make(true);
         }
@@ -115,21 +107,23 @@ class MedicineBannerController extends Controller
     }
 
     public function destroy($id)
-    {
-        $banner = MedicineBanner::findOrFail($id);
+{
+    $banner = MedicineBanner::findOrFail($id);
 
-
-        if ($banner->image && Storage::exists('public/banners/' . $banner->image)) {
-            Storage::delete('public/banners/' . $banner->image);
-        }
-
-        $banner->delete();
-
-        // return response()->json(['success' => 'Deleted successfully']);
-
-        return redirect()->route('medicinebanner.index')
-            ->with('success', 'medicinebanner deleted successfully');
+    if ($banner->image && Storage::exists('public/banners/' . $banner->image)) {
+        Storage::delete('public/banners/' . $banner->image);
     }
+
+    $banner->delete();
+
+    if (request()->ajax()) {
+        return response()->json(['success' => 'Banner deleted successfully']);
+    }
+
+    return redirect()->route('medicinebanner.index')
+        ->with('success', 'Medicine banner deleted successfully');
+}
+
 
     public function getAllBanners()
     {

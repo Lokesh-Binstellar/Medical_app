@@ -19,36 +19,33 @@ class PopularCategoryController extends Controller
         $AddedCategory = PopularCategory::all();
         if ($request->ajax()) {
             $data = PopularCategory::all();
-    
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('logo', function ($product_brand) {
                     return '<img src="' . asset('storage/category/' . $product_brand->logo) . '" border="0" width="40" class="img-rounded" align="center" />';
                 })
-                
+
                 ->addColumn('action', function ($row) {
                     return '
-                    <div class="dropdown">
-                      <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
-                      <ul class="dropdown-menu">
-                       <li>
-                    <a href="' . route('popular_category.edit', $row->id) . '" class="dropdown-item" >Edit</a>
-                    </li>
-                        
-                        <li>
-                          <form action="' . route('popular_category.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-                            ' . csrf_field() . method_field('DELETE') . '
-                            <button class="dropdown-item" type="submit">Delete</button>
-                          </form>
-                        </li>
-                      </ul>
-                    </div>';
+    <div class="dropdown">
+      <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+      <ul class="dropdown-menu">
+        <li>
+          <a href="' . route('popular_category.edit', $row->id) . '" class="dropdown-item">Edit</a>
+        </li>
+        <li>
+          <button class="dropdown-item text-danger" type="button" onclick="deletePOPcate(' . $row->id . ')">Delete</button>
+        </li>
+      </ul>
+    </div>';
                 })
-                ->rawColumns(['action','logo'])
+
+                ->rawColumns(['action', 'logo'])
                 ->make(true);
         }
 
-        
+
         return view('popular_category.index', compact('popularCategory', 'AddedCategory'));
     }
 
@@ -176,18 +173,30 @@ class PopularCategoryController extends Controller
             'data' => $categoryData
         ], 200);
     }
+
     public function destroy(string $id)
     {
-        $category = PopularCategory::findOrFail($id);
+        try {
+            $category = PopularCategory::findOrFail($id);
 
-        // Delete the logo from storage if it exists
-        if ($category->logo && Storage::disk('public')->exists($category->logo)) {
-            Storage::disk('public')->delete($category->logo);
+            // Delete the logo from storage if it exists
+            if ($category->logo && Storage::disk('public')->exists($category->logo)) {
+                Storage::disk('public')->delete($category->logo);
+            }
+
+            // Delete the category from the database
+            $category->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Category deleted successfully.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete category. Please try again.',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        // Delete the brand from the database
-        $category->delete();
-
-        return redirect()->route('popular_category.index')->with('success', 'category deleted successfully.');
     }
 }

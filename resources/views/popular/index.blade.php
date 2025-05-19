@@ -77,46 +77,72 @@
 
 @section('scripts')
 <script>
-    $(function() {
-        // DataTable already here...
-        var table = $('.data-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('popular.index') }}",
-            columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'name', name: 'name' },
-                { data: 'logo', name: 'logo' },
-                { data: 'action', name: 'action', orderable: false, searchable: false }
-            ]
-        });
+   $(function () {
+    // ✅ DataTable Initialization
+    var table = $('.data-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('popular.index') }}",
+        columns: [
+            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+            { data: 'name', name: 'name' },
+            { data: 'logo', name: 'logo' },
+            { data: 'action', name: 'action', orderable: false, searchable: false }
+        ]
+    });
 
-        // ✅ Initialize Select2 with correct placeholder
-        $('#brand-select').select2({
-            placeholder: "Select Brand",
-            allowClear: true
-        });
+    // ✅ Select2 Initialization
+    $('#brand-select').select2({
+        placeholder: "Select Brand",
+        allowClear: true
+    });
 
-        // ✅ Delete function (already fine)
-        window.deleteUser = function(id) {
-            if (confirm('Are you sure you want to delete this Brand?')) {
+    // ✅ SweetAlert Delete Function
+    window.deleteUser = function (id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This brand will be deleted permanently!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                confirmButton: 'btn btn-danger me-2',
+                cancelButton: 'btn btn-secondary'
+            },
+            buttonsStyling: false,
+            reverseButtons: false // Confirm (Yes) on left, Cancel on right
+        }).then((result) => {
+            if (result.isConfirmed) {
                 $.ajax({
                     url: '{{ route('popular.destroy', '') }}/' + id,
                     type: 'DELETE',
                     data: {
                         _token: '{{ csrf_token() }}',
                     },
-                    success: function(response) {
-                        alert('Popular deleted successfully!');
+                    success: function (response) {
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'Brand deleted successfully.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
                         table.ajax.reload();
                     },
-                    error: function(xhr, status, error) {
-                        alert('Error: ' + error);
+                    error: function (xhr, status, error) {
+                        Swal.fire(
+                            'Error!',
+                            'Something went wrong. Please try again.',
+                            'error'
+                        );
                     }
                 });
             }
-        }
-    });
+        });
+    }
+});
+
 </script>
 
 

@@ -23,19 +23,16 @@ class JoinUsController extends Controller
             return datatables()->of(JoinUs::latest()->get())
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    return '
-                        <div class="dropdown">
-                          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
-                          <ul class="dropdown-menu">
-                            <li>
-                              <form action="' . route('joinus.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-                                ' . csrf_field() . method_field('DELETE') . '
-                                <button class="dropdown-item " type="submit">Delete</button>
-                              </form>
-                            </li>
-                          </ul>
-                        </div>';
-                })
+    return '
+        <div class="dropdown">
+          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item" onclick="deleteJoinUs(' . $row->id . ')">Delete</a></li>
+          </ul>
+        </div>
+    ';
+})
+
                 ->rawColumns(['action'])
                 ->make(true);
         }
@@ -154,14 +151,18 @@ class JoinUsController extends Controller
 
 
 
-    public function destroy($id)
-    {
-        $join = JoinUs::findOrFail($id);
-        $join->delete();
+ public function destroy($id)
+{
+    $join = JoinUs::findOrFail($id);
+    $join->delete();
 
-        return redirect()->route('joinus.index')
-            ->with('success', 'Join Us request deleted successfully');
+    if (request()->ajax()) {
+        return response()->json(['success' => 'Join Us request deleted successfully']);
     }
+
+    return redirect()->route('joinus.index')
+        ->with('success', 'Join Us request deleted successfully');
+}
 
 
 

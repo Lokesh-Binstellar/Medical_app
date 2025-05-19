@@ -216,21 +216,53 @@
                 ]
             });
 
-            window.deleteBanner = function(id) {
-                if (confirm("Delete this banner?")) {
-                    $.ajax({
-                        url: "/join-us/" + id,
-                        type: 'DELETE',
-                        data: {
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function() {
-                            table.ajax.reload();
-                            alert("Deleted");
-                        }
-                    });
-                }
+            window.deleteJoinUs = function(id) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        confirmButton: 'btn btn-danger me-2',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false,
+                    reverseButtons: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/join-us/" + id,
+                            type: 'DELETE',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    title: 'Deleted!',
+                                    text: response.success,
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                                $('.data-table').DataTable().ajax.reload();
+                            },
+                            error: function() {
+                                Swal.fire({
+                                    title: 'Failed!',
+                                    text: 'Something went wrong.',
+                                    icon: 'error',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                            }
+                        });
+                    }
+                });
             }
+
+
 
             window.editBanner = function(id) {
                 $.get('/join-us/' + id + '/edit', function(data) {
@@ -289,42 +321,42 @@
                 });
             });
         });
-        
+
 
         function submitJoinUsForm(event) {
-    event.preventDefault();
+            event.preventDefault();
 
-    var formData = {
-        type: $('#type').val(),
-        first_name: $('#first_name').val(),
-        last_name: $('#last_name').val(),
-        email: $('#email').val(),
-        phone_number: $('#phone_number').val(),
-        message: $('#message').val(),
-    };
+            var formData = {
+                type: $('#type').val(),
+                first_name: $('#first_name').val(),
+                last_name: $('#last_name').val(),
+                email: $('#email').val(),
+                phone_number: $('#phone_number').val(),
+                message: $('#message').val(),
+            };
 
-    $.ajax({
-        url: '/api/join-us',
-        type: 'POST',
-        data: JSON.stringify(formData),
-        contentType: 'application/json',
-        dataType: 'json',
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-            'Accept': 'application/json'
-        },
-        success: function (response) {
-            alert(response.message); // You can use toast here too
-        },
-        error: function (xhr) {
-            if (xhr.responseJSON && xhr.responseJSON.message) {
-                alert(xhr.responseJSON.message);
-            } else {
-                alert('Something went wrong. Please try again later.');
-            }
+            $.ajax({
+                url: '/api/join-us',
+                type: 'POST',
+                data: JSON.stringify(formData),
+                contentType: 'application/json',
+                dataType: 'json',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                    'Accept': 'application/json'
+                },
+                success: function(response) {
+                    alert(response.message); // You can use toast here too
+                },
+                error: function(xhr) {
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        alert(xhr.responseJSON.message);
+                    } else {
+                        alert('Something went wrong. Please try again later.');
+                    }
+                }
+            });
         }
-    });
-}
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
 @endsection
