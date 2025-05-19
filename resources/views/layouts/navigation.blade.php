@@ -204,6 +204,16 @@
     </li>
 @endif
 
+@if ($isSuperAdmin)
+    <li class="menu-item {{ request()->routeIs('zip_code_vise_delivery.index') ? 'active' : '' }}">
+        <a href="{{ route('zip_code_vise_delivery.index') }}" class="menu-link">
+            <i class="menu-icon tf-icons mdi mdi-map-marker"></i>
+            <div data-i18n="Zip Code Vice Delivery">Zip Code Vice Delivery</div>
+        </a>
+    </li>
+@endif
+
+
 
         <li class="menu-item">
             <a href="{{ route('logout') }}" class="menu-link"

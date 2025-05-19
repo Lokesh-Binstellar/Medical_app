@@ -39,6 +39,7 @@ class AppRatingController extends Controller
             ->addColumn('created_at', function ($rating) {
                 return $rating->created_at->format('M d, Y');
             })
+            ->addIndexColumn()
             ->rawColumns(['review'])
             ->make(true);
     }

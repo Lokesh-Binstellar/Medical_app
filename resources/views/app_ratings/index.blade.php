@@ -18,6 +18,7 @@
                                     <table id="add-row" class="display table table-striped table-hover data-table">
                                         <thead>
                                             <tr>
+                                                <th>ID</th>
                                                 <th>Reviewer</th>
                                                 <th>Review</th>
                                                 <th>Date</th>
@@ -45,6 +46,10 @@
             serverSide: true,
             ajax: '{{ route("app_ratings.index") }}',
             columns: [
+                {
+                        data: 'DT_RowIndex',
+                        name: 'id'
+                    },
                 { data: 'reviewer', name: 'reviewer' },
                 { data: 'review', name: 'review', orderable: false, searchable: false },
                 { data: 'created_at', name: 'created_at' }

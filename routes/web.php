@@ -23,6 +23,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RequestQuoteController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ZipCodeViceDeliveryController;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Broadcast;
 use App\Models\HomeBanner;
@@ -88,7 +89,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     //Pharmacist
     Route::prefix('pharmacy')->group(function () {
-        Route::get('/', [PharmaciesController::class,'index'])->name('pharmacist.index');
+        Route::get('/', [PharmaciesController::class, 'index'])->name('pharmacist.index');
         Route::group(['middleware' => 'permission:Pharmacies,create'], function () {
             Route::get('/create', [PharmaciesController::class, 'create'])->name('pharmacist.create');
             Route::post('/store', [PharmaciesController::class, 'store'])->name('pharmacist.store');
@@ -218,6 +219,15 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/fetch-cart-by-customer', [MedicineSearchController::class, 'fetchCartByCustomer']);
 
+
+    // rating 
+    Route::get('/app-ratings', [AppRatingController::class, 'index'])->name('app_ratings.index');
+
+    // zip_code_vise_delivery
+    Route::get('/zipcodes', [ZipCodeViceDeliveryController::class, 'index'])->name('zip_code_vise_delivery.index');
+    Route::post('/zipcodes/upload', [ZipCodeViceDeliveryController::class, 'uploadZipcodes'])->name('zip_code_vise_delivery.upload');
+    Route::delete('/zipcodes/delete-all', [ZipCodeViceDeliveryController::class, 'deleteAll'])->name('zip_code_vise_delivery.deleteAll');
+
 });
 
 require __DIR__ . '/auth.php';
@@ -303,6 +313,3 @@ Route::prefix('notifications')->group(function () {
     Route::get('/', [RequestQuoteController::class, 'index'])->name('notification.index');
     Route::post('/read/{id}', [RequestQuoteController::class, 'markAsRead'])->name('notifications.read');
 });
-
-
-Route::get('/app-ratings', [AppRatingController::class, 'index'])->name('app_ratings.index');

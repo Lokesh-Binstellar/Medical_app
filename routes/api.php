@@ -20,6 +20,7 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PopularLabTestController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\RequestQuoteController;
+use App\Http\Controllers\ZipCodeViceDeliveryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -70,6 +71,10 @@ Route::middleware('check.api.key')->group(function () {
         Route::get('/patients', [PatientController::class, 'index']);
         Route::post('/patients', [PatientController::class, 'store']);
         Route::put('/patients/{id}', [PatientController::class, 'update']);
+
+
+        // zip_code_vise_delivery
+        Route::get('/zipcodes', [ZipCodeViceDeliveryController::class, 'getZipcodes']);
     });
 
     Route::get('/productListByCategory/{categoryName}', [OtcController::class, 'productListByCategory']);
@@ -82,5 +87,4 @@ Route::middleware('check.api.key')->group(function () {
     Route::post('/join-us', [JoinUsController::class, 'store']);
 
     Route::get('/placeOrder', [MedicineSearchController::class, 'placeOrder']);
-
 });
