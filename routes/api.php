@@ -16,6 +16,7 @@ use App\Http\Controllers\HomeBannerController;
 use App\Http\Controllers\JoinUsController;
 use App\Http\Controllers\MedicineBannerController;
 use App\Http\Controllers\PopularLabTestController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\RequestQuoteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +57,7 @@ Route::middleware('check.api.key')->group(function () {
         Route::post('/add-to-cart', [AddMedicineController::class, 'frontendAddToCart']);
         Route::get('/getUserCart', [AddMedicineController::class, 'getAddToCart'])->name('getUserCart.getAddToCart');
         Route::post('/requestAQuote', [RequestQuoteController::class, 'requestAQuote']);
+          Route::post('/ratings', [RatingController::class, 'store']);
     });
 
     Route::get('/productListByCategory/{categoryName}', [OtcController::class, 'productListByCategory']);
@@ -69,6 +71,9 @@ Route::middleware('check.api.key')->group(function () {
 
     Route::get('/allPharmacyRequests', [MedicineSearchController::class, 'allPharmacyRequests']);
     Route::get('/pharmacyRequest', [MedicineSearchController::class, 'pharmacyRequest']);
+
+
+  
 
 });
 

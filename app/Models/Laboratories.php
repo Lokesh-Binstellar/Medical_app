@@ -36,12 +36,16 @@ class Laboratories extends Model
     {
         return $this->hasMany(LabPackages::class, 'lab_id');
     }
-    
+    public function ratings()
+    {
+        return $this->morphMany(Rating::class, 'rateable');
+    }
 
-//     public function labtests()
-// {
-//     // Assuming a laboratory has many tests (many-to-many relationship)
-//     return $this->belongsToMany(LabTest::class, 'lab_tests', 'id', 'id');
-// }
+
+    //     public function labtests()
+    // {
+    //     // Assuming a laboratory has many tests (many-to-many relationship)
+    //     return $this->belongsToMany(LabTest::class, 'lab_tests', 'id', 'id');
+    // }
 
 }

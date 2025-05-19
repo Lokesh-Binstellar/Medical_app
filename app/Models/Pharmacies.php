@@ -7,24 +7,24 @@ use Phar;
 
 class Pharmacies extends Model
 {
-   protected $fillable = [
-    'pharmacy_name',
-    'owner_name',
-    'user_id',
-    'email',
-    'phone',
-    'city',
-    'state',
-    'pincode',
-    'address',
-    'latitude',
-    'longitude',
-    'image',
-    'username',
-    'password',
-    'license',
-    'status',
-   
+    protected $fillable = [
+        'pharmacy_name',
+        'owner_name',
+        'user_id',
+        'email',
+        'phone',
+        'city',
+        'state',
+        'pincode',
+        'address',
+        'latitude',
+        'longitude',
+        'image',
+        'username',
+        'password',
+        'license',
+        'status',
+
     ];
 
 
@@ -32,11 +32,15 @@ class Pharmacies extends Model
 
 
     public function user()
-{
-    return $this->belongsTo(User::class);
-}
-public function medicines()
-{
-    return $this->hasMany(Phrmacymedicine::class, 'phrmacy_id'); // Make sure the foreign key matches
-}
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function medicines()
+    {
+        return $this->hasMany(Phrmacymedicine::class, 'phrmacy_id'); // Make sure the foreign key matches
+    }
+    public function ratings()
+    {
+        return $this->morphMany(Rating::class, 'rateable');
+    }
 }
