@@ -256,103 +256,197 @@ class AddMedicineController extends Controller
     {
         //
     }
-    public function getAddToCart(Request $request)
-    {
-        $id = $request->get('user_id');
+    // public function getAddToCart(Request $request)
+    // {
+    //     $id = $request->get('user_id');
 
-        try {
-            $carts = DB::table('carts')
-                ->where('customer_id', $id)
-                ->orderByDesc('created_at')
-                ->get();
+    //     try {
+    //         $carts = DB::table('carts')
+    //             ->where('customer_id', $id)
+    //             ->orderByDesc('created_at')
+    //             ->get();
 
-            if ($carts->isEmpty()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'No cart records found for customer ID ' . $id
-                ], 404);
-            }
+    //         if ($carts->isEmpty()) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'No cart records found for customer ID ' . $id
+    //             ], 404);
+    //         }
 
-            $result = $carts->map(function ($cart) {
-                $productDetails = json_decode($cart->products_details, true);
-                $detailedProducts = [];
+    //         $result = $carts->map(function ($cart) {
+    //             $productDetails = json_decode($cart->products_details, true);
+    //             $detailedProducts = [];
 
-                if (is_array($productDetails)) {
-                    foreach ($productDetails as $product) {
-                        $productId = $product['product_id'] ?? null;
-                        if (!$productId)
-                            continue;
+    //             if (is_array($productDetails)) {
+    //                 foreach ($productDetails as $product) {
+    //                     $productId = $product['product_id'] ?? null;
+    //                     if (!$productId)
+    //                         continue;
 
-                        $type = null;
-                        $medicine = \App\Models\Medicine::where('product_id', $productId)->first();
+    //                     $type = null;
+    //                     $medicine = \App\Models\Medicine::where('product_id', $productId)->first();
 
-                        if ($medicine) {
-                            $type = 'medicine';
-                        } else {
-                            $medicine = \App\Models\Otcmedicine::where('otc_id', $productId)->first();
-                            if ($medicine) {
-                                $type = 'otc';
-                            }
-                        }
+    //                     if ($medicine) {
+    //                         $type = 'medicine';
+    //                     } else {
+    //                         $medicine = \App\Models\Otcmedicine::where('otc_id', $productId)->first();
+    //                         if ($medicine) {
+    //                             $type = 'otc';
+    //                         }
+    //                     }
 
-                        if ($medicine && $type) {
-                            $name = $type === 'medicine'
-                                ? ($medicine->product_name ?? '')
-                                : ($medicine->name ?? '');
+    //                     if ($medicine && $type) {
+    //                         $name = $type === 'medicine'
+    //                             ? ($medicine->product_name ?? '')
+    //                             : ($medicine->name ?? '');
 
-                            $packageDetail = $product['packaging_detail'] ?? $medicine->packaging ?? $medicine->packaging_detail ?? '';
-                            $quantity = $product['quantity'] ?? $medicine->qty ?? 1;
+    //                         $packageDetail = $product['packaging_detail'] ?? $medicine->packaging ?? $medicine->packaging_detail ?? '';
+    //                         $quantity = $product['quantity'] ?? $medicine->qty ?? 1;
 
-                            $imageUrls = [];
-                            if (!empty($medicine->image_url)) {
-                                $images = is_array($medicine->image_url)
-                                    ? $medicine->image_url
-                                    : (json_decode($medicine->image_url, true) ?: explode(',', $medicine->image_url));
+    //                         $imageUrls = [];
+    //                         if (!empty($medicine->image_url)) {
+    //                             $images = is_array($medicine->image_url)
+    //                                 ? $medicine->image_url
+    //                                 : (json_decode($medicine->image_url, true) ?: explode(',', $medicine->image_url));
 
-                                $imageUrls = array_map(function ($img) {
-                                    $img = trim($img);
-                                    return Str::startsWith($img, 'medicines/')
-                                        ? asset('storage/' . $img)
-                                        : asset('storage/medicines/' . $img);
-                                }, $images);
-                            }
+    //                             $imageUrls = array_map(function ($img) {
+    //                                 $img = trim($img);
+    //                                 return Str::startsWith($img, 'medicines/')
+    //                                     ? asset('storage/' . $img)
+    //                                     : asset('storage/medicines/' . $img);
+    //                             }, $images);
+    //                         }
 
-                            $detailedProducts[] = [
-                                "product_id" => $type === 'medicine' ? $medicine->product_id : $medicine->otc_id,
-                                'type' => $type,
-                                'name' => $name,
-                                'prescription_required' => ($medicine->prescription_required === 'Prescription Required'),
-                                'packaging_detail' => $packageDetail,
-                                'quantity' => $quantity,
-                                'is_substitute' => $product['is_substitute'] ?? 'no',
-                                'image_url' => $imageUrls,
-                            ];
-                        }
+    //                         $detailedProducts[] = [
+    //                             "product_id" => $type === 'medicine' ? $medicine->product_id : $medicine->otc_id,
+    //                             'type' => $type,
+    //                             'name' => $name,
+    //                             'prescription_required' => ($medicine->prescription_required === 'Prescription Required'),
+    //                             'packaging_detail' => $packageDetail,
+    //                             'quantity' => $quantity,
+    //                             'is_substitute' => $product['is_substitute'] ?? 'no',
+    //                             'image_url' => $imageUrls,
+    //                         ];
+    //                     }
+    //                 }
+    //             }
+
+    //             return [
+
+    //                 'id' => $cart->id,
+    //                 'customer_id' => $cart->customer_id,
+    //                 'products_details' => $detailedProducts,
+
+    //             ];
+
+    //         });
+
+    //         return response()->json([
+    //             'status' => true,
+    //             'data' => $result
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Something went wrong.',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
+
+public function getAddToCart(Request $request)
+{
+    $id = $request->get('user_id');
+
+    try {
+        $cart = DB::table('carts')
+            ->where('customer_id', $id)
+            ->orderByDesc('created_at')
+            ->first();
+
+        if (!$cart) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No cart records found for customer ID ' . $id
+            ], 404);
+        }
+
+        $productDetails = json_decode($cart->products_details, true);
+        $detailedProducts = [];
+
+        if (is_array($productDetails)) {
+            foreach ($productDetails as $product) {
+                $productId = $product['product_id'] ?? null;
+                if (!$productId) continue;
+
+                $type = null;
+                $medicine = \App\Models\Medicine::where('product_id', $productId)->first();
+
+                if ($medicine) {
+                    $type = 'medicine';
+                } else {
+                    $medicine = \App\Models\Otcmedicine::where('otc_id', $productId)->first();
+                    if ($medicine) {
+                        $type = 'otc';
                     }
                 }
 
-                return [
-                    'id' => $cart->id,
-                    'customer_id' => $cart->customer_id,
-                    'products_details' => $detailedProducts,
-                    'created_at' => \Carbon\Carbon::parse($cart->created_at)->toDateTimeString(),
-                ];
-            });
+                if ($medicine && $type) {
+                    $name = $type === 'medicine'
+                        ? ($medicine->product_name ?? '')
+                        : ($medicine->name ?? '');
 
-            return response()->json([
-                'status' => true,
-                'data' => $result
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Something went wrong.',
-                'error' => $e->getMessage()
-            ], 500);
+                    $packageDetail = $product['packaging_detail'] ?? $medicine->packaging ?? $medicine->packaging_detail ?? '';
+                    $quantity = $product['quantity'] ?? $medicine->qty ?? 1;
+
+                    $imageUrls = [];
+                    if (!empty($medicine->image_url)) {
+                        $images = is_array($medicine->image_url)
+                            ? $medicine->image_url
+                            : (json_decode($medicine->image_url, true) ?: explode(',', $medicine->image_url));
+
+                        $imageUrls = array_map(function ($img) {
+                            $img = trim($img);
+                            return Str::startsWith($img, 'medicines/')
+                                ? asset('storage/' . $img)
+                                : asset('storage/medicines/' . $img);
+                        }, $images);
+                    }
+
+                    $detailedProducts[] = [
+                        "product_id" => $type === 'medicine' ? $medicine->product_id : $medicine->otc_id,
+                        'type' => $type,
+                        'name' => $name,
+                        'prescription_required' => ($medicine->prescription_required === 'Prescription Required'),
+                        'packaging_detail' => $packageDetail,
+                        'quantity' => $quantity,
+                        'is_substitute' => $product['is_substitute'] ?? 'no',
+                        'image_url' => $imageUrls,
+                    ];
+                }
+            }
         }
+
+        $cartObject = [
+            'id' => $cart->id,
+            'customer_id' => $cart->customer_id,
+            'products_details' => $detailedProducts
+        ];
+
+        return response()->json([
+            'status' => true,
+            'data' => (object) $cartObject
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong.',
+            'error' => $e->getMessage()
+        ], 500);
     }
-
-
+}
 
 
     public function removeProduct($cartId, $productId)
@@ -501,50 +595,50 @@ class AddMedicineController extends Controller
         if (!$prescription) {
             return response()->json(['status' => 'error', 'message' => 'Prescription not found']);
         }
-        
+
         $customerId = $prescription->customer_id;
-        
+
         // Step 2: Find Cart using customer_id
         $cart = Carts::where('customer_id', $customerId)->first();
         if (!$cart || !$cart->products_details) {
             return response()->json(['status' => 'error', 'message' => 'No cart found']);
         }
-        
+
         // Step 3: Decode product_details JSON
         $products = json_decode($cart->products_details, true);
         $result = [];
-    
-    foreach ($products as $item) {
-        $productId = $item['product_id'];
-        $isSubstitute = $item['is_substitute'] ?? 0;
-        $packagingDetail = $item['packaging_detail'] ?? '';
-        $quantity = $item['quantity'] ?? 1;
-        
-        $medicine = Medicine::where('product_id', $productId)->first();
-        $medName = $medicine->product_name .' + '. $medicine->salt_composition;
-        $type = 'medicine';
-        
-        // If not found in medicines, try otcmedicines
-        if (!$medicine) {
-            $medicine = Otcmedicine::where('otc_id', $productId)->first();
-            $medName = $medicine->name;
-            $type = 'otc';
-        }
-        
-        if ($medicine) {
-            $result[] = [
-                'product_id' => $productId,
-                'type' => $type,
-                'name' => $medName ?? 'N/A',
-                'packaging_detail' => $packagingDetail,
-                'quantity' => $quantity,
-                'is_substitute' => $isSubstitute,
-            ];
-        }
-    }
-    // dd($result);
 
-    return response()->json(['status' => 'success', 'data' => $result]);
+        foreach ($products as $item) {
+            $productId = $item['product_id'];
+            $isSubstitute = $item['is_substitute'] ?? 0;
+            $packagingDetail = $item['packaging_detail'] ?? '';
+            $quantity = $item['quantity'] ?? 1;
+
+            $medicine = Medicine::where('product_id', $productId)->first();
+            $medName = $medicine->product_name . ' + ' . $medicine->salt_composition;
+            $type = 'medicine';
+
+            // If not found in medicines, try otcmedicines
+            if (!$medicine) {
+                $medicine = Otcmedicine::where('otc_id', $productId)->first();
+                $medName = $medicine->name;
+                $type = 'otc';
+            }
+
+            if ($medicine) {
+                $result[] = [
+                    'product_id' => $productId,
+                    'type' => $type,
+                    'name' => $medName ?? 'N/A',
+                    'packaging_detail' => $packagingDetail,
+                    'quantity' => $quantity,
+                    'is_substitute' => $isSubstitute,
+                ];
+            }
+        }
+        // dd($result);
+
+        return response()->json(['status' => 'success', 'data' => $result]);
     }
 
 
