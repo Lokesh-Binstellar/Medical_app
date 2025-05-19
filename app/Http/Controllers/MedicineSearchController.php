@@ -182,7 +182,7 @@ class MedicineSearchController extends Controller
         return response()->json(['status' => 'success', 'data' => $result]);
     }
 
-    public function placeOrder(Request $request)
+    public function allPharmacyRequests(Request $request)
     {
         $getMedicine = Phrmacymedicine::with('pharmacy')->get();
 
@@ -275,9 +275,11 @@ class MedicineSearchController extends Controller
                     'pharmacy_name' => $pharmacy->pharmacy_name ?? 'Unknown',
                     'pharmacy_address' => $pharmacy->address ?? 'Unknown',
                     'medicines' => $decodedMedicines->values(),
-                    'total_amount' => $group->sum('total_amount'),
+                    'item_price' => $group->sum('total_amount'),
                     'mrp_amount' => $group->sum('mrp_amount'),
                     'rating' => 4,
+                    'platform_fees' => 4,
+                    'total_price' => $group->sum('total_amount')  + 4,
                     'distance' => $distance ?? 'Unknown'
                 ];
             })->values();
@@ -296,6 +298,26 @@ class MedicineSearchController extends Controller
         }
 
     }
+
+    public function pharmacyRequest()
+    {
+
+
+
+
+        $getMedicine = Phrmacymedicine::with('pharmacy')->get();
+        echo $getMedicine;
+        die;
+
+        return response()->json(
+            [
+                "status" => true,
+                "data" => "test"
+            ]
+        );
+    }
+
+
 
     public function getRoadDistance($lat1, $lon1, $lat2, $lon2, $apiKey)
     {
