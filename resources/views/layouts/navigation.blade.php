@@ -195,6 +195,16 @@
         @endif
 
 
+@if (in_array('App Rating', $permissions) || $isSuperAdmin == 1)
+    <li class="menu-item {{ request()->routeIs('app_ratings.index') ? 'active' : '' }}">
+        <a href="{{ route('app_ratings.index') }}" class="menu-link">
+            <i class="menu-icon tf-icons mdi mdi-star"></i>
+            <div data-i18n="App Rating">App Rating</div>
+        </a>
+    </li>
+@endif
+
+
         <li class="menu-item">
             <a href="{{ route('logout') }}" class="menu-link"
                 onclick="event.preventDefault();document.getElementById('logout-form').submit();">

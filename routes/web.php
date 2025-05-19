@@ -7,6 +7,7 @@ use App\Http\Controllers\LabtestController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicineSearchController;
 use App\Http\Controllers\AddMedicineController;
+use App\Http\Controllers\AppRatingController;
 use App\Http\Controllers\OtcController;
 use App\Http\Controllers\packageCategoryController;
 use App\Http\Controllers\PackageController;
@@ -302,3 +303,6 @@ Route::prefix('notifications')->group(function () {
     Route::get('/', [RequestQuoteController::class, 'index'])->name('notification.index');
     Route::post('/read/{id}', [RequestQuoteController::class, 'markAsRead'])->name('notifications.read');
 });
+
+
+Route::get('/app-ratings', [AppRatingController::class, 'index'])->name('app_ratings.index');

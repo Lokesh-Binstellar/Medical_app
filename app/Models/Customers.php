@@ -35,6 +35,12 @@ class Customers extends Model
         return $this->hasMany(Prescription::class);
     }
 
+    public function appRatings()
+{
+    return $this->hasMany(AppRating::class);
+}
+
+
 }
 
 

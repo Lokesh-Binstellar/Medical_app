@@ -2,6 +2,7 @@
 
 use App\Events\MyEvent;
 use App\Http\Controllers\AddMedicineController;
+use App\Http\Controllers\AppRatingController;
 use App\Http\Controllers\AuthTokenController;
 use App\Http\Controllers\CustomerAddressController;
 use App\Http\Controllers\FileUploadController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeBannerController;
 use App\Http\Controllers\JoinUsController;
 use App\Http\Controllers\MedicineBannerController;
+use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PopularLabTestController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\RequestQuoteController;
@@ -57,7 +59,17 @@ Route::middleware('check.api.key')->group(function () {
         Route::post('/add-to-cart', [AddMedicineController::class, 'frontendAddToCart']);
         Route::get('/getUserCart', [AddMedicineController::class, 'getAddToCart'])->name('getUserCart.getAddToCart');
         Route::post('/requestAQuote', [RequestQuoteController::class, 'requestAQuote']);
-          Route::post('/ratings', [RatingController::class, 'store']);
+
+        // rating 
+        Route::post('/ratings', [RatingController::class, 'store']);
+        Route::post('/rate-app', [AppRatingController::class, 'store']);
+
+
+
+        // Patient
+        Route::get('/patients', [PatientController::class, 'index']);
+        Route::post('/patients', [PatientController::class, 'store']);
+        Route::put('/patients/{id}', [PatientController::class, 'update']);
     });
 
     Route::get('/productListByCategory/{categoryName}', [OtcController::class, 'productListByCategory']);
@@ -69,13 +81,17 @@ Route::middleware('check.api.key')->group(function () {
 
     Route::post('/join-us', [JoinUsController::class, 'store']);
 
-    Route::get('/placeOrder',[MedicineSearchController::class,'placeOrder']);
+    Route::get('/placeOrder', [MedicineSearchController::class, 'placeOrder']);
+
+    // routes/api.php
+
+    // Route::middleware('auth:sanctum')->group(function () {
+    //     Route::get('/patients', [PatientController::class, 'index']);
+    //     Route::post('/patients', [PatientController::class, 'store']);
+    //     Route::put('/patients/{id}', [PatientController::class, 'update']);
+    //     Route::delete('/patients/{id}', [PatientController::class, 'destroy']);
+    // });
 
 
-  
 
 });
-
-
-
- 
