@@ -118,6 +118,11 @@ class RequestQuoteController extends Controller
                 RequestQuote::create([
                     'customer_id' => $userId,
                     'pharmacy_id' => $pharmacy->user_id,
+                     'customer_address' => json_encode([
+                        'type' => $addressType,
+                        'lat' => $address->lat,
+                        'lng' => $address->lng
+                    ])
                 ]);
                 $pharmacyUser = User::where('id', $pharmacy->user_id)->first();
                 $requestingUser = User::find($userId);

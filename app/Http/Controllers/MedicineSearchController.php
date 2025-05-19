@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Events\MyEvent;
+use App\Events\Pharmacymedicine;
 use App\Models\Carts;
+use App\Models\CustomerAddress;
 use App\Models\Customers;
 use App\Models\Medicine;
 use App\Models\Otcmedicine;
 use App\Models\Pharmacies;
 use App\Models\Phrmacymedicine;
+use App\Models\RequestQuote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -28,32 +31,30 @@ class MedicineSearchController extends Controller
         return view('Pharmacist.add-medicine', compact('medicines'));
     }
 
-
-
-
     public function store(Request $request)
     {
         $data = $request->all();
-        // dd($request->all());
-
         $user = Auth::user();
-        // Validate basic structure (you can add more rules as needed)
-        // dd($data['customer'][0]['customer_id']);
 
+        // Get pharmacy info
         $pharmacy = Pharmacies::where('user_id', $user->id)->first();
+        // dd($pharmacy);
 
-
-        // Store in database
-        // 'customer_id' => $customerId,
-        $medicine = new Phrmacymedicine(); // your model
+        // Save medicine
+        $medicine = new Phrmacymedicine();
         $medicine->medicine = json_encode($data['medicine']);
-
         $medicine->total_amount = $data['total_amount'];
         $medicine->mrp_amount = $data['mrp_amount'];
         $medicine->commission_amount = $data['commission_amount'];
-        $medicine->phrmacy_id = $pharmacy->id;
+        $medicine->phrmacy_id = $pharmacy->user_id;
         $medicine->customer_id = $data['customer'][0]['customer_id'];
         $medicine->save();
+
+        // ✅ Update request_quotes only if both customer_id and pharmacy_id match
+        DB::table('request_quotes')
+            ->where('customer_id', $data['customer'][0]['customer_id'])
+            ->where('pharmacy_id', $pharmacy->user_id)
+            ->update(['pharmacy_address_status' => 1]);
 
         return redirect()->back()->with('success', 'Medicine added successfully!');
     }
@@ -84,7 +85,7 @@ class MedicineSearchController extends Controller
             ->get()
             ->map(function ($item) {
                 return [
-                    'id' => 'otc-' . $item->otc_id,  // use otc_id here
+                    'id' => $item->otc_id,  // use otc_id here
                     'text' => $item->name,
                 ];
             });
@@ -92,24 +93,33 @@ class MedicineSearchController extends Controller
         return response()->json($medicines->merge($otc));
     }
 
-
     public function customerSelect(Request $request)
     {
         $search = $request->input('query');
 
         // Step 1: Get matching customers from request_quotes + customers
-        $customers = DB::table('request_quotes')
-            ->join('customers', 'request_quotes.customer_id', '=', 'customers.id')
+        $customers = DB::table('customers')
             ->where(function ($query) use ($search) {
                 $query->where('customers.firstName', 'like', "%{$search}%")
                     ->orWhere('customers.mobile_no', 'like', "%{$search}%");
+            })
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('request_quotes')
+                    ->whereRaw('request_quotes.customer_id = customers.id')
+                    ->where('request_quotes.pharmacy_address_status', '=', 0);
+            })
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('request_quotes')
+                    ->whereRaw('request_quotes.customer_id = customers.id')
+                    ->where('request_quotes.pharmacy_address_status', '=', 1);
             })
             ->select('customers.id', DB::raw("CONCAT(customers.firstName, ' (', customers.mobile_no, ')') as text"))
             ->distinct()
             ->limit(10)
             ->get();
 
-        // Step 2: (Optional) Get cart for the first matched customer
         $firstCustomerId = $customers->first()?->id;
         $product = null;
 
@@ -170,5 +180,136 @@ class MedicineSearchController extends Controller
         // dd($result);
 
         return response()->json(['status' => 'success', 'data' => $result]);
+    }
+
+    public function placeOrder(Request $request)
+    {
+        $getMedicine = Phrmacymedicine::with('pharmacy')->get();
+
+        try {
+            $combinations = $getMedicine->map(function ($item) {
+                return [
+                    'customer_id' => $item->customer_id,
+                    'pharmacy_id' => $item->phrmacy_id,
+                ];
+            });
+
+            $quoteAddresses = RequestQuote::where(function ($query) use ($combinations) {
+                foreach ($combinations as $combo) {
+                    $query->orWhere(function ($q) use ($combo) {
+                        $q->where('customer_id', $combo['customer_id'])
+                            ->where('pharmacy_id', $combo['pharmacy_id']);
+                    });
+                }
+            })->get()->mapWithKeys(function ($quote) {
+                $address = json_decode($quote->customer_address, true);
+                $key = $quote->customer_id . '_' . $quote->pharmacy_id;
+
+                return [
+                    $key => [
+                        'type' => $address['type'] ?? null,
+                        'lat' => trim($address['lat'] ?? ''),
+                        'lng' => trim($address['lng'] ?? ''),
+                    ]
+                ];
+            });
+
+            $apiKey = env('GOOGLE_MAPS_API_KEY');
+            $userId = $getMedicine->pluck('customer_id')->unique();
+
+            $carts = Carts::where('customer_id', $userId)->get()->flatMap(function ($cart) {
+                try {
+                    return json_decode($cart->products_details, true);
+                } catch (\Exception $e) {
+                    return [];
+                }
+            });
+            $cartQuantities = collect($carts)->mapWithKeys(function ($item) {
+                return [$item['product_id'] => $item['quantity']];
+            });
+            $grouped = $getMedicine->groupBy('phrmacy_id')->map(function ($group, $pharmacyId) use ($cartQuantities, $quoteAddresses, $apiKey) {
+                $pharmacy = $group->first()->pharmacy;
+                $customerId = $group->first()->customer_id;
+                $key = $customerId . '_' . $pharmacyId;
+                $customerAddress = $quoteAddresses[$key] ?? null;
+                $distance = null;
+                if ($customerAddress && $pharmacy && $pharmacy->latitude && $pharmacy->longitude) {
+                    $distanceValue = $this->getRoadDistance(
+                        $customerAddress['lat'],
+                        $customerAddress['lng'],
+                        $pharmacy->latitude,
+                        $pharmacy->longitude,
+                        $apiKey
+                    );
+                    $distance = $distanceValue !== false ? round($distanceValue, 2) . ' km' : 'Unknown';
+                }
+
+                $decodedMedicines = $group->flatMap(function ($item) use ($cartQuantities) {
+                    try {
+                        $decoded = is_string($item->medicine)
+                            ? json_decode($item->medicine, true)
+                            : $item->medicine;
+
+                        $decodedArray = is_array($decoded) ? $decoded : [$decoded];
+
+                        return collect($decodedArray)->map(function ($med) use ($cartQuantities) {
+                            $medId = $med['medicine_id'];
+
+                            $image = Medicine::where('product_id', $medId)->value('image_url');
+                            if (!$image) {
+                                $image = Otcmedicine::where('otc_id', $medId)->value('image_url');
+                            }
+
+                            $med['image'] = $image ? asset('storage/' . $image) : null;
+                            $med['qty'] = $cartQuantities[$med['medicine_id']] ?? 0;
+
+                            return $med;
+                        });
+                    } catch (\Exception $e) {
+                        return [['error' => 'Invalid JSON']];
+                    }
+                });
+
+                return [
+                    'pharmacy_id' => $pharmacyId,
+                    'pharmacy_name' => $pharmacy->pharmacy_name ?? 'Unknown',
+                    'pharmacy_address' => $pharmacy->address ?? 'Unknown',
+                    'medicines' => $decodedMedicines->values(),
+                    'total_amount' => $group->sum('total_amount'),
+                    'mrp_amount' => $group->sum('mrp_amount'),
+                    'rating' => 4,
+                    'distance' => $distance ?? 'Unknown'
+                ];
+            })->values();
+
+            return response()->json([
+                'status' => true,
+                'data' => $grouped
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
+    }
+
+    public function getRoadDistance($lat1, $lon1, $lat2, $lon2, $apiKey)
+    {
+
+        $url = "https://maps.googleapis.com/maps/api/directions/json?origin=$lat1,$lon1&destination=$lat2,$lon2&key=$apiKey";
+
+        $response = file_get_contents($url);
+        $data = json_decode($response, true);
+
+        if ($data['status'] === 'OK') {
+            $distanceMeters = $data['routes'][0]['legs'][0]['distance']['value'];
+            return $distanceMeters / 1000; // return in KM
+        }
+
+        return false;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Phar;
 
 class Pharmacies extends Model
 {
@@ -34,5 +35,8 @@ class Pharmacies extends Model
 {
     return $this->belongsTo(User::class);
 }
-
+public function medicines()
+{
+    return $this->hasMany(Phrmacymedicine::class, 'phrmacy_id'); // Make sure the foreign key matches
+}
 }

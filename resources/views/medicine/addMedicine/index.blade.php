@@ -129,7 +129,7 @@
                                 </div>
 
                                 <div>
-                                    <div class="header">Side-by-Side PDF Preview</div>
+                                    <div class="header">Prescriptions Preview</div>
 
                                     <div class="pdf-wrapper" id="prescription-preview"></div>
 
@@ -480,7 +480,7 @@
                         response.files.forEach(function(fileUrl, index) {
                             html += `
                         <div class="pdf-box">
-                            <div class="pdf-title">Document ${index + 1}</div>
+                            <div class="pdf-title">Prescription ${index + 1}</div>
                             <iframe class="pdf-viewer" src="${fileUrl}">
                                 This browser does not support PDFs. 
                                 <a href="assets/storage/uploads${fileUrl}" download>Download PDF</a>.
