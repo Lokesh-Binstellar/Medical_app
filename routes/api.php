@@ -3,6 +3,7 @@
 use App\Events\MyEvent;
 use App\Http\Controllers\AddMedicineController;
 use App\Http\Controllers\AppRatingController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AuthTokenController;
 use App\Http\Controllers\CustomerAddressController;
 use App\Http\Controllers\FileUploadController;
@@ -75,6 +76,8 @@ Route::middleware('check.api.key')->group(function () {
 
         // zip_code_vise_delivery
         Route::get('/zipcodes', [ZipCodeViceDeliveryController::class, 'getZipcodes']);
+        Route::post('/ratings', [RatingController::class,'store']);
+        Route::post('/placeOrder',[OrderController::class,'placeOrder']);
     });
 
     Route::get('/productListByCategory/{categoryName}', [OtcController::class, 'productListByCategory']);

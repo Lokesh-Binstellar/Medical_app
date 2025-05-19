@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('laboratories', function (Blueprint $table) {
+        /* Schema::table('laboratories', function (Blueprint $table) {
             $table->boolean('pickup')->after('license');
-        });
+        }); */
     }
 
     /**
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('laboratories', function (Blueprint $table) {
+        /* Schema::table('laboratories', function (Blueprint $table) {
             $table->dropColumn('pickup');
-        });
+        }); */
     }
 };
