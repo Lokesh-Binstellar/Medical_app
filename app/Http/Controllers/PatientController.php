@@ -6,28 +6,29 @@ use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PatientController extends Controller
 {
     public function index(Request $request)
-{
-    $customerId = $request->get('user_id');
+    {
+        $customerId = $request->get('user_id');
 
-    $patients = Patient::where('customer_id', $customerId)->get()->map(function ($patient) {
-        return [
-            'id' => $patient->id,
-            'customer_id' => $patient->customer_id,
-            'name' => $patient->name,
-            'birth_date' => $patient->birth_date, // Accessor formats it already
-            'gender' => $patient->gender,
-        ];
-    });
+        $patients = Patient::where('customer_id', $customerId)->get()->map(function ($patient) {
+            return [
+                'id' => $patient->id,
+                'customer_id' => $patient->customer_id,
+                'name' => $patient->name,
+                'birth_date' => $patient->birth_date, // Accessor formats it already
+                'gender' => $patient->gender,
+            ];
+        });
 
-    return response()->json([
-        'success' => true,
-        'data' => $patients
-    ]);
-}
+        return response()->json([
+            'success' => true,
+            'data' => $patients
+        ]);
+    }
 
     public function store(Request $request)
     {
@@ -71,6 +72,7 @@ class PatientController extends Controller
         }
     }
 
+
     public function update(Request $request, $id)
     {
         try {
@@ -87,13 +89,12 @@ class PatientController extends Controller
             $data = $request->only(['name', 'birth_date', 'gender']);
 
             if (isset($data['birth_date'])) {
-                // Convert frontend date 'd/m/Y' to DB format 'Y-m-d'
                 $data['birth_date'] = Carbon::createFromFormat('d/m/Y', $data['birth_date'])->format('Y-m-d');
             }
 
             $patient->update($data);
 
-            $rawDate = $patient->getAttributes()['birth_date']; // raw 'Y-m-d' string
+            $rawDate = $patient->getAttributes()['birth_date'];
 
             return response()->json([
                 'message' => 'Patient updated',
@@ -112,6 +113,11 @@ class PatientController extends Controller
                 'status' => false,
                 'message' => $errorMessage,
             ], 422);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => "No patient found.",
+            ], 404);
         }
     }
 }
