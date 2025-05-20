@@ -352,7 +352,7 @@ class MedicineSearchController extends Controller
 
         // Step 3: Fetch all prescriptions for this customer_id
        $prescriptions = Prescription::where('customer_id', $customerId)
-                              ->where('status', 1)
+                            ->where('status', 0)
                               ->get();
 
         if ($prescriptions->isEmpty()) {
@@ -371,7 +371,7 @@ class MedicineSearchController extends Controller
                 foreach ($files as $file) {
                     $file = trim($file);
                     if (!empty($file)) {
-                        $fileUrls[] = asset('storage/uploads/' . $file);
+                        $fileUrls[] = asset('uploads/' . $file);
                     }
                 }
             }

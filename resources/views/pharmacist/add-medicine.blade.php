@@ -353,7 +353,7 @@
                 minimumInputLength: 0,
                 ajax: {
 
-                    url: "/search-medicine",
+                    url: `{{ route('search.medicine') }}`,
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {
