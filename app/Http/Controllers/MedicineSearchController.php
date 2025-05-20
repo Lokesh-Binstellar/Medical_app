@@ -302,10 +302,6 @@ class MedicineSearchController extends Controller
         }
     }
 
-  
-
-
-
     public function getRoadDistance($lat1, $lon1, $lat2, $lon2, $apiKey)
     {
 

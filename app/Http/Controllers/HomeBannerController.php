@@ -15,7 +15,7 @@ class HomeBannerController extends Controller
             return datatables()->of(HomeBanner::latest()->get())
                 ->addIndexColumn()
                 ->addColumn('image', function ($row) {
-                    return '<img src="' . asset('storage/banners/' . $row->image) . '" width="100">';
+                    return '<img src="' . asset('banners/' . $row->image) . '" width="100">';
                 })
                 ->addColumn('action', function ($row) {
     return '
@@ -38,26 +38,30 @@ class HomeBannerController extends Controller
         return view('homebanner.index');
     }
 
-    public function store(Request $request)
-    {
+   public function store(Request $request)
+{
+    $request->validate([
+        'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        'priority' => 'nullable|integer|min:0'
+    ]);
 
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'priority' => 'nullable|integer|min:0'
-        ]);
-
-
-        $fileName = time() . '.' . $request->image->extension();
-
-
-        Storage::disk('uploads')->put($fileName, file_get_contents($request->file('image')));
-
-
-        HomeBanner::create(['image' => $fileName, 'priority' => $request->priority ?? 0]);
-
-
-        return redirect()->back()->with('success', 'Banner Added!');
+   $uploadPath = public_path('banners');
+    if (!file_exists($uploadPath)) {
+        mkdir($uploadPath, 0755, true);
     }
+
+    $fileName = $request->image->getClientOriginalName();
+
+    $request->file('image')->move($uploadPath, $fileName);
+
+    HomeBanner::create([
+        'image' => $fileName,
+        'priority' => $request->priority ?? 0
+    ]);
+
+    return redirect()->back()->with('success', 'Banner Added!');
+}
+
 
     public function show($id)
     {
@@ -73,57 +77,66 @@ class HomeBannerController extends Controller
 
 
     public function update(Request $request, $id)
-    {
-        $banner = HomeBanner::findOrFail($id);
-
-        if ($request->hasFile('image')) {
-            $request->validate([
-                'image' => 'image|mimes:jpeg,png,jpg|max:2048'
-            ]);
-
-            // Delete old image if exists
-            if ($banner->image && Storage::disk('uploads')->exists($banner->image)) {
-                Storage::disk('uploads')->delete($banner->image);
-            }
-
-            // Generate new file name
-            $fileName = time() . '.' . $request->image->extension();
-
-            // Save new image using 'uploads' disk
-            Storage::disk('uploads')->put($fileName, file_get_contents($request->file('image')));
-
-            // Update DB
-            $banner->image = $fileName;
-        }
-
-        $banner->priority = $request->priority ?? 0;
-        $banner->save();
-
-        return redirect()->route('homebanner.index')->with('success', 'Banner updated successfully!');
-    }
-
-   public function destroy($id)
 {
     $banner = HomeBanner::findOrFail($id);
 
-    if ($banner->image && Storage::exists('public/banners/' . $banner->image)) {
-        Storage::delete('public/banners/' . $banner->image);
+    if ($request->hasFile('image')) {
+        $request->validate([
+            'image' => 'image|mimes:jpeg,png,jpg|max:2048'
+        ]);
+
+        $uploadPath = public_path('banners');
+
+        if (!file_exists($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
+
+        if ($banner->image && file_exists($uploadPath . '/' . $banner->image)) {
+            unlink($uploadPath . '/' . $banner->image);
+        }
+
+        $fileName = $request->image->getClientOriginalName();
+        $request->file('image')->move($uploadPath, $fileName);
+
+        $banner->image = $fileName;
     }
 
-    $banner->delete();
+    $banner->priority = $request->priority ?? 0;
+    $banner->save();
 
-    return response()->json(['success' => true, 'message' => 'Banner deleted successfully']);
+    return redirect()->route('homebanner.index')->with('success', 'Banner updated successfully!');
 }
 
 
-    public function getAllBanners()
-    {
+public function destroy($id)
+{
+    
+  $banner = HomeBanner::findOrFail($id);
+
+   $imagePath = public_path('banners/' . $banner->image);
+
+if ($banner->image && file_exists($imagePath)) {
+    unlink($imagePath);
+}
+
+$banner->delete();
+ if (request()->ajax()) {
+        return response()->json(['success' => 'Banner deleted successfully']);
+    }
+
+ return redirect()->route('homebanner.index')
+        ->with('success', 'Home banner deleted successfully');
+}
+
+
+public function getAllBanners()
+ {
         $banners = HomeBanner::orderBy('priority', 'asc')->get(['id', 'image', 'priority']);
 
         $result = $banners->map(function ($banner) {
             return [
                 'id' => $banner->id,
-                'image_url' => asset('storage/banners/' . $banner->image),
+                'image_url' => asset('banners/' . $banner->image),
                 // 'priority' => $banner->priority
             ];
         });

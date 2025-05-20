@@ -19,36 +19,74 @@ class MedicineImport implements ToModel, WithHeadingRow
     public function model(array $row)
     {
         $savedImages=[];
+        // if (!empty($row['final_urls'])) {
+        //     $urls = explode('|', $row['final_urls']);
+        
+        //     foreach ($urls as $url) {
+        //         $url = trim($url); // clean spaces
+        
+        //         if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+        //             continue;
+        //         }
+        
+        //         // Get original filename from URL
+        //         $fileName = basename(parse_url($url, PHP_URL_PATH));
+        //         $relativePath = 'medicines/' . $fileName;
+        
+        //         // Check if the file already exists
+        //         if (!Storage::disk('public')->exists($relativePath)) {
+        //             try {
+        //                 $fileContents = Http::get($url)->body();
+        //                 Storage::disk('public')->put($relativePath, $fileContents);
+        //             } catch (\Exception $e) {
+        //                 \Log::error("Image download failed: $url - " . $e->getMessage());
+        //                 continue;
+        //             }
+        //         }
+        
+        //         // Get public URL and add to array
+        //         $fileUrl =$relativePath;
+        //         $savedImages[] = $fileUrl;
+        //     }
+        // }
         if (!empty($row['final_urls'])) {
-            $urls = explode('|', $row['final_urls']);
-        
-            foreach ($urls as $url) {
-                $url = trim($url); // clean spaces
-        
-                if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
-                    continue;
+    $urls = explode('|', $row['final_urls']);
+
+    foreach ($urls as $url) {
+        $url = trim($url); // clean spaces
+
+        if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+            continue;
+        }
+
+        // Get original filename from URL
+        $fileName = basename(parse_url($url, PHP_URL_PATH));
+        $relativePath = 'medicines/' . $fileName;
+        $absolutePath = public_path($relativePath);
+
+        // Check if the file already exists in public folder
+        if (!file_exists($absolutePath)) {
+            try {
+                $fileContents = Http::get($url)->body();
+
+                // Ensure directory exists
+                if (!file_exists(dirname($absolutePath))) {
+                    mkdir(dirname($absolutePath), 0755, true);
                 }
-        
-                // Get original filename from URL
-                $fileName = basename(parse_url($url, PHP_URL_PATH));
-                $relativePath = 'medicines/' . $fileName;
-        
-                // Check if the file already exists
-                if (!Storage::disk('public')->exists($relativePath)) {
-                    try {
-                        $fileContents = Http::get($url)->body();
-                        Storage::disk('public')->put($relativePath, $fileContents);
-                    } catch (\Exception $e) {
-                        \Log::error("Image download failed: $url - " . $e->getMessage());
-                        continue;
-                    }
-                }
-        
-                // Get public URL and add to array
-                $fileUrl =$relativePath;
-                $savedImages[] = $fileUrl;
+
+                // Save file in public/medicines
+                file_put_contents($absolutePath, $fileContents);
+            } catch (\Exception $e) {
+                \Log::error("Image download failed: $url - " . $e->getMessage());
+                continue;
             }
         }
+
+        // Save path (e.g. medicines/filename.jpg) to DB array
+        $savedImages[] = $relativePath;
+    }
+}
+
         
         
                 //echo '<pre>';print_r(value:   $savedImages);

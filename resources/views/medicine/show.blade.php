@@ -149,7 +149,7 @@
                             <th>Image(s)</th>
                             <td>
                                 @foreach (explode(',', $medicines->image_url) as $img)
-                                    <img src="{{ asset('storage/' . $img) }}" alt="medicine image"
+                                    <img src="{{ asset($img) }}" alt="medicine image"
                                         style="max-height: 120px; margin: 5px;">
                                 @endforeach
                             </td>
