@@ -18,7 +18,7 @@ return new class extends Migration
         $table->string('pharmacy_id');
         $table->json('product_details'); // Store as JSON from cart
         $table->text('items_price');
-        $table->text('platform_fees')->default(4);
+        $table->text('platform_fees');
         $table->text('total_price');
         $table->text('delivery_charges');
         $table->text('delivery_address');
