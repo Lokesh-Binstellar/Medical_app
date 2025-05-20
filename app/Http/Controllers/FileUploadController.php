@@ -100,13 +100,10 @@ class FileUploadController extends Controller
     {
         $userId = $request->get('user_id');
 
-        // Check if file exists in the request
         if ($request->hasFile('file')) {
 
             // Get the original file name
             $originalFileName = $request->file('file')->getClientOriginalName();
-
-            // Store the uploaded file in the 'uploads' directory
             $path = $request->file('file')->move(public_path('uploads'), $originalFileName);
 
             // Get the prescription status from the request

@@ -483,6 +483,8 @@
                         dataType: 'json',
                         delay: 250,
                         data: function(params) {
+                            console.log('dfsf');
+                            console.log(params);
                             return {
                                 query: params.term
                             };
