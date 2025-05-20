@@ -399,6 +399,7 @@ public function getAddToCart(Request $request)
 
                     $packageDetail = $product['packaging_detail'] ?? $medicine->packaging ?? $medicine->packaging_detail ?? '';
                     $quantity = $product['quantity'] ?? $medicine->qty ?? 1;
+                    // echo $quantity;die;
 
                     $imageUrls = [];
                     if (!empty($medicine->image_url)) {
@@ -558,7 +559,7 @@ public function getAddToCart(Request $request)
         foreach ($currentProducts as &$item) {
             if ($item['product_id'] == $productId) {
                 // If found, update quantity & packaging
-                $item['quantity'] += $quantity;
+                $item['quantity'] = $quantity;
                 $item['packaging_detail'] = $packagingDetail;
                 $found = true;
                 break;
@@ -715,7 +716,7 @@ public function getAddToCart(Request $request)
             // Step 5: Generate full URLs for each file
             foreach ($files as $file) {
                 // Trim any extra spaces and generate a full URL
-                $fileUrls[] = asset('storage/uploads/' . trim($file));
+                $fileUrls[] = asset('uploads/' . trim($file));
             }
         }
 

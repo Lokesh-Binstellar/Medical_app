@@ -211,6 +211,8 @@ class MedicineSearchController extends Controller
 
                         return collect($decodedArray)->map(function ($med) use ($cartQuantities) {
                             $medId = $med['medicine_id'];
+                          
+                         
 
                             $image = Medicine::where('product_id', $medId)->value('image_url');
                             if (!$image) {
@@ -219,6 +221,8 @@ class MedicineSearchController extends Controller
 
                             $med['image'] = $image ? asset('storage/' . $image) : null;
                             $med['qty'] = $cartQuantities[$med['medicine_id']] ?? 0;
+                            $med['price'] = $med['discount'] ?? 0;
+                         unset($med['discount']);
 
                             return $med;
                         });
@@ -254,23 +258,7 @@ class MedicineSearchController extends Controller
         }
     }
 
-    public function pharmacyRequest()
-    {
-
-
-
-
-        $getMedicine = Phrmacymedicine::with('pharmacy')->get();
-        echo $getMedicine;
-        die;
-
-        return response()->json(
-            [
-                "status" => true,
-                "data" => "test"
-            ]
-        );
-    }
+  
 
 
 
