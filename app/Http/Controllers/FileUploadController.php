@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Prescription;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\public;
 use Yajra\DataTables\Facades\DataTables;
 
 class FileUploadController extends Controller
@@ -32,19 +32,19 @@ class FileUploadController extends Controller
 
                     // Check if the file is an image
                     if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-                        return '<a href="' .asset('storage/uploads/' . $fileUrl). '" target="_blank">
-                                        <img src="' . asset('storage/uploads/' . $fileUrl). '" alt="Prescription Image" style="max-width: 60px; height: auto;" class="img-thumbnail">
+                        return '<a href="' .asset('public/uploads/' . $fileUrl). '" target="_blank">
+                                        <img src="' . asset('public/uploads/' . $fileUrl). '" alt="Prescription Image" style="max-width: 60px; height: auto;" class="img-thumbnail">
                                     </a>';
                     }
                     // Check if the file is a PDF
                     elseif (strtolower($extension) === 'pdf') {
-                        return '<a href="' . asset('storage/uploads/' . $fileUrl) . '" target="_blank">
+                        return '<a href="' . asset('public/uploads/' . $fileUrl) . '" target="_blank">
                                         <img src="' . asset('assets/pdf-icon.png') . '" style="width: 40px;" alt="PDF Preview">
                                     </a>';
                     }
                     // For other file types
                     else {
-                        return '<a href="' . asset('storage/uploads/' . $fileUrl). '" target="_blank">View File</a>';
+                        return '<a href="' . asset('public/uploads/' . $fileUrl). '" target="_blank">View File</a>';
                     }
                 })
                 ->editColumn('prescription_status', function ($row) {
@@ -107,7 +107,7 @@ class FileUploadController extends Controller
             $originalFileName = $request->file('file')->getClientOriginalName();
 
             // Store the uploaded file in the 'uploads' directory
-            $path = $request->file('file')->storeAs('uploads', $originalFileName, 'public');
+            $path = $request->file('file')->move(public_path('uploads'), $originalFileName);
 
             // Get the prescription status from the request
             $prescription_status = $request->get('prescription_status', null);

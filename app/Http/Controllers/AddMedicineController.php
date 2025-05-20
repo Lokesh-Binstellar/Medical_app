@@ -716,7 +716,7 @@ public function getAddToCart(Request $request)
             // Step 5: Generate full URLs for each file
             foreach ($files as $file) {
                 // Trim any extra spaces and generate a full URL
-                $fileUrls[] = asset('storage/uploads/' . trim($file));
+                $fileUrls[] = asset('uploads/' . trim($file));
             }
         }
 
