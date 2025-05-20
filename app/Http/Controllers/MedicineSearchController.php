@@ -29,7 +29,7 @@ class MedicineSearchController extends Controller
         $medicines = Phrmacymedicine::where('phrmacy_id', $pharmacy->id)->get();
 
 
-        return view('Pharmacist.add-medicine', compact('medicines'));
+        return view('pharmacist.add-medicine', compact('medicines'));
     }
 
     public function store(Request $request)
