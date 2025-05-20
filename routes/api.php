@@ -65,6 +65,8 @@ Route::middleware('check.api.key')->group(function () {
         // rating 
         Route::post('/ratings', [RatingController::class, 'store']);
         Route::post('/rate-app', [AppRatingController::class, 'store']);
+        Route::get('/popular-pharmacies', [RatingController::class, 'popularPharmacies']);
+        Route::get('/popular-labs', [RatingController::class, 'popularLaboratories']);
 
 
 
