@@ -483,7 +483,7 @@
                             <div class="pdf-title">Prescription ${index + 1}</div>
                             <iframe class="pdf-viewer" src="${fileUrl}">
                                 This browser does not support PDFs. 
-                                <a href="assets/storage/uploads${fileUrl}" download>Download PDF</a>.
+                                <a href="${fileUrl}" download>Download PDF</a>.
                             </iframe>
                         </div>
                     `;

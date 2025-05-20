@@ -697,7 +697,11 @@ public function getAddToCart(Request $request)
         $customerId = $prescription->customer_id;
 
         // Step 3: Fetch all prescriptions for the customer, to get all files
-        $prescriptions = Prescription::where('customer_id', $customerId)->get();
+        $prescriptions = Prescription::where('customer_id', $customerId)
+                              ->where('status', 1)
+                              ->get();
+
+        
 
         if ($prescriptions->isEmpty()) {
             return response()->json([
