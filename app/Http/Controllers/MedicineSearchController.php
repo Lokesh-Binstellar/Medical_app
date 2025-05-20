@@ -11,6 +11,7 @@ use App\Models\Medicine;
 use App\Models\Otcmedicine;
 use App\Models\Pharmacies;
 use App\Models\Phrmacymedicine;
+use App\Models\Prescription;
 use App\Models\RequestQuote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -136,51 +137,7 @@ class MedicineSearchController extends Controller
         ]);
     }
 
-    public function fetchCartByCustomer(Request $request)
-    {
-        $customerId = $request->input('customer_id');
 
-        $cart = Carts::where('customer_id', $customerId)->first();
-
-        if (!$cart || !$cart->products_details) {
-            return response()->json(['status' => 'error', 'message' => 'Cart not found']);
-        }
-
-        $products = json_decode($cart->products_details, true);
-        $result = [];
-
-        foreach ($products as $item) {
-            $productId = $item['product_id'];
-            $isSubstitute = $item['is_substitute'] ?? 0;
-            $packagingDetail = $item['packaging_detail'] ?? '';
-            $quantity = $item['quantity'] ?? 1;
-
-            $medicine = Medicine::where('product_id', $productId)->first();
-            $medName = $medicine->product_name . ' + ' . $medicine->salt_composition;
-            $type = 'medicine';
-
-            // If not found in medicines, try otcmedicines
-            if (!$medicine) {
-                $medicine = Otcmedicine::where('otc_id', $productId)->first();
-                $medName = $medicine->name;
-                $type = 'otc';
-            }
-
-            if ($medicine) {
-                $result[] = [
-                    'product_id' => $productId,
-                    'type' => $type,
-                    'name' => $medName ?? 'N/A',
-                    'packaging_detail' => $packagingDetail,
-                    'quantity' => $quantity,
-                    'is_substitute' => $isSubstitute,
-                ];
-            }
-        }
-        // dd($result);
-
-        return response()->json(['status' => 'success', 'data' => $result]);
-    }
 
     public function allPharmacyRequests(Request $request)
     {
@@ -288,7 +245,6 @@ class MedicineSearchController extends Controller
                 'status' => true,
                 'data' => $grouped
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
@@ -296,7 +252,6 @@ class MedicineSearchController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
-
     }
 
     public function pharmacyRequest()
@@ -333,5 +288,118 @@ class MedicineSearchController extends Controller
         }
 
         return false;
+    }
+
+
+
+    public function fetchCartByCustomer(Request $request)
+    {
+        $customerId = $request->input('customer_id');
+
+        $cart = Carts::where('customer_id', $customerId)->first();
+
+        if (!$cart || !$cart->products_details) {
+            return response()->json(['status' => 'error', 'message' => 'Cart not found']);
+        }
+
+        $products = json_decode($cart->products_details, true);
+        $result = [];
+
+        foreach ($products as $item) {
+            $productId = $item['product_id'];
+            $isSubstitute = $item['is_substitute'] ?? 0;
+            $packagingDetail = $item['packaging_detail'] ?? '';
+            $quantity = $item['quantity'] ?? 1;
+
+            $medicine = Medicine::where('product_id', $productId)->first();
+            $medName = $medicine->product_name . ' + ' . $medicine->salt_composition;
+            $type = 'medicine';
+
+            // If not found in medicines, try otcmedicines
+            if (!$medicine) {
+                $medicine = Otcmedicine::where('otc_id', $productId)->first();
+                $medName = $medicine->name;
+                $type = 'otc';
+            }
+
+            if ($medicine) {
+                $result[] = [
+                    'product_id' => $productId,
+                    'type' => $type,
+                    'name' => $medName ?? 'N/A',
+                    'packaging_detail' => $packagingDetail,
+                    'quantity' => $quantity,
+                    'is_substitute' => $isSubstitute,
+                ];
+            }
+        }
+        // dd($result);
+
+        return response()->json(['status' => 'success', 'data' => $result]);
+    }
+
+
+
+    public function fetchPrescriptionFiles(Request $request)
+    {
+        // Step 1: Get the customer_id from the request
+        $customerId = $request->input('customer_id');
+        
+        if (!$customerId) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Customer ID is required'
+            ]);
+        }
+        
+        // Step 2: Check if customer_id exists in request_quotes table
+        $requestQuoteExists = DB::table('request_quotes')->where('customer_id', $customerId)->first();
+        // dd($requestQuoteExists);
+        if (!$requestQuoteExists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No request quote found for this customer'
+            ]);
+        }
+
+        // Step 3: Fetch all prescriptions for this customer_id
+       $prescriptions = Prescription::where('customer_id', $customerId)
+                              ->where('status', 1)
+                              ->get();
+
+        if ($prescriptions->isEmpty()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No prescriptions found for this customer'
+            ]);
+        }
+
+        $fileUrls = [];
+
+        // Step 4: Loop through prescriptions and get all files
+        foreach ($prescriptions as $prescription) {
+            if ($prescription->prescription_file) {
+                $files = explode(',', $prescription->prescription_file);
+                foreach ($files as $file) {
+                    $file = trim($file);
+                    if (!empty($file)) {
+                        $fileUrls[] = asset('storage/uploads/' . $file);
+                    }
+                }
+            }
+        }
+
+        // Step 5: Return result
+        if (empty($fileUrls)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No files found for this customer'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'files' => $fileUrls
+        ]);
     }
 }

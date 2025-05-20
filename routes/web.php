@@ -208,16 +208,26 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('', [AddMedicineController::class, 'store'])->name('addMedicine.store');
         // web.php or api.php (depending on where you're calling it from)
         Route::get('/get-medicine-strip', [AddMedicineController::class, 'getMedicineStrip'])->name('medicine.strip');
+        Route::get('/search-medicines', [AddMedicineController::class, 'searchMedicines'])->name('medicines.search');
+        Route::get('/prescription/select', [AddMedicineController::class, 'prescriptionSelect'])->name('prescription.select');
+        Route::get('/prescriptions/{customerId}/prescriptions', [AddMedicineController::class, 'getPrescriptionsByCustomer']);
+        //fetch-customer-cart
+        Route::get('/fetch-customer-cart', [AddMedicineController::class, 'fetchCustomerCart']);
+        Route::get('/fetch-prescription-files', [AddMedicineController::class, 'fetchPrescriptionFiles']);
+    });
+    Route::prefix('search-medicine')->group(function () {
+        Route::get('/pharmacist/add-medicine', [MedicineSearchController::class, 'index'])->name('add.medicine');
+        Route::get('/search-medicine', [MedicineSearchController::class, 'search'])->name('search.medicine');
+        Route::post('/add-medicine', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
+        Route::post('/medicines/store', [MedicineSearchController::class, 'store'])->name('medicines.store');
+        Route::get('/customers/select', [MedicineSearchController::class, 'customerSelect'])->name('customers.select');
+
+        Route::get('/fetch-cart-by-customer', [MedicineSearchController::class, 'fetchCartByCustomer']);
+        Route::get('/fetch-prescription-files', [MedicineSearchController::class, 'fetchPrescriptionFiles'])->name('search.prescription');;
     });
 
     // Route::post('/add-medicine/store', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
-    Route::get('/pharmacist/add-medicine', [MedicineSearchController::class, 'index'])->name('add.medicine');
-    Route::get('/search-medicine', [MedicineSearchController::class, 'search'])->name('search.medicine');
-    Route::post('/add-medicine', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
-    Route::post('/medicines/store', [MedicineSearchController::class, 'store'])->name('medicines.store');
-    Route::get('/customers/select', [MedicineSearchController::class, 'customerSelect'])->name('customers.select');
 
-    Route::get('/fetch-cart-by-customer', [MedicineSearchController::class, 'fetchCartByCustomer']);
 
 
     // rating 
@@ -227,15 +237,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/zipcodes', [ZipCodeViceDeliveryController::class, 'index'])->name('zip_code_vise_delivery.index');
     Route::post('/zipcodes/upload', [ZipCodeViceDeliveryController::class, 'uploadZipcodes'])->name('zip_code_vise_delivery.upload');
     Route::delete('/zipcodes/delete-all', [ZipCodeViceDeliveryController::class, 'deleteAll'])->name('zip_code_vise_delivery.deleteAll');
-
 });
 
 require __DIR__ . '/auth.php';
 
 
-Route::get('/search-medicines', [AddMedicineController::class, 'searchMedicines'])->name('medicines.search');
-Route::get('/prescription/select', [AddMedicineController::class, 'prescriptionSelect'])->name('prescription.select');
-Route::get('/prescriptions/{customerId}/prescriptions', [AddMedicineController::class, 'getPrescriptionsByCustomer']);
+
 Route::get('/prescriptions', [FileUploadController::class, 'index'])->name('prescriptions.index');
 Route::post('/prescriptions/update-status/{id}', [FileUploadController::class, 'updateStatus']);
 
@@ -247,9 +254,7 @@ Route::prefix('popular-lab-tests')->group(function () {
     Route::delete('/{id}', [PopularLabTestController::class, 'destroy'])->name('popular_lab_test.destroy');
 });
 
-//fetch-customer-cart
-Route::get('/fetch-customer-cart', [AddMedicineController::class, 'fetchCustomerCart']);
-Route::get('/fetch-prescription-files', [AddMedicineController::class, 'fetchPrescriptionFiles']);
+
 
 //HomeBanners
 Route::prefix('homebanners')->group(function () {

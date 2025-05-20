@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('styles')
-
     {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
 
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
@@ -56,9 +55,61 @@
             border-radius: 0px !important;
             /* light gray */
         }
-/* .card{
-    border: 1px solid #033a62;
-} */
+  .header {
+            padding: 16px;
+            background-color: #2c3e50;
+            color: #fff;
+            font-size: 1.5rem;
+            border-radius: 6px 6px 0 0;
+            margin-bottom: 20px;
+        }
+
+        .pdf-wrapper {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pdf-box {
+            flex: 1 1 45%;
+            min-width: 300px;
+        }
+
+        .pdf-title {
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            color: #34495e;
+            text-align: center;
+        }
+
+        .pdf-viewer {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .footer a {
+            text-decoration: none;
+            color: #2980b9;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 900px) {
+            .pdf-box {
+                flex: 1 1 100%;
+            }
+
+            .pdf-viewer {
+                height: 500px;
+            }
+        }
     </style>
 @endsection
 @section('content')
@@ -78,10 +129,20 @@
                     <div class="d-flex selectCustomer align-items-center gap-5">
                         <label class="font-bold">Please Select Customer :</label>
                         <select class="form-control customer-search customerDropdown" name="customer[0][customer_id]"
-                            id="customer-search">
+                            id="prescription-select">
                             <option value="">Search customer...</option>
                         </select>
                     </div>
+
+
+                    <div>
+                        <div class="header">Prescriptions Preview</div>
+
+                        <div class="pdf-wrapper" id="prescription-preview"></div>
+
+                        <div class="footer" id="download-links"></div>
+                    </div>
+
 
                     <div class="card " style="display:none;" id="cart-details">
                         <h5 class="card-header ">Customer Cart Details</h5>
@@ -110,16 +171,17 @@
                             <thead>
                                 <div
                                     style="border-left: 5px solid #f44336; background-color: #ffe6e6; padding: 10px 15px; margin-bottom: 10px; border-radius: 6px; font-family: Arial, sans-serif;">
-                                    <strong style="color: #d32f2f;">Note :</strong> <br><strong>Please make sure to enter the
+                                    <strong style="color: #d32f2f;">Note :</strong> <br><strong>Please make sure to enter
+                                        the
                                         total price manually, not the per unit price based on the quantity
-                                    requested by the customer.</strong>
+                                        requested by the customer.</strong>
                                     <br>
                                     <strong>
-                                    If requested quantity is not available,
-                                    kindly mark the medicine as not available</strong>.
+                                        If requested quantity is not available,
+                                        kindly mark the medicine as not available</strong>.
                                 </div>
 
-                               
+
                                 <tr>
                                     <th>Search Medicine</th>
                                     <th>MRP</th>
@@ -235,7 +297,7 @@
                                     <div class="accordion-body">
                                         <div class="table-responsive">
                                             <table class="table table-bordered table-striped">
-                                                <thead >
+                                                <thead>
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Medicine Name</th>
@@ -587,11 +649,11 @@
         // fetch-cart-by-customer products_details
 
         $(document).ready(function() {
-            $('#customer-search').on('select2:select', function(e) {
+            $('#prescription-select').on('select2:select', function(e) {
                 const customerId = e.params.data.id;
 
                 $.ajax({
-                    url: '/fetch-cart-by-customer',
+                    url: '/search-medicine/fetch-cart-by-customer',
                     method: 'GET',
                     data: {
                         customer_id: customerId
@@ -626,7 +688,45 @@
                 });
             });
         });
+
+
+         $('#prescription-select').on('select2:select', function(e) {
+    var customerId = e.params.data.id;  // Assuming this is customer_id
+console.log("customerId",customerId);
+
+    $.ajax({
+        url: `{{ route('search.prescription') }}`,
+        method: 'GET',
+        data: { customer_id: customerId },  // Send customer_id, not prescriptionId
+        success: function(response) {
+            if (response.status === 'success') {
+                let html = '';
+                response.files.forEach(function(fileUrl, index) {
+                    html += `
+                        <div class="pdf-box">
+                            <div class="pdf-title">Prescription ${index + 1}</div>
+                            <iframe class="pdf-viewer" src="${fileUrl}">
+                                This browser does not support PDFs. 
+                                <a href="${fileUrl}" download>Download PDF</a>.
+                            </iframe>
+                        </div>
+                    `;
+                });
+
+                $('.pdf-wrapper').html(html);
+                $('#pdf-details').show();
+            } else {
+                $('.pdf-wrapper').html('No files available.');
+                $('#pdf-details').hide();
+            }
+        },
+        error: function() {
+            $('.pdf-wrapper').html('Error loading files.');
+            $('#pdf-details').hide();
+        }
+    });
+});
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
-    
 @endsection

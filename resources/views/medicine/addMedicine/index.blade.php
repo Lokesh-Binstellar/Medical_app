@@ -385,7 +385,7 @@
             var prescriptionId = e.params.data.id;
 
             $.ajax({
-                url: '/fetch-customer-cart',
+                url: '/addMedicine/fetch-customer-cart',
                 method: 'GET',
                 data: {
                     prescription_id: prescriptionId
@@ -419,7 +419,8 @@
                 }
             });
         });
-
+        
+        
         // Handle delete button click
         $(document).on('click', '.delete-row', function() {
             let row = $(this).closest('tr');
@@ -458,7 +459,6 @@
 
 
 
-
         // $(document).on('change', '.customer-search', function() {
         $('#prescription-select').on('select2:select', function(e) {
             //$('.customer-search').on('select2:select', function(e) {
@@ -467,7 +467,7 @@
 
 
             $.ajax({
-                url: '/fetch-prescription-files',
+                url: '/addMedicine/fetch-prescription-files',
                 method: 'GET',
                 data: {
                     prescriptionId: prescriptionId
