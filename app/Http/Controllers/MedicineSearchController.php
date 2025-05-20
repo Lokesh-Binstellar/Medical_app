@@ -193,7 +193,7 @@ class MedicineSearchController extends Controller
                 return [$item['product_id'] => $item['quantity']];
             });
 
-            $grouped = $getMedicine->groupBy('phrmacy_id')->map(function ($group, $pharmacyId) use ($cartQuantities, $quoteAddresses, $apiKey) {
+            $grouped = $getMedicine->groupBy('phrmacy_id')->map(function ($group, $pharmacyId) use ($cartQuantities, $quoteAddresses, $apiKey,$userId) {
                 $pharmacy = $group->first()->pharmacy;
                 $customerId = $group->first()->customer_id;
                 $key = $customerId . '_' . $pharmacyId;
@@ -240,6 +240,37 @@ class MedicineSearchController extends Controller
                     }
                 });
 
+                $delivery_available = 'no';
+
+                $zipCode = DB::table('customer_addresses')
+                    ->where('customer_id', $userId)
+                    ->where('address_type', $customerAddress['type'])
+                    ->value('postal_code');
+
+                if ($zipCode) {
+                    $zipExists = DB::table('zip_code_vice_deliveries')
+                        ->where('zipcode', $zipCode)
+                        ->exists();
+
+                    if ($zipExists) {
+                        $delivery_available = 'yes';
+                    }
+                }
+
+
+                $delivery_charge = null;
+
+                $distance = floatval($distance);
+
+                if ($distance > 0 && $distance <= 5) {
+                    $delivery_charge = 30;
+                } elseif ($distance > 5) {
+                    $delivery_charge = 50;
+                } else {
+                    // Handle case where distance is 0 or invalid
+                    $delivery_charge = null; // or any default value you want
+                }
+
 
 
                 return [
@@ -252,7 +283,9 @@ class MedicineSearchController extends Controller
                     'rating' => 4,
                     'platform_fees' => 4,
                     'total_price' => $group->sum('total_amount')  + 4,
-                    'distance' => $distance ?? 'Unknown'
+                    'distance' => $distance ?? 'Unknown',
+                    'delivery_available' => $delivery_available,
+                    'delivery_charge' => $delivery_charge
                 ];
             })->values();
 
