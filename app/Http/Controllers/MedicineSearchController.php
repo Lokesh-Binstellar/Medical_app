@@ -140,8 +140,16 @@ class MedicineSearchController extends Controller
 
 
     public function allPharmacyRequests(Request $request)
-    {
-        $getMedicine = Phrmacymedicine::with('pharmacy')->get();
+    { 
+        $currentCustomer = $request->get('user_id');  // e.g. 2
+
+        $getMedicine = Phrmacymedicine::with('pharmacy')
+            ->whereHas('pharmacy', function ($query) use ($currentCustomer) {
+                $query->where('customer_id', $currentCustomer);
+            })
+            ->get();
+
+        
 
         try {
             $combinations = $getMedicine->map(function ($item) {
@@ -172,7 +180,7 @@ class MedicineSearchController extends Controller
             });
 
             $apiKey = env('GOOGLE_MAPS_API_KEY');
-            $userId = $getMedicine->pluck('customer_id')->unique();
+            $userId = $request->get('user_id');
 
             $carts = Carts::where('customer_id', $userId)->get()->flatMap(function ($cart) {
                 try {
@@ -184,6 +192,7 @@ class MedicineSearchController extends Controller
             $cartQuantities = collect($carts)->mapWithKeys(function ($item) {
                 return [$item['product_id'] => $item['quantity']];
             });
+
             $grouped = $getMedicine->groupBy('phrmacy_id')->map(function ($group, $pharmacyId) use ($cartQuantities, $quoteAddresses, $apiKey) {
                 $pharmacy = $group->first()->pharmacy;
                 $customerId = $group->first()->customer_id;
@@ -230,6 +239,8 @@ class MedicineSearchController extends Controller
                         return [['error' => 'Invalid JSON']];
                     }
                 });
+
+
 
                 return [
                     'pharmacy_id' => $pharmacyId,

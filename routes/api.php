@@ -78,6 +78,7 @@ Route::middleware('check.api.key')->group(function () {
         Route::get('/zipcodes', [ZipCodeViceDeliveryController::class, 'getZipcodes']);
         Route::post('/ratings', [RatingController::class,'store']);
         Route::post('/placeOrder',[OrderController::class,'placeOrder']);
+        Route::get('/allPharmacyRequests', [MedicineSearchController::class, 'allPharmacyRequests']);
     });
 
     Route::get('/productListByCategory/{categoryName}', [OtcController::class, 'productListByCategory']);
@@ -90,5 +91,5 @@ Route::middleware('check.api.key')->group(function () {
     Route::post('/join-us', [JoinUsController::class, 'store']);
 
     Route::get('/placeOrder', [MedicineSearchController::class, 'placeOrder']);
-    Route::get('/allPharmacyRequests', [MedicineSearchController::class, 'allPharmacyRequests']);
+    
 });
