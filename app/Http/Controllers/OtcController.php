@@ -106,6 +106,8 @@ public function productListByCategory($categoryName)
     }
 
    $formatted = $products->map(function ($item) {
+    $baseUrl = url('storage/medicines');
+    $defaultImage = "{$baseUrl}/placeholder.png";
         return [
             'product_id' => $item->otc_id,
             'product_name' => $item->name,
@@ -113,7 +115,7 @@ public function productListByCategory($categoryName)
             'packaging' => $item->packaging,
             'imageUrls' => $item->image_url
                 ? collect(explode(',', $item->image_url))->map(fn($img) => url('medicines/' . trim(basename($img))))
-                : [],
+                : [ $defaultImage],
         ];
     });
 

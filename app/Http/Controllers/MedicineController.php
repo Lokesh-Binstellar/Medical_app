@@ -80,7 +80,7 @@ class MedicineController extends Controller
 
     public function import(Request $request)
     {
-      
+
         $request->validate([
             'file' => 'required|max:2048',
         ]);
@@ -111,7 +111,8 @@ class MedicineController extends Controller
             ->paginate($perPage)
             ->map(function ($item) {
                 $baseUrl = url('storage/medicines');
-                $item->image_url = $item->image_url ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img))) : [];
+                $defaultImage = "{$baseUrl}/placeholder.png";
+                $item->image_url = $item->image_url ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img))) : [$defaultImage];
                 $item->type = 'medicine';
                 return $item;
             });
@@ -122,7 +123,8 @@ class MedicineController extends Controller
             ->paginate($perPage)
             ->map(function ($item) {
                 $baseUrl = url('medicines/');
-                $item->image_url = $item->image_url ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img))) : [];
+                $defaultImage = "{$baseUrl}/placeholder.png";
+                $item->image_url = $item->image_url ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img))) : [$defaultImage];
                 $item->product_id = $item->otc_id;
                 $item->product_name = $item->name;
                 $item->packaging_detail = $item->packaging;
@@ -170,21 +172,21 @@ class MedicineController extends Controller
         }
 
         $baseUrl = url('medicines/');
-
+        $defaultImage = "{$baseUrl}/placeholder.png";
         if ($medicine) {
             $medicine->image_url = $medicine->image_url
                 ? collect(explode(',', $medicine->image_url))
-                    ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
-                    ->toArray()
-                : [];
+                ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
+                ->toArray()
+                : [$defaultImage];
         }
 
         if ($otc) {
             $otc->image_url = $otc->image_url
                 ? collect(explode(',', $otc->image_url))
-                    ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
-                    ->toArray()
-                : [];
+                ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
+                ->toArray()
+                : [$defaultImage];
         }
         return response()->json(
             [
@@ -195,33 +197,30 @@ class MedicineController extends Controller
             200,
         );
     }
-public function medicineBySaltComposition(Request $request)
-{
-    $productId = $request->input('product_id');
-// echo $productId;die;
- 
-    $product = Medicine::find($productId);
+    public function medicineBySaltComposition(Request $request)
+    {
+        $productId = $request->input('product_id');
+        // echo $productId;die;
 
-    if (!$product) {
+        $product = Medicine::find($productId);
+
+        if (!$product) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Product not found.',
+            ], 404);
+        }
+
+        $salt = $product->salt_composition;
+
+        $relatedProducts = Medicine::where('salt_composition', $salt)
+            ->where('id', '!=', $productId)
+            ->get();
+
         return response()->json([
-            'status' => false,
-            'message' => 'Product not found.',
-        ], 404);
+            'status' => true,
+            'salt_composition' => $salt,
+            'related_products' => $relatedProducts,
+        ]);
     }
-
-    $salt = $product->salt_composition;
-
-    $relatedProducts = Medicine::where('salt_composition', $salt)
-        ->where('id', '!=', $productId) 
-        ->get();
-
-    return response()->json([
-        'status' => true,
-        'salt_composition' => $salt,
-        'related_products' => $relatedProducts,
-    ]);
-}
-
-
-
 }
