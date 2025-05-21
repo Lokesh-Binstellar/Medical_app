@@ -55,6 +55,9 @@
             border-radius: 0px !important;
             /* light gray */
         }
+        .accordion-button::after{
+            display: none;
+        }
 
         .header {
             padding: 16px;
@@ -283,17 +286,25 @@
                             @endphp
 
                             <div class="accordion-item border-0 shadow-sm mb-3 ">
-                                <h2 class="accordion-header" id="heading{{ $accordionId }}">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapse{{ $accordionId }}" aria-expanded="false"
-                                        aria-controls="collapse{{ $accordionId }}">
-                                        Record #{{ $accordionId }} (Pharmacy ID: {{ $pharmacyId }})
-                                        <br>
-                                        Customer ID : {{ $entry->customer_id }} <br>
-                                        Customer Details : {{ $customer->firstName ?? 'N/A' }} | Phone:
-                                        {{ $customer->mobile_no ?? 'N/A' }}
-                                    </button>
-                                </h2>
+                              <h2 class="accordion-header" id="heading{{ $accordionId }}">
+    <button class="accordion-button collapsed d-flex justify-content-between align-items-center w-100" 
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapse{{ $accordionId }}"
+        aria-expanded="false"
+        aria-controls="collapse{{ $accordionId }}">
+
+        <div class="text-start">
+            Record #{{ $accordionId }} (Pharmacy ID: {{ $pharmacyId }})<br>
+            Customer ID : {{ $entry->customer_id }}<br>
+            Customer Details : {{ $customer->firstName ?? 'N/A' }} | Phone: {{ $customer->mobile_no ?? 'N/A' }}
+        </div>
+
+        <i class="fa-solid fa-arrow-down text-dark ms-auto"></i>
+    </button>
+</h2>
+
+
                                 <div id="collapse{{ $accordionId }}" class="accordion-collapse collapse"
                                     aria-labelledby="heading{{ $accordionId }}" data-bs-parent="#medicineAccordion">
                                     <div class="accordion-body">
@@ -487,7 +498,7 @@
                             return {
                                 query: params.term,
                                 current_pharmacy_id: $('#current_pharmacy_id')
-                                .val() // static value added here
+                                    .val() // static value added here
                             };
                         },
                         processResults: function(data) {
