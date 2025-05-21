@@ -169,23 +169,21 @@ class MedicineController extends Controller
         }
 
         $baseUrl = url('medicines/');
-
+        $defaultImage = "{$baseUrl}/placeholder.png";
         if ($medicine) {
             $medicine->image_url = $medicine->image_url
                 ? collect(explode(',', $medicine->image_url))
-                    ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
-                    ->toArray()
-                : [];
+                ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
+                ->toArray()
+                : [$defaultImage];
         }
 
         if ($otc) {
             $otc->image_url = $otc->image_url
                 ? collect(explode(',', $otc->image_url))
-                    ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
-                    ->toArray()
-                : [];
-            $otc->product_id = $otc->otc_id;
-            unset($otc->otc_id);
+                ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
+                ->toArray()
+                : [$defaultImage];
         }
         return response()->json(
             [

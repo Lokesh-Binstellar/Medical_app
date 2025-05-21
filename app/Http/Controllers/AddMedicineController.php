@@ -147,92 +147,92 @@ class AddMedicineController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'prescription_id' => 'required',
-        'medicine.*.medicine_id' => 'required',
-        'medicine.*.packaging_detail' => 'required',
-        'medicine.*.quantity' => 'required|numeric',
-        'medicine.*.is_substitute' => 'required',
-    ]);
+    {
+        $validated = $request->validate([
+            'prescription_id' => 'required',
+            'medicine.*.medicine_id' => 'required',
+            'medicine.*.packaging_detail' => 'required',
+            'medicine.*.quantity' => 'required|numeric',
+            'medicine.*.is_substitute' => 'required',
+        ]);
 
-    $prescriptionId = $request['prescription_id'];
+        $prescriptionId = $request['prescription_id'];
 
-    $prescription = Prescription::find($prescriptionId);
-    if (!$prescription) {
-        return redirect()->back()->with('error', 'Prescription not found.');
-    }
+        $prescription = Prescription::find($prescriptionId);
+        if (!$prescription) {
+            return redirect()->back()->with('error', 'Prescription not found.');
+        }
 
-    $customerId = $prescription->customer_id;
+        $customerId = $prescription->customer_id;
 
-    $incomingProducts = $validated['medicine'];
+        $incomingProducts = $validated['medicine'];
 
-    $cart = DB::table('carts')->where('customer_id', $customerId)->first();
+        $cart = DB::table('carts')->where('customer_id', $customerId)->first();
 
-    if ($cart) {
-        $existingProducts = json_decode($cart->products_details, true) ?? [];
+        if ($cart) {
+            $existingProducts = json_decode($cart->products_details, true) ?? [];
 
-    
-        $existingProductIds = array_column($existingProducts, 'product_id');
 
-        $mergedProducts = $existingProducts;
+            $existingProductIds = array_column($existingProducts, 'product_id');
 
-        foreach ($incomingProducts as $row) {
-            if (!in_array($row['medicine_id'], $existingProductIds)) {
-                $mergedProducts[] = [
+            $mergedProducts = $existingProducts;
+
+            foreach ($incomingProducts as $row) {
+                if (!in_array($row['medicine_id'], $existingProductIds)) {
+                    $mergedProducts[] = [
+                        'product_id' => $row['medicine_id'],
+                        'packaging_detail' => $row['packaging_detail'],
+                        'quantity' => (int) $row['quantity'],
+                        'is_substitute' => $row['is_substitute'],
+                    ];
+                }
+            }
+
+            $mergedProducts = array_map(function ($item) {
+                $item['quantity'] = (int) $item['quantity'];
+                return $item;
+            }, $mergedProducts);
+
+            $existingPrescriptions = json_decode($cart->prescription_id, true) ?? [];
+            $updatedPrescriptions = array_unique(array_merge($existingPrescriptions, [$prescriptionId]));
+
+            DB::table('carts')->where('id', $cart->id)->update([
+                'products_details' => json_encode($mergedProducts),
+                'prescription_id' => json_encode($updatedPrescriptions),
+                'updated_at' => now(),
+            ]);
+        } else {
+            $productsToInsert = [];
+
+            foreach ($incomingProducts as $row) {
+                $productsToInsert[] = [
                     'product_id' => $row['medicine_id'],
                     'packaging_detail' => $row['packaging_detail'],
                     'quantity' => (int) $row['quantity'],
                     'is_substitute' => $row['is_substitute'],
                 ];
             }
+
+            $productsToInsert = array_map(function ($item) {
+                $item['quantity'] = (int) $item['quantity'];
+                return $item;
+            }, $productsToInsert);
+
+            DB::table('carts')->insert([
+                'customer_id' => $customerId,
+                'prescription_id' => json_encode([$prescriptionId]),
+                'products_details' => json_encode($productsToInsert),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
-
-        $mergedProducts = array_map(function ($item) {
-            $item['quantity'] = (int) $item['quantity'];
-            return $item;
-        }, $mergedProducts);
-
-        $existingPrescriptions = json_decode($cart->prescription_id, true) ?? [];
-        $updatedPrescriptions = array_unique(array_merge($existingPrescriptions, [$prescriptionId]));
-
-        DB::table('carts')->where('id', $cart->id)->update([
-            'products_details' => json_encode($mergedProducts),
-            'prescription_id' => json_encode($updatedPrescriptions),
+        DB::table('prescriptions')->where('id', $prescriptionId)->update([
+            'status' => 0,
             'updated_at' => now(),
         ]);
-    } else {
-        $productsToInsert = [];
 
-        foreach ($incomingProducts as $row) {
-            $productsToInsert[] = [
-                'product_id' => $row['medicine_id'],
-                'packaging_detail' => $row['packaging_detail'],
-                'quantity' => (int) $row['quantity'],
-                'is_substitute' => $row['is_substitute'],
-            ];
-        }
-
-        $productsToInsert = array_map(function ($item) {
-            $item['quantity'] = (int) $item['quantity'];
-            return $item;
-        }, $productsToInsert);
-
-        DB::table('carts')->insert([
-            'customer_id' => $customerId,
-            'prescription_id' => json_encode([$prescriptionId]),
-            'products_details' => json_encode($productsToInsert),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        return redirect()->back()->with('success', 'Products added to cart successfully ');
     }
-    DB::table('prescriptions')->where('id', $prescriptionId)->update([
-        'status' => 0,
-        'updated_at' => now(),
-    ]);
-
-    return redirect()->back()->with('success', 'Products added to cart successfully ');
-}
 
 
     /**
@@ -357,99 +357,99 @@ class AddMedicineController extends Controller
     // }
 
 
-public function getAddToCart(Request $request)
-{
-    $id = $request->get('user_id');
+    public function getAddToCart(Request $request)
+    {
+        $id = $request->get('user_id');
 
-    try {
-        $cart = DB::table('carts')
-            ->where('customer_id', $id)
-            ->orderByDesc('created_at')
-            ->first();
+        try {
+            $cart = DB::table('carts')
+                ->where('customer_id', $id)
+                ->orderByDesc('created_at')
+                ->first();
 
-        if (!$cart) {
-            return response()->json([
-                'status' => false,
-                'message' => 'No cart records found for customer ID ' . $id
-            ], 404);
-        }
+            if (!$cart) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No cart records found for customer ID ' . $id
+                ], 404);
+            }
 
-        $productDetails = json_decode($cart->products_details, true);
-        $detailedProducts = [];
+            $productDetails = json_decode($cart->products_details, true);
+            $detailedProducts = [];
 
-        if (is_array($productDetails)) {
-            foreach ($productDetails as $product) {
-                $productId = $product['product_id'] ?? null;
-                if (!$productId) continue;
+            if (is_array($productDetails)) {
+                foreach ($productDetails as $product) {
+                    $productId = $product['product_id'] ?? null;
+                    if (!$productId) continue;
 
-                $type = null;
-                $medicine = \App\Models\Medicine::where('product_id', $productId)->first();
+                    $type = null;
+                    $medicine = \App\Models\Medicine::where('product_id', $productId)->first();
 
-                if ($medicine) {
-                    $type = 'medicine';
-                } else {
-                    $medicine = \App\Models\Otcmedicine::where('otc_id', $productId)->first();
                     if ($medicine) {
-                        $type = 'otc';
-                    }
-                }
-
-                if ($medicine && $type) {
-                    $name = $type === 'medicine'
-                        ? ($medicine->product_name ?? '')
-                        : ($medicine->name ?? '');
-
-                    $packageDetail = $product['packaging_detail'] ?? $medicine->packaging ?? $medicine->packaging_detail ?? '';
-                    $quantity = $product['quantity'] ?? $medicine->qty ?? 1;
-                    // echo $quantity;die;
-
-                    $imageUrls = [];
-                    if (!empty($medicine->image_url)) {
-                        $images = is_array($medicine->image_url)
-                            ? $medicine->image_url
-                            : (json_decode($medicine->image_url, true) ?: explode(',', $medicine->image_url));
-
-                        $imageUrls = array_map(function ($img) {
-                            $img = trim($img);
-                            return Str::startsWith($img, 'medicines/')
-                                ? asset('storage/' . $img)
-                                : asset('storage/medicines/' . $img);
-                        }, $images);
+                        $type = 'medicine';
+                    } else {
+                        $medicine = \App\Models\Otcmedicine::where('otc_id', $productId)->first();
+                        if ($medicine) {
+                            $type = 'otc';
+                        }
                     }
 
-                    $detailedProducts[] = [
-                        "product_id" => $type === 'medicine' ? $medicine->product_id : $medicine->otc_id,
-                        'type' => $type,
-                        'name' => $name,
-                        'prescription_required' => ($medicine->prescription_required === 'Prescription Required'),
-                        'packaging_detail' => $packageDetail,
-                        'quantity' => $quantity,
-                        'is_substitute' => $product['is_substitute'] ?? 'no',
-                        'image_url' => $imageUrls,
-                    ];
+                    if ($medicine && $type) {
+                        $name = $type === 'medicine'
+                            ? ($medicine->product_name ?? '')
+                            : ($medicine->name ?? '');
+
+                        $packageDetail = $product['packaging_detail'] ?? $medicine->packaging ?? $medicine->packaging_detail ?? '';
+                        $quantity = $product['quantity'] ?? $medicine->qty ?? 1;
+                        // echo $quantity;die;
+                        $baseUrl = url('storage/medicines');
+                        $defaultImage = "{$baseUrl}/placeholder.png";
+                        $imageUrls = [$defaultImage];
+                        if (!empty($medicine->image_url)) {
+                            $images = is_array($medicine->image_url)
+                                ? $medicine->image_url
+                                : (json_decode($medicine->image_url, true) ?: explode(',', $medicine->image_url));
+
+                            $imageUrls = array_map(function ($img) {
+                                $img = trim($img);
+                                return Str::startsWith($img, 'medicines/')
+                                    ? asset('storage/' . $img)
+                                    : asset('storage/medicines/' . $img);
+                            }, $images);
+                        }
+
+                        $detailedProducts[] = [
+                            "product_id" => $type === 'medicine' ? $medicine->product_id : $medicine->otc_id,
+                            'type' => $type,
+                            'name' => $name,
+                            'prescription_required' => ($medicine->prescription_required === 'Prescription Required'),
+                            'packaging_detail' => $packageDetail,
+                            'quantity' => $quantity,
+                            'is_substitute' => $product['is_substitute'] ?? 'no',
+                            'image_url' => $imageUrls,
+                        ];
+                    }
                 }
             }
+
+            $cartObject = [
+                'id' => $cart->id,
+                'customer_id' => $cart->customer_id,
+                'products_details' => $detailedProducts
+            ];
+
+            return response()->json([
+                'status' => true,
+                'data' => (object) $cartObject
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong.',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $cartObject = [
-            'id' => $cart->id,
-            'customer_id' => $cart->customer_id,
-            'products_details' => $detailedProducts
-        ];
-
-        return response()->json([
-            'status' => true,
-            'data' => (object) $cartObject
-        ]);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Something went wrong.',
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
 
 
     public function removeProduct($cartId, $productId)
@@ -700,10 +700,10 @@ public function getAddToCart(Request $request)
 
         // Step 3: Fetch all prescriptions for the customer, to get all files
         $prescriptions = Prescription::where('customer_id', $customerId)
-                              ->where('status', 1)
-                              ->get();
+            ->where('status', 1)
+            ->get();
 
-        
+
 
         if ($prescriptions->isEmpty()) {
             return response()->json([
