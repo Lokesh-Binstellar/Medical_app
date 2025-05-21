@@ -21,7 +21,7 @@ class PhlebotomistController extends Controller
 
 
             // dd($laboratory->id);
-            $data = phlebotomist::where('laboratory_id', $laboratory->id)->latest();
+            $data = Phlebotomist::where('laboratory_id', $laboratory->id)->latest();
 
             return DataTables::of($data)
                 ->addIndexColumn()
