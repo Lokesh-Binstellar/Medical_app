@@ -402,7 +402,7 @@ class AddMedicineController extends Controller
                         $packageDetail = $product['packaging_detail'] ?? $medicine->packaging ?? $medicine->packaging_detail ?? '';
                         $quantity = $product['quantity'] ?? $medicine->qty ?? 1;
                         // echo $quantity;die;
-                        $baseUrl = url('storage/medicines');
+                        $baseUrl = url('medicines');
                         $defaultImage = "{$baseUrl}/placeholder.png";
                         $imageUrls = [$defaultImage];
                         if (!empty($medicine->image_url)) {

@@ -171,7 +171,7 @@ class PopularBrandController extends Controller
             ->select('id', 'product_id', 'product_name', 'salt_composition', 'packaging_detail', 'image_url', 'marketer')
             ->get()
             ->map(function ($item) {
-                $baseUrl = url('storage/medicines');
+                $baseUrl = url('medicines');
                 $defaultImage = "{$baseUrl}/placeholder.png";
                 $item->image_url = $item->image_url
                     ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
@@ -192,7 +192,7 @@ class PopularBrandController extends Controller
                 $item->packaging_detail = $item->packaging;
                 $item->type = 'otc';
                 $item->brand = $item->manufacturers ?? '';
-                $baseUrl = url('storage/medicines');
+                $baseUrl = url('medicines');
                 $defaultImage = "{$baseUrl}/placeholder.png";
                 $item->image_url = $item->image_url
                     ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
