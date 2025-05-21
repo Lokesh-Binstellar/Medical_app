@@ -9,6 +9,11 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <style>
+        .Show-Medicine:hover {
+    color: #fefefe !important;
+    background-color: #033a62 !important;
+    /* border-color: #fefefe !important; */
+}
         /* Fix column widths */
         #medicine-table td,
         #medicine-table th {
@@ -301,9 +306,9 @@
                                             {{ $customer->mobile_no ?? 'N/A' }}
                                         </div>
 
-                                        <i class="fa-solid fa-arrow-down text-dark ms-auto"></i>
-                                    </button>
-                                </h2>
+        <a type="button" class="btn btn-primary Show-Medicine ">Show Medicine<i class="fa-solid fa-arrow-down pl-1"></i></a>
+    </button>
+</h2>
 
 
                                 <div id="collapse{{ $accordionId }}" class="accordion-collapse collapse"

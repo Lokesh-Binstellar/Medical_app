@@ -231,7 +231,7 @@ class AddMedicineController extends Controller
         'updated_at' => now(),
     ]);
 
-    return redirect()->back()->with('success', 'Products added to cart successfully (skipping duplicates).');
+    return redirect()->back()->with('success', 'Products added to cart successfully ');
 }
 
 
