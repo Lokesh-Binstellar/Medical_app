@@ -32,25 +32,24 @@ class FileUploadController extends Controller
 
                     // Check if the file is an image
                     if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-                        return '<a href="' .asset('public/uploads/' . $fileUrl). '" target="_blank">
-                                        <img src="' . asset('public/uploads/' . $fileUrl). '" alt="Prescription Image" style="max-width: 60px; height: auto;" class="img-thumbnail">
+                        return '<a href="' .asset('uploads/' . $fileUrl). '" target="_blank">
+                                        <img src="' . asset('uploads/' . $fileUrl). '" alt="Prescription Image" style="max-width: 60px; height: auto;" class="img-thumbnail">
                                     </a>';
                     }
                     // Check if the file is a PDF
                     elseif (strtolower($extension) === 'pdf') {
-                        return '<a href="' . asset('public/uploads/' . $fileUrl) . '" target="_blank">
+                        return '<a href="' . asset('uploads/' . $fileUrl) . '" target="_blank">
                                         <img src="' . asset('assets/pdf-icon.png') . '" style="width: 40px;" alt="PDF Preview">
                                     </a>';
                     }
                     // For other file types
                     else {
-                        return '<a href="' . asset('public/uploads/' . $fileUrl). '" target="_blank">View File</a>';
+                        return '<a href="' . asset('uploads/' . $fileUrl). '" target="_blank">View File</a>';
                     }
                 })
                 ->editColumn('prescription_status', function ($row) {
                     $selectedValue = $row->prescription_status;
 
-                    // Check if the prescription status is "No" (rejected) and disable the select
                     $disabled = $selectedValue === 1 ? 'disabled' : '';
 
                     return '<select class="form-control custom-dropdown rounded"
@@ -71,26 +70,6 @@ class FileUploadController extends Controller
                         return '<span class="badge bg-danger">Rejected</span>';
                     }
                 })
-                //         ->addColumn('action', function ($row) {
-                //             return '
-                //                 <div class="dropdown">
-                //                   <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
-                //   <ul class="dropdown-menu">
-
-
-                //                     <li>
-                //                     <a href="' . route('laboratorie.edit', $row->id) . '" class="dropdown-item" >Edit</a>
-                //                     </li>
-
-                //                     <li>
-                //                       <form action="' . route('laboratorie.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-                //                         ' . csrf_field() . method_field('DELETE') . '
-                //                         <button class="dropdown-item " type="submit">Delete</button>
-                //                       </form>
-                //                     </li>
-                //                   </ul>
-                //                 </div>';
-                //         })
                 ->rawColumns(['prescription_file', 'prescription_status', 'status'])
                 ->make(true);
         }

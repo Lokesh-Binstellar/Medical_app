@@ -68,21 +68,23 @@ class PopularBrandController extends Controller
         $brand = new PopularBrand();
         $brand->name = $request->name;
 
-        if ($request->hasFile('logo')) {
+            if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $originalName = $file->getClientOriginalName();
-            $destinationPath = storage_path('app/public/brands');
+            $destinationPath = public_path('popular/brands'); // Store directly in /public/brands
 
-            $filename = time() . '_' . $originalName;
-            if (file_exists($destinationPath . '/' . $originalName)) {
-                $file->move($destinationPath, $filename);
-            } else {
-                $file->move($destinationPath, $originalName);
-                $filename = $originalName;
+            // Make sure directory exists
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
             }
 
-            // ✅ Save only the filename
-            $brand->logo = $filename; // ← make sure this ends with ;
+            $saveName = $originalName;
+
+            // If file already exists, optionally overwrite or skip (your choice)
+            $file->move($destinationPath, $saveName);
+
+            // ✅ Save only the original filename
+            $brand->logo = $saveName;
         }
 
 

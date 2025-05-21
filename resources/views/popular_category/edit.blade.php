@@ -36,7 +36,7 @@
                                 <div class="form-group col-md-6 d-flex justify-content-center flex-column">
                                     @if ($category->logo)
                                         <div class="mb-2">
-                                            <img id="logo" src="{{url('storage/category/' .$category->logo)}}" alt="category Image" class="img-thumbnail"
+                                            <img id="logo" src="{{url('popular/category/' .$category->logo)}}" alt="category Image" class="img-thumbnail"
                                                 style="max-height: 150px;">
                                         </div>
                                     @endif

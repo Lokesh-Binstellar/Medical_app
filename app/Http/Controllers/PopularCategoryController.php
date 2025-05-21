@@ -23,7 +23,7 @@ class PopularCategoryController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('logo', function ($product_brand) {
-                    return '<img src="' . asset('storage/category/' . $product_brand->logo) . '" border="0" width="40" class="img-rounded" align="center" />';
+                    return '<img src="' . asset('popular/category/' . $product_brand->logo) . '" border="0" width="40" class="img-rounded" align="center" />';
                 })
 
                 ->addColumn('action', function ($row) {
@@ -32,10 +32,14 @@ class PopularCategoryController extends Controller
       <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
       <ul class="dropdown-menu">
         <li>
-          <a href="' . route('popular_category.edit', $row->id) . '" class="dropdown-item">Edit</a>
+          <a href="' .
+                        route('popular_category.edit', $row->id) .
+                        '" class="dropdown-item">Edit</a>
         </li>
         <li>
-          <button class="dropdown-item text-danger" type="button" onclick="deletePOPcate(' . $row->id . ')">Delete</button>
+          <button class="dropdown-item text-danger" type="button" onclick="deletePOPcate(' .
+                        $row->id .
+                        ')">Delete</button>
         </li>
       </ul>
     </div>';
@@ -44,7 +48,6 @@ class PopularCategoryController extends Controller
                 ->rawColumns(['action', 'logo'])
                 ->make(true);
         }
-
 
         return view('popular_category.index', compact('popularCategory', 'AddedCategory'));
     }
@@ -72,21 +75,14 @@ class PopularCategoryController extends Controller
 
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
-            $originalName = $file->getClientOriginalName(); // e.g. logo.png
-            $destinationPath = storage_path('app/public/category');
+            $originalName = $file->getClientOriginalName(); 
+            $destinationPath = public_path('popular/category'); 
 
-            // Check if file with same name exists
-            $filename = time() . '_' . $originalName;
-            if (file_exists($destinationPath . '/' . $originalName)) {
-                $file->move($destinationPath, $filename); // Unique name
-            } else {
-                $file->move($destinationPath, $originalName); // Same name
-                $filename = $originalName;
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
             }
-
-            // Save full URL and original name
-            $category->logo = url('storage/brand/' . $filename); // Base URL + file path
-            $category->logo = $originalName; // Just original file name
+            $file->move($destinationPath, $originalName);
+            $category->logo = $originalName;
         }
 
         $category->save();
@@ -126,14 +122,20 @@ class PopularCategoryController extends Controller
         $category->name = $request->name;
 
         if ($request->hasFile('logo')) {
-            // Delete old logo if exists
-            if ($category->logo && Storage::disk('public')->exists($category->logo)) {
-                Storage::disk('public')->delete($category->logo);
+            $file = $request->file('logo');
+            $originalName = $file->getClientOriginalName(); 
+            $destinationPath = public_path('popular/category');
+
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
             }
 
-            $path = $request->file('logo')->store('brands', 'public');
+            if ($category->logo && file_exists(public_path('popular/category/' . $category->logo))) {
+                unlink(public_path('popular/category/' . $category->logo));
+            }
 
-            $category->logo = $path;
+            $file->move($destinationPath, $originalName);
+            $category->logo = $originalName;
         }
 
         $category->save();
@@ -163,15 +165,17 @@ class PopularCategoryController extends Controller
             return [
                 'id' => $category->id,
                 'name' => $category->name,
-                'logo' => $category->logo ? url('storage/category/' . basename($category->logo)) : [],
-
+                'logo' => $category->logo ? url('popular/category/' . basename($category->logo)) : [],
             ];
         });
 
-        return response()->json([
-            'status' => true,
-            'data' => $categoryData
-        ], 200);
+        return response()->json(
+            [
+                'status' => true,
+                'data' => $categoryData,
+            ],
+            200,
+        );
     }
 
     public function destroy(string $id)
@@ -187,16 +191,22 @@ class PopularCategoryController extends Controller
             // Delete the category from the database
             $category->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Category deleted successfully.'
-            ], 200);
+            return response()->json(
+                [
+                    'success' => true,
+                    'message' => 'Category deleted successfully.',
+                ],
+                200,
+            );
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete category. Please try again.',
-                'error' => $e->getMessage()
-            ], 500);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Failed to delete category. Please try again.',
+                    'error' => $e->getMessage(),
+                ],
+                500,
+            );
         }
     }
 }

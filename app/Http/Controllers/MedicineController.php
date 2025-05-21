@@ -27,7 +27,9 @@ class MedicineController extends Controller
                   <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
   <ul class="dropdown-menu">
                     <li>
-                     <a href="' . route('medicine.show', $row->id) . '"class="dropdown-item" >View
+                     <a href="' .
+                        route('medicine.show', $row->id) .
+                        '"class="dropdown-item" >View
     </a>
                     </li>
 
@@ -41,7 +43,6 @@ class MedicineController extends Controller
         // $tests = LabTest::all();
         return view('medicine.index');
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -66,8 +67,6 @@ class MedicineController extends Controller
     {
         $medicines = Medicine::find($id);
 
-
-
         return view('medicine.show', compact('medicines'));
     }
 
@@ -81,33 +80,17 @@ class MedicineController extends Controller
 
     public function import(Request $request)
     {
-        // Validate incoming request data
+      
         $request->validate([
             'file' => 'required|max:2048',
         ]);
 
-        Excel::import(new MedicineImport, $request->file('file'));
+        Excel::import(new MedicineImport(), $request->file('file'));
 
         return back()->with('success', 'Medicine imported successfully.');
     }
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 
 
-    // search medicine 
     public function search(Request $request)
     {
         $query = $request->query('query');
@@ -116,22 +99,19 @@ class MedicineController extends Controller
             return response()->json(
                 [
                     'status' => false,
-                    'message' => 'Query parameter is required.'
+                    'message' => 'Query parameter is required.',
                 ],
-                400
+                400,
             );
         }
 
-        // Search from Medicine
         $medicines = Medicine::where('salt_composition', 'LIKE', "%$query%")
             ->orWhere('product_name', 'LIKE', "%$query%")
             ->select('id', 'product_id', 'product_name', 'salt_composition', 'packaging_detail', 'image_url')
             ->paginate($perPage)
             ->map(function ($item) {
                 $baseUrl = url('storage/medicines');
-                $item->image_url = $item->image_url
-                    ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
-                    : [];
+                $item->image_url = $item->image_url ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img))) : [];
                 $item->type = 'medicine';
                 return $item;
             });
@@ -142,9 +122,7 @@ class MedicineController extends Controller
             ->paginate($perPage)
             ->map(function ($item) {
                 $baseUrl = url('medicines/');
-                $item->image_url = $item->image_url
-                    ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
-                    : [];
+                $item->image_url = $item->image_url ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img))) : [];
                 $item->product_id = $item->otc_id;
                 $item->product_name = $item->name;
                 $item->packaging_detail = $item->packaging;
@@ -154,25 +132,27 @@ class MedicineController extends Controller
                 return $item;
             });
 
-
         // Merge both collections
         $results = $medicines->merge($otc);
 
         return response()->json([
             'status' => true,
-            'data' => $results
+            'data' => $results,
         ]);
     }
+
 
     public function medicineByProductId(Request $request, $id)
     {
         // echo $id;die;
         if (empty($id)) {
-
-            return response()->json([
-                'success' => false,
-                'message' => 'ID parameter is required.'
-            ], 400);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'ID parameter is required.',
+                ],
+                400,
+            );
         }
         $productId = $id;
         $medicine = Medicine::where('product_id', $productId)->first();
@@ -180,32 +160,68 @@ class MedicineController extends Controller
 
         // Step 4: If neither found
         if (!$medicine && !$otc) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Product not found in either table.'
-            ], 404);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Product not found in either table.',
+                ],
+                404,
+            );
         }
 
         $baseUrl = url('medicines/');
 
         if ($medicine) {
             $medicine->image_url = $medicine->image_url
-                ? collect(explode(',', $medicine->image_url))->map(fn($img) => $baseUrl . '/' . trim(basename($img)))->toArray()
+                ? collect(explode(',', $medicine->image_url))
+                    ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
+                    ->toArray()
                 : [];
         }
 
         if ($otc) {
             $otc->image_url = $otc->image_url
-                ? collect(explode(',', $otc->image_url))->map(fn($img) => $baseUrl . '/' . trim(basename($img)))->toArray()
+                ? collect(explode(',', $otc->image_url))
+                    ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
+                    ->toArray()
                 : [];
         }
-
-        // Step 7: Return whichever was found
-        return response()->json([
-            'success' => true,
-            'data' => $medicine ?? $otc,
-            'source' => $medicine ? 'medicines' : 'otcmedicines'
-        ], 200);
+        return response()->json(
+            [
+                'success' => true,
+                'data' => $medicine ?? $otc,
+                'source' => $medicine ? 'medicines' : 'otcmedicines',
+            ],
+            200,
+        );
     }
+public function medicineBySaltComposition(Request $request)
+{
+    $productId = $request->input('product_id');
+// echo $productId;die;
+ 
+    $product = Medicine::find($productId);
+
+    if (!$product) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Product not found.',
+        ], 404);
+    }
+
+    $salt = $product->salt_composition;
+
+    $relatedProducts = Medicine::where('salt_composition', $salt)
+        ->where('id', '!=', $productId) 
+        ->get();
+
+    return response()->json([
+        'status' => true,
+        'salt_composition' => $salt,
+        'related_products' => $relatedProducts,
+    ]);
+}
+
+
 
 }
