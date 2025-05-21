@@ -147,91 +147,93 @@ class AddMedicineController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
+{
+    $validated = $request->validate([
+        'prescription_id' => 'required',
+        'medicine.*.medicine_id' => 'required',
+        'medicine.*.packaging_detail' => 'required',
+        'medicine.*.quantity' => 'required|numeric',
+        'medicine.*.is_substitute' => 'required',
+    ]);
 
-        $validated = $request->validate([
-            'prescription_id' => 'required',
-            'medicine.*.medicine_id' => 'required',
-            'medicine.*.packaging_detail' => 'required',
-            'medicine.*.quantity' => 'required',
-            'medicine.*.is_substitute' => 'required',
-        ]);
+    $prescriptionId = $request['prescription_id'];
 
-        $prescriptionId = $request['prescription_id'];
+    $prescription = Prescription::find($prescriptionId);
+    if (!$prescription) {
+        return redirect()->back()->with('error', 'Prescription not found.');
+    }
 
-        // Get prescription
-        $prescription = Prescription::find($prescriptionId);
-        if (!$prescription) {
-            return redirect()->back()->with('error', 'Prescription not found.');
-        }
+    $customerId = $prescription->customer_id;
 
-        $customerId = $prescription->customer_id;
+    $incomingProducts = $validated['medicine'];
 
-        // Prepare new products from request
-        $incomingProducts = $validated['medicine'];
+    $cart = DB::table('carts')->where('customer_id', $customerId)->first();
 
-        // Check existing cart
-        $cart = DB::table('carts')->where('customer_id', $customerId)->first();
+    if ($cart) {
+        $existingProducts = json_decode($cart->products_details, true) ?? [];
 
-        if ($cart) {
-            $existingProducts = json_decode($cart->products_details, true) ?? [];
+    
+        $existingProductIds = array_column($existingProducts, 'product_id');
 
-            // Get existing product_ids to avoid duplicates
-            $existingProductIds = array_column($existingProducts, 'product_id');
+        $mergedProducts = $existingProducts;
 
-            $mergedProducts = $existingProducts;
-
-            foreach ($incomingProducts as $row) {
-                if (!in_array($row['medicine_id'], $existingProductIds)) {
-                    $mergedProducts[] = [
-                        'product_id' => $row['medicine_id'],
-                        'packaging_detail' => $row['packaging_detail'],
-                        'quantity' => $row['quantity'],
-                        'is_substitute' => $row['is_substitute'],
-                    ];
-                }
-            }
-
-            // Merge prescription IDs too
-            $existingPrescriptions = json_decode($cart->prescription_id, true) ?? [];
-            $updatedPrescriptions = array_unique(array_merge($existingPrescriptions, [$prescriptionId]));
-
-            // Update cart
-            DB::table('carts')->where('id', $cart->id)->update([
-                'products_details' => json_encode($mergedProducts),
-                'prescription_id' => json_encode($updatedPrescriptions),
-                'updated_at' => now(),
-            ]);
-        } else {
-            // Create new cart
-            $productsToInsert = [];
-
-            foreach ($incomingProducts as $row) {
-                $productsToInsert[] = [
+        foreach ($incomingProducts as $row) {
+            if (!in_array($row['medicine_id'], $existingProductIds)) {
+                $mergedProducts[] = [
                     'product_id' => $row['medicine_id'],
                     'packaging_detail' => $row['packaging_detail'],
-                    'quantity' => $row['quantity'],
+                    'quantity' => (int) $row['quantity'],
                     'is_substitute' => $row['is_substitute'],
                 ];
             }
-
-            DB::table('carts')->insert([
-                'customer_id' => $customerId,
-                'prescription_id' => json_encode([$prescriptionId]),
-                'products_details' => json_encode($productsToInsert),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
         }
 
-        // Update prescription status
-        DB::table('prescriptions')->where('id', $prescriptionId)->update([
-            'status' => 0,
+        $mergedProducts = array_map(function ($item) {
+            $item['quantity'] = (int) $item['quantity'];
+            return $item;
+        }, $mergedProducts);
+
+        $existingPrescriptions = json_decode($cart->prescription_id, true) ?? [];
+        $updatedPrescriptions = array_unique(array_merge($existingPrescriptions, [$prescriptionId]));
+
+        DB::table('carts')->where('id', $cart->id)->update([
+            'products_details' => json_encode($mergedProducts),
+            'prescription_id' => json_encode($updatedPrescriptions),
             'updated_at' => now(),
         ]);
+    } else {
+        $productsToInsert = [];
 
-        return redirect()->back()->with('success', 'Products added to cart successfully (skipping duplicates).');
+        foreach ($incomingProducts as $row) {
+            $productsToInsert[] = [
+                'product_id' => $row['medicine_id'],
+                'packaging_detail' => $row['packaging_detail'],
+                'quantity' => (int) $row['quantity'],
+                'is_substitute' => $row['is_substitute'],
+            ];
+        }
+
+        $productsToInsert = array_map(function ($item) {
+            $item['quantity'] = (int) $item['quantity'];
+            return $item;
+        }, $productsToInsert);
+
+        DB::table('carts')->insert([
+            'customer_id' => $customerId,
+            'prescription_id' => json_encode([$prescriptionId]),
+            'products_details' => json_encode($productsToInsert),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
+    DB::table('prescriptions')->where('id', $prescriptionId)->update([
+        'status' => 0,
+        'updated_at' => now(),
+    ]);
+
+    return redirect()->back()->with('success', 'Products added to cart successfully (skipping duplicates).');
+}
+
 
     /**
      * Display the specified resource.

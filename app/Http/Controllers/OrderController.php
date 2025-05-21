@@ -24,24 +24,27 @@ public function placeOrder(Request $request)
     
     try {
         
-        $cartItems = Carts::where('customer_id', $userId)->get();
-        // echo $userId;die;
+        $cartItems = Carts::where('customer_id', $userId)->first();;
+        
+       if (!$cartItems) {
+    return response()->json([
+        'status' => false,
+        'message' => 'Cart is empty.'
+    ], 400);
+}
+        $products = json_decode($cartItems->products_details, true);
+        // echo $products;die;
 
-        if ($cartItems->isEmpty()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Cart is empty.'
-            ], 400);
-        }
-
-        $productDetails = $cartItems->map(function ($item) {
+        $productDetails =collect($products)->map(function ($item){ 
             return [
-                'product_id' => $item->product_id,
-                'name' => $item->product_name,
-                'quantity' => $item->quantity,
-                'price' => $item->price,
+              'product_id' => $item['product_id'],
+            //   'name' => '', 
+            'packaging_detail'=>$item['packaging_detail'],
+              'quantity' => (int) $item['quantity'],
+            //   'price' => $item['price'] ?? 0,
             ];
         });
+        // dd($productDetails);die;
 
         $distance = $request->distance;
         if ($distance <= 5) {
@@ -75,7 +78,7 @@ $orderId = 'P' . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
             'platform_fees' => $platformFees,
             'delivery_charges' => $deliveryCharges,
             'total_price' => $totalPrice,
-            'delivery_charges'=>$request->delivery_charges,
+            // 'delivery_charges'=>$request->delivery_charges,
             'delivery_address' => $request->delivery_address,
             'delivery_options' => $request->delivery_options,
             'add_patient' => $request->add_patient,
