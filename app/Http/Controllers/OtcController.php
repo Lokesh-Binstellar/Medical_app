@@ -106,7 +106,7 @@ public function productListByCategory($categoryName)
     }
 
    $formatted = $products->map(function ($item) {
-    $baseUrl = url('storage/medicines');
+    $baseUrl = url('medicines');
     $defaultImage = "{$baseUrl}/placeholder.png";
         return [
             'product_id' => $item->otc_id,
