@@ -141,7 +141,7 @@ class MedicineController extends Controller
             ->select('id', 'otc_id', 'name', 'packaging', 'image_url')
             ->paginate($perPage)
             ->map(function ($item) {
-                $baseUrl = url('storage/medicines');
+                $baseUrl = url('medicines/');
                 $item->image_url = $item->image_url
                     ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
                     : [];
@@ -186,7 +186,7 @@ class MedicineController extends Controller
             ], 404);
         }
 
-        $baseUrl = url('storage/medicines');
+        $baseUrl = url('medicines/');
 
         if ($medicine) {
             $medicine->image_url = $medicine->image_url

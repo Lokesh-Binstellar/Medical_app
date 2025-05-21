@@ -88,9 +88,19 @@
                         <tr>
                             <th>Image(s)</th>
                             <td>
-                                @foreach (explode(',', $otcmedicine->image_url) as $img)
-                                    <img src="{{ asset('storage/' . trim($img)) }}" alt="OTC image"
-                                        style="max-height: 120px; margin: 5px;">
+                                @php
+                                    $images = array_filter(
+                                        array_map('trim', explode(',', $otcmedicine->image_url ?? '')),
+                                    );
+                                @endphp
+
+                                @foreach ($images as $img)
+                                    @if (!empty($img) && file_exists(public_path($img)))
+                                        <img src="{{ asset($img) }}" alt="OTC image"
+                                            style="max-height: 120px; margin: 5px;">
+                                    @else
+                                        <small style="color: red;">Missing: {{ $img }}</small>
+                                    @endif
                                 @endforeach
                             </td>
                         </tr>
