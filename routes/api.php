@@ -42,7 +42,7 @@ Route::middleware('check.api.key')->group(function () {
     Route::get('/getAllPopularBrand', [PopularBrandController::class, 'getBrand'])->name('popular.get_brand');
     Route::get('/getAllPopularCategory', [PopularCategoryController::class, 'getCategory'])->name('popular.getCategory');
 
-
+Route::get('/medicine-by-salt', [MedicineController::class, 'medicineBySaltComposition']);
     Route::get('/popular-lab-tests', [PopularLabTestController::class, 'getAll']);
 
 

@@ -112,7 +112,7 @@ public function productListByCategory($categoryName)
             'category' => $item->category,
             'packaging' => $item->packaging,
             'imageUrls' => $item->image_url
-                ? collect(explode(',', $item->image_url))->map(fn($img) => url('storage/medicines/' . trim(basename($img))))
+                ? collect(explode(',', $item->image_url))->map(fn($img) => url('medicines/' . trim(basename($img))))
                 : [],
         ];
     });
