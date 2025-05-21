@@ -80,7 +80,6 @@ class MedicineController extends Controller
 
     public function import(Request $request)
     {
-
         $request->validate([
             'file' => 'required|max:2048',
         ]);
@@ -89,7 +88,6 @@ class MedicineController extends Controller
 
         return back()->with('success', 'Medicine imported successfully.');
     }
-
 
     public function search(Request $request)
     {
@@ -110,7 +108,7 @@ class MedicineController extends Controller
             ->select('id', 'product_id', 'product_name', 'salt_composition', 'packaging_detail', 'image_url')
             ->paginate($perPage)
             ->map(function ($item) {
-                $baseUrl = url('storage/medicines');
+                $baseUrl = url('medicines/');
                 $defaultImage = "{$baseUrl}/placeholder.png";
                 $item->image_url = $item->image_url ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img))) : [$defaultImage];
                 $item->type = 'medicine';
@@ -142,7 +140,6 @@ class MedicineController extends Controller
             'data' => $results,
         ]);
     }
-
 
     public function medicineByProductId(Request $request, $id)
     {
@@ -197,30 +194,42 @@ class MedicineController extends Controller
             200,
         );
     }
+
     public function medicineBySaltComposition(Request $request)
     {
         $productId = $request->input('product_id');
-        // echo $productId;die;
 
-        $product = Medicine::find($productId);
+        $product = Medicine::where('product_id', $productId)->first();
 
         if (!$product) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Product not found.',
-            ], 404);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Product not found.',
+                ],
+                404,
+            );
         }
 
         $salt = $product->salt_composition;
 
         $relatedProducts = Medicine::where('salt_composition', $salt)
-            ->where('id', '!=', $productId)
-            ->get();
+            ->where('product_id', '!=', $productId)
+            ->get(['product_id', 'product_name', 'packaging_detail', 'prescription_required']);
+
+        $formattedProducts = $relatedProducts->map(function ($item) {
+            return [
+                'product_id' => $item->product_id,
+                'product_name' => $item->product_name,
+                'packaging_detail' => $item->packaging_detail,
+                'prescription_required' => $item->prescription_required === 'Prescription Required' ? true : false,
+            ];
+        });
 
         return response()->json([
             'status' => true,
             'salt_composition' => $salt,
-            'related_products' => $relatedProducts,
+            'substitute_products' => $formattedProducts,
         ]);
     }
 }

@@ -4,6 +4,7 @@ use App\Events\MyEvent;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaboratoriesController;
 use App\Http\Controllers\LabtestController;
+use App\Http\Controllers\AddLabTestController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicineSearchController;
 use App\Http\Controllers\AddMedicineController;
@@ -32,7 +33,6 @@ use App\Models\HomeBanner;
 use App\Models\MedicineBanner;
 use Illuminate\Support\Facades\Route;
 
-
 // Route::get('/', function () {
 //     return view('welcome');
 // });
@@ -43,7 +43,9 @@ Route::get('/', function () {
 // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified', 'permission:pharmacies,create']);
 
 // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified']);
-Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified']);
+Route::get('/', [DashboardController::class, 'index'])
+    ->name('dashboard')
+    ->middleware(['auth', 'verified']);
 
 Auth::routes();
 Route::group(['middleware' => ['auth']], function () {
@@ -70,8 +72,6 @@ Route::group(['middleware' => ['auth']], function () {
         });
     });
 
-
-
     //User
     Route::prefix('users')->group(function () {
         Route::get('', [UserController::class, 'index'])->name('user.index');
@@ -87,7 +87,6 @@ Route::group(['middleware' => ['auth']], function () {
             Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('user.destroy');
         });
     });
-
 
     //Pharmacist
     Route::prefix('pharmacy')->group(function () {
@@ -107,7 +106,6 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('/{id}', [PharmaciesController::class, 'show'])->name('pharmacist.show');
         });
     });
-
 
     //laboratories
     Route::prefix('laboratory')->group(function () {
@@ -191,7 +189,6 @@ Route::group(['middleware' => ['auth']], function () {
         Route::delete('/{id}', [packageCategoryController::class, 'destroy'])->name('packageCategory.destroy');
     });
 
-
     //Add Lab Packages
     Route::prefix('labPackage')->group(function () {
         Route::get('', [PackageController::class, 'index'])->name('labPackage.index');
@@ -207,7 +204,7 @@ Route::group(['middleware' => ['auth']], function () {
     //Add Medicine
     Route::prefix('addMedicine')->group(function () {
         Route::get('', [AddMedicineController::class, 'index'])->name('addMedicine.index');
-        
+
         Route::post('', [AddMedicineController::class, 'store'])->name('addMedicine.store');
         // web.php or api.php (depending on where you're calling it from)
         Route::get('/get-medicine-strip', [AddMedicineController::class, 'getMedicineStrip'])->name('medicine.strip');
@@ -226,14 +223,12 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/customers/select', [MedicineSearchController::class, 'customerSelect'])->name('customers.select');
 
         Route::get('/fetch-cart-by-customer', [MedicineSearchController::class, 'fetchCartByCustomer']);
-        Route::get('/fetch-prescription-files', [MedicineSearchController::class, 'fetchPrescriptionFiles'])->name('search.prescription');;
+        Route::get('/fetch-prescription-files', [MedicineSearchController::class, 'fetchPrescriptionFiles'])->name('search.prescription');
     });
 
     // Route::post('/add-medicine/store', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
 
-
-
-    // rating 
+    // rating
     Route::get('/app-ratings', [AppRatingController::class, 'index'])->name('app_ratings.index');
 
     // zip_code_vise_delivery
@@ -241,14 +236,14 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/zipcodes/upload', [ZipCodeViceDeliveryController::class, 'uploadZipcodes'])->name('zip_code_vise_delivery.upload');
     Route::delete('/zipcodes/delete-all', [ZipCodeViceDeliveryController::class, 'deleteAll'])->name('zip_code_vise_delivery.deleteAll');
 
-
+    Route::get('/addLabTest',[AddLabTestController::class, 'index'])->name('addLabTest.index');
+    Route::get('/addLabTestSearch',[AddLabTestController::class, 'search'])->name('addLabTest.search');
 });
 
 require __DIR__ . '/auth.php';
 
-
-    // phlebotomist routes group with resource controller style
-    Route::prefix('phlebotomist')->group(function () {
+// phlebotomist routes group with resource controller style
+Route::prefix('phlebotomist')->group(function () {
     Route::get('/', [PhlebotomistController::class, 'index'])->name('phlebotomist.index');
     Route::get('/create', [PhlebotomistController::class, 'create'])->name('phlebotomist.create');
     Route::post('/store', [PhlebotomistController::class, 'store'])->name('phlebotomist.store');
@@ -256,8 +251,6 @@ require __DIR__ . '/auth.php';
     Route::put('/{id}', [PhlebotomistController::class, 'update'])->name('phlebotomist.update');
     Route::delete('/{id}', [PhlebotomistController::class, 'destroy'])->name('phlebotomist.destroy');
 });
-
-
 
 Route::get('/prescriptions', [FileUploadController::class, 'index'])->name('prescriptions.index');
 Route::post('/prescriptions/update-status/{id}', [FileUploadController::class, 'updateStatus']);
@@ -269,8 +262,6 @@ Route::prefix('popular-lab-tests')->group(function () {
     Route::post('/store', [PopularLabTestController::class, 'store'])->name('popular_lab_test.store');
     Route::delete('/{id}', [PopularLabTestController::class, 'destroy'])->name('popular_lab_test.destroy');
 });
-
-
 
 //HomeBanners
 Route::prefix('homebanners')->group(function () {
@@ -293,8 +284,6 @@ Route::prefix('homebanners')->group(function () {
         Route::get('/{id}', [HomeBannerController::class, 'show'])->name('homebanner.show');
     });
 });
-
-
 
 //Medicine Banners
 
@@ -337,4 +326,3 @@ Route::prefix('notifications')->group(function () {
 Route::get('/additionalcharges', [AdditionalchargesController::class, 'showForm'])->name('additionalcharges');
 Route::post('/platform-fee', [AdditionalchargesController::class, 'storeOrUpdate'])->name('platform-fee.store');
 // Route::get('/platform-fee/{id?}', [AdditionalchargesController::class, 'showForm'])->name('platform-fee.form');
-

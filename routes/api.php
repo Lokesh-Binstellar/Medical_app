@@ -19,14 +19,12 @@ use App\Http\Controllers\JoinUsController;
 use App\Http\Controllers\MedicineBannerController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PopularLabTestController;
+use App\Http\Controllers\LabtestController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\RequestQuoteController;
 use App\Http\Controllers\ZipCodeViceDeliveryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-
-
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -42,15 +40,13 @@ Route::middleware('check.api.key')->group(function () {
     Route::get('/getAllPopularBrand', [PopularBrandController::class, 'getBrand'])->name('popular.get_brand');
     Route::get('/getAllPopularCategory', [PopularCategoryController::class, 'getCategory'])->name('popular.getCategory');
 
-Route::get('/medicine-by-salt', [MedicineController::class, 'medicineBySaltComposition']);
+    Route::get('/medicine-by-salt', [MedicineController::class, 'medicineBySaltComposition']);
     Route::get('/popular-lab-tests', [PopularLabTestController::class, 'getAll']);
-
 
     Route::delete('/cart/{cartId}/product/{productId}', [AddMedicineController::class, 'removeProduct']);
 
     Route::post('/send-otp', [AuthController::class, 'sendOtp']);
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
-
 
     // with jwt token
     Route::middleware('authTest')->group(function () {
@@ -62,30 +58,31 @@ Route::get('/medicine-by-salt', [MedicineController::class, 'medicineBySaltCompo
         Route::get('/getUserCart', [AddMedicineController::class, 'getAddToCart'])->name('getUserCart.getAddToCart');
         Route::post('/requestAQuote', [RequestQuoteController::class, 'requestAQuote']);
 
-        // rating 
+        // rating
         Route::post('/ratings', [RatingController::class, 'store']);
         Route::post('/rate-app', [AppRatingController::class, 'store']);
         Route::get('/popular-pharmacies', [RatingController::class, 'popularPharmacies']);
         Route::get('/popular-labs', [RatingController::class, 'popularLaboratories']);
-
-
 
         // Patient
         Route::get('/patients', [PatientController::class, 'index']);
         Route::post('/patients', [PatientController::class, 'store']);
         Route::put('/patients/{id}', [PatientController::class, 'update']);
 
-
         // zip_code_vise_delivery
-        Route::get('/zipcodes', [ZipCodeViceDeliveryController::class, 'getZipcodes']);
-        Route::post('/ratings', [RatingController::class,'store']);
-        Route::post('/placeOrder',[OrderController::class,'placeOrder']);
-        Route::get('/allPharmacyRequests', [MedicineSearchController::class, 'allPharmacyRequests']);
+        Route::post('/ratings', [RatingController::class, 'store']);
+        Route::post('/placeOrder', [OrderController::class, 'placeOrder']);
+        Route::get('/allPharmacyRequests', [MedicineSearchController::class, 'allPharmacyRequests']); 
     });
 
+
+    //labTest
+    Route::get('/LabTestDetails', [LabtestController::class, 'labTestDetails']);
+
+
+    
     Route::get('/productListByCategory/{categoryName}', [OtcController::class, 'productListByCategory']);
     Route::get('/productListByBrand/{brandName}', [PopularBrandController::class, 'productListByBrand']);
-
 
     Route::get('/homebanners', [HomeBannerController::class, 'getAllBanners']);
     Route::get('/medicinebanners', [MedicineBannerController::class, 'getAllBanners']);
@@ -93,5 +90,4 @@ Route::get('/medicine-by-salt', [MedicineController::class, 'medicineBySaltCompo
     Route::post('/join-us', [JoinUsController::class, 'store']);
 
     Route::get('/placeOrder', [MedicineSearchController::class, 'placeOrder']);
-    
 });
