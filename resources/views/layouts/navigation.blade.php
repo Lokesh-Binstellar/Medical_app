@@ -131,14 +131,7 @@
 
 
 
-        @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
-            <li class="menu-item {{ in_array(Route::current()->getName(), ['labtest.index']) ? 'active' : '' }}">
-                <a href="{{ route('labtest.index') }}" class="menu-link">
-                    <i class="menu-icon tf-icons mdi mdi-flask"></i>
-                    <div data-i18n="Lab Test">Lab Test</div>
-                </a>
-            </li>
-        @endif
+      
 
         @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
             <li
@@ -159,20 +152,19 @@
             </li>
         @endif
 
+        @if (in_array('Prescriptions', $permissions) || $isSuperAdmin == 1)
+        <li class="menu-item {{ in_array(Route::current()->getName(), ['prescriptions.index']) ? 'active' : '' }}">
+            <a href="{{ route('prescriptions.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons mdi mdi-prescription "></i>
+                <div data-i18n="Prescriptions">Prescriptions</div>
+            </a>
+        </li>
+        @endif
         @if (in_array('Carts', $permissions) || $isSuperAdmin == 1)
             <li class="menu-item {{ in_array(Route::current()->getName(), ['additionalcharges']) ? 'active' : '' }}">
                 <a href="{{ route('additionalcharges') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-file-document-outline"></i>
                     <div data-i18n="Additional Charges">Additional Charges</div>
-                </a>
-            </li>
-        @endif
-
-        @if (in_array('Prescriptions', $permissions) || $isSuperAdmin == 1)
-            <li class="menu-item {{ in_array(Route::current()->getName(), ['prescriptions.index']) ? 'active' : '' }}">
-                <a href="{{ route('prescriptions.index') }}" class="menu-link">
-                    <i class="menu-icon tf-icons mdi mdi-prescription "></i>
-                    <div data-i18n="Prescriptions">Prescriptions</div>
                 </a>
             </li>
         @endif
@@ -233,7 +225,27 @@
             </li>
         @endif
 
-
+<li class="menu-item">
+        <a href="javascript:void(0);" class="menu-link menu-toggle">
+          <i class="menu-icon tf-icons mdi mdi-flask"></i>
+          <div data-i18n="Lab">Lab</div>
+        </a>
+        <ul class="menu-sub">
+          <li class="menu-item">
+            <a href="app-logistics-dashboard.html" class="menu-link">
+              <div data-i18n="Dashboard">Dashboard</div>
+            </a>
+          </li>
+           @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['labtest.index']) ? 'active' : '' }}">
+                <a href="{{ route('labtest.index') }}" class="menu-link">
+                    <i class="menu-icon ri:import-line "></i>
+                    <div data-i18n="Import Lab Test">Import Lab Test</div>
+                </a>
+            </li>
+        @endif
+        </ul>
+      </li>
 
         <li class="menu-item">
             <a href="{{ route('logout') }}" class="menu-link"
