@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\MyEvent;
 use App\Events\Pharmacymedicine;
 use App\Models\Carts;
+use App\Models\Additionalcharges;
 use App\Models\CustomerAddress;
 use App\Models\Customers;
 use App\Models\Medicine;
@@ -290,6 +291,8 @@ class MedicineSearchController extends Controller
 
                 $discount = $group->sum('mrp_amount') - $group->sum('total_amount');
 
+                $platfromfee = Additionalcharges::value('platfrom_fee') ?? 0;
+
                 return [
                     'pharmacy_id' => $pharmacyId,
                     'pharmacy_name' => $pharmacy->pharmacy_name ?? 'Unknown',
@@ -298,8 +301,8 @@ class MedicineSearchController extends Controller
                     'mrp_amount' => $group->sum('mrp_amount'),
                     'item_price' => $group->sum('total_amount'),
                     'total_discount' => $group->sum('mrp_amount') > 0 ? round(($discount / $group->sum('mrp_amount')) * 100, 2) : 0,
-                    'platform_fees' => 4,
-                    'total_price' => $group->sum('total_amount')  + 4,
+                    'platform_fees' => $platfromfee,
+                    'total_price' => $group->sum('total_amount')  + $platfromfee,
                     'rating' => $rating,
                     'distance' => $distance ?? 'Unknown',
                     'delivery_available' => $delivery_available,
