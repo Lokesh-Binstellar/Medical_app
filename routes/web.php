@@ -18,6 +18,7 @@ use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\HomeBannerController;
 use App\Http\Controllers\JoinUsController;
 use App\Http\Controllers\MedicineBannerController;
+use App\Http\Controllers\PhlebotomistController;
 use App\Http\Controllers\PopularLabTestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RequestQuoteController;
@@ -237,9 +238,22 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/zipcodes', [ZipCodeViceDeliveryController::class, 'index'])->name('zip_code_vise_delivery.index');
     Route::post('/zipcodes/upload', [ZipCodeViceDeliveryController::class, 'uploadZipcodes'])->name('zip_code_vise_delivery.upload');
     Route::delete('/zipcodes/delete-all', [ZipCodeViceDeliveryController::class, 'deleteAll'])->name('zip_code_vise_delivery.deleteAll');
+
+
 });
 
 require __DIR__ . '/auth.php';
+
+
+    // phlebotomist routes group with resource controller style
+    Route::prefix('phlebotomist')->group(function () {
+    Route::get('/', [PhlebotomistController::class, 'index'])->name('phlebotomist.index');
+    Route::get('/create', [PhlebotomistController::class, 'create'])->name('phlebotomist.create');
+    Route::post('/store', [PhlebotomistController::class, 'store'])->name('phlebotomist.store');
+    Route::get('/{id}/edit', [PhlebotomistController::class, 'edit'])->name('phlebotomist.edit');
+    Route::put('/{id}', [PhlebotomistController::class, 'update'])->name('phlebotomist.update');
+    Route::delete('/{id}', [PhlebotomistController::class, 'destroy'])->name('phlebotomist.destroy');
+});
 
 
 

@@ -1,14 +1,14 @@
 @extends('layouts.app')
 @section('styles')
-
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
     <style>
-.select2 {
-        width: 300px !important;
-    }
-    body>span.select2-container.select2-container--default.select2-container--open {
+        .select2 {
+            width: 300px !important;
+        }
+
+        body>span.select2-container.select2-container--default.select2-container--open {
             width: auto !important;
         }
     </style>
@@ -26,7 +26,7 @@
                                     class="d-flex gap-2 " id="importForm">
                                     @csrf
                                     <div class="error-msg">
-                                        <select name="name" class="form-control select2 " id="brand-select"  >
+                                        <select name="name" class="form-control select2 " id="brand-select">
                                             <option value="">Select Brand</option>
                                             @foreach ($popularBrands as $item)
                                                 <option value="{{ $item }}">{{ $item }}</option>
@@ -38,9 +38,10 @@
                                     </div>
                                     <div>
 
-                                        <button type="submit" class="btn btn-primary addButton text-nowrap px-5">+ Add Brand</button>
+                                        <button type="submit" class="btn btn-primary addButton text-nowrap px-5">+ Add
+                                            Brand</button>
                                     </div>
-                                    
+
                                 </form>
                             </div>
 
@@ -51,7 +52,7 @@
                                 <div class="alert alert-success">{{ session('success') }}</div>
                             @endif
 
-                           
+
 
                             <div class="table-responsive">
                                 <table id="add-row" class="display table table-striped table-hover data-table">
@@ -76,74 +77,86 @@
 @endsection
 
 @section('scripts')
-<script>
-   $(function () {
-    // ✅ DataTable Initialization
-    var table = $('.data-table').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "{{ route('popular.index') }}",
-        columns: [
-            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'name', name: 'name' },
-            { data: 'logo', name: 'logo' },
-            { data: 'action', name: 'action', orderable: false, searchable: false }
-        ]
-    });
-
-    // ✅ Select2 Initialization
-    $('#brand-select').select2({
-        placeholder: "Select Brand",
-        allowClear: true
-    });
-
-    // ✅ SweetAlert Delete Function
-    window.deleteUser = function (id) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "This brand will be deleted permanently!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel',
-            customClass: {
-                confirmButton: 'btn btn-danger me-2',
-                cancelButton: 'btn btn-secondary'
-            },
-            buttonsStyling: false,
-            reverseButtons: false // Confirm (Yes) on left, Cancel on right
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '{{ route('popular.destroy', '') }}/' + id,
-                    type: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}',
+    <script>
+        $(function() {
+            // ✅ DataTable Initialization
+            var table = $('.data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('popular.index') }}",
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
                     },
-                    success: function (response) {
-                        Swal.fire({
-                            title: 'Deleted!',
-                            text: 'Brand deleted successfully.',
-                            icon: 'success',
-                            timer: 1500,
-                            showConfirmButton: false
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'logo',
+                        name: 'logo'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
+            });
+
+            // ✅ Select2 Initialization
+            $('#brand-select').select2({
+                placeholder: "Select Brand",
+                allowClear: true
+            });
+
+            // ✅ SweetAlert Delete Function
+            window.deleteUser = function(id) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This brand will be deleted permanently!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        confirmButton: 'btn btn-danger me-2',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false,
+                    reverseButtons: false // Confirm (Yes) on left, Cancel on right
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '{{ route('popular.destroy', '') }}/' + id,
+                            type: 'DELETE',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    title: 'Deleted!',
+                                    text: 'Brand deleted successfully.',
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                                table.ajax.reload();
+                            },
+                            error: function(xhr, status, error) {
+                                Swal.fire(
+                                    'Error!',
+                                    'Something went wrong. Please try again.',
+                                    'error'
+                                );
+                            }
                         });
-                        table.ajax.reload();
-                    },
-                    error: function (xhr, status, error) {
-                        Swal.fire(
-                            'Error!',
-                            'Something went wrong. Please try again.',
-                            'error'
-                        );
                     }
                 });
             }
         });
-    }
-});
-
-</script>
-
-
+    </script>
 @endsection

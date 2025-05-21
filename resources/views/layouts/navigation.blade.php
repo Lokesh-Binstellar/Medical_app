@@ -205,23 +205,33 @@
         @endif
 
 
-@if (in_array('App Rating', $permissions) || $isSuperAdmin == 1)
-    <li class="menu-item {{ request()->routeIs('app_ratings.index') ? 'active' : '' }}">
-        <a href="{{ route('app_ratings.index') }}" class="menu-link">
-            <i class="menu-icon tf-icons mdi mdi-star"></i>
-            <div data-i18n="App Rating">App Rating</div>
-        </a>
-    </li>
-@endif
+        @if (in_array('App Rating', $permissions) || $isSuperAdmin == 1)
+            <li class="menu-item {{ request()->routeIs('app_ratings.index') ? 'active' : '' }}">
+                <a href="{{ route('app_ratings.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons mdi mdi-star"></i>
+                    <div data-i18n="App Rating">App Rating</div>
+                </a>
+            </li>
+        @endif
 
-@if ($isSuperAdmin)
-    <li class="menu-item {{ request()->routeIs('zip_code_vise_delivery.index') ? 'active' : '' }}">
-        <a href="{{ route('zip_code_vise_delivery.index') }}" class="menu-link">
-            <i class="menu-icon tf-icons mdi mdi-map-marker"></i>
-            <div data-i18n="Zip Code Vice Delivery">Zip Code Vice Delivery</div>
-        </a>
-    </li>
-@endif
+        @if ($isSuperAdmin)
+            <li class="menu-item {{ request()->routeIs('zip_code_vise_delivery.index') ? 'active' : '' }}">
+                <a href="{{ route('zip_code_vise_delivery.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons mdi mdi-map-marker"></i>
+                    <div data-i18n="Zip Code Vice Delivery">Zip Code Vice Delivery</div>
+                </a>
+            </li>
+        @endif
+
+        @if (in_array('Laboratories', $permissions))
+            <li
+                class="menu-item {{ in_array(Route::current()->getName(), ['phlebotomist.index']) ? 'active' : '' }}">
+                <a href="{{ route('phlebotomist.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons mdi mdi-account-plus"></i>
+                    <div data-i18n="Add phlebotomist">Add phlebotomist</div>
+                </a>
+            </li>
+        @endif
 
 
 
