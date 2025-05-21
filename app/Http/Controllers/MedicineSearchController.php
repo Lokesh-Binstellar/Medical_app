@@ -97,29 +97,25 @@ class MedicineSearchController extends Controller
     public function customerSelect(Request $request)
     {
         $search = $request->input('query');
+        $currentPharmacyId = $request->input('current_pharmacy_id');
 
-        // Step 1: Get matching customers from request_quotes + customers
+       $customerIds = DB::table('request_quotes')
+            ->where('pharmacy_id', $currentPharmacyId)
+            ->where('pharmacy_address_status', 0)
+            ->pluck('customer_id');
+
         $customers = DB::table('customers')
-            ->where(function ($query) use ($search) {
-                $query->where('customers.firstName', 'like', "%{$search}%")
-                    ->orWhere('customers.mobile_no', 'like', "%{$search}%");
-            })
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('request_quotes')
-                    ->whereRaw('request_quotes.customer_id = customers.id')
-                    ->where('request_quotes.pharmacy_address_status', '=', 0);
-            })
-            ->whereNotExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('request_quotes')
-                    ->whereRaw('request_quotes.customer_id = customers.id')
-                    ->where('request_quotes.pharmacy_address_status', '=', 1);
-            })
-            ->select('customers.id', DB::raw("CONCAT(customers.firstName, ' (', customers.mobile_no, ')') as text"))
-            ->distinct()
-            ->limit(10)
+            ->whereIn('id', $customerIds)
+            ->select('id', 'firstName', 'mobile_no') // Include 'id' here
             ->get();
+
+        // Format for Select2: id + text
+        $results = $customers->map(function ($customer) {
+            return [
+                'id' => $customer->id,
+                'text' => $customer->firstName . ' (' . $customer->mobile_no . ')',
+            ];
+        });
 
         $firstCustomerId = $customers->first()?->id;
         $product = null;
@@ -132,9 +128,10 @@ class MedicineSearchController extends Controller
         }
 
         return response()->json([
-            'results' => $customers,
+            'results' => $results,
             'product' => $product
         ]);
+
     }
 
 
@@ -211,34 +208,44 @@ class MedicineSearchController extends Controller
                 }
 
                 $decodedMedicines = $group->flatMap(function ($item) use ($cartQuantities) {
-                    try {
-                        $decoded = is_string($item->medicine)
-                            ? json_decode($item->medicine, true)
-                            : $item->medicine;
+                try {
+                    $decoded = is_string($item->medicine)
+                        ? json_decode($item->medicine, true)
+                        : $item->medicine;
 
-                        $decodedArray = is_array($decoded) ? $decoded : [$decoded];
+                    $decodedArray = is_array($decoded) ? $decoded : [$decoded];
 
-                        return collect($decodedArray)->map(function ($med) use ($cartQuantities) {
-                            $medId = $med['medicine_id'];
-                          
-                         
+                    return collect($decodedArray)->map(function ($med) use ($cartQuantities) {
+                        $medId = $med['medicine_id'];
 
-                            $image = Medicine::where('product_id', $medId)->value('image_url');
-                            if (!$image) {
-                                $image = Otcmedicine::where('otc_id', $medId)->value('image_url');
-                            }
+                        $image = Medicine::where('product_id', $medId)->value('image_url');
+                        if (!$image) {
+                            $image = Otcmedicine::where('otc_id', $medId)->value('image_url');
+                        }
 
-                            $med['image'] = $image ? asset('storage/' . $image) : null;
-                            $med['qty'] = $cartQuantities[$med['medicine_id']] ?? 0;
-                            $med['price'] = $med['discount'] ?? 0;
-                         unset($med['discount']);
+                        $med['image'] = $image ? asset('storage/' . $image) : null;
+                        $med['qty'] = $cartQuantities[$medId] ?? 0;
+                        $med['price'] = $med['discount'] ?? 0;
+                        unset($med['discount']);
 
-                            return $med;
-                        });
-                    } catch (\Exception $e) {
-                        return [['error' => 'Invalid JSON']];
-                    }
-                });
+                        return [
+                            'medicine_id'      => $med['medicine_id'] ?? null,
+                            'medicine_name'    => $med['medicine_name'] ?? null,
+                            'qty'              => isset($med['qty']) ? (int) $med['qty'] : 0,
+                            'available'        => $med['available'] ?? null,
+                            'is_substitute'    => $med['is_substitute'] ?? null,
+                            'image'            => $med['image'] ?? null,
+                            'mrp'              => isset($med['mrp']) ? (float) $med['mrp'] : null,
+                            'price'            => isset($med['price']) ? (float) $med['price'] : null,
+                            'discount_percent' => isset($med['discount_percent']) ? (float) $med['discount_percent'] : null,
+                        ];
+
+                    });
+                } catch (\Exception $e) {
+                    return [['error' => 'Invalid JSON']];
+                }
+            });
+
 
                 $delivery_available = 'no';
 
@@ -271,18 +278,33 @@ class MedicineSearchController extends Controller
                     $delivery_charge = null; // or any default value you want
                 }
 
+                $rating = null;
 
+                $ratings = DB::table('ratings')
+                    ->where('rateable_id', $pharmacyId)
+                    ->where('rateable_type', 'Pharmacy')
+                    ->pluck('rating');
+
+                $totalRatings = $ratings->count();
+
+                if ($totalRatings > 0) {
+                    $average = round($ratings->avg(), 1);
+                    $rating = $average . " ($totalRatings)";
+                }
+
+                $discount = $group->sum('mrp_amount') - $group->sum('total_amount');
 
                 return [
                     'pharmacy_id' => $pharmacyId,
                     'pharmacy_name' => $pharmacy->pharmacy_name ?? 'Unknown',
                     'pharmacy_address' => $pharmacy->address ?? 'Unknown',
                     'medicines' => $decodedMedicines->values(),
-                    'item_price' => $group->sum('total_amount'),
                     'mrp_amount' => $group->sum('mrp_amount'),
-                    'rating' => 4,
+                    'item_price' => $group->sum('total_amount'),
+                    'total_discount' => $group->sum('mrp_amount') > 0 ? round(($discount / $group->sum('mrp_amount')) * 100, 2) : 0,
                     'platform_fees' => 4,
                     'total_price' => $group->sum('total_amount')  + 4,
+                    'rating' => $rating,
                     'distance' => $distance ?? 'Unknown',
                     'delivery_available' => $delivery_available,
                     'delivery_charge' => $delivery_charge

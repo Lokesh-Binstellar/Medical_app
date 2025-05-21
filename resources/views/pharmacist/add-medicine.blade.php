@@ -122,6 +122,7 @@
             <div class="card-header  text-white fw-bold fs-5">
                 Add Medicine
             </div>
+            <input type="hidden" name="current_pharmacy_id" id="current_pharmacy_id" value="{{ Auth::id() }}">
 
             <div class="card-body">
                 <form method="POST" action="{{ route('medicines.store') }}" id="medicineCreateForm"
@@ -483,10 +484,9 @@
                         dataType: 'json',
                         delay: 250,
                         data: function(params) {
-                            console.log('dfsf');
-                            console.log(params);
                             return {
-                                query: params.term
+                                query: params.term,
+                                current_pharmacy_id: $('#current_pharmacy_id').val() // static value added here
                             };
                         },
                         processResults: function(data) {
@@ -498,6 +498,7 @@
                     }
                 });
             }
+
 
 
             initCustomerSelect2($('.customer-search'));

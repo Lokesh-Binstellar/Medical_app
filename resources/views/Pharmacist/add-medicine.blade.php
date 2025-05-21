@@ -120,7 +120,7 @@
         <div class="card shadow-xl rounded-3">
             <!-- Blue Header Title -->
             <div class="card-header  text-white fw-bold fs-5">
-                Add Medicine
+                Add Medicine21
             </div>
 
             <div class="card-body">
