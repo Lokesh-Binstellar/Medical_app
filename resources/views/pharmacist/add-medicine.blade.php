@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @section('styles')
-    {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
+    {{--
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
 
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
@@ -55,7 +56,8 @@
             border-radius: 0px !important;
             /* light gray */
         }
-        .accordion-button::after{
+
+        .accordion-button::after {
             display: none;
         }
 
@@ -205,8 +207,8 @@
                                         <input type="hidden" class="medicine_name " name="medicine[0][medicine_name]">
                                     </td>
                                     <td>
-                                        <input type="number" name="medicine[0][mrp]" class="form-control mrp"
-                                            step="0.01" placeholder="MRP">
+                                        <input type="number" name="medicine[0][mrp]" class="form-control mrp" step="0.01"
+                                            placeholder="MRP">
                                     </td>
                                     <td>
                                         <input type="number" name="medicine[0][discount]" class="form-control discount"
@@ -286,23 +288,22 @@
                             @endphp
 
                             <div class="accordion-item border-0 shadow-sm mb-3 ">
-                              <h2 class="accordion-header" id="heading{{ $accordionId }}">
-    <button class="accordion-button collapsed d-flex justify-content-between align-items-center w-100" 
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#collapse{{ $accordionId }}"
-        aria-expanded="false"
-        aria-controls="collapse{{ $accordionId }}">
+                                <h2 class="accordion-header" id="heading{{ $accordionId }}">
+                                    <button
+                                        class="accordion-button collapsed d-flex justify-content-between align-items-center w-100"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $accordionId }}"
+                                        aria-expanded="false" aria-controls="collapse{{ $accordionId }}">
 
-        <div class="text-start">
-            Record #{{ $accordionId }} (Pharmacy ID: {{ $pharmacyId }})<br>
-            Customer ID : {{ $entry->customer_id }}<br>
-            Customer Details : {{ $customer->firstName ?? 'N/A' }} | Phone: {{ $customer->mobile_no ?? 'N/A' }}
-        </div>
+                                        <div class="text-start">
+                                            Record #{{ $accordionId }} (Pharmacy ID: {{ $pharmacyId }})<br>
+                                            Customer ID : {{ $entry->customer_id }}<br>
+                                            Customer Details : {{ $customer->firstName ?? 'N/A' }} | Phone:
+                                            {{ $customer->mobile_no ?? 'N/A' }}
+                                        </div>
 
-        <i class="fa-solid fa-arrow-down text-dark ms-auto"></i>
-    </button>
-</h2>
+                                        <i class="fa-solid fa-arrow-down text-dark ms-auto"></i>
+                                    </button>
+                                </h2>
 
 
                                 <div id="collapse{{ $accordionId }}" class="accordion-collapse collapse"
@@ -368,24 +369,24 @@
                     url: `{{ route('search.medicine') }}`,
                     dataType: 'json',
                     delay: 250,
-                    data: function(params) {
+                    data: function (params) {
                         return {
                             q: params.term || ''
                         };
                     },
-                    processResults: function(data) {
+                    processResults: function (data) {
                         return {
                             results: data
                         };
                     }
                 }
-            }).on('select2:select', function(e) {
+            }).on('select2:select', function (e) {
                 const selectedText = e.params.data.text;
                 const $row = $(this).closest('tr');
                 $row.find('.medicine_name').val(selectedText);
             });
             // ✅ CSS fix for new select2 dropdowns
-            $el.each(function() {
+            $el.each(function () {
                 const container = $(this).data('select2')?.$container;
                 if (container) {
                     container.css('width', '350px');
@@ -396,7 +397,7 @@
         function calculateTotal() {
             let total = 0;
 
-            $('.discount').each(function() {
+            $('.discount').each(function () {
                 const value = parseFloat($(this).val()) || 0;
                 total += value;
             });
@@ -416,7 +417,7 @@
         function calculateMRPTotal() {
             let mrpTotal = 0;
 
-            $('.mrp').each(function() {
+            $('.mrp').each(function () {
                 const value = parseFloat($(this).val()) || 0;
                 mrpTotal += value;
             });
@@ -426,18 +427,18 @@
         }
 
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             let index = 1;
 
             initSelect2($('.medicine_search'));
 
-            $('#add-row').on('click', function() {
+            $('#add-row').on('click', function () {
                 const $newRow = $('.medicine-row').first().clone();
 
                 $newRow.find('input').val('');
                 $newRow.find('select').not('.medicine_search').val('yes');
 
-                $newRow.find('select, input').each(function() {
+                $newRow.find('select, input').each(function () {
                     const name = $(this).attr('name');
                     if (name) {
                         const newName = name.replace(/\[\d+\]/, `[${index}]`);
@@ -455,14 +456,14 @@
                 calculateTotal();
             });
 
-            $(document).on('click', '.remove-row', function() {
+            $(document).on('click', '.remove-row', function () {
                 if ($('#medicine-body .medicine-row').length > 1) {
                     $(this).closest('tr').remove();
                     calculateTotal();
                 }
             });
 
-            $(document).on('input', '.mrp, .discount', function() {
+            $(document).on('input', '.mrp, .discount', function () {
                 const $row = $(this).closest('tr');
                 const mrp = parseFloat($row.find('.mrp').val()) || 0;
                 const discountAmount = parseFloat($row.find('.discount').val()) || 0;
@@ -473,7 +474,7 @@
                 calculateTotal();
             });
 
-            $(document).on('input', '.mrp, .discount_percent', function() {
+            $(document).on('input', '.mrp, .discount_percent', function () {
                 const $row = $(this).closest('tr');
                 const mrp = parseFloat($row.find('.mrp').val()) || 0;
                 const percent = parseFloat($row.find('.discount_percent').val()) || 0;
@@ -494,14 +495,14 @@
                         url: '{{ route('customers.select') }}',
                         dataType: 'json',
                         delay: 250,
-                        data: function(params) {
+                        data: function (params) {
                             return {
                                 query: params.term,
                                 current_pharmacy_id: $('#current_pharmacy_id')
                                     .val() // static value added here
                             };
                         },
-                        processResults: function(data) {
+                        processResults: function (data) {
                             return {
                                 results: data.results
                             };
@@ -516,7 +517,7 @@
             initCustomerSelect2($('.customer-search'));
 
 
-            $('form').on('submit', function(e) {
+            $('form').on('submit', function (e) {
                 let isValid = true;
 
 
@@ -526,7 +527,7 @@
                 $('.medicine_search').next('.select2-container').css('border', '');
 
 
-                $('#medicine-body .medicine-row').each(function(index) {
+                $('#medicine-body .medicine-row').each(function (index) {
                     const $row = $(this);
 
                     const $medicineSelect = $row.find('.medicine_search');
@@ -606,28 +607,28 @@
 
 
 
-            $(document).on('change input', '.medicine_search', function() {
+            $(document).on('change input', '.medicine_search', function () {
                 if ($(this).val()) {
                     $(this).next('.select2-container').css('border', '');
                     $(this).closest('td').find('.medicine-error').remove();
                 }
             });
 
-            $(document).on('input', 'input[name*="[mrp]"]', function() {
+            $(document).on('input', 'input[name*="[mrp]"]', function () {
                 if ($(this).val() > 0) {
                     $(this).css('border', '');
                     $(this).closest('td').find('.mrp-error').remove();
                 }
             });
 
-            $(document).on('input', 'input[name*="[discount]"]', function() {
+            $(document).on('input', 'input[name*="[discount]"]', function () {
                 if ($(this).val() >= 0) {
                     $(this).css('border', '');
                     $(this).closest('td').find('.discount-error').remove();
                 }
             });
 
-            $(document).on('input', 'input[name*="[discount_percent]"]', function() {
+            $(document).on('input', 'input[name*="[discount_percent]"]', function () {
                 const val = parseFloat($(this).val());
                 if (val >= 0 && val <= 100) {
                     $(this).css('border', '');
@@ -635,21 +636,21 @@
                 }
             });
 
-            $(document).on('change', 'select[name*="[available]"]', function() {
+            $(document).on('change', 'select[name*="[available]"]', function () {
                 if ($(this).val()) {
                     $(this).css('border', '');
                     $(this).closest('td').find('.available-error').remove();
                 }
             });
 
-            $(document).on('change', 'select[name*="[is_substitute]"]', function() {
+            $(document).on('change', 'select[name*="[is_substitute]"]', function () {
                 if ($(this).val()) {
                     $(this).css('border', '');
                     $(this).closest('td').find('.substitute-error').remove();
                 }
             });
 
-            $(document).on('change', 'select.customer-search', function() {
+            $(document).on('change', 'select.customer-search', function () {
                 if ($(this).val()) {
                     $(this).css('border', '');
                     $('.customer-error').remove();
@@ -664,8 +665,8 @@
 
         // fetch-cart-by-customer products_details
 
-        $(document).ready(function() {
-            $('#prescription-select').on('select2:select', function(e) {
+        $(document).ready(function () {
+            $('#prescription-select').on('select2:select', function (e) {
                 const customerId = e.params.data.id;
 
                 $.ajax({
@@ -674,20 +675,20 @@
                     data: {
                         customer_id: customerId
                     },
-                    success: function(response) {
+                    success: function (response) {
                         if (response.status === 'success') {
                             const products = response.data;
                             let html = '';
 
                             products.forEach(product => {
                                 html += `<tr>
-                            <td>${product.product_id}</td>
-                             <td>${product.name}</td>
-                            <td>${product.packaging_detail}</td>
-                            <td>${product.quantity}</td>
-                            <td>${product.is_substitute}</td>
-                       
-                        </tr>`;
+                                <td>${product.product_id}</td>
+                                 <td>${product.name}</td>
+                                <td>${product.packaging_detail}</td>
+                                <td>${product.quantity}</td>
+                                <td>${product.is_substitute}</td>
+
+                            </tr>`;
                             });
 
                             $('#cart-product-body').html(html);
@@ -697,7 +698,7 @@
                             $('#cart-details').hide();
                         }
                     },
-                    error: function() {
+                    error: function () {
                         $('#cart-product-body').html('');
                         $('#cart-details').hide();
                     }
@@ -706,7 +707,7 @@
         });
 
 
-        $('#prescription-select').on('select2:select', function(e) {
+        $('#prescription-select').on('select2:select', function (e) {
             var customerId = e.params.data.id; // Assuming this is customer_id
             console.log("customerId", customerId);
 
@@ -716,19 +717,19 @@
                 data: {
                     customer_id: customerId
                 }, // Send customer_id, not prescriptionId
-                success: function(response) {
+                success: function (response) {
                     if (response.status === 'success') {
                         let html = '';
-                        response.files.forEach(function(fileUrl, index) {
+                        response.files.forEach(function (fileUrl, index) {
                             html += `
-                        <div class="pdf-box">
-                            <div class="pdf-title">Prescription ${index + 1}</div>
-                            <iframe class="pdf-viewer" src="${fileUrl}">
-                                This browser does not support PDFs. 
-                                <a href="${fileUrl}" download>Download PDF</a>.
-                            </iframe>
-                        </div>
-                    `;
+                            <div class="pdf-box">
+                                <div class="pdf-title">Prescription ${index + 1}</div>
+                                <iframe class="pdf-viewer" src="${fileUrl}">
+                                    This browser does not support PDFs. 
+                                    <a href="${fileUrl}" download>Download PDF</a>.
+                                </iframe>
+                            </div>
+                        `;
                         });
 
                         $('.pdf-wrapper').html(html);
@@ -738,7 +739,7 @@
                         $('#pdf-details').hide();
                     }
                 },
-                error: function() {
+                error: function () {
                     $('.pdf-wrapper').html('Error loading files.');
                     $('#pdf-details').hide();
                 }

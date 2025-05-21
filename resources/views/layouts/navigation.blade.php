@@ -160,8 +160,8 @@
         @endif
 
         @if (in_array('Carts', $permissions) || $isSuperAdmin == 1)
-            <li class="menu-item {{ in_array(Route::current()->getName(), ['addMedicine.index']) ? 'active' : '' }}">
-                <a href="{{ route('addMedicine.index') }}" class="menu-link">
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['additionalcharges']) ? 'active' : '' }}">
+                <a href="{{ route('additionalcharges') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-file-document-outline"></i>
                     <div data-i18n="Additional Charges">Additional Charges</div>
                 </a>

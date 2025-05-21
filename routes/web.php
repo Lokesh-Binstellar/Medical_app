@@ -7,6 +7,7 @@ use App\Http\Controllers\LabtestController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicineSearchController;
 use App\Http\Controllers\AddMedicineController;
+use App\Http\Controllers\AdditionalchargesController;
 use App\Http\Controllers\AppRatingController;
 use App\Http\Controllers\OtcController;
 use App\Http\Controllers\packageCategoryController;
@@ -206,6 +207,7 @@ Route::group(['middleware' => ['auth']], function () {
     //Add Medicine
     Route::prefix('addMedicine')->group(function () {
         Route::get('', [AddMedicineController::class, 'index'])->name('addMedicine.index');
+        
         Route::post('', [AddMedicineController::class, 'store'])->name('addMedicine.store');
         // web.php or api.php (depending on where you're calling it from)
         Route::get('/get-medicine-strip', [AddMedicineController::class, 'getMedicineStrip'])->name('medicine.strip');
@@ -332,3 +334,7 @@ Route::prefix('notifications')->group(function () {
     Route::get('/', [RequestQuoteController::class, 'index'])->name('notification.index');
     Route::post('/read/{id}', [RequestQuoteController::class, 'markAsRead'])->name('notifications.read');
 });
+Route::get('/additionalcharges', [AdditionalchargesController::class, 'showForm'])->name('additionalcharges');
+Route::post('/platform-fee', [AdditionalchargesController::class, 'storeOrUpdate'])->name('platform-fee.store');
+// Route::get('/platform-fee/{id?}', [AdditionalchargesController::class, 'showForm'])->name('platform-fee.form');
+
