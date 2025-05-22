@@ -176,7 +176,7 @@ class PopularBrandController extends Controller
 
     // Medicine data
     $medicines = Medicine::where('marketer', '=', $brandName)
-        ->select('id', 'product_id', 'product_name', 'salt_composition', 'packaging_detail', 'image_url', 'marketer')
+        ->select('product_id', 'product_name', 'salt_composition', 'packaging_detail', 'image_url', 'marketer')
         ->get()
         ->map(function ($item) use ($baseUrl, $defaultImage) {
             $item->image_url = $item->image_url
@@ -191,7 +191,7 @@ class PopularBrandController extends Controller
 
     // OTC data
     $otc = Otcmedicine::where('manufacturers', '=', $brandName)
-        ->select('id', 'otc_id', 'name', 'packaging', 'image_url', 'manufacturers')
+        ->select('otc_id', 'name', 'packaging', 'image_url', 'manufacturers')
         ->get()
         ->map(function ($item) use ($baseUrl, $defaultImage) {
             $item->product_id = $item->otc_id;
