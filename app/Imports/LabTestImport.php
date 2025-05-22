@@ -23,7 +23,7 @@ class LabTestImport implements ToModel,WithHeadingRow
             'description' => $row['description'],
             'contains' => $row['contains'],
             'gender' => $row['gender'],
-            'reports_in' => $row['reports_in'],
+            // 'reports_in' => $row['reports_in'],
             'sample_required' => $row['sample_required'],
             'preparation' => $row['preparation'],
             'how_does_it_work' => $row['how_does_it_work'],

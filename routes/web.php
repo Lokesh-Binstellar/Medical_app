@@ -238,6 +238,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/addLabTest',[AddLabTestController::class, 'index'])->name('addLabTest.index');
     Route::get('/addLabTestSearch',[AddLabTestController::class, 'search'])->name('addLabTest.search');
+    Route::get('/get-contains', [AddLabTestController::class,'getContains'])->name('addLabTest.contains');
 });
 
 require __DIR__ . '/auth.php';

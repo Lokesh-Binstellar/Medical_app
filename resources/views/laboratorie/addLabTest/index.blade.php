@@ -171,16 +171,15 @@
                                             <tr class="medicine-row">
                                                 <td class="customWidth">
                                                     <select class="form-control medicine-search"
-                                                        name="medicine[0][medicine_id]">
-                                                        <option value="">Search
-                                                            Test...</option>
+                                                        name="medicine[0][medicine_id]" style="width: 100%">
+                                                        <option value="">Search Test...</option>
                                                     </select>
                                                 </td>
                                                 <td>
                                                     <input type="text" name="medicine[0][packaging_detail]"
                                                         class="form-control packaging-info" readonly>
                                                 </td>
-                                               
+
 
 
                                                 <td>
@@ -232,27 +231,27 @@
                 });
             }
 
-            function initCustomerSelect2($el) {
-                $el.select2({
-                    placeholder: 'Search customer...',
-                    ajax: {
-                        url: '{{ route('prescription.select') }}',
-                        dataType: 'json',
-                        delay: 250,
-                        data: function(params) {
-                            return {
-                                query: params.term
-                            };
-                        },
-                        processResults: function(data) {
-                            return {
-                                results: data.results
-                            };
-                        },
-                        cache: true
-                    }
-                });
-            }
+            // function initCustomerSelect2($el) {
+            //     $el.select2({
+            //         placeholder: 'Search customer...',
+            //         ajax: {
+            //             url: '{{ route('prescription.select') }}',
+            //             dataType: 'json',
+            //             delay: 250,
+            //             data: function(params) {
+            //                 return {
+            //                     query: params.term
+            //                 };
+            //             },
+            //             processResults: function(data) {
+            //                 return {
+            //                     results: data.results
+            //                 };
+            //             },
+            //             cache: true
+            //         }
+            //     });
+            // }
 
             let index = 1;
             initSelect2($('.medicine-search'));
@@ -346,14 +345,14 @@
 
                 if (id) {
                     $.ajax({
-                        url: '{{ route('medicine.strip') }}',
+                        url: '{{ route('addLabTest.contains') }}',
                         type: 'GET',
                         data: {
                             id: id
                         },
                         success: function(response) {
                             if (response.status) {
-                                $row.find('.packaging-info').val(response.packaging_detail ||
+                                $row.find('.packaging-info').val(response.contains ||
                                     '');
                             } else {
                                 $row.find('.packaging-info').val('');
@@ -409,8 +408,8 @@
                 }
             });
         });
-        
-        
+
+
         // Handle delete button click
         $(document).on('click', '.delete-row', function() {
             let row = $(this).closest('tr');
