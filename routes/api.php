@@ -90,4 +90,8 @@ Route::middleware('check.api.key')->group(function () {
     Route::post('/join-us', [JoinUsController::class, 'store']);
 
     Route::get('/placeOrder', [MedicineSearchController::class, 'placeOrder']);
+    Route::get('/brand/filter', [PopularBrandController::class, 'getFilters']);
+    Route::get('/category/filter', [OtcController::class, 'getFilters']);
+
+
 });
