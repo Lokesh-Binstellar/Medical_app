@@ -43,11 +43,10 @@ Route::middleware('check.api.key')->group(function () {
     Route::get('/medicine-by-salt', [MedicineController::class, 'medicineBySaltComposition']);
     Route::get('/popular-lab-tests', [PopularLabTestController::class, 'getAll']);
 
-    Route::delete('/cart/{cartId}/product/{productId}', [AddMedicineController::class, 'removeProduct']);
-
+    
     Route::post('/send-otp', [AuthController::class, 'sendOtp']);
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
-
+    
     // with jwt token
     Route::middleware('authTest')->group(function () {
         Route::post('/customer/address', [CustomerAddressController::class, 'store']);
@@ -57,7 +56,8 @@ Route::middleware('check.api.key')->group(function () {
         Route::post('/add-to-cart', [AddMedicineController::class, 'frontendAddToCart']);
         Route::get('/getUserCart', [AddMedicineController::class, 'getAddToCart'])->name('getUserCart.getAddToCart');
         Route::post('/requestAQuote', [RequestQuoteController::class, 'requestAQuote']);
-
+        Route::delete('/medicineCart/remove-product/{id}', [AddMedicineController::class, 'removeCartProduct']);
+        
         // rating
         Route::post('/ratings', [RatingController::class, 'store']);
         Route::post('/rate-app', [AppRatingController::class, 'store']);

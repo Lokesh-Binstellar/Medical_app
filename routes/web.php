@@ -237,6 +237,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('/zipcodes/delete-all', [ZipCodeViceDeliveryController::class, 'deleteAll'])->name('zip_code_vise_delivery.deleteAll');
 
     Route::get('/addLabTest',[AddLabTestController::class, 'index'])->name('addLabTest.index');
+    Route::post('/store', [AddLabTestController::class,'store'])->name('addLabTest.store');
     Route::get('/addLabTestSearch',[AddLabTestController::class, 'search'])->name('addLabTest.search');
     Route::get('/get-contains', [AddLabTestController::class,'getContains'])->name('addLabTest.contains');
 });
