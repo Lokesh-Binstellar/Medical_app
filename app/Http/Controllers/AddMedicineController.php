@@ -24,7 +24,6 @@ class AddMedicineController extends Controller
         return view('medicine.addMedicine.index');
     }
 
-
     public function searchMedicines(Request $request)
     {
         $query = $request->input('query');
@@ -56,7 +55,7 @@ class AddMedicineController extends Controller
         $results = $medicines->concat($otcmedicines)->values();
 
         return response()->json([
-            'results' => $results
+            'results' => $results,
         ]);
     }
 
@@ -69,23 +68,19 @@ class AddMedicineController extends Controller
             ->where('prescription_status', 0)
             ->where('status', 1)
             ->whereHas('customers', function ($query) use ($search) {
-                $query->where('mobile_no', 'like', "%{$search}%")
-                    ->orWhere('firstName', 'like', "%{$search}%");
+                $query->where('mobile_no', 'like', "%{$search}%")->orWhere('firstName', 'like', "%{$search}%");
             })
             ->limit(10)
             ->get()
             ->map(function ($prescription) {
                 return [
                     'id' => $prescription->id,
-                    'text' => 'Prescription #' . $prescription->id . ' - ' .
-                        $prescription->customers->firstName . ' (' .
-                        $prescription->customers->mobile_no . ')',
+                    'text' => 'Prescription #' . $prescription->id . ' - ' . $prescription->customers->firstName . ' (' . $prescription->customers->mobile_no . ')',
                 ];
             });
 
         return response()->json(['results' => $prescriptions]);
     }
-
 
     public function getMedicineStrip(Request $request)
     {
@@ -93,10 +88,13 @@ class AddMedicineController extends Controller
 
         try {
             if (!$id) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Medicine ID is required.'
-                ], 400);
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => 'Medicine ID is required.',
+                    ],
+                    400,
+                );
             }
 
             // Try to find in prescription medicines first
@@ -104,7 +102,7 @@ class AddMedicineController extends Controller
             if ($medicine) {
                 return response()->json([
                     'status' => true,
-                    'packaging_detail' => $medicine->packaging_detail ?? ''
+                    'packaging_detail' => $medicine->packaging_detail ?? '',
                 ]);
             }
 
@@ -113,27 +111,28 @@ class AddMedicineController extends Controller
             if ($otcMedicine) {
                 return response()->json([
                     'status' => true,
-                    'packaging_detail' => $otcMedicine->packaging ?? ''
+                    'packaging_detail' => $otcMedicine->packaging ?? '',
                 ]);
             }
 
-            return response()->json([
-                'status' => false,
-                'message' => 'Medicine not found'
-            ], 404);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Medicine not found',
+                ],
+                404,
+            );
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Something went wrong',
-                'error' => $e->getMessage()
-            ], 500);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Something went wrong',
+                    'error' => $e->getMessage(),
+                ],
+                500,
+            );
         }
     }
-
-
-
-
-
 
     /**
      * Show the form for creating a new resource.
@@ -172,7 +171,6 @@ class AddMedicineController extends Controller
         if ($cart) {
             $existingProducts = json_decode($cart->products_details, true) ?? [];
 
-
             $existingProductIds = array_column($existingProducts, 'product_id');
 
             $mergedProducts = $existingProducts;
@@ -196,11 +194,13 @@ class AddMedicineController extends Controller
             $existingPrescriptions = json_decode($cart->prescription_id, true) ?? [];
             $updatedPrescriptions = array_unique(array_merge($existingPrescriptions, [$prescriptionId]));
 
-            DB::table('carts')->where('id', $cart->id)->update([
-                'products_details' => json_encode($mergedProducts),
-                'prescription_id' => json_encode($updatedPrescriptions),
-                'updated_at' => now(),
-            ]);
+            DB::table('carts')
+                ->where('id', $cart->id)
+                ->update([
+                    'products_details' => json_encode($mergedProducts),
+                    'prescription_id' => json_encode($updatedPrescriptions),
+                    'updated_at' => now(),
+                ]);
         } else {
             $productsToInsert = [];
 
@@ -226,38 +226,19 @@ class AddMedicineController extends Controller
                 'updated_at' => now(),
             ]);
         }
-        DB::table('prescriptions')->where('id', $prescriptionId)->update([
-            'status' => 0,
-            'updated_at' => now(),
-        ]);
+        DB::table('prescriptions')
+            ->where('id', $prescriptionId)
+            ->update([
+                'status' => 0,
+                'updated_at' => now(),
+            ]);
 
         return redirect()->back()->with('success', 'Products added to cart successfully ');
     }
 
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+   
     // public function getAddToCart(Request $request)
     // {
     //     $id = $request->get('user_id');
@@ -356,22 +337,21 @@ class AddMedicineController extends Controller
     //     }
     // }
 
-
     public function getAddToCart(Request $request)
     {
         $id = $request->get('user_id');
 
         try {
-            $cart = DB::table('carts')
-                ->where('customer_id', $id)
-                ->orderByDesc('created_at')
-                ->first();
+            $cart = DB::table('carts')->where('customer_id', $id)->orderByDesc('created_at')->first();
 
             if (!$cart) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'No cart records found for customer ID ' . $id
-                ], 404);
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => 'No cart records found for customer ID ' . $id,
+                    ],
+                    404,
+                );
             }
 
             $productDetails = json_decode($cart->products_details, true);
@@ -380,7 +360,9 @@ class AddMedicineController extends Controller
             if (is_array($productDetails)) {
                 foreach ($productDetails as $product) {
                     $productId = $product['product_id'] ?? null;
-                    if (!$productId) continue;
+                    if (!$productId) {
+                        continue;
+                    }
 
                     $type = null;
                     $medicine = \App\Models\Medicine::where('product_id', $productId)->first();
@@ -395,34 +377,28 @@ class AddMedicineController extends Controller
                     }
 
                     if ($medicine && $type) {
-                        $name = $type === 'medicine'
-                            ? ($medicine->product_name ?? '')
-                            : ($medicine->name ?? '');
+                        $name = $type === 'medicine' ? $medicine->product_name ?? '' : $medicine->name ?? '';
 
-                        $packageDetail = $product['packaging_detail'] ?? $medicine->packaging ?? $medicine->packaging_detail ?? '';
-                        $quantity = $product['quantity'] ?? $medicine->qty ?? 1;
+                        $packageDetail = $product['packaging_detail'] ?? ($medicine->packaging ?? ($medicine->packaging_detail ?? ''));
+                        $quantity = $product['quantity'] ?? ($medicine->qty ?? 1);
                         // echo $quantity;die;
                         $baseUrl = url('medicines');
                         $defaultImage = "{$baseUrl}/placeholder.png";
                         $imageUrls = [$defaultImage];
                         if (!empty($medicine->image_url)) {
-                            $images = is_array($medicine->image_url)
-                                ? $medicine->image_url
-                                : (json_decode($medicine->image_url, true) ?: explode(',', $medicine->image_url));
+                            $images = is_array($medicine->image_url) ? $medicine->image_url : (json_decode($medicine->image_url, true) ?: explode(',', $medicine->image_url));
 
                             $imageUrls = array_map(function ($img) {
                                 $img = trim($img);
-                                return Str::startsWith($img, 'medicines/')
-                                    ? asset('storage/' . $img)
-                                    : asset('storage/medicines/' . $img);
+                                return Str::startsWith($img, 'medicines/') ? asset('storage/' . $img) : asset('storage/medicines/' . $img);
                             }, $images);
                         }
 
                         $detailedProducts[] = [
-                            "product_id" => $type === 'medicine' ? $medicine->product_id : $medicine->otc_id,
+                            'product_id' => $type === 'medicine' ? $medicine->product_id : $medicine->otc_id,
                             'type' => $type,
                             'name' => $name,
-                            'prescription_required' => ($medicine->prescription_required === 'Prescription Required'),
+                            'prescription_required' => $medicine->prescription_required === 'Prescription Required',
                             'packaging_detail' => $packageDetail,
                             'quantity' => $quantity,
                             'is_substitute' => $product['is_substitute'] ?? 'no',
@@ -435,33 +411,37 @@ class AddMedicineController extends Controller
             $cartObject = [
                 'id' => $cart->id,
                 'customer_id' => $cart->customer_id,
-                'products_details' => $detailedProducts
+                'products_details' => $detailedProducts,
             ];
 
             return response()->json([
                 'status' => true,
-                'data' => (object) $cartObject
+                'data' => (object) $cartObject,
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Something went wrong.',
-                'error' => $e->getMessage()
-            ], 500);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Something went wrong.',
+                    'error' => $e->getMessage(),
+                ],
+                500,
+            );
         }
     }
 
-
     public function removeProduct($cartId, $productId)
     {
-
         $cart = DB::table('carts')->where('id', $cartId)->first();
 
         if (!$cart) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Cart not found.'
-            ], 404);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Cart not found.',
+                ],
+                404,
+            );
         }
 
         $products = json_decode($cart->products_details, true);
@@ -474,17 +454,68 @@ class AddMedicineController extends Controller
         // Reindex the array
         $updatedProducts = array_values($updatedProducts);
 
-        DB::table('carts')->where('id', $cartId)->update([
-            'products_details' => json_encode($updatedProducts),
-            'updated_at' => now(),
-        ]);
+        DB::table('carts')
+            ->where('id', $cartId)
+            ->update([
+                'products_details' => json_encode($updatedProducts),
+                'updated_at' => now(),
+            ]);
 
         return response()->json([
             'status' => true,
             'message' => 'Product removed successfully.',
-            'data' => $updatedProducts
+            'data' => $updatedProducts,
         ]);
     }
+
+  public function removeCartProduct(Request $request, $id)
+{
+    $userId = $request->get('user_id');
+
+    try {
+        if (!$userId) {
+            return response()->json(['status' => false, 'message' => 'Unauthorized.'], 401);
+        }
+
+        $cart = Carts::where('customer_id', $userId)->first();
+
+        if (!$cart) {
+            return response()->json(['status' => false, 'message' => 'Cart not found.'], 404);
+        }
+
+        $productDetails = json_decode($cart->products_details ?: '[]', true);
+
+        if (empty($productDetails)) {
+            return response()->json(['status' => false, 'message' => 'No products in cart.']);
+        }
+
+        $originalCount = count($productDetails);
+
+        $filtered = collect($productDetails)
+            ->filter(function ($item) use ($id) {
+                return isset($item['product_id']) && $item['product_id'] != $id;
+            })
+            ->values()
+            ->all();
+
+        if (count($filtered) === $originalCount) {
+            // No change = product not found
+            return response()->json(['status' => false, 'message' => 'Product not found in cart.']);
+        }
+
+        $cart->products_details = json_encode($filtered);
+        $cart->save();
+
+        return response()->json(['status' => true, 'message' => 'Product removed from cart.']);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
 
 
     /**
@@ -504,27 +535,36 @@ class AddMedicineController extends Controller
 
         // Validate product_id
         if (!$productId) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Product ID is required'
-            ], 400);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Product ID is required',
+                ],
+                400,
+            );
         }
 
         // Validate quantity
         if (!$quantity || !is_numeric($quantity) || $quantity <= 0) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Quantity must be a valid number greater than 0'
-            ], 400);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Quantity must be a valid number greater than 0',
+                ],
+                400,
+            );
         }
 
         // Check if customer exists
         $customer = Customers::find($userId);
         if (!$customer) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Customer not found'
-            ], 404);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Customer not found',
+                ],
+                404,
+            );
         }
 
         // Check which table the product belongs to and get packaging_detail
@@ -538,10 +578,13 @@ class AddMedicineController extends Controller
             if ($medProduct) {
                 $packagingDetail = $medProduct->packaging_detail;
             } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Product not found in both otcmedicines and medicines'
-                ], 404);
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => 'Product not found in both otcmedicines and medicines',
+                    ],
+                    404,
+                );
             }
         }
 
@@ -550,7 +593,7 @@ class AddMedicineController extends Controller
         if (!$cart) {
             $cart = Carts::create([
                 'customer_id' => $userId,
-                "prescription_id" => "",
+                'prescription_id' => '',
                 'products_details' => json_encode([]),
             ]);
         }
@@ -573,7 +616,7 @@ class AddMedicineController extends Controller
                 'product_id' => $productId,
                 'packaging_detail' => $packagingDetail,
                 'quantity' => $quantity,
-                'is_substitute' => 'no'
+                'is_substitute' => 'no',
             ];
         }
 
@@ -582,12 +625,9 @@ class AddMedicineController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Product added to cart successfully'
+            'message' => 'Product added to cart successfully',
         ]);
     }
-
-
-
 
     public function fetchCustomerCart(Request $request)
     {
@@ -644,8 +684,6 @@ class AddMedicineController extends Controller
         return response()->json(['status' => 'success', 'data' => $result]);
     }
 
-
-
     public function deleteCartProduct(Request $request)
     {
         $prescriptionId = $request->input('prescription_id');
@@ -674,69 +712,50 @@ class AddMedicineController extends Controller
         return response()->json(['status' => 'success']);
     }
 
-
-
-
-
     //prescritption files
 
     public function fetchPrescriptionFiles(Request $request)
     {
-        // Get the prescription ID from the request
         $prescriptionId = $request->input('prescriptionId');
 
-        // Step 1: Find the prescription based on the prescription ID
         $prescription = Prescription::find($prescriptionId);
 
         if (!$prescription) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Prescription not found'
+                'message' => 'Prescription not found',
             ]);
         }
 
-        // Step 2: Get the customer_id associated with this prescription
         $customerId = $prescription->customer_id;
 
-        // Step 3: Fetch all prescriptions for the customer, to get all files
-        $prescriptions = Prescription::where('customer_id', $customerId)
-            ->where('status', 1)
-            ->get();
-
-
+        $prescriptions = Prescription::where('customer_id', $customerId)->where('status', 1)->get();
 
         if ($prescriptions->isEmpty()) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'No prescriptions found for this customer'
+                'message' => 'No prescriptions found for this customer',
             ]);
         }
 
         $fileUrls = [];
-
-        // Step 4: Loop through all prescriptions to get their files
         foreach ($prescriptions as $prescription) {
-            // Assuming `prescription_file` holds a comma-separated string of file names
-            $files = explode(',', $prescription->prescription_file); // Split the file names into an array
+            $files = explode(',', $prescription->prescription_file);
 
-            // Step 5: Generate full URLs for each file
             foreach ($files as $file) {
-                // Trim any extra spaces and generate a full URL
                 $fileUrls[] = asset('uploads/' . trim($file));
             }
         }
-
-        // Step 6: Return the list of file URLs
         if (empty($fileUrls)) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'No files found for this customer'
+                'message' => 'No files found for this customer',
             ]);
         }
 
         return response()->json([
             'status' => 'success',
-            'files' => $fileUrls
+            'files' => $fileUrls,
         ]);
     }
 }

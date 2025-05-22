@@ -116,7 +116,7 @@
                                     {{ session('error') }}
                                 </div>
                             @endif
-                            <form method="POST" action="{{ route('addMedicine.store') }}" class="d-flex flex-column gap-3">
+                            <form method="POST" action="{{ route('addLabTest.store') }}" class="d-flex flex-column gap-3">
                                 @csrf
                                 <!-- Prescription Dropdown -->
                                 <!-- Prescription Dropdown (Already using select2) -->
@@ -171,12 +171,12 @@
                                             <tr class="medicine-row">
                                                 <td class="customWidth">
                                                     <select class="form-control medicine-search"
-                                                        name="medicine[0][medicine_id]" style="width: 100%">
+                                                        name="labtest[0][id]" style="width: 100%">
                                                         <option value="">Search Test...</option>
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <input type="text" name="medicine[0][packaging_detail]"
+                                                    <input type="text" name="labtest[0][contains]"
                                                         class="form-control packaging-info" readonly>
                                                 </td>
 
@@ -231,27 +231,27 @@
                 });
             }
 
-            // function initCustomerSelect2($el) {
-            //     $el.select2({
-            //         placeholder: 'Search customer...',
-            //         ajax: {
-            //             url: '{{ route('prescription.select') }}',
-            //             dataType: 'json',
-            //             delay: 250,
-            //             data: function(params) {
-            //                 return {
-            //                     query: params.term
-            //                 };
-            //             },
-            //             processResults: function(data) {
-            //                 return {
-            //                     results: data.results
-            //                 };
-            //             },
-            //             cache: true
-            //         }
-            //     });
-            // }
+            function initCustomerSelect2($el) {
+                $el.select2({
+                    placeholder: 'Search customer...',
+                    ajax: {
+                        url: '{{ route('prescription.select') }}',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                query: params.term
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.results
+                            };
+                        },
+                        cache: true
+                    }
+                });
+             }
 
             let index = 1;
             initSelect2($('.medicine-search'));
@@ -275,7 +275,7 @@
                 $newRow.find('.select2-container').remove();
                 $newRow.find('.medicine-search').remove();
 
-                const $newSelect = $(`<select class="form-control medicine-search" style="width: 100%;" name="medicine[${index}][medicine_id]">
+                const $newSelect = $(`<select class="form-control medicine-search" style="width: 100%;" name="labtest[${index}][id]">
                 <option value="">Search medicine...</option>
             </select>`);
 

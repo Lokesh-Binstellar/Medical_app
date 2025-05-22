@@ -34,10 +34,10 @@
                                 <th>Gender</th>
                                 <td>{{ ucfirst($tests->gender) }}</td>
                             </tr>
-                            <tr>
+                            {{-- <tr>
                                 <th>Reports In</th>
                                 <td>{{ $tests->reports_in }}</td>
-                            </tr>
+                            </tr> --}}
                             <tr>
                                 <th>Sample Required</th>
                                 <td>{{ $tests->sample_required ? 'Yes' : 'No' }}</td>
