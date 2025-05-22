@@ -99,17 +99,27 @@ class OtcController extends Controller
         $page = $request->query('page', 1);
         $perPage = $request->query('per_page', 20);
 
-        // Fetch all products in category
-        $products = Otcmedicine::where('category', $categoryName)->get();
+        $packageFilter = $request->query('package'); // Now using 'package'
+        $productFormFilter = $request->query('product_form'); // e.g., 'Oil'
+
+        // Filter products in category
+        $products = Otcmedicine::where('category', $categoryName)
+            ->when($packageFilter, function ($query, $packageFilter) {
+                $query->where('package', $packageFilter);
+            })
+            ->when($productFormFilter, function ($query, $productFormFilter) {
+                $query->where('product_form', $productFormFilter);
+            })
+            ->get();
 
         if ($products->isEmpty()) {
             return response()->json([
                 'status' => false,
-                'message' => 'No products found in this category.'
+                'message' => 'No products found in this category.',
             ], 404);
         }
 
-        // Format the product data
+        // Format results
         $baseUrl = url('medicines');
         $defaultImage = "{$baseUrl}/placeholder.png";
 
@@ -119,13 +129,14 @@ class OtcController extends Controller
                 'product_name' => $item->name,
                 'category' => $item->category,
                 'packaging' => $item->packaging,
+                'product_form' => $item->product_form,
                 'imageUrls' => $item->image_url
                     ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
                     : [$defaultImage],
             ];
         });
 
-        // Manual pagination
+        // Paginate
         $total = $formatted->count();
         $paginated = $formatted->forPage($page, $perPage)->values();
 
@@ -159,5 +170,32 @@ class OtcController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function getFilters()
+    {
+        // Unique product forms from OTC
+        $productForms = Otcmedicine::whereNotNull('product_form')
+            ->where('product_form', '!=', '')
+            ->distinct()
+            ->pluck('product_form')
+            ->unique()
+            ->values();
+
+        // Unique packages from OTC
+        $package = Otcmedicine::whereNotNull('package')
+            ->where('package', '!=', '')
+            ->distinct()
+            ->pluck('package')
+            ->unique()
+            ->values();
+
+        return response()->json([
+            'status' => true,
+            'filters' => [
+                'product_forms' => $productForms,
+                'package' => $package,
+            ]
+        ]);
     }
 }

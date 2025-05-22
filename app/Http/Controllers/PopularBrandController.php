@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class PopularBrandController extends Controller
 {
@@ -69,7 +70,7 @@ class PopularBrandController extends Controller
         $brand = new PopularBrand();
         $brand->name = $request->name;
 
-            if ($request->hasFile('logo')) {
+        if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $originalName = $file->getClientOriginalName();
             $destinationPath = public_path('popular/brands'); // Store directly in /public/brands
@@ -159,77 +160,96 @@ class PopularBrandController extends Controller
         ], 200);
     }
 
-    public function productListByBrand(Request $request,$brandName)
+    public function productListByBrand(Request $request, $brandName)
     {
-       $page = $request->query('page', 1);
-    $perPage = $request->query('per_page', 20);
+  
 
-    if (!$brandName) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Brand parameter is required.'
-        ], 400);
-    }
+$page = $request->query('page', 1);
+$perPage = $request->query('per_page', 20);
 
-    $baseUrl = url('medicines');
-    $defaultImage = "{$baseUrl}/placeholder.png";
+$packageFilter = $request->query('package');
+$productFormFilter = $request->query('product_form');
 
-    // Medicine data
-    $medicines = Medicine::where('marketer', '=', $brandName)
-        ->select('product_id', 'product_name', 'salt_composition', 'packaging_detail', 'image_url', 'marketer')
-        ->get()
-        ->map(function ($item) use ($baseUrl, $defaultImage) {
-            $item->image_url = $item->image_url
-                ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
-                : [$defaultImage];
-
-            $item->type = 'medicine';
-            $item->brand = $item->marketer ?? '';
-            unset($item->marketer);
-            return $item;
-        });
-
-    // OTC data
-    $otc = Otcmedicine::where('manufacturers', '=', $brandName)
-        ->select('otc_id', 'name', 'packaging', 'image_url', 'manufacturers')
-        ->get()
-        ->map(function ($item) use ($baseUrl, $defaultImage) {
-            $item->product_id = $item->otc_id;
-            $item->product_name = $item->name;
-            $item->packaging_detail = $item->packaging;
-            $item->type = 'otc';
-            $item->brand = $item->manufacturers ?? '';
-            $item->image_url = $item->image_url
-                ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
-                : [$defaultImage];
-
-            unset($item->otc_id, $item->name, $item->packaging, $item->manufacturers);
-            return $item;
-        });
-
-    // Merge and paginate
-    $results = $medicines->merge($otc);
-    $total = $results->count();
-    $items = $results->forPage($page, $perPage)->values();
-
-    $paginator = new LengthAwarePaginator(
-        $items,
-        $total,
-        $perPage,
-        $page,
-        ['path' => url()->current(), 'query' => $request->query()]
-    );
-
+if (!$brandName) {
     return response()->json([
-        'success' => true,
-        'data' => $paginator->items(),
-        'meta' => [
-            'total' => $paginator->total(),
-            'per_page' => $paginator->perPage(),
-            'current_page' => $paginator->currentPage(),
-            'last_page' => $paginator->lastPage(),
-        ]
-    ]);
+        'status' => false,
+        'message' => 'Brand parameter is required.'
+    ], 400);
+}
+
+$baseUrl = url('medicines');
+$defaultImage = "{$baseUrl}/placeholder.png";
+
+// --- Fetch and transform Medicines ---
+$medicines = Medicine::where('marketer', $brandName)
+    ->when($packageFilter, fn($q) => $q->where('package', $packageFilter))
+    ->when($productFormFilter, fn($q) => $q->where('product_form', $productFormFilter))
+    ->select('product_id', 'product_name', 'salt_composition', 'package', 'image_url', 'marketer', 'product_form')
+    ->get()
+    ->map(function ($item) use ($baseUrl, $defaultImage) {
+        return [
+            'product_id' => $item->product_id,
+            'product_name' => $item->product_name,
+            'salt_composition' => $item->salt_composition,
+            'packaging_detail' => $item->package,
+            'product_form' => $item->product_form,
+            'image_url' => $item->image_url
+                ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
+                : [$defaultImage],
+            'type' => 'medicine',
+            'brand' => $item->marketer ?? '',
+        ];
+    });
+
+// --- Fetch and transform OTC Medicines ---
+$otc = Otcmedicine::where('manufacturers', $brandName)
+    ->when($packageFilter, fn($q) => $q->where('package', $packageFilter))
+    ->when($productFormFilter, fn($q) => $q->where('product_form', $productFormFilter))
+    ->select('otc_id', 'name', 'package', 'image_url', 'manufacturers', 'product_form')
+    ->get()
+    ->map(function ($item) use ($baseUrl, $defaultImage) {
+        return [
+            'product_id' => $item->otc_id,
+            'product_name' => $item->name,
+            'salt_composition' => null,
+            'packaging_detail' => $item->package,
+            'product_form' => $item->product_form,
+            'image_url' => $item->image_url
+                ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
+                : [$defaultImage],
+            'type' => 'otc',
+            'brand' => $item->manufacturers ?? '',
+        ];
+    });
+
+// --- Merge the collections ---
+$merged = $medicines->concat($otc)->values(); // ensures fresh indexes
+
+$total = $merged->count();
+$paginated = $merged->slice(($page - 1) * $perPage, $perPage)->values();
+
+// --- Paginate manually ---
+$paginator = new LengthAwarePaginator(
+    $paginated,
+    $total,
+    $perPage,
+    $page,
+    ['path' => url()->current(), 'query' => $request->query()]
+);
+
+// --- Return JSON response ---
+return response()->json([
+    'success' => true,
+    'data' => $paginator->items(),
+    'meta' => [
+        'total' => $paginator->total(),
+        'per_page' => $paginator->perPage(),
+        'current_page' => $paginator->currentPage(),
+        'last_page' => $paginator->lastPage(),
+    ]
+]);
+
+
     }
 
     public function destroy($id)
@@ -244,5 +264,42 @@ class PopularBrandController extends Controller
         $brand->delete();
 
         return response()->json(['status' => true, 'message' => 'Brand deleted successfully.']);
+    }
+
+    public function getFilters()
+    {
+        // Unique product forms
+        $medicineForms = Medicine::whereNotNull('product_form')
+            ->where('product_form', '!=', '')
+            ->distinct()
+            ->pluck('product_form');
+
+        $otcForms = Otcmedicine::whereNotNull('product_form')
+            ->where('product_form', '!=', '')
+            ->distinct()
+            ->pluck('product_form');
+
+        $productForms = $medicineForms->merge($otcForms)->unique()->values();
+
+        // Unique package details
+        $medicinePackages = Medicine::whereNotNull('package')
+            ->where('package', '!=', '')
+            ->distinct()
+            ->pluck('package');
+
+        $otcPackages = Otcmedicine::whereNotNull('package')
+            ->where('package', '!=', '')
+            ->distinct()
+            ->pluck('package');
+
+        $package = $medicinePackages->merge($otcPackages)->unique()->values();
+
+        return response()->json([
+            'status' => true,
+            'filters' => [
+                'product_forms' => $productForms,
+                'package' => $package
+            ]
+        ]);
     }
 }
