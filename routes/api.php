@@ -3,6 +3,7 @@
 use App\Events\MyEvent;
 use App\Http\Controllers\AddMedicineController;
 use App\Http\Controllers\AppRatingController;
+use App\Http\Controllers\AddLabTestController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AuthTokenController;
 use App\Http\Controllers\CustomerAddressController;
@@ -26,9 +27,7 @@ use App\Http\Controllers\ZipCodeViceDeliveryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
+
 Route::post('/login', [AuthTokenController::class, 'login']);
 
 //fetch apis
@@ -53,11 +52,19 @@ Route::middleware('check.api.key')->group(function () {
         Route::get('/customerAddressFetch', [CustomerAddressController::class, 'getAddress']);
         Route::put('/customerDetails', [AuthController::class, 'update']);
         Route::post('/upload-file', [FileUploadController::class, 'upload']);
+
+        //medicine Cart
         Route::post('/add-to-cart', [AddMedicineController::class, 'frontendAddToCart']);
         Route::get('/getUserCart', [AddMedicineController::class, 'getAddToCart'])->name('getUserCart.getAddToCart');
         Route::post('/requestAQuote', [RequestQuoteController::class, 'requestAQuote']);
         Route::delete('/medicineCart/remove-product/{id}', [AddMedicineController::class, 'removeCartProduct']);
         
+        //lab Cart
+        Route::get('/getUserLabCart', [AddLabTestController::class, 'getUserlabcart'])->name('userCart.getUserLabCart');
+        Route::delete('/deleteTestFromLabCart/{id}', [AddLabTestController::class, 'deleteTestFromLabCart'])->name('userCart.deleteTestFromLabCart');
+
+
+
         // rating
         Route::post('/ratings', [RatingController::class, 'store']);
         Route::post('/rate-app', [AppRatingController::class, 'store']);

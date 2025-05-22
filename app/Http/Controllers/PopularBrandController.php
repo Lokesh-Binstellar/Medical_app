@@ -184,14 +184,14 @@ $defaultImage = "{$baseUrl}/placeholder.png";
 $medicines = Medicine::where('marketer', $brandName)
     ->when($packageFilter, fn($q) => $q->where('package', $packageFilter))
     ->when($productFormFilter, fn($q) => $q->where('product_form', $productFormFilter))
-    ->select('product_id', 'product_name', 'salt_composition', 'package', 'image_url', 'marketer', 'product_form')
+    ->select('product_id', 'product_name', 'salt_composition', 'packaging_detail', 'image_url', 'marketer', 'product_form')
     ->get()
     ->map(function ($item) use ($baseUrl, $defaultImage) {
         return [
             'product_id' => $item->product_id,
             'product_name' => $item->product_name,
             'salt_composition' => $item->salt_composition,
-            'packaging_detail' => $item->package,
+            'packaging_detail' => $item->packaging_detail,
             'product_form' => $item->product_form,
             'image_url' => $item->image_url
                 ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
@@ -205,14 +205,14 @@ $medicines = Medicine::where('marketer', $brandName)
 $otc = Otcmedicine::where('manufacturers', $brandName)
     ->when($packageFilter, fn($q) => $q->where('package', $packageFilter))
     ->when($productFormFilter, fn($q) => $q->where('product_form', $productFormFilter))
-    ->select('otc_id', 'name', 'package', 'image_url', 'manufacturers', 'product_form')
+    ->select('otc_id', 'name', 'packaging', 'image_url', 'manufacturers', 'product_form')
     ->get()
     ->map(function ($item) use ($baseUrl, $defaultImage) {
         return [
             'product_id' => $item->otc_id,
             'product_name' => $item->name,
             'salt_composition' => null,
-            'packaging_detail' => $item->package,
+            'packaging_detail' => $item->packaging,
             'product_form' => $item->product_form,
             'image_url' => $item->image_url
                 ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
