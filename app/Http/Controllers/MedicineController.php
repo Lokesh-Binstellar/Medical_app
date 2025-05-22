@@ -218,6 +218,9 @@ class MedicineController extends Controller
                     ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
                     ->toArray()
                 : [$defaultImage];
+
+                $otc->product_id = $otc->otc_id;
+        unset($otc->otc_id);
         }
         return response()->json(
             [

@@ -163,14 +163,12 @@ class AddMedicineController extends Controller
         }
 
         $customerId = $prescription->customer_id;
-
         $incomingProducts = $validated['medicine'];
 
-        $cart = DB::table('carts')->where('customer_id', $customerId)->first();
+        $cart = Carts::where('customer_id', $customerId)->first();
 
         if ($cart) {
             $existingProducts = json_decode($cart->products_details, true) ?? [];
-
             $existingProductIds = array_column($existingProducts, 'product_id');
 
             $mergedProducts = $existingProducts;
@@ -194,13 +192,10 @@ class AddMedicineController extends Controller
             $existingPrescriptions = json_decode($cart->prescription_id, true) ?? [];
             $updatedPrescriptions = array_unique(array_merge($existingPrescriptions, [$prescriptionId]));
 
-            DB::table('carts')
-                ->where('id', $cart->id)
-                ->update([
-                    'products_details' => json_encode($mergedProducts),
-                    'prescription_id' => json_encode($updatedPrescriptions),
-                    'updated_at' => now(),
-                ]);
+            $cart->products_details = json_encode($mergedProducts);
+            $cart->prescription_id = json_encode($updatedPrescriptions);
+            $cart->updated_at = now();
+            $cart->save();
         } else {
             $productsToInsert = [];
 
@@ -213,12 +208,7 @@ class AddMedicineController extends Controller
                 ];
             }
 
-            $productsToInsert = array_map(function ($item) {
-                $item['quantity'] = (int) $item['quantity'];
-                return $item;
-            }, $productsToInsert);
-
-            DB::table('carts')->insert([
+            Carts::create([
                 'customer_id' => $customerId,
                 'prescription_id' => json_encode([$prescriptionId]),
                 'products_details' => json_encode($productsToInsert),
@@ -226,117 +216,16 @@ class AddMedicineController extends Controller
                 'updated_at' => now(),
             ]);
         }
-        DB::table('prescriptions')
-            ->where('id', $prescriptionId)
-            ->update([
-                'status' => 0,
-                'updated_at' => now(),
-            ]);
 
-        return redirect()->back()->with('success', 'Products added to cart successfully ');
+        Prescription::where('id', $prescriptionId)->update([
+            'status' => 0,
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Products added to cart successfully');
     }
 
-
-
-   
-    // public function getAddToCart(Request $request)
-    // {
-    //     $id = $request->get('user_id');
-
-    //     try {
-    //         $carts = DB::table('carts')
-    //             ->where('customer_id', $id)
-    //             ->orderByDesc('created_at')
-    //             ->get();
-
-    //         if ($carts->isEmpty()) {
-    //             return response()->json([
-    //                 'status' => false,
-    //                 'message' => 'No cart records found for customer ID ' . $id
-    //             ], 404);
-    //         }
-
-    //         $result = $carts->map(function ($cart) {
-    //             $productDetails = json_decode($cart->products_details, true);
-    //             $detailedProducts = [];
-
-    //             if (is_array($productDetails)) {
-    //                 foreach ($productDetails as $product) {
-    //                     $productId = $product['product_id'] ?? null;
-    //                     if (!$productId)
-    //                         continue;
-
-    //                     $type = null;
-    //                     $medicine = \App\Models\Medicine::where('product_id', $productId)->first();
-
-    //                     if ($medicine) {
-    //                         $type = 'medicine';
-    //                     } else {
-    //                         $medicine = \App\Models\Otcmedicine::where('otc_id', $productId)->first();
-    //                         if ($medicine) {
-    //                             $type = 'otc';
-    //                         }
-    //                     }
-
-    //                     if ($medicine && $type) {
-    //                         $name = $type === 'medicine'
-    //                             ? ($medicine->product_name ?? '')
-    //                             : ($medicine->name ?? '');
-
-    //                         $packageDetail = $product['packaging_detail'] ?? $medicine->packaging ?? $medicine->packaging_detail ?? '';
-    //                         $quantity = $product['quantity'] ?? $medicine->qty ?? 1;
-
-    //                         $imageUrls = [];
-    //                         if (!empty($medicine->image_url)) {
-    //                             $images = is_array($medicine->image_url)
-    //                                 ? $medicine->image_url
-    //                                 : (json_decode($medicine->image_url, true) ?: explode(',', $medicine->image_url));
-
-    //                             $imageUrls = array_map(function ($img) {
-    //                                 $img = trim($img);
-    //                                 return Str::startsWith($img, 'medicines/')
-    //                                     ? asset('storage/' . $img)
-    //                                     : asset('storage/medicines/' . $img);
-    //                             }, $images);
-    //                         }
-
-    //                         $detailedProducts[] = [
-    //                             "product_id" => $type === 'medicine' ? $medicine->product_id : $medicine->otc_id,
-    //                             'type' => $type,
-    //                             'name' => $name,
-    //                             'prescription_required' => ($medicine->prescription_required === 'Prescription Required'),
-    //                             'packaging_detail' => $packageDetail,
-    //                             'quantity' => $quantity,
-    //                             'is_substitute' => $product['is_substitute'] ?? 'no',
-    //                             'image_url' => $imageUrls,
-    //                         ];
-    //                     }
-    //                 }
-    //             }
-
-    //             return [
-
-    //                 'id' => $cart->id,
-    //                 'customer_id' => $cart->customer_id,
-    //                 'products_details' => $detailedProducts,
-
-    //             ];
-
-    //         });
-
-    //         return response()->json([
-    //             'status' => true,
-    //             'data' => $result
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Something went wrong.',
-    //             'error' => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
-
+    
     public function getAddToCart(Request $request)
     {
         $id = $request->get('user_id');
@@ -468,55 +357,56 @@ class AddMedicineController extends Controller
         ]);
     }
 
-  public function removeCartProduct(Request $request, $id)
-{
-    $userId = $request->get('user_id');
+    public function removeCartProduct(Request $request, $id)
+    {
+        $userId = $request->get('user_id');
 
-    try {
-        if (!$userId) {
-            return response()->json(['status' => false, 'message' => 'Unauthorized.'], 401);
+        try {
+            if (!$userId) {
+                return response()->json(['status' => false, 'message' => 'Unauthorized.'], 401);
+            }
+
+            $cart = Carts::where('customer_id', $userId)->first();
+
+            if (!$cart) {
+                return response()->json(['status' => false, 'message' => 'Cart not found.'], 404);
+            }
+
+            $productDetails = json_decode($cart->products_details ?: '[]', true);
+
+            if (empty($productDetails)) {
+                return response()->json(['status' => false, 'message' => 'No products in cart.']);
+            }
+
+            $originalCount = count($productDetails);
+
+            $filtered = collect($productDetails)
+                ->filter(function ($item) use ($id) {
+                    return isset($item['product_id']) && $item['product_id'] != $id;
+                })
+                ->values()
+                ->all();
+
+            if (count($filtered) === $originalCount) {
+                // No change = product not found
+                return response()->json(['status' => false, 'message' => 'Product not found in cart.']);
+            }
+
+            $cart->products_details = json_encode($filtered);
+            $cart->save();
+
+            return response()->json(['status' => true, 'message' => 'Product removed from cart.']);
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Something went wrong.',
+                    'error' => $e->getMessage(),
+                ],
+                500,
+            );
         }
-
-        $cart = Carts::where('customer_id', $userId)->first();
-
-        if (!$cart) {
-            return response()->json(['status' => false, 'message' => 'Cart not found.'], 404);
-        }
-
-        $productDetails = json_decode($cart->products_details ?: '[]', true);
-
-        if (empty($productDetails)) {
-            return response()->json(['status' => false, 'message' => 'No products in cart.']);
-        }
-
-        $originalCount = count($productDetails);
-
-        $filtered = collect($productDetails)
-            ->filter(function ($item) use ($id) {
-                return isset($item['product_id']) && $item['product_id'] != $id;
-            })
-            ->values()
-            ->all();
-
-        if (count($filtered) === $originalCount) {
-            // No change = product not found
-            return response()->json(['status' => false, 'message' => 'Product not found in cart.']);
-        }
-
-        $cart->products_details = json_encode($filtered);
-        $cart->save();
-
-        return response()->json(['status' => true, 'message' => 'Product removed from cart.']);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Something went wrong.',
-            'error' => $e->getMessage(),
-        ], 500);
     }
-}
-
 
     /**
      * Remove the specified resource from storage.
@@ -633,7 +523,6 @@ class AddMedicineController extends Controller
     {
         $prescriptionId = $request->input('prescription_id');
 
-        // Step 1: Get prescription with customer_id
         $prescription = Prescription::find($prescriptionId);
         if (!$prescription) {
             return response()->json(['status' => 'error', 'message' => 'Prescription not found']);
@@ -641,13 +530,11 @@ class AddMedicineController extends Controller
 
         $customerId = $prescription->customer_id;
 
-        // Step 2: Find Cart using customer_id
         $cart = Carts::where('customer_id', $customerId)->first();
         if (!$cart || !$cart->products_details) {
             return response()->json(['status' => 'error', 'message' => 'No cart found']);
         }
 
-        // Step 3: Decode product_details JSON
         $products = json_decode($cart->products_details, true);
         $result = [];
 
@@ -661,7 +548,6 @@ class AddMedicineController extends Controller
             $medName = $medicine->product_name . ' + ' . $medicine->salt_composition;
             $type = 'medicine';
 
-            // If not found in medicines, try otcmedicines
             if (!$medicine) {
                 $medicine = Otcmedicine::where('otc_id', $productId)->first();
                 $medName = $medicine->name;

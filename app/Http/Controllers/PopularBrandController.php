@@ -250,6 +250,15 @@ return response()->json([
 ]);
 
 
+        'status' => true,
+        'data' => $paginator->items(),
+        'meta' => [
+            'total' => $paginator->total(),
+            'per_page' => $paginator->perPage(),
+            'current_page' => $paginator->currentPage(),
+            'last_page' => $paginator->lastPage(),
+        ]
+    ]);
     }
 
     public function destroy($id)
