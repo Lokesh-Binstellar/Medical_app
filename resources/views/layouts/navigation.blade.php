@@ -224,35 +224,30 @@
             </li>
         @endif
 
-        <li class="menu-item">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons mdi mdi-flask"></i>
-                <div data-i18n="Lab">Lab</div>
-            </a>
-            <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
+        @if ($isSuperAdmin == 1)
+            <li class="menu-item">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons mdi mdi-flask"></i>
+                    <div data-i18n="Lab">Lab</div>
+                </a>
+                <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
 
-
-                @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
                     <li
                         class="menu-item {{ in_array(Route::current()->getName(), ['labtest.index']) ? 'active' : '' }}">
                         <a href="{{ route('labtest.index') }}" class="menu-link">
                             <div data-i18n="Import Lab Test">Import Lab Test</div>
                         </a>
                     </li>
-                @endif
-
-
-                @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
                     <li
                         class="menu-item {{ in_array(Route::current()->getName(), ['addLabTest.index']) ? 'active' : '' }}">
                         <a href="{{ route('addLabTest.index') }}" class="menu-link">
                             <div data-i18n="Add Lab Test">Add Lab Test</div>
                         </a>
                     </li>
-                @endif
-            </ul>
 
-        </li>
+                </ul>
+            </li>
+        @endif
 
         <li class="menu-item">
             <a href="{{ route('logout') }}" class="menu-link"
