@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class MedicineController extends Controller
 {
@@ -92,52 +93,85 @@ class MedicineController extends Controller
     public function search(Request $request)
     {
         $query = $request->query('query');
-        $perPage = $request->query('per_page', 5);
+        $page = $request->query('page', 1);
+        $perPage = $request->query('per_page', 20);
+
         if (!$query) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => 'Query parameter is required.',
-                ],
-                400,
-            );
+            return response()->json([
+                'status' => false,
+                'message' => 'Query parameter is required.',
+            ], 400);
         }
 
-        $medicines = Medicine::where('salt_composition', 'LIKE', "%$query%")
-            ->orWhere('product_name', 'LIKE', "%$query%")
+        $baseUrl = url('medicines/');
+        $defaultImage = "{$baseUrl}/placeholder.png";
+
+        // 1. Medicines by product_name
+        $medicinesByName = Medicine::where('product_name', 'LIKE', "%$query%")
             ->select('id', 'product_id', 'product_name', 'salt_composition', 'packaging_detail', 'image_url')
-            ->paginate($perPage)
-            ->map(function ($item) {
-                $baseUrl = url('medicines/');
-                $defaultImage = "{$baseUrl}/placeholder.png";
-                $item->image_url = $item->image_url ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img))) : [$defaultImage];
+            ->get()
+            ->map(function ($item) use ($baseUrl, $defaultImage) {
+                $item->image_url = $item->image_url
+                    ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
+                    : [$defaultImage];
                 $item->type = 'medicine';
                 return $item;
             });
 
-        // Search from OtcMedicine
+        // 2. OTC Medicines by name
         $otc = Otcmedicine::where('name', 'LIKE', "%$query%")
             ->select('id', 'otc_id', 'name', 'packaging', 'image_url')
-            ->paginate($perPage)
-            ->map(function ($item) {
-                $baseUrl = url('medicines/');
-                $defaultImage = "{$baseUrl}/placeholder.png";
-                $item->image_url = $item->image_url ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img))) : [$defaultImage];
+            ->get()
+            ->map(function ($item) use ($baseUrl, $defaultImage) {
+                $item->image_url = $item->image_url
+                    ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
+                    : [$defaultImage];
                 $item->product_id = $item->otc_id;
                 $item->product_name = $item->name;
                 $item->packaging_detail = $item->packaging;
                 $item->type = 'otc';
                 unset($item->otc_id, $item->name, $item->packaging);
-
                 return $item;
             });
 
-        // Merge both collections
-        $results = $medicines->merge($otc);
+        // 3. Medicines by salt_composition, excluding already included product_ids
+        $excludedIds = $medicinesByName->pluck('product_id');
+        $medicinesBySalt = Medicine::where('salt_composition', 'LIKE', "%$query%")
+            ->whereNotIn('product_id', $excludedIds)
+            ->select('id', 'product_id', 'product_name', 'salt_composition', 'packaging_detail', 'image_url')
+            ->get()
+            ->map(function ($item) use ($baseUrl, $defaultImage) {
+                $item->image_url = $item->image_url
+                    ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
+                    : [$defaultImage];
+                $item->type = 'medicine';
+                return $item;
+            });
+
+        // 4. Merge in desired order
+        $merged = $medicinesByName->merge($otc)->merge($medicinesBySalt);
+
+        // 5. Manual Pagination
+        $total = $merged->count();
+        $items = $merged->forPage($page, $perPage)->values();
+
+        $paginator = new LengthAwarePaginator(
+            $items,
+            $total,
+            $perPage,
+            $page,
+            ['path' => url()->current(), 'query' => $request->query()]
+        );
 
         return response()->json([
             'status' => true,
-            'data' => $results,
+            'data' => $paginator->items(),
+            'meta' => [
+                'total' => $paginator->total(),
+                'per_page' => $paginator->perPage(),
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+            ],
         ]);
     }
 
@@ -173,16 +207,16 @@ class MedicineController extends Controller
         if ($medicine) {
             $medicine->image_url = $medicine->image_url
                 ? collect(explode(',', $medicine->image_url))
-                ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
-                ->toArray()
+                    ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
+                    ->toArray()
                 : [$defaultImage];
         }
 
         if ($otc) {
             $otc->image_url = $otc->image_url
                 ? collect(explode(',', $otc->image_url))
-                ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
-                ->toArray()
+                    ->map(fn($img) => $baseUrl . '/' . trim(basename($img)))
+                    ->toArray()
                 : [$defaultImage];
         }
         return response()->json(

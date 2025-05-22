@@ -18,11 +18,11 @@
                     {{ session('success') }}
                 </div>
             @endif
-           <form action="{{ route('platform-fee.store') }}" method="POST">
+           <form action="{{ route('platform-fee.store') }}" method="POST" data-parsley-validate>
                 @csrf
                 <div class="mb-3">
                     <label for="platfrom-fee" class="form-label">Platform Fee</label>
-                    <input type="text" class="form-control" id="platfrom-fee" name="platfrom_fee" placeholder="Enter platform fee" value="{{ old('platfrom_fee', $charge->platfrom_fee ?? '') }}">
+                    <input type="text" required data-parsley-required-message="Platform Fee is required" class="form-control" id="platfrom-fee" name="platfrom_fee" placeholder="Enter platform fee" value="{{ old('platfrom_fee', $charge->platfrom_fee ?? '') }}">
                 </div>
 
                 <button type="submit" class="btn btn-primary">Save Platform Fee</button>
@@ -34,3 +34,17 @@
 
 @endsection
 
+@section('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/parsleyjs"></script>
+    <script>
+        $(document).ready(function () {
+            $('form[data-parsley-validate]').parsley({
+                errorClass: 'is-invalid',
+                successClass: 'is-valid',
+                errorsWrapper: '<span class="invalid-feedback d-block"></span>',
+                errorTemplate: '<span></span>',
+                trigger: 'change'
+            });
+        });
+    </script>
+@endsection

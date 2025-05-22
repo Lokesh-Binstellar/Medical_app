@@ -7,6 +7,7 @@ use App\Models\Otcmedicine;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class OtcController extends Controller
 {
@@ -93,38 +94,61 @@ class OtcController extends Controller
 
         return back()->with('success', 'OtcMedicine imported successfully.');
     }
-public function productListByCategory($categoryName)
-{
-    // Find all OTC medicines by category_name
-    $products = Otcmedicine::where('category', $categoryName)->get();
+    public function productListByCategory(Request $request, $categoryName)
+    {
+        $page = $request->query('page', 1);
+        $perPage = $request->query('per_page', 20);
 
-    if ($products->isEmpty()) {
+        // Fetch all products in category
+        $products = Otcmedicine::where('category', $categoryName)->get();
+
+        if ($products->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No products found in this category.'
+            ], 404);
+        }
+
+        // Format the product data
+        $baseUrl = url('medicines');
+        $defaultImage = "{$baseUrl}/placeholder.png";
+
+        $formatted = $products->map(function ($item) use ($baseUrl, $defaultImage) {
+            return [
+                'product_id' => $item->otc_id,
+                'product_name' => $item->name,
+                'category' => $item->category,
+                'packaging' => $item->packaging,
+                'imageUrls' => $item->image_url
+                    ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
+                    : [$defaultImage],
+            ];
+        });
+
+        // Manual pagination
+        $total = $formatted->count();
+        $paginated = $formatted->forPage($page, $perPage)->values();
+
+        $paginator = new LengthAwarePaginator(
+            $paginated,
+            $total,
+            $perPage,
+            $page,
+            ['path' => url()->current(), 'query' => $request->query()]
+        );
+
         return response()->json([
-            'status' => false,
-            'message' => 'No products found in this category.'
-        ], 404);
+            'status' => true,
+            'category' => $categoryName,
+            'products' => $paginator->items(),
+            'meta' => [
+                'total' => $paginator->total(),
+                'per_page' => $paginator->perPage(),
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+            ]
+        ]);
     }
-
-   $formatted = $products->map(function ($item) {
-    $baseUrl = url('medicines');
-    $defaultImage = "{$baseUrl}/placeholder.png";
-        return [
-            'product_id' => $item->otc_id,
-            'product_name' => $item->name,
-            'category' => $item->category,
-            'packaging' => $item->packaging,
-            'imageUrls' => $item->image_url
-                ? collect(explode(',', $item->image_url))->map(fn($img) => url('medicines/' . trim(basename($img))))
-                : [ $defaultImage],
-        ];
-    });
-
-    return response()->json([
-        'status' => true,
-        'category' => $categoryName,
-        'products' => $formatted
-    ]);
-}
 
 
 
