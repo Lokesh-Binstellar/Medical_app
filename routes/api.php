@@ -23,6 +23,7 @@ use App\Http\Controllers\PopularLabTestController;
 use App\Http\Controllers\LabtestController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\RequestQuoteController;
+use App\Http\Controllers\LabRequestQuoteController;
 use App\Http\Controllers\ZipCodeViceDeliveryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +59,7 @@ Route::middleware('check.api.key')->group(function () {
         Route::get('/getUserCart', [AddMedicineController::class, 'getAddToCart'])->name('getUserCart.getAddToCart');
         Route::post('/requestAQuote', [RequestQuoteController::class, 'requestAQuote']);
         Route::delete('/medicineCart/remove-product/{id}', [AddMedicineController::class, 'removeCartProduct']);
+        Route::post('/labRequestAQuote', [LabRequestQuoteController::class, 'searchlabs']);
         
         //lab Cart
         Route::get('/getUserLabCart', [AddLabTestController::class, 'getUserlabcart'])->name('userCart.getUserLabCart');

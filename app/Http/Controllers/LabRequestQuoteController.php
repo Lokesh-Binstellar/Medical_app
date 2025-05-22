@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LabCart;
+use App\Models\LabTest;
+use App\Models\Rating;
 use Illuminate\Http\Request;
 use App\Models\Laboratories;
 use App\Models\CustomerAddress;
+use App\Models\Additionalcharges;
 
 class LabRequestQuoteController extends Controller
 {
@@ -38,27 +42,55 @@ class LabRequestQuoteController extends Controller
 
         return false;
     }
-    public function requestAQuote(Request $request)
+    public function searchlabs(Request $request)
     {
+
         $addressType = $request->input('address_type');
         $userId = $request->get('user_id');
         $apiKey = env('GOOGLE_MAPS_API_KEY');
 
-        $address = CustomerAddress::where('customer_id', $userId)->where('address_type', $addressType)->first();
+        // Step 1: Check if tests exist in lab_carts for this user
+        $cartTests = LabCart::where('customer_id', $userId)->pluck('test_details');
 
-        if (!$address || !$address->lat || !$address->lng) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => 'Customer location not found.',
-                ],
-                404,
-            );
+        if ($cartTests->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No tests found in cart for this customer.',
+            ], 404);
         }
 
-        $nearby = [];
+        // 1. Get user address
+        $address = CustomerAddress::where('customer_id', $userId)
+            ->where('address_type', $addressType)
+            ->first();
 
-        // Replace Pharmacies with Laboratories model
+        if (!$address || !$address->lat || !$address->lng) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Customer location not found.',
+            ], 404);
+        }
+
+
+
+        $testIds = collect();
+        foreach ($cartTests as $testGroup) {
+            $decoded = json_decode($testGroup, true);
+            if (is_array($decoded)) {
+                $testIds = $testIds->merge(collect($decoded)->pluck('test_id'));
+            }
+        }
+        $testIds = $testIds->unique()->values();
+
+        // 3. Get test names from lab_tests
+        $testNamesMap = LabTest::whereIn('id', $testIds)
+            ->pluck('name', 'id');
+
+        // 4. Filter nearby labs and match tests
+        $matchingLabs = [];
+
+        $laboratories = Laboratories::all();
+
         $laboratories = Laboratories::all();
 
         foreach ($laboratories as $lab) {
@@ -66,53 +98,85 @@ class LabRequestQuoteController extends Controller
                 $distance = $this->getRoadDistance($address->lat, $address->lng, $lab->latitude, $lab->longitude, $apiKey);
 
                 if ($distance !== false && $distance <= 10) {
-                    $lab->road_distance_km = round($distance, 2);
-                    $nearby[] = $lab;
+                    $labTests = json_decode($lab->test, true);
+                    if (!is_array($labTests))
+                        continue;
+
+                    $matchedTests = collect($labTests)->filter(function ($labTest) use ($testIds) {
+                        return isset($labTest['test']) && $testIds->contains($labTest['test']);
+                    })->map(function ($labTest) use ($testNamesMap) {
+                        $testId = $labTest['test'];
+                        return [
+                            'test_name' => $testNamesMap[$testId] ?? 'Unknown',
+                            'price' => $labTest['price'],
+                            'homeprice' => $labTest['homeprice'] ?? null,
+                        ];
+                    })->values();
+
+
+                    // 🧮 Calculate totals
+                    $totalPrice = $matchedTests->sum('price');
+                    $totalHomePrice = $matchedTests->sum('homeprice');
+
+                    $totalPickupCharge = $matchedTests->sum(function ($test) {
+                        return ($test['homeprice'] - $test['price']);
+                    });
+
+                    $platformFee = Additionalcharges::value('platfrom_fee') ?? 0;
+                    $totalPriceWithFee = $totalPrice + $platformFee;
+                    $totalHomePriceWithFee = $totalHomePrice + $platformFee;
+
+
+
+                    if ($matchedTests->isNotEmpty()) {
+                        // Get rating for this lab
+                        $ratings = Rating::where('rateable_id', $lab->user_id)
+                            ->where('rateable_type', 'Laboratory')
+                            ->pluck('rating');
+
+                        $totalRatings = $ratings->count();
+                        $rating = null;
+
+                        if ($totalRatings > 0) {
+                            $average = round($ratings->avg(), 1);
+                            $rating = $average . " ($totalRatings)";
+                        }
+
+                        $matchingLabs[] = [
+                            'lab_name' => $lab->lab_name,
+                            'road_distance_km' => round($distance, 2),
+                            'matched_tests' => $matchedTests,
+                            'rating' => $rating,
+                            'nabl_iso_certified' => $lab->nabl_iso_certified == 1 ? 'Yes' : 'No',
+                            'pickup' => $lab->pickup == 1 ? 'Yes' : 'No',
+                            'total_price' => $totalPrice,
+                            'total_homeprice' => $totalHomePrice,
+                            'total_sample_pickup_charge' => $totalPickupCharge,
+                            'platform_fee' => $platformFee,
+                            'total_price_plus_platform_fee' => $totalPriceWithFee,
+                            'total_homeprice_plus_platform_fee' => $totalHomePriceWithFee,
+                        ];
+                    }
                 }
             }
         }
 
-        if (empty($nearby)) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => 'No laboratory found within 10 km radius.',
-                ],
-                404,
-            );
-        }
 
-        foreach ($nearby as $lab) {
-            $exists = RequestQuote::where('customer_id', $userId)->where('laboratory_id', $lab->user_id)->exists();
 
-            $labUser = User::where('id', $lab->user_id)->first();
-            $customer = Customers::find($userId);
 
-            // Notify lab user
-            $labUser->notify(new QuoteRequested($customer));
-
-            if (!$exists) {
-                RequestQuote::create([
-                    'customer_id' => $userId,
-                    'laboratory_id' => $lab->user_id,
-                    'customer_address' => json_encode([
-                        'type' => $addressType,
-                        'lat' => $address->lat,
-                        'lng' => $address->lng,
-                    ]),
-                ]);
-
-                $requestingUser = User::find($userId);
-
-                if ($labUser && $requestingUser) {
-                    Notification::send($labUser, new QuoteRequested($requestingUser));
-                }
-            }
+        // 5. Return response
+        if (empty($matchingLabs)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No matching labs found within 10 km.',
+            ], 404);
         }
 
         return response()->json([
             'status' => true,
-            'message' => 'Nearby laboratories notified successfully.',
+            'labs' => $matchingLabs,
+            'rating' => $rating,
         ]);
+
     }
 }

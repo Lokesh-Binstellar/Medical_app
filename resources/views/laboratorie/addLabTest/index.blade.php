@@ -370,44 +370,44 @@
         });
 
 
-        $('#prescription-select').on('select2:select', function(e) {
-            var prescriptionId = e.params.data.id;
+        // $('#prescription-select').on('select2:select', function(e) {
+        //     var prescriptionId = e.params.data.id;
 
-            $.ajax({
-                url: '/addMedicine/fetch-customer-cart',
-                method: 'GET',
-                data: {
-                    prescription_id: prescriptionId
-                },
-                success: function(response) {
-                    if (response.status === 'success') {
-                        let products = response.data;
-                        let html = '';
+        //     $.ajax({
+        //         url: '/addMedicine/fetch-customer-cart',
+        //         method: 'GET',
+        //         data: {
+        //             prescription_id: prescriptionId
+        //         },
+        //         success: function(response) {
+        //             if (response.status === 'success') {
+        //                 let products = response.data;
+        //                 let html = '';
 
-                        products.forEach(function(product) {
-                            html += `<tr data-product-id="${product.product_id}">
-                        <td>${product.product_id}</td>
-                        <td>${product.name}</td>
-                        <td>${product.packaging_detail}</td>
-                        <td>${product.quantity}</td>
-                        <td>${product.is_substitute}</td>
-                         <td><button class="btn btn-primary delete-row">Delete</button></td>
-                    </tr>`;
-                        });
+        //                 products.forEach(function(product) {
+        //                     html += `<tr data-product-id="${product.product_id}">
+        //                 <td>${product.product_id}</td>
+        //                 <td>${product.name}</td>
+        //                 <td>${product.packaging_detail}</td>
+        //                 <td>${product.quantity}</td>
+        //                 <td>${product.is_substitute}</td>
+        //                  <td><button class="btn btn-primary delete-row">Delete</button></td>
+        //             </tr>`;
+        //                 });
 
-                        $('#cart-product-body').html(html);
-                        $('#cart-details').show();
-                    } else {
-                        $('#cart-product-body').html('');
-                        $('#cart-details').hide();
-                    }
-                },
-                error: function() {
-                    $('#cart-product-body').html('');
-                    $('#cart-details').hide();
-                }
-            });
-        });
+        //                 $('#cart-product-body').html(html);
+        //                 $('#cart-details').show();
+        //             } else {
+        //                 $('#cart-product-body').html('');
+        //                 $('#cart-details').hide();
+        //             }
+        //         },
+        //         error: function() {
+        //             $('#cart-product-body').html('');
+        //             $('#cart-details').hide();
+        //         }
+        //     });
+        // });
 
 
         // Handle delete button click
