@@ -100,6 +100,12 @@ class LaboratoriesController extends Controller
             'report' => 'nullable|array',
             'offer_visiting_price' => 'nullable|array',
             'offer_home_price' => 'nullable|array',
+            'package_name' => 'nullable|array',
+            'package_name.*' => 'string',
+            'package_test_contains' => 'nullable|array',
+            'package_test_contains.*' => 'string',
+            'package_description' => 'nullable|array',
+            'package_description.*' => 'string',
         ]);
 
         if ($validation->fails()) {
@@ -125,7 +131,7 @@ class LaboratoriesController extends Controller
             $image->move($destinationPath, $imageName);
             $params['image'] = $imageName;
         }
-
+        //test details
         $testData = [];
         $tests = $request->test ?? [];
         $prices = $request->price ?? [];
@@ -144,9 +150,23 @@ class LaboratoriesController extends Controller
                 'offer_home_price' => $offer_home_price[$key] ?? null,
             ];
         }
+        //package details json data
+        $packageData = [];
+        $package_names = $request->package_name ?? [];
+        $package_test_contains = $request->package_test_contains ?? [];
+        $package_descriptions = $request->package_description ?? [];
+
+        foreach ($package_names as $key => $name) {
+            $packageData[] = [
+                'package_name' => $name,
+                'package_test_contains' => $package_test_contains[$key] ?? null,
+                'package_description' => $package_descriptions[$key] ?? null,
+            ];
+        }
 
         $params['test'] = json_encode($testData);
-        unset($params['price'], $params['homeprice'], $params['report'], $params['offer_visiting_price'], $params['offer_home_price']);
+        $params['package_details'] = json_encode($packageData);
+        unset($params['price'], $params['homeprice'], $params['report'], $params['offer_visiting_price'], $params['offer_home_price'], $params['package_name'], $params['package_test_contains'], $params['package_description']);
 
         Laboratories::create($params);
 
@@ -156,8 +176,7 @@ class LaboratoriesController extends Controller
 
     /**
      * Display the specified resource.
-     */
-    public function show($id)
+     */ public function show($id)
     {
         // Fetch the laboratory details
         $lab = Laboratories::findOrFail($id);
@@ -180,6 +199,9 @@ class LaboratoriesController extends Controller
                 'test_name' => $testInfo ? $testInfo->test_name : 'Unknown',
                 'price' => $test['price'],
                 'homeprice' => $test['homeprice'],
+                'report' => $test['report'],
+                'offer_visiting_price' => $test['offer_visiting_price'],
+                'offer_home_price' => $test['offer_home_price'],
             ];
         }
 
@@ -233,17 +255,6 @@ class LaboratoriesController extends Controller
             'offer_visiting_price.*' => 'nullable|string',
             'offer_home_price.*' => 'nullable|string',
         ]);
-
-        // Update related user
-        // $user = User::find($laboratorie->user_id);
-        // if ($user) {
-        //     $user->name = $request->username;
-        //     $user->email = $request->email;
-        //     if ($request->filled('password')) {
-        //         $user->password = Hash::make($request->password);
-        //     }
-        //     $user->save();
-        // }
 
         $data = $request->only(['lab_name', 'owner_name', 'email', 'phone', 'city', 'state', 'pincode', 'address', 'latitude', 'longitude', 'username', 'license', 'pickup', 'gstno', 'nabl_iso_certified']);
 
