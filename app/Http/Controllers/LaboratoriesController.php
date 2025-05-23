@@ -17,32 +17,39 @@ class LaboratoriesController extends Controller
      */
     public function index(Request $request)
     {
-
         if ($request->ajax()) {
             $data = Laboratories::query();
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-    return '
+                    return '
     <div class="dropdown">
         <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown" aria-expanded="false">
             Action
         </button>
         <ul class="dropdown-menu">
-            <li><a href="' . route('laboratorie.show', $row->id) . '" class="dropdown-item">View</a></li>
-            <li><a href="' . route('laboratorie.edit', $row->id) . '" class="dropdown-item">Edit</a></li>
+            <li><a href="' .
+                        route('laboratorie.show', $row->id) .
+                        '" class="dropdown-item">View</a></li>
+            <li><a href="' .
+                        route('laboratorie.edit', $row->id) .
+                        '" class="dropdown-item">Edit</a></li>
             <li>
-                <button 
-                    class="dropdown-item btn-delete-laboratory" 
-                    data-id="' . $row->id . '" 
-                    data-url="' . route('laboratorie.destroy', $row->id) . '"
+                <button
+                    class="dropdown-item btn-delete-laboratory"
+                    data-id="' .
+                        $row->id .
+                        '"
+                    data-url="' .
+                        route('laboratorie.destroy', $row->id) .
+                        '"
                 >
                     Delete
                 </button>
             </li>
         </ul>
     </div>';
-})
+                })
 
                 ->rawColumns(['action'])
                 ->make(true);
@@ -90,6 +97,9 @@ class LaboratoriesController extends Controller
             'test.*' => 'string',
             'price' => 'nullable|array',
             'homeprice' => 'nullable|array',
+            'report' => 'nullable|array',
+            'offer_visiting_price' => 'nullable|array',
+            'offer_home_price' => 'nullable|array',
         ]);
 
         if ($validation->fails()) {
@@ -102,7 +112,7 @@ class LaboratoriesController extends Controller
             'name' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role_id' => $roleId
+            'role_id' => $roleId,
         ]);
 
         $params['user_id'] = $user->id;
@@ -120,23 +130,28 @@ class LaboratoriesController extends Controller
         $tests = $request->test ?? [];
         $prices = $request->price ?? [];
         $homeprices = $request->homeprice ?? [];
+        $report = $request->report ?? [];
+        $offer_visiting_price = $request->offer_visiting_price ?? [];
+        $offer_home_price = $request->offer_visiting_price ?? [];
 
         foreach ($tests as $key => $test) {
             $testData[] = [
                 'test' => $test,
                 'price' => $prices[$key] ?? null,
                 'homeprice' => $homeprices[$key] ?? null,
+                'report' => $report[$key] ?? null,
+                'offer_visiting_price' => $offer_visiting_price[$key] ?? null,
+                'offer_home_price' => $offer_home_price[$key] ?? null,
             ];
         }
 
         $params['test'] = json_encode($testData);
-        unset($params['price'], $params['homeprice']);
+        unset($params['price'], $params['homeprice'], $params['report'], $params['offer_visiting_price'], $params['offer_home_price']);
 
         Laboratories::create($params);
 
         // dd( );
-        return redirect()->route('laboratorie.index')
-            ->with('success', 'Laboratory created successfully.');
+        return redirect()->route('laboratorie.index')->with('success', 'Laboratory created successfully.');
     }
 
     /**
@@ -171,9 +186,6 @@ class LaboratoriesController extends Controller
         return view('laboratorie.show', compact('lab', 'labTests'));
     }
 
-
-
-
     /**
      * Show the form for editing the specified resource.
      */
@@ -181,9 +193,7 @@ class LaboratoriesController extends Controller
     {
         $laboratorie = Laboratories::findOrFail($id);
 
-
         $labTests = json_decode($laboratorie->test, true) ?? [];
-
 
         $allTests = LabTest::all();
 
@@ -218,6 +228,9 @@ class LaboratoriesController extends Controller
             'test.*' => 'nullable|string',
             'price.*' => 'nullable|numeric',
             'homeprice.*' => 'nullable|numeric',
+            'report.*' => 'nullable|array',
+            'offer_visiting_price.*' => 'nullable|array',
+            'offer_home_price.*' => 'nullable|array',
         ]);
 
         // Update related user
@@ -231,24 +244,7 @@ class LaboratoriesController extends Controller
         //     $user->save();
         // }
 
-
-        $data = $request->only([
-            'lab_name',
-            'owner_name',
-            'email',
-            'phone',
-            'city',
-            'state',
-            'pincode',
-            'address',
-            'latitude',
-            'longitude',
-            'username',
-            'license',
-            'pickup',
-            'gstno',
-            'nabl_iso_certified'
-        ]);
+        $data = $request->only(['lab_name', 'owner_name', 'email', 'phone', 'city', 'state', 'pincode', 'address', 'latitude', 'longitude', 'username', 'license', 'pickup', 'gstno', 'nabl_iso_certified']);
 
         // Image upload and old delete
         if ($request->hasFile('image')) {
@@ -263,7 +259,6 @@ class LaboratoriesController extends Controller
             }
         }
 
-
         $existingTests = json_decode($laboratorie->test, true) ?? [];
 
         // Prepare test data to update
@@ -271,15 +266,20 @@ class LaboratoriesController extends Controller
         $tests = $request->test ?? [];
         $prices = $request->price ?? [];
         $homeprices = $request->homeprice ?? [];
+        $report = $request->report ?? [];
+        $offer_visiting_price = $request->offer_visiting_price ?? [];
+        $offer_home_price = $request->offer_visiting_price ?? [];
 
         foreach ($tests as $key => $testId) {
             if (!empty($testId)) {
-
                 $found = false;
                 foreach ($existingTests as &$existingTest) {
                     if ($existingTest['test'] == $testId) {
                         $existingTest['price'] = $prices[$key] ?? 0;
                         $existingTest['homeprice'] = $homeprices[$key] ?? 0;
+                        $existingTest['report'] = $report[$key] ?? 0;
+                        $existingTest['offer_visiting_price'] = $offer_visiting_price[$key] ?? 0;
+                        $existingTest['offer_home_price'] = $offer_home_price[$key] ?? 0;
                         $found = true;
                         break;
                     }
@@ -291,14 +291,15 @@ class LaboratoriesController extends Controller
                         'test' => $testId,
                         'price' => $prices[$key] ?? 0,
                         'homeprice' => $homeprices[$key] ?? 0,
+                        'report' => $report[$key] ?? null,
+                        'offer_visiting_price' => $offer_visiting_price[$key] ?? null,
+                        'offer_home_price' => $offer_home_price[$key] ?? null,
                     ];
                 }
             }
         }
 
-
         $mergedTests = array_merge($existingTests, $testData);
-
 
         $uniqueTests = [];
         foreach ($mergedTests as $test) {
@@ -308,46 +309,43 @@ class LaboratoriesController extends Controller
         // Re-index the array
         $testData = array_values($uniqueTests);
 
-
         $data['test'] = json_encode($testData);
-
 
         $laboratorie->update($data);
         // dd($laboratorie);
 
-        return redirect()->route('laboratorie.index')
-            ->with('success', 'Laboratory updated successfully!');
+        return redirect()->route('laboratorie.index')->with('success', 'Laboratory updated successfully!');
     }
-
-
 
     /**
      * Remove the specified resource from storage.
      */
-   public function destroy($id, Request $request)
-{
-    try {
-        $laboratory = Laboratories::findOrFail($id);
-        $laboratory->delete();
+    public function destroy($id, Request $request)
+    {
+        try {
+            $laboratory = Laboratories::findOrFail($id);
+            $laboratory->delete();
 
-        if ($request->ajax()) {
-            return response()->json([
-                'status' => true,
-                'message' => 'Laboratory deleted successfully'
-            ]);
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Laboratory deleted successfully',
+                ]);
+            }
+
+            return redirect()->route('laboratorie.index')->with('success', 'Laboratory deleted successfully');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => 'Failed to delete laboratory: ' . $e->getMessage(),
+                    ],
+                    500,
+                );
+            }
+
+            return redirect()->route('laboratorie.index')->with('error', 'Failed to delete laboratory');
         }
-
-        return redirect()->route('laboratorie.index')->with('success', 'Laboratory deleted successfully');
-    } catch (\Exception $e) {
-        if ($request->ajax()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Failed to delete laboratory: ' . $e->getMessage()
-            ], 500);
-        }
-
-        return redirect()->route('laboratorie.index')->with('error', 'Failed to delete laboratory');
     }
-}
-
 }

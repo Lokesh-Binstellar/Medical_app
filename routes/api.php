@@ -58,6 +58,7 @@ Route::middleware('check.api.key')->group(function () {
         Route::post('/add-to-cart', [AddMedicineController::class, 'frontendAddToCart']);
         Route::get('/getUserCart', [AddMedicineController::class, 'getAddToCart'])->name('getUserCart.getAddToCart');
         Route::post('/requestAQuote', [RequestQuoteController::class, 'requestAQuote']);
+   
         Route::delete('/medicineCart/remove-product/{id}', [AddMedicineController::class, 'removeCartProduct']);
         Route::post('/labRequestAQuote', [LabRequestQuoteController::class, 'searchlabs']);
         

@@ -239,7 +239,7 @@ $paginator = new LengthAwarePaginator(
 
 // --- Return JSON response ---
 return response()->json([
-    'success' => true,
+    'status' => true,
     'data' => $paginator->items(),
     'meta' => [
         'total' => $paginator->total(),

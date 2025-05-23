@@ -44,7 +44,6 @@ class LabRequestQuoteController extends Controller
     }
     public function searchlabs(Request $request)
     {
-
         $addressType = $request->input('address_type');
         $userId = $request->get('user_id');
         $apiKey = env('GOOGLE_MAPS_API_KEY');
@@ -53,25 +52,27 @@ class LabRequestQuoteController extends Controller
         $cartTests = LabCart::where('customer_id', $userId)->pluck('test_details');
 
         if ($cartTests->isEmpty()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'No tests found in cart for this customer.',
-            ], 404);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'No tests found in cart for this customer.',
+                ],
+                404,
+            );
         }
 
         // 1. Get user address
-        $address = CustomerAddress::where('customer_id', $userId)
-            ->where('address_type', $addressType)
-            ->first();
+        $address = CustomerAddress::where('customer_id', $userId)->where('address_type', $addressType)->first();
 
         if (!$address || !$address->lat || !$address->lng) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Customer location not found.',
-            ], 404);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Customer location not found.',
+                ],
+                404,
+            );
         }
-
-
 
         $testIds = collect();
         foreach ($cartTests as $testGroup) {
@@ -83,8 +84,7 @@ class LabRequestQuoteController extends Controller
         $testIds = $testIds->unique()->values();
 
         // 3. Get test names from lab_tests
-        $testNamesMap = LabTest::whereIn('id', $testIds)
-            ->pluck('name', 'id');
+        $testNamesMap = LabTest::whereIn('id', $testIds)->pluck('name', 'id');
 
         // 4. Filter nearby labs and match tests
         $matchingLabs = [];
@@ -99,40 +99,39 @@ class LabRequestQuoteController extends Controller
 
                 if ($distance !== false && $distance <= 10) {
                     $labTests = json_decode($lab->test, true);
-                    if (!is_array($labTests))
+                    if (!is_array($labTests)) {
                         continue;
+                    }
 
-                    $matchedTests = collect($labTests)->filter(function ($labTest) use ($testIds) {
-                        return isset($labTest['test']) && $testIds->contains($labTest['test']);
-                    })->map(function ($labTest) use ($testNamesMap) {
-                        $testId = $labTest['test'];
-                        return [
-                            'test_name' => $testNamesMap[$testId] ?? 'Unknown',
-                            'price' => $labTest['price'],
-                            'homeprice' => $labTest['homeprice'] ?? null,
-                        ];
-                    })->values();
-
+                    $matchedTests = collect($labTests)
+                        ->filter(function ($labTest) use ($testIds) {
+                            return isset($labTest['test']) && $testIds->contains($labTest['test']);
+                        })
+                        ->map(function ($labTest) use ($testNamesMap) {
+                            $testId = $labTest['test'];
+                            return [
+                                'test_name' => $testNamesMap[$testId] ?? 'Unknown',
+                                'price' => $labTest['price'],
+                                'homeprice' => $labTest['homeprice'] ?? null,
+                            ];
+                        })
+                        ->values();
 
                     // 🧮 Calculate totals
                     $totalPrice = $matchedTests->sum('price');
                     $totalHomePrice = $matchedTests->sum('homeprice');
 
                     $totalPickupCharge = $matchedTests->sum(function ($test) {
-                        return ($test['homeprice'] - $test['price']);
+                        return $test['homeprice'] - $test['price'];
                     });
 
                     $platformFee = Additionalcharges::value('platfrom_fee') ?? 0;
                     $totalPriceWithFee = $totalPrice + $platformFee;
                     $totalHomePriceWithFee = $totalHomePrice + $platformFee;
 
-
-
                     if ($matchedTests->isNotEmpty()) {
                         // Get rating for this lab
-                        $ratings = Rating::where('rateable_id', $lab->user_id)
-                            ->where('rateable_type', 'Laboratory')
-                            ->pluck('rating');
+                        $ratings = Rating::where('rateable_id', $lab->user_id)->where('rateable_type', 'Laboratory')->pluck('rating');
 
                         $totalRatings = $ratings->count();
                         $rating = null;
@@ -161,15 +160,15 @@ class LabRequestQuoteController extends Controller
             }
         }
 
-
-
-
         // 5. Return response
         if (empty($matchingLabs)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'No matching labs found within 10 km.',
-            ], 404);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'No matching labs found within 10 km.',
+                ],
+                404,
+            );
         }
 
         return response()->json([
@@ -177,6 +176,5 @@ class LabRequestQuoteController extends Controller
             'labs' => $matchingLabs,
             'rating' => $rating,
         ]);
-
     }
 }
