@@ -156,7 +156,8 @@ class LaboratoriesController extends Controller
 
     /**
      * Display the specified resource.
-     */ public function show($id)
+     */
+    public function show($id)
     {
         // Fetch the laboratory details
         $lab = Laboratories::findOrFail($id);
@@ -268,7 +269,7 @@ class LaboratoriesController extends Controller
         $homeprices = $request->homeprice ?? [];
         $report = $request->report ?? [];
         $offer_visiting_price = $request->offer_visiting_price ?? [];
-        $offer_home_price = $request->offer_visiting_price ?? [];
+        $offer_home_price = $request->offer_home_price ?? [];
 
         foreach ($tests as $key => $testId) {
             if (!empty($testId)) {
