@@ -228,9 +228,9 @@ class LaboratoriesController extends Controller
             'test.*' => 'nullable|string',
             'price.*' => 'nullable|numeric',
             'homeprice.*' => 'nullable|numeric',
-            'report.*' => 'nullable|array',
-            'offer_visiting_price.*' => 'nullable|array',
-            'offer_home_price.*' => 'nullable|array',
+            'report.*' => 'nullable|string',
+            'offer_visiting_price.*' => 'nullable|string',
+            'offer_home_price.*' => 'nullable|string',
         ]);
 
         // Update related user
