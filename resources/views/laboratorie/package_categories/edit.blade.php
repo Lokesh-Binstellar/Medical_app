@@ -20,25 +20,25 @@
 
 
                     <div class="card">
-                        <h5 class="card-header">Edit Package Category</h5>
+                        <h5 class="card-header">Edit Organ</h5>
                         <div class="card-body">
                             <form class="row g-3" action="{{  route('packageCategory.update', $packageCategory->id)  }}"
                                 method="POST" enctype="multipart/form-data" id="importForm">
                                 @csrf
                                 @method('PUT')
                                 {{-- Pharmacy Name --}}
-                                <div class="col-md-6">
+                                <div class="">
                                     <div class="form-floating form-floating-outline">
                                         <input value="{{ $packageCategory->name }}"  type="text" name="name"
-                                            id="name" class="form-control" placeholder="Package Category Name" />
-                                        <label for="name">Package Category Name</label>
+                                            id="name" class="form-control" placeholder="Organ Name" />
+                                        <label for="name">Organ Name</label>
                                     </div>
                                 </div>
             
                                
                                 
                                 {{-- Image --}}
-                                <div class="form-group col-md-6 d-flex justify-content-center flex-column">
+                                <div class="form-group d-flex justify-content-center flex-column">
                                     @if ($packageCategory->package_image)
                                         <div class="mb-2">
                                             <img id="logo" src={{asset('assets/package_image/' .$packageCategory->package_image)}} alt="category Image" class="img-thumbnail"

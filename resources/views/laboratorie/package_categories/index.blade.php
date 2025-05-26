@@ -15,7 +15,7 @@
                 <div class="col-md-12">
                     <div class="card shadow-lg">
                         <div class="card-header bg-primary text-white">
-                            <h4 class="card-title mb-0">Package Category</h4>
+                            <h4 class="card-title mb-0">Filter By Organ</h4>
                         </div>
 
                         <div class="card-body">
@@ -28,19 +28,19 @@
                                     enctype="multipart/form-data" class="row g-3 align-items-center" id="importForm">
                                     @csrf
                                     <div class="col-md-4">
-                                        <label for="name" class="form-label">Package Category Name</label>
+                                        <label for="name" class="form-label">Organ Name</label>
                                         <input type="text" name="name" class="form-control" id="name" 
-                                            placeholder="Enter category name">
+                                            placeholder="Enter organ name">
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label for="package_image" class="form-label">Category Logo(jpeg,png,jpg,gif,svg)
+                                        <label for="package_image" class="form-label">Organ Logo(jpeg,png,jpg,gif,svg)
                                         </label>
                                         <input type="file" name="package_image" class="form-control" id="package_image">
                                     </div>
 
                                     <div class="col-md-4">
-                                        <button type="submit" class="btn btn-primary  ">+ Add Package Category</button>
+                                        <button type="submit" class="btn btn-primary  ">+ SUBMIT</button>
                                     </div>
                                 </form>
                             </div>
@@ -57,8 +57,8 @@
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
-                                                <th>Name</th>
-                                                <th>Package Image</th>
+                                                <th>Organ Name</th>
+                                                <th>Organ Image</th>
                                                 <th style="width: 10%">Action</th>
                                             </tr>
                                         </thead>

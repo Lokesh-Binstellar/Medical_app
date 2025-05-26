@@ -137,8 +137,9 @@
             <li
                 class="menu-item {{ in_array(Route::current()->getName(), ['packageCategory.index']) ? 'active' : '' }}">
                 <a href="{{ route('packageCategory.index') }}" class="menu-link">
-                    <i class="menu-icon tf-icons mdi mdi-package-variant"></i>
-                    <div data-i18n="Package Category">Package Category</div>
+                    <i class="menu-icon tf-icons mdi mdi-filter-variant"></i>
+
+                    <div data-i18n="Filter By Organs">Filter By Organs</div>
                 </a>
             </li>
         @endif

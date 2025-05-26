@@ -92,64 +92,73 @@ class LabRequestQuoteController extends Controller
         $laboratories = Laboratories::all();
 
         foreach ($laboratories as $lab) {
-            if ($lab->latitude && $lab->longitude) {
-                $distance = $this->getRoadDistance($address->lat, $address->lng, $lab->latitude, $lab->longitude, $apiKey);
+            // Ensure both cities are available
+            if (!empty($lab->city) && !empty($address->city)) {
+                // Case-insensitive city comparison
+                if (strcasecmp(trim($lab->city), trim($address->city)) === 0) {
 
-                if ($distance !== false && $distance <= 10) {
                     $labTests = json_decode($lab->test, true);
                     if (!is_array($labTests)) {
                         continue;
                     }
 
-                   $matchedTests = collect($labTests)
-    ->filter(function ($labTest) use ($testIds) {
-        return isset($labTest['test']) && $testIds->contains($labTest['test']);
-    })
-    ->map(function ($labTest) use ($testNamesMap) {
-        $testId = $labTest['test'];
+                    $distance = null;
+                    if ($lab->latitude && $lab->longitude) {
+                        $distance = $this->getRoadDistance($address->lat, $address->lng, $lab->latitude, $lab->longitude, $apiKey);
+                        if ($distance !== false) {
+                            $distance = round($distance, 2);
+                        } else {
+                            $distance = null;
+                        }
+                    }
 
-        $originalPrice = (float) $labTest['price'];
-        $originalHomePrice = (float) ($labTest['homeprice'] ?? 0);
-        $offerVisitingPrice = isset($labTest['offer_visiting_price']) ? (float) $labTest['offer_visiting_price'] : null;
-        $offerHomePrice = isset($labTest['offer_home_price']) ? (float) $labTest['offer_home_price'] : null;
+                    $matchedTests = collect($labTests)
+                        ->filter(function ($labTest) use ($testIds) {
+                            return isset($labTest['test']) && $testIds->contains($labTest['test']);
+                        })
+                        ->map(function ($labTest) use ($testNamesMap) {
+                            $testId = $labTest['test'];
 
-        return array_filter([
-            'test_name' => $testNamesMap[$testId] ?? 'Unknown',
-            'original_price' => $originalPrice,
-            'original_homeprice' => $originalHomePrice,
-            'offer_visiting_price' => ($offerVisitingPrice !== null && $offerVisitingPrice !== $originalPrice) ? $offerVisitingPrice : null,
-            'offer_home_price' => ($offerHomePrice !== null && $offerHomePrice !== $originalHomePrice) ? $offerHomePrice : null,
-        ], function ($value) {
-            return $value !== null;
-        });
-    })
-    ->values();
+                            $originalPrice = (float) $labTest['price'];
+                            $originalHomePrice = (float) ($labTest['homeprice'] ?? 0);
+                            $offerVisitingPrice = isset($labTest['offer_visiting_price']) ? (float) $labTest['offer_visiting_price'] : null;
+                            $offerHomePrice = isset($labTest['offer_home_price']) ? (float) $labTest['offer_home_price'] : null;
 
-
+                            return array_filter([
+                                'test_name' => $testNamesMap[$testId] ?? 'Unknown',
+                                'original_price' => $originalPrice,
+                                'original_homeprice' => $originalHomePrice,
+                                'offer_visiting_price' => ($offerVisitingPrice !== null && $offerVisitingPrice !== $originalPrice) ? $offerVisitingPrice : null,
+                                'offer_home_price' => ($offerHomePrice !== null && $offerHomePrice !== $originalHomePrice) ? $offerHomePrice : null,
+                            ], function ($value) {
+                                return $value !== null;
+                            });
+                        })
+                        ->values();
 
                     // 🧮 Calculate totals
                     $totalPrice = $matchedTests->sum(function ($test) {
-    return isset($test['offer_visiting_price']) ? $test['offer_visiting_price'] : $test['original_price'];
-});
+                        return isset($test['offer_visiting_price']) ? $test['offer_visiting_price'] : $test['original_price'];
+                    });
 
-$totalHomePrice = $matchedTests->sum(function ($test) {
-    return isset($test['offer_home_price']) ? $test['offer_home_price'] : $test['original_homeprice'];
-});
+                    $totalHomePrice = $matchedTests->sum(function ($test) {
+                        return isset($test['offer_home_price']) ? $test['offer_home_price'] : $test['original_homeprice'];
+                    });
 
-$totalPickupCharge = $matchedTests->sum(function ($test) {
-    $price = isset($test['offer_visiting_price']) ? $test['offer_visiting_price'] : $test['original_price'];
-    $homeprice = isset($test['offer_home_price']) ? $test['offer_home_price'] : $test['original_homeprice'];
-    return $homeprice - $price;
-});
-
+                    $totalPickupCharge = $matchedTests->sum(function ($test) {
+                        $price = isset($test['offer_visiting_price']) ? $test['offer_visiting_price'] : $test['original_price'];
+                        $homeprice = isset($test['offer_home_price']) ? $test['offer_home_price'] : $test['original_homeprice'];
+                        return $homeprice - $price;
+                    });
 
                     $platformFee = Additionalcharges::value('platfrom_fee') ?? 0;
                     $totalPriceWithFee = $totalPrice + $platformFee;
                     $totalHomePriceWithFee = $totalHomePrice + $platformFee;
 
                     if ($matchedTests->isNotEmpty()) {
-                        // Get rating for this lab
-                        $ratings = Rating::where('rateable_id', $lab->user_id)->where('rateable_type', 'Laboratory')->pluck('rating');
+                        $ratings = Rating::where('rateable_id', $lab->user_id)
+                            ->where('rateable_type', 'Laboratory')
+                            ->pluck('rating');
 
                         $totalRatings = $ratings->count();
                         $rating = null;
@@ -161,7 +170,7 @@ $totalPickupCharge = $matchedTests->sum(function ($test) {
 
                         $matchingLabs[] = [
                             'lab_name' => $lab->lab_name,
-                            'road_distance_km' => round($distance, 2),
+                            'road_distance_km' => $distance, // not applicable when filtering by city
                             'matched_tests' => $matchedTests,
                             'rating' => $rating,
                             'nabl_iso_certified' => $lab->nabl_iso_certified == 1 ? 'Yes' : 'No',
@@ -177,6 +186,7 @@ $totalPickupCharge = $matchedTests->sum(function ($test) {
                 }
             }
         }
+
 
         // 5. Return response
         if (empty($matchingLabs)) {
