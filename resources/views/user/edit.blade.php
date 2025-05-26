@@ -22,7 +22,7 @@
                         <div class="form-floating form-floating-outline">
                             <input type="text" id="name" class="form-control" placeholder="John Doe"
                                 name="name" value="{{ $user->name }}"/>
-                            <label for="name">Full Name</label>
+                            <label for="name">User Name</label>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -74,7 +74,7 @@
 
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
-                            <select id="role_id" name="role_id" class="form-select select2" data-allow-clear="true">
+                            <select id="role_id" name="role_id" class="form-select select2" readonly disabled>
                                 <option value="">Select Role</option>
                                 @foreach ($roles as $role)
                                     <option value="{{ $role->id }}" @if ($user->role_id == $role->id) selected @endif>{{ $role->name }}</option>

@@ -23,28 +23,31 @@
                     <div class="card shadow">
                         <div class="card-header d-flex justify-content-between align-items-center ">
                             <h4 class="card-title mb-0 ">Popular Lab Test </h4>
+
+                        </div>
+                        <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <form action="{{ route('popular_lab_test.store') }}" method="POST"
                                     enctype="multipart/form-data" class="d-flex gap-2 align-items-center" id="importForm">
                                     @csrf
                                     <div class="error-msg">
-                                    <select name="name" class="form-control select2" id="lab-test-select" required>
-                                        <option value="">Select Lab Test</option>
-                                        @foreach ($labTests as $item)
-                                            <option value="{{ $item->id }}" data-contains="{{ $item->contains }}">
-                                                {{ $item->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                        <select name="name" class="form-control select2" id="lab-test-select" required>
+                                            <option value="">Select Lab Test</option>
+                                            @foreach ($labTests as $item)
+                                                <option value="{{ $item->id }}" data-contains="{{ $item->contains }}">
+                                                    {{ $item->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                     {{-- <input type="file" name="logo" class="form-control" id="logo"> --}}
-                                    <button type="submit" class="btn btn-primary addButton text-nowrap px-5">+ Add
+                                    <button type="submit" class="btn btn-primary  text-nowrap px-5">+ Add
                                         Lab Test</button>
                                 </form>
                             </div>
 
-                        </div>
 
-                        <div class="card-body">
+
+                            
                             @if (session('success'))
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                                     {{ session('success') }}
@@ -56,7 +59,7 @@
                                     {{ session('error') }}
                                 </div>
                             @endif
-
+<div class="card-body">
                             <div class="table-responsive">
                                 <table id="add-row" class="display table table-striped table-hover data-table">
                                     <thead>
@@ -72,6 +75,7 @@
                                 </table>
 
                             </div>
+</div>
                         </div>
                     </div>
                 </div>
@@ -82,7 +86,7 @@
 
 @section('scripts')
     <script>
-      $(function() {
+        $(function() {
             var table = $('.data-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -155,7 +159,7 @@
                 });
             }
 
-  // Initialize Select2
+            // Initialize Select2
             $('#lab-test-select').select2({
                 placeholder: "Select Lab Test",
                 allowClear: true
@@ -172,6 +176,4 @@
             });
         });
     </script>
-
-   
 @endsection
