@@ -27,7 +27,7 @@
                                 @csrf
                                 @method('PUT')
                                 {{-- Pharmacy Name --}}
-                                <div class="">
+                                <div class="col-md-12">
                                     <div class="form-floating form-floating-outline">
                                         <input value="{{ $packageCategory->name }}"  type="text" name="name"
                                             id="name" class="form-control" placeholder="Organ Name" />
@@ -38,14 +38,14 @@
                                
                                 
                                 {{-- Image --}}
-                                <div class="form-group d-flex justify-content-center flex-column">
+                                <div class="form-group d-flex justify-content-center flex-column col-md-12">
                                     @if ($packageCategory->package_image)
                                         <div class="mb-2">
                                             <img id="logo" src={{asset('assets/package_image/' .$packageCategory->package_image)}} alt="category Image" class="img-thumbnail"
                                                 style="max-height: 150px;">
                                         </div>
                                     @endif
-                                    <input type="file" name="logo" class="form-control"
+                                    <input type="file" name="package_image" class="form-control"
                                         data-parsley-required="{{ $packageCategory->package_image ? 'false' : 'true' }}"
                                         data-parsley-required-message="The image field is required.">
                                     <small class="text-muted">Leave blank to keep existing image</small>

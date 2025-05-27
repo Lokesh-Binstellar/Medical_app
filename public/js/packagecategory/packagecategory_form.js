@@ -3,10 +3,10 @@ const getFileValidators = (label = 'file') => ({
         message: `Please upload your ${label}.`
     },
     file: {
-        extension: 'csv,xlsx,xls,pdf,doc,docx,zip', // or leave out extension if no restrictions
-        maxSize: 5 * 1024 * 1024, // example: 5MB
-        message: 'Please upload a valid file (max 5MB).'
-    }
+            extension: 'jpeg,jpg,png,gif,svg',
+            maxSize: 5 * 1024 * 1024, // 5MB
+            message: 'Please upload a valid image file (jpeg, jpg, png, gif, svg) max 5MB.',
+        },
 });
 
 document.addEventListener('DOMContentLoaded', function () {
