@@ -170,7 +170,7 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
     //Popular Brand
-    Route::prefix('popular')->group(function () {
+    Route::prefix('popularBrand')->group(function () {
         Route::get('/', [PopularBrandController::class, 'index'])->name('popular.index');
         Route::group(['middleware' => 'permission:PopularBrand,create'], function () {
             Route::post('/store', [PopularBrandController::class, 'store'])->name('popular.store');
