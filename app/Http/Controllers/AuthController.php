@@ -56,12 +56,12 @@ class AuthController extends Controller
             ]);
 
             return response()->json([
-                'status'=>true,
+                'status' => true,
                 'message' => 'OTP sent successfully.',
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'status'=>false,
+                'status' => false,
                 'message' => 'Failed to send OTP: ' . $e->getMessage(),
             ], 500);
         }
@@ -83,12 +83,12 @@ class AuthController extends Controller
             $mobile_no = '+91' . $mobile_no;
         }
 
-       
+
         $user = Customers::where('mobile_no', $mobile_no)->first();
 
         if (!$user) {
             return response()->json([
-                'status'=>false,
+                'status' => false,
                 'message' => 'User not found.'
             ], 404);
         }
@@ -97,10 +97,11 @@ class AuthController extends Controller
         if ((string) $user->otp_code !== (string) $request->otp_code || now()->gt($user->otp_expires_at)) {
             return response()->json(
                 [
-                    'status'=>false,
+                    'status' => false,
                     'message' => 'Invalid or expired OTP.'
                 ],
-                 400);
+                400
+            );
         }
 
         // Update user as verified
@@ -121,7 +122,7 @@ class AuthController extends Controller
             $jwt = JWT::encode($payload, $jwtSecret, 'HS256');
         } catch (\Exception $e) {
             return response()->json([
-                'status'=>true,
+                'status' => true,
                 'message' => 'Error generating token.'
             ], 500);
         }
@@ -140,14 +141,14 @@ class AuthController extends Controller
     // update Customers details
     public function update(Request $request)
     {
-      
+
         $request->validate([
             'firstName' => 'required|string|max:255',
             'lastName' => 'required|string|max:255',
         ]);
         $userId = $request->get('user_id');
         $customer = Customers::find($userId);
-    
+
         if (!$customer) {
             return response()->json(['message' => 'Customer not found'], 404);
         }
@@ -155,19 +156,51 @@ class AuthController extends Controller
             'firstName' => $request->firstName,
             'lastName' => $request->lastName,
         ]);
-    
+
         return response()->json([
             'status' => true,
             'message' => 'Customer updated successfully',
-           'customer' => [
-            'mobile_no' => $customer->mobile_no,
-            'firstName' => $customer->firstName,
-            'lastName' => $customer->lastName,
-        ],
+            'customer' => [
+                'mobile_no' => $customer->mobile_no,
+                'firstName' => $customer->firstName,
+                'lastName' => $customer->lastName,
+            ],
         ]);
     }
-    public function store(){
-       return 'ok';
+
+    public function getCustomerDetails(Request $request)
+    {
+        $userId = $request->get('user_id');
+        if (!$userId) {
+            return response()->json([
+                'status' => false,
+                'message' => 'user_id is required',
+            ], 400);
+        }
+
+        $customer = Customers::find($userId);
+
+        if (!$customer) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Customer not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'customer' => [
+                'firstName' => $customer->firstName,
+                'lastName' => $customer->lastName,
+                'email' => $customer->email,
+                'mobile_no' => $customer->mobile_no,
+            ],
+        ]);
     }
 
+
+    public function store()
+    {
+        return 'ok';
+    }
 }
