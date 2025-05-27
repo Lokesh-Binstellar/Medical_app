@@ -126,11 +126,10 @@
 @endsection
 @section('content')
 
-
     <div class="container mt-4">
         <div class="card shadow-xl rounded-3">
             <!-- Blue Header Title -->
-            <div class="card-header  text-white fw-bold fs-5">
+            <div class="card-header text-white fw-bold fs-5">
                 Add Medicine
             </div>
             <input type="hidden" name="current_pharmacy_id" id="current_pharmacy_id" value="{{ Auth::id() }}">
@@ -147,7 +146,6 @@
                         </select>
                     </div>
 
-
                     <div>
                         <div class="header">Prescriptions Preview</div>
 
@@ -156,9 +154,8 @@
                         <div class="footer" id="download-links"></div>
                     </div>
 
-
-                    <div class="card " style="display:none;" id="cart-details">
-                        <h5 class="card-header ">Customer Cart Details</h5>
+                    <div class="card" style="display:none;" id="cart-details">
+                        <h5 class="card-header">Customer Cart Details</h5>
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered">
@@ -178,7 +175,6 @@
                         </div>
                     </div>
 
-
                     <div class="table-responsive mb-3">
                         <table class="display table table-striped table-hover data-table" id="medicine-table">
                             <thead>
@@ -194,12 +190,12 @@
                                         kindly mark the medicine as not available</strong>.
                                 </div>
 
-
                                 <tr>
                                     <th>Search Medicine</th>
                                     <th>MRP</th>
                                     <th>Final Amount</th>
                                     <th>Discount %</th>
+                                    <th>Quantity</th>
                                     <th>Available</th>
                                     <th>Substitute</th>
                                     <th>Action</th>
@@ -210,11 +206,11 @@
                                     <td>
                                         <select class="form-select medicine_search medicineDropdown"
                                             name="medicine[0][medicine_id]"></select>
-                                        <input type="hidden" class="medicine_name " name="medicine[0][medicine_name]">
+                                        <input type="hidden" class="medicine_name" name="medicine[0][medicine_name]">
                                     </td>
                                     <td>
-                                        <input type="number" name="medicine[0][mrp]" class="form-control mrp" step="0.01"
-                                            placeholder="MRP">
+                                        <input type="number" name="medicine[0][mrp]" class="form-control mrp"
+                                            step="0.01" placeholder="MRP">
                                     </td>
                                     <td>
                                         <input type="number" name="medicine[0][discount]" class="form-control discount"
@@ -223,6 +219,10 @@
                                     <td>
                                         <input type="number" name="medicine[0][discount_percent]"
                                             class="form-control discount_percent" step="0.01" placeholder="%">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="medicine[0][quantity]" class="form-control quantity"
+                                            step="0" placeholder="Quantity" readonly style="background-color: #eef0f3;">
                                     </td>
                                     <td>
                                         <select name="medicine[0][available]" class="form-select">
@@ -246,8 +246,8 @@
 
                     <div class="d-flex justify-content-between flex-wrap gap-3">
                         <div class="d-flex gap-2 justify-center align-items-center">
-                            <button type="button" id="add-row" class="btn btn-primary">+</button>
-                            <button type="submit" class="btn  btn-primary">Save</button>
+                            {{-- <button type="button" id="add-row" class="btn btn-primary">+</button> --}}
+                            <button type="submit" class="btn btn-primary">Save</button>
                         </div>
 
                         <div class="d-flex flex-column text-end">
@@ -274,10 +274,9 @@
         </div>
     </div>
 
-
-    <div class="container ">
+    <div class="container">
         <div class="card shadow-xl my-5">
-            <div class="card-header  text-white">
+            <div class="card-header text-white">
                 <h5 class="mb-0">Medicine Data</h5>
             </div>
 
@@ -292,25 +291,27 @@
                                 $customer = $entry->customer;
                                 $statusText = '';
                                 if ($entry->status == 0) {
-                                    $statusText = '<span class="badge rounded-pill bg-label-warning me-1">Request Sent</span>';
+                                    $statusText =
+                                        '<span class="badge rounded-pill bg-label-warning me-1">Request Sent</span>';
                                 } elseif ($entry->status == 1) {
-                                    $statusText = '<span class="badge rounded-pill bg-label-success me-1">Request Accepted</span>';
+                                    $statusText =
+                                        '<span class="badge rounded-pill bg-label-success me-1">Request Accepted</span>';
                                 } elseif ($entry->status == 2) {
-                                    $statusText = '<span class="badge rounded-pill bg-label-danger me-1">Request Cancelled</span>';
+                                    $statusText =
+                                        '<span class="badge rounded-pill bg-label-danger me-1">Request Cancelled</span>';
                                 }
-
-
-
                             @endphp
 
-                            <div class="accordion-item border-0 shadow-sm mb-3 ">
+                            <div class="accordion-item border-0 shadow-sm mb-3">
                                 <h2 class="accordion-header" id="heading{{ $accordionId }}">
                                     <button
                                         class="accordion-button collapsed d-flex justify-content-between align-items-center w-100"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $accordionId }}"
-                                        aria-expanded="false" aria-controls="collapse{{ $accordionId }}">
+                                        type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse{{ $accordionId }}" aria-expanded="false"
+                                        aria-controls="collapse{{ $accordionId }}">
 
-                                        <table class="table table-bordered table-sm w-auto" style="border: 1px solid black;">
+                                        <table class="table table-bordered table-sm w-auto"
+                                            style="border: 1px solid black;">
                                             <tbody>
                                                 <tr>
                                                     <th><strong>Record #</strong></th>
@@ -329,9 +330,11 @@
                                                     <tr>
                                                         <td colspan="2">
                                                             <span class="text-danger">
-                                                                <strong>Note:</strong> Accepted order details will be displayed under
+                                                                <strong>Note:</strong> Accepted order details will be
+                                                                displayed under
                                                                 <strong>Orders</strong>.
-                                                                You need to update the order status to <strong>Completed</strong> or
+                                                                You need to update the order status to
+                                                                <strong>Completed</strong> or
                                                                 <strong>Cancelled</strong> from there.
                                                             </span>
                                                         </td>
@@ -340,13 +343,10 @@
                                             </tbody>
                                         </table>
 
-
-
-                                        <a type="button" class="btn btn-primary Show-Medicine ">Show Medicine<i
+                                        <a type="button" class="btn btn-primary Show-Medicine">Show Medicine<i
                                                 class="fa-solid fa-arrow-down pl-1"></i></a>
                                     </button>
                                 </h2>
-
 
                                 <div id="collapse{{ $accordionId }}" class="accordion-collapse collapse"
                                     aria-labelledby="heading{{ $accordionId }}" data-bs-parent="#medicineAccordion">
@@ -360,6 +360,7 @@
                                                         <th>MRP</th>
                                                         <th>Final Price</th>
                                                         <th>Discount %</th>
+                                                        <th>Quantity</th>
                                                         <th>Available</th>
                                                         <th>Substitute</th>
                                                     </tr>
@@ -373,6 +374,7 @@
                                                             <td>₹{{ $med['mrp'] ?? '0.00' }}</td>
                                                             <td>₹{{ $med['discount'] ?? '0.00' }}</td>
                                                             <td>{{ $med['discount_percent'] ?? '0' }}%</td>
+                                                            <td>{{ $med['quantity'] ?? '0' }}</td>
                                                             <td>{{ ucfirst($med['available'] ?? '-') }}</td>
                                                             <td>{{ ucfirst($med['is_substitute'] ?? '-') }}</td>
                                                         </tr>
@@ -395,11 +397,8 @@
         </div>
     </div>
 
-
-
-
-
 @endsection
+
 @section('scripts')
     <script>
         function initSelect2($el) {
@@ -411,24 +410,24 @@
                     url: `{{ route('search.medicine') }}`,
                     dataType: 'json',
                     delay: 250,
-                    data: function (params) {
+                    data: function(params) {
                         return {
                             q: params.term || ''
                         };
                     },
-                    processResults: function (data) {
+                    processResults: function(data) {
                         return {
                             results: data
                         };
                     }
                 }
-            }).on('select2:select', function (e) {
+            }).on('select2:select', function(e) {
                 const selectedText = e.params.data.text;
                 const $row = $(this).closest('tr');
                 $row.find('.medicine_name').val(selectedText);
             });
             // ✅ CSS fix for new select2 dropdowns
-            $el.each(function () {
+            $el.each(function() {
                 const container = $(this).data('select2')?.$container;
                 if (container) {
                     container.css('width', '350px');
@@ -439,7 +438,7 @@
         function calculateTotal() {
             let total = 0;
 
-            $('.discount').each(function () {
+            $('.discount').each(function() {
                 const value = parseFloat($(this).val()) || 0;
                 total += value;
             });
@@ -459,7 +458,7 @@
         function calculateMRPTotal() {
             let mrpTotal = 0;
 
-            $('.mrp').each(function () {
+            $('.mrp').each(function() {
                 const value = parseFloat($(this).val()) || 0;
                 mrpTotal += value;
             });
@@ -469,18 +468,18 @@
         }
 
 
-        $(document).ready(function () {
+        $(document).ready(function() {
             let index = 1;
 
             initSelect2($('.medicine_search'));
 
-            $('#add-row').on('click', function () {
+            $('#add-row').on('click', function() {
                 const $newRow = $('.medicine-row').first().clone();
 
                 $newRow.find('input').val('');
                 $newRow.find('select').not('.medicine_search').val('yes');
 
-                $newRow.find('select, input').each(function () {
+                $newRow.find('select, input').each(function() {
                     const name = $(this).attr('name');
                     if (name) {
                         const newName = name.replace(/\[\d+\]/, `[${index}]`);
@@ -498,14 +497,14 @@
                 calculateTotal();
             });
 
-            $(document).on('click', '.remove-row', function () {
+            $(document).on('click', '.remove-row', function() {
                 if ($('#medicine-body .medicine-row').length > 1) {
                     $(this).closest('tr').remove();
                     calculateTotal();
                 }
             });
 
-            $(document).on('input', '.mrp, .discount', function () {
+            $(document).on('input', '.mrp, .discount', function() {
                 const $row = $(this).closest('tr');
                 const mrp = parseFloat($row.find('.mrp').val()) || 0;
                 const discountAmount = parseFloat($row.find('.discount').val()) || 0;
@@ -516,7 +515,7 @@
                 calculateTotal();
             });
 
-            $(document).on('input', '.mrp, .discount_percent', function () {
+            $(document).on('input', '.mrp, .discount_percent', function() {
                 const $row = $(this).closest('tr');
                 const mrp = parseFloat($row.find('.mrp').val()) || 0;
                 const percent = parseFloat($row.find('.discount_percent').val()) || 0;
@@ -537,14 +536,14 @@
                         url: '{{ route('customers.select') }}',
                         dataType: 'json',
                         delay: 250,
-                        data: function (params) {
+                        data: function(params) {
                             return {
                                 query: params.term,
                                 current_pharmacy_id: $('#current_pharmacy_id')
                                     .val() // static value added here
                             };
                         },
-                        processResults: function (data) {
+                        processResults: function(data) {
                             return {
                                 results: data.results
                             };
@@ -554,22 +553,20 @@
                 });
             }
 
-
-
             initCustomerSelect2($('.customer-search'));
 
 
-            $('form').on('submit', function (e) {
+            $('form').on('submit', function(e) {
                 let isValid = true;
 
 
-                $('.medicine-error, .mrp-error, .discount-error, .discount-percent-error, .available-error, .substitute-error, .customer-error')
+                $('.medicine-error, .mrp-error, .discount-error, .discount-percent-error, .quantity-error,.available-error, .substitute-error, .customer-error')
                     .remove();
                 $('.form-control, .form-select').css('border', '');
                 $('.medicine_search').next('.select2-container').css('border', '');
 
 
-                $('#medicine-body .medicine-row').each(function (index) {
+                $('#medicine-body .medicine-row').each(function(index) {
                     const $row = $(this);
 
                     const $medicineSelect = $row.find('.medicine_search');
@@ -611,11 +608,21 @@
                         );
                     }
 
+                    // ✅ Fixed: quantity is an INPUT field, not a SELECT
+                    const $quantity = $row.find(`input[name="medicine[${index}][quantity]"]`);
+                    if (!$quantity.val() || parseFloat($quantity.val()) <= 0) {
+                        isValid = false;
+                        $quantity.css('border', '1px solid red');
+                        $row.find('td:nth-child(5)').append(
+                            '<div class="text-danger small quantity-error mt-1">Please enter a valid quantity.</div>'
+                        );
+                    }
+
                     const $available = $row.find(`select[name="medicine[${index}][available]"]`);
                     if (!$available.val()) {
                         isValid = false;
                         $available.css('border', '1px solid red');
-                        $row.find('td:nth-child(5)').append(
+                        $row.find('td:nth-child(6)').append(
                             '<div class="text-danger small available-error mt-1">Please select availability.</div>'
                         );
                     }
@@ -625,7 +632,7 @@
                     if (!$substitute.val()) {
                         isValid = false;
                         $substitute.css('border', '1px solid red');
-                        $row.find('td:nth-child(6)').append(
+                        $row.find('td:nth-child(7)').append(
                             '<div class="text-danger small substitute-error mt-1">Please select if it is a substitute.</div>'
                         );
                     }
@@ -647,30 +654,28 @@
                 if (!isValid) e.preventDefault();
             });
 
-
-
-            $(document).on('change input', '.medicine_search', function () {
+            $(document).on('change input', '.medicine_search', function() {
                 if ($(this).val()) {
                     $(this).next('.select2-container').css('border', '');
                     $(this).closest('td').find('.medicine-error').remove();
                 }
             });
 
-            $(document).on('input', 'input[name*="[mrp]"]', function () {
+            $(document).on('input', 'input[name*="[mrp]"]', function() {
                 if ($(this).val() > 0) {
                     $(this).css('border', '');
                     $(this).closest('td').find('.mrp-error').remove();
                 }
             });
 
-            $(document).on('input', 'input[name*="[discount]"]', function () {
+            $(document).on('input', 'input[name*="[discount]"]', function() {
                 if ($(this).val() >= 0) {
                     $(this).css('border', '');
                     $(this).closest('td').find('.discount-error').remove();
                 }
             });
 
-            $(document).on('input', 'input[name*="[discount_percent]"]', function () {
+            $(document).on('input', 'input[name*="[discount_percent]"]', function() {
                 const val = parseFloat($(this).val());
                 if (val >= 0 && val <= 100) {
                     $(this).css('border', '');
@@ -678,21 +683,29 @@
                 }
             });
 
-            $(document).on('change', 'select[name*="[available]"]', function () {
+            // ✅ Fixed: quantity is an INPUT field, not a SELECT
+            $(document).on('input', 'input[name*="[quantity]"]', function() {
+                if ($(this).val() && parseFloat($(this).val()) > 0) {
+                    $(this).css('border', '');
+                    $(this).closest('td').find('.quantity-error').remove();
+                }
+            });
+
+            $(document).on('change', 'select[name*="[available]"]', function() {
                 if ($(this).val()) {
                     $(this).css('border', '');
                     $(this).closest('td').find('.available-error').remove();
                 }
             });
 
-            $(document).on('change', 'select[name*="[is_substitute]"]', function () {
+            $(document).on('change', 'select[name*="[is_substitute]"]', function() {
                 if ($(this).val()) {
                     $(this).css('border', '');
                     $(this).closest('td').find('.substitute-error').remove();
                 }
             });
 
-            $(document).on('change', 'select.customer-search', function () {
+            $(document).on('change', 'select.customer-search', function() {
                 if ($(this).val()) {
                     $(this).css('border', '');
                     $('.customer-error').remove();
@@ -702,89 +715,160 @@
 
         });
 
-
-
-
-        // fetch-cart-by-customer products_details
-
-        $(document).ready(function () {
-            $('#prescription-select').on('select2:select', function (e) {
+        // Enhanced customer selection handler - Auto-populate medicine table from cart
+        $(document).ready(function() {
+            $('#prescription-select').on('select2:select', function(e) {
                 const customerId = e.params.data.id;
 
+                // Fetch cart data and auto-populate medicine table
                 $.ajax({
                     url: '/search-medicine/fetch-cart-by-customer',
                     method: 'GET',
                     data: {
                         customer_id: customerId
                     },
-                    success: function (response) {
+                    success: function(response) {
                         if (response.status === 'success') {
                             const products = response.data;
-                            let html = '';
-
-                            products.forEach(product => {
-                                html += `<tr>
-                                                <td>${product.product_id}</td>
-                                                 <td>${product.name}</td>
-                                                <td>${product.packaging_detail}</td>
-                                                <td>${product.quantity}</td>
-                                                <td>${product.is_substitute}</td>
-
-                                            </tr>`;
+                            
+                            // Clear existing medicine rows except the first one
+                            $('#medicine-body .medicine-row:not(:first)').remove();
+                            
+                            // Clear the first row
+                            const $firstRow = $('#medicine-body .medicine-row:first');
+                            $firstRow.find('input').val('');
+                            $firstRow.find('select').not('.medicine_search').prop('selectedIndex', 0);
+                            $firstRow.find('.medicine_search').val(null).trigger('change');
+                            
+                            // Populate rows based on cart products
+                            products.forEach((product, productIndex) => {
+                                let $targetRow;
+                                
+                                if (productIndex === 0) {
+                                    // Use the first existing row
+                                    $targetRow = $firstRow;
+                                } else {
+                                    // Clone the first row for additional products
+                                    $targetRow = $firstRow.clone();
+                                    
+                                    // Update name attributes for the new row
+                                    $targetRow.find('select, input').each(function() {
+                                        const name = $(this).attr('name');
+                                        if (name) {
+                                            const newName = name.replace(/\[\d+\]/, `[${productIndex}]`);
+                                            $(this).attr('name', newName);
+                                        }
+                                    });
+                                    
+                                    // Remove existing Select2 container and reinitialize
+                                    $targetRow.find('.select2-container').remove();
+                                    const $newSelect = $targetRow.find('.medicine_search').clone().val('');
+                                    $targetRow.find('.medicine_search').replaceWith($newSelect);
+                                    
+                                    // Append to table body
+                                    $('#medicine-body').append($targetRow);
+                                    
+                                    // Initialize Select2 for the new dropdown
+                                    initSelect2($newSelect);
+                                }
+                                
+                                // Set the medicine dropdown value and trigger change
+                                const $medicineSelect = $targetRow.find('.medicine_search');
+                                
+                                // Create option and add to select
+                                const option = new Option(product.name, product.product_id, true, true);
+                                $medicineSelect.append(option).trigger('change');
+                                
+                                // Set the hidden medicine name field
+                                $targetRow.find('.medicine_name').val(product.name);
+                                
+                                // Set quantity
+                                $targetRow.find('.quantity').val(product.quantity);
+                                
+                                // Set substitute status if available
+                                if (product.is_substitute !== undefined) {
+                                    const substituteValue = product.is_substitute == 1 ? 'yes' : 'no';
+                                    $targetRow.find('select[name*="[is_substitute]"]').val(substituteValue);
+                                }
+                                
+                                // Set availability to 'yes' by default
+                                $targetRow.find('select[name*="[available]"]').val('yes');
                             });
-
-                            $('#cart-product-body').html(html);
+                            
+                            // Update index for future manual additions
+                            index = products.length;
+                            
+                            // Show cart details table
+                            let cartHtml = '';
+                            products.forEach(product => {
+                                cartHtml += `<tr>
+                                    <td>${product.product_id}</td>
+                                    <td>${product.name}</td>
+                                    <td>${product.packaging_detail}</td>
+                                    <td>${product.quantity}</td>
+                                    <td>${product.is_substitute}</td>
+                                </tr>`;
+                            });
+                            
+                            $('#cart-product-body').html(cartHtml);
                             $('#cart-details').show();
+                            
+                            // Recalculate totals
+                            calculateTotal();
+                            
                         } else {
+                            // Clear medicine table if no cart data
+                            $('#medicine-body .medicine-row:not(:first)').remove();
+                            const $firstRow = $('#medicine-body .medicine-row:first');
+                            $firstRow.find('input').val('');
+                            $firstRow.find('select').not('.medicine_search').prop('selectedIndex', 0);
+                            $firstRow.find('.medicine_search').val(null).trigger('change');
+                            
                             $('#cart-product-body').html('');
                             $('#cart-details').hide();
                         }
                     },
-                    error: function () {
+                    error: function() {
+                        console.error('Error fetching cart data');
                         $('#cart-product-body').html('');
                         $('#cart-details').hide();
                     }
                 });
-            });
-        });
 
+                // Keep the existing prescription preview functionality
+                $.ajax({
+                    url: `{{ route('search.prescription') }}`,
+                    method: 'GET',
+                    data: {
+                        customer_id: customerId
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            let html = '';
+                            response.files.forEach(function(fileUrl, index) {
+                                html += `
+                                    <div class="pdf-box">
+                                        <div class="pdf-title">Prescription ${index + 1}</div>
+                                        <iframe class="pdf-viewer" src="${fileUrl}">
+                                            This browser does not support PDFs. 
+                                            <a href="${fileUrl}" download>Download PDF</a>.
+                                        </iframe>
+                                    </div>
+                                `;
+                            });
 
-        $('#prescription-select').on('select2:select', function (e) {
-            var customerId = e.params.data.id; // Assuming this is customer_id
-            console.log("customerId", customerId);
-
-            $.ajax({
-                url: `{{ route('search.prescription') }}`,
-                method: 'GET',
-                data: {
-                    customer_id: customerId
-                }, // Send customer_id, not prescriptionId
-                success: function (response) {
-                    if (response.status === 'success') {
-                        let html = '';
-                        response.files.forEach(function (fileUrl, index) {
-                            html += `
-                                            <div class="pdf-box">
-                                                <div class="pdf-title">Prescription ${index + 1}</div>
-                                                <iframe class="pdf-viewer" src="${fileUrl}">
-                                                    This browser does not support PDFs. 
-                                                    <a href="${fileUrl}" download>Download PDF</a>.
-                                                </iframe>
-                                            </div>
-                                        `;
-                        });
-
-                        $('.pdf-wrapper').html(html);
-                        $('#pdf-details').show();
-                    } else {
-                        $('.pdf-wrapper').html('No files available.');
+                            $('.pdf-wrapper').html(html);
+                            $('#pdf-details').show();
+                        } else {
+                            $('.pdf-wrapper').html('No files available.');
+                            $('#pdf-details').hide();
+                        }
+                    },
+                    error: function() {
+                        $('.pdf-wrapper').html('Error loading files.');
                         $('#pdf-details').hide();
                     }
-                },
-                error: function () {
-                    $('.pdf-wrapper').html('Error loading files.');
-                    $('#pdf-details').hide();
-                }
+                });
             });
         });
     </script>
