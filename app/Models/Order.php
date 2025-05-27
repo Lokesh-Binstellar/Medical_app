@@ -32,7 +32,7 @@ class Order extends Model
 
     public function customer()
     {
-        return $this->belongsTo(Customers::class, 'id');
+        return $this->belongsTo(Customers::class, 'user_id', 'id');
     }
 
 }
