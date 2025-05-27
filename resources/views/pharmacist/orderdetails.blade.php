@@ -19,6 +19,11 @@
             <strong>Note:</strong> Once an order is <strong>Accepted</strong>, its details will be visible here.<br>
             Please ensure to update the order status to <strong>Completed</strong> after the delivery boy has delivered the medicines, or to <strong>Cancelled</strong>.
         </div>
+        @elseif (Auth::user()->role->name === 'delivery_person')
+        <div class="alert alert-warning" role="alert">
+            <strong>Note:</strong> Once an order is <strong>assigned</strong>, its details will be visible here.<br>
+            Please ensure to update the order status to <strong>Completed</strong> after the delivery.
+        </div>
         @endif
         <div class="card-body">
             <div class="table-responsive text-nowrap" style="overflow-x: auto;">
@@ -63,57 +68,70 @@
                                     @endif
                                 </td>
                                 <td>
-                                    {{ ucfirst($order->delivery_options) }}
+                                    {{ ucfirst(str_replace('_', ' ', $order->delivery_options)) }}
                                 </td>
                                 @if (Auth::user()->role->name === 'admin')
-                                        @if($order->delivery_options === 'home_delivery')
-                                            <td>
-                                                <form action="{{ route('orders.assignDeliveryPerson', $order->id) }}" method="POST">
-                                                    @csrf
-                                                    <div class="d-flex align-items-center">
-                                                        <select name="delivery_person_id" class="form-select form-select-sm me-2" required>
-                                                            <option value="">-- Select Delivery Person --</option>
-                                                            @foreach($deliveryPersons as $person)
-                                                                <option value="{{ $person->id }}" {{ $order->delivery_person_id == $person->id ? 'selected' : '' }}>
-                                                                    {{ $person->name }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                        <button type="submit" class="btn btn-sm btn-primary">Assign</button>
-                                                    </div>
-                                                    
-                                                </form>
-                                            </td>
+                                @if($order->delivery_options === 'home_delivery' && $order->status == 0)
+                                    <td>
+                                        <form action="{{ route('orders.assignDeliveryPerson', $order->id) }}" method="POST">
+                                            @csrf
+                                            <div class="d-flex align-items-center">
+                                                <select name="delivery_person_id" class="form-select form-select-sm me-2" required>
+                                                    <option value="">-- Select Delivery Person --</option>
+                                                    @foreach($deliveryPersons as $person)
+                                                        <option value="{{ $person->id }}" {{ $order->delivery_person_id == $person->id ? 'selected' : '' }}>
+                                                            {{ $person->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <button type="submit" class="btn btn-sm btn-primary">Assign</button>
+                                            </div>
+                                        </form>
+                                    </td>
+                                @else
+                                    <td>
+                                        @if($order->status == 1)
+                                            <span class="text-success fw-semibold">Order is Delivered</span>
+                                        @elseif($order->status == 2)
+                                            <span class="text-danger fw-semibold">Order is Cancelled</span>
                                         @else
-                                            <td>{{ ucfirst($order->delivery_options) }}</td>
+                                            {{ ucfirst(str_replace('_', ' ', $order->delivery_options)) }}
                                         @endif
-                                    @endif
+                                    </td>
+                                @endif
+                            @endif
+
                                 
                                 <td>
-                                    {{ ucfirst($order->payment_option) }}
+                                    {{ ucfirst(str_replace('_', ' ', $order->payment_option)) }}
                                 </td>
                                 <td>
+                                @if ($order->status == 0)
+                                    <form action="{{ route('pharmacy.updateOrderStatus', $order->id) }}" method="POST"
+                                        class="d-inline-block status-form">
+                                        @csrf
+                                        @method('PUT')
+                                        <select name="status" class="form-select form-select-sm me-2 status-select">
+                                            <option value="">-- Update Status --</option>
 
-                                    @if ($order->status == 0)
-                                        <form action="{{ route('pharmacy.updateOrderStatus', $order->id) }}" method="POST"
-                                            class="d-flex align-items-center">
-                                            @csrf
-                                            @method('PUT')
-                                            <select name="status" class="form-select form-select-sm me-2"
-                                                onchange="this.form.submit()">
-                                                <option value="">-- Update Status --</option>
+                                            @if (Auth::user()->role->name === 'delivery_person')
+                                                <option value="1">Complete</option>
+                                            @else
                                                 <option value="1">Complete</option>
                                                 <option value="2">Cancel</option>
-                                            </select>
-                                        </form>
-                                    @else
-                                        @if ($order->status == 1)
-                                            <span class="badge bg-success">Delivered to Customer</span>
-                                        @elseif ($order->status == 2)
-                                            <span class="badge bg-danger">Order Cancelled</span>
-                                        @endif
+                                            @endif
+
+                                        </select>
+                                    </form>
+                                @else
+                                    @if ($order->status == 1)
+                                        <span class="badge bg-success">Delivered to Customer</span>
+                                    @elseif ($order->status == 2)
+                                        <span class="badge bg-danger">Order Cancelled</span>
                                     @endif
-                                </td>
+                                @endif
+                            </td>
+
                                 <td>
                                     <a href="{{ route('orders.medicines', $order->id) }}"
                                     class="btn btn-sm view-meds-btn bg-primary text-white"
@@ -161,4 +179,58 @@
 
 @section('scripts')
     <!-- Add custom JS if needed -->
+     <!-- SweetAlert Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.status-select').forEach(select => {
+        select.addEventListener('change', function () {
+            const form = this.closest('form');
+            const selectedValue = this.value;
+
+            if (selectedValue === "1") {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You are about to mark this order as completed.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, mark as complete!',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        confirmButton: 'btn btn-success me-2',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    } else {
+                        select.value = '';
+                    }
+                });
+            } else if (selectedValue === "2") {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You are about to cancel this order.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'No',
+                    customClass: {
+                        confirmButton: 'btn btn-danger me-2',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    } else {
+                        select.value = '';
+                    }
+                });
+            }
+        });
+    });
+});
+
+</script>
 @endsection
