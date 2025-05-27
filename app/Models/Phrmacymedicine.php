@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Phrmacymedicine extends Model
 {
     protected $fillable = [
-        'medicine','total_amount','commission_amount', 'phrmacy_id','mrp_amount'
+        'medicine','total_amount','commission_amount', 'phrmacy_id','mrp_amount','status'
     ];
 
     public function customer()

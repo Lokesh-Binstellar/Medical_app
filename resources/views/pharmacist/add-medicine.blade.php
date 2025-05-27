@@ -10,10 +10,11 @@
 
     <style>
         .Show-Medicine:hover {
-    color: #fefefe !important;
-    background-color: #033a62 !important;
-    /* border-color: #fefefe !important; */
-}
+            color: #fefefe !important;
+            background-color: #033a62 !important;
+            /* border-color: #fefefe !important; */
+        }
+
         /* Fix column widths */
         #medicine-table td,
         #medicine-table th {
@@ -289,6 +290,16 @@
                                 $pharmacyId = $entry->phrmacy_id;
                                 $medData = json_decode($entry->medicine, true);
                                 $customer = $entry->customer;
+                                $statusText = '';
+                                if ($entry->status == 0) {
+                                    $statusText = '<span class="badge rounded-pill bg-label-warning me-1">Request Sent</span>';
+                                } elseif ($entry->status == 1) {
+                                    $statusText = '<span class="badge rounded-pill bg-label-success me-1">Request Accepted</span>';
+                                } elseif ($entry->status == 2) {
+                                    $statusText = '<span class="badge rounded-pill bg-label-danger me-1">Request Cancelled</span>';
+                                }
+
+
 
                             @endphp
 
@@ -299,16 +310,42 @@
                                         type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $accordionId }}"
                                         aria-expanded="false" aria-controls="collapse{{ $accordionId }}">
 
-                                        <div class="text-start">
-                                            Record #{{ $accordionId }} (Pharmacy ID: {{ $pharmacyId }})<br>
-                                            Customer ID : {{ $entry->customer_id }}<br>
-                                            Customer Details : {{ $customer->firstName ?? 'N/A' }} | Phone:
-                                            {{ $customer->mobile_no ?? 'N/A' }}
-                                        </div>
+                                        <table class="table table-bordered table-sm w-auto">
+                                            <tbody>
+                                                <tr>
+                                                    <th><strong>Record #</strong></th>
+                                                    <td><strong>{{ $accordionId }}</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><strong>Customer Details</strong></th>
+                                                    <td><strong>Name: {{ $customer->firstName ?? 'N/A' }} | Phone:
+                                                            {{ $customer->mobile_no ?? 'N/A' }}</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <th><strong>Status</strong></th>
+                                                    <td><strong>{!! $statusText !!}</strong></td>
+                                                </tr>
+                                                @if ($entry->status == 1)
+                                                    <tr>
+                                                        <td colspan="2">
+                                                            <span class="text-danger">
+                                                                <strong>Note:</strong> Accepted order details will be displayed under
+                                                                <strong>Orders</strong>.
+                                                                You need to update the order status to <strong>Completed</strong> or
+                                                                <strong>Cancelled</strong> from there.
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                @endif
+                                            </tbody>
+                                        </table>
 
-        <a type="button" class="btn btn-primary Show-Medicine ">Show Medicine<i class="fa-solid fa-arrow-down pl-1"></i></a>
-    </button>
-</h2>
+
+
+                                        <a type="button" class="btn btn-primary Show-Medicine ">Show Medicine<i
+                                                class="fa-solid fa-arrow-down pl-1"></i></a>
+                                    </button>
+                                </h2>
 
 
                                 <div id="collapse{{ $accordionId }}" class="accordion-collapse collapse"
@@ -687,13 +724,13 @@
 
                             products.forEach(product => {
                                 html += `<tr>
-                                <td>${product.product_id}</td>
-                                 <td>${product.name}</td>
-                                <td>${product.packaging_detail}</td>
-                                <td>${product.quantity}</td>
-                                <td>${product.is_substitute}</td>
+                                                <td>${product.product_id}</td>
+                                                 <td>${product.name}</td>
+                                                <td>${product.packaging_detail}</td>
+                                                <td>${product.quantity}</td>
+                                                <td>${product.is_substitute}</td>
 
-                            </tr>`;
+                                            </tr>`;
                             });
 
                             $('#cart-product-body').html(html);
@@ -727,14 +764,14 @@
                         let html = '';
                         response.files.forEach(function (fileUrl, index) {
                             html += `
-                            <div class="pdf-box">
-                                <div class="pdf-title">Prescription ${index + 1}</div>
-                                <iframe class="pdf-viewer" src="${fileUrl}">
-                                    This browser does not support PDFs. 
-                                    <a href="${fileUrl}" download>Download PDF</a>.
-                                </iframe>
-                            </div>
-                        `;
+                                            <div class="pdf-box">
+                                                <div class="pdf-title">Prescription ${index + 1}</div>
+                                                <iframe class="pdf-viewer" src="${fileUrl}">
+                                                    This browser does not support PDFs. 
+                                                    <a href="${fileUrl}" download>Download PDF</a>.
+                                                </iframe>
+                                            </div>
+                                        `;
                         });
 
                         $('.pdf-wrapper').html(html);

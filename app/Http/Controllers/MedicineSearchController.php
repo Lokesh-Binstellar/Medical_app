@@ -9,6 +9,7 @@ use App\Models\Additionalcharges;
 use App\Models\CustomerAddress;
 use App\Models\Customers;
 use App\Models\Medicine;
+use App\Models\Order;
 use App\Models\Otcmedicine;
 use App\Models\Pharmacies;
 use App\Models\Phrmacymedicine;
@@ -96,7 +97,7 @@ class MedicineSearchController extends Controller
         $search = $request->input('query');
         $currentPharmacyId = $request->input('current_pharmacy_id');
 
-       $customerIds = DB::table('request_quotes')
+        $customerIds = DB::table('request_quotes')
             ->where('pharmacy_id', $currentPharmacyId)
             ->where('pharmacy_address_status', 0)
             ->pluck('customer_id');
@@ -134,7 +135,7 @@ class MedicineSearchController extends Controller
 
 
     public function allPharmacyRequests(Request $request)
-    { 
+    {
         $currentCustomer = $request->get('user_id');  // e.g. 2
 
         $getMedicine = Phrmacymedicine::with('pharmacy')
@@ -143,7 +144,7 @@ class MedicineSearchController extends Controller
             })
             ->get();
 
-        
+
 
         try {
             $combinations = $getMedicine->map(function ($item) {
@@ -187,7 +188,7 @@ class MedicineSearchController extends Controller
                 return [$item['product_id'] => $item['quantity']];
             });
 
-            $grouped = $getMedicine->groupBy('phrmacy_id')->map(function ($group, $pharmacyId) use ($cartQuantities, $quoteAddresses, $apiKey,$userId) {
+            $grouped = $getMedicine->groupBy('phrmacy_id')->map(function ($group, $pharmacyId) use ($cartQuantities, $quoteAddresses, $apiKey, $userId) {
                 $pharmacy = $group->first()->pharmacy;
                 $customerId = $group->first()->customer_id;
                 $key = $customerId . '_' . $pharmacyId;
@@ -205,43 +206,43 @@ class MedicineSearchController extends Controller
                 }
 
                 $decodedMedicines = $group->flatMap(function ($item) use ($cartQuantities) {
-                try {
-                    $decoded = is_string($item->medicine)
-                        ? json_decode($item->medicine, true)
-                        : $item->medicine;
+                    try {
+                        $decoded = is_string($item->medicine)
+                            ? json_decode($item->medicine, true)
+                            : $item->medicine;
 
-                    $decodedArray = is_array($decoded) ? $decoded : [$decoded];
+                        $decodedArray = is_array($decoded) ? $decoded : [$decoded];
 
-                    return collect($decodedArray)->map(function ($med) use ($cartQuantities) {
-                        $medId = $med['medicine_id'];
+                        return collect($decodedArray)->map(function ($med) use ($cartQuantities) {
+                            $medId = $med['medicine_id'];
 
-                        $image = Medicine::where('product_id', $medId)->value('image_url');
-                        if (!$image) {
-                            $image = Otcmedicine::where('otc_id', $medId)->value('image_url');
-                        }
+                            $image = Medicine::where('product_id', $medId)->value('image_url');
+                            if (!$image) {
+                                $image = Otcmedicine::where('otc_id', $medId)->value('image_url');
+                            }
 
-                        $med['image'] = $image ? asset('storage/' . $image) : null;
-                        $med['qty'] = $cartQuantities[$medId] ?? 0;
-                        $med['price'] = $med['discount'] ?? 0;
-                        unset($med['discount']);
+                            $med['image'] = $image ? asset('storage/' . $image) : null;
+                            $med['qty'] = $cartQuantities[$medId] ?? 0;
+                            $med['price'] = $med['discount'] ?? 0;
+                            unset($med['discount']);
 
-                        return [
-                            'medicine_id'      => $med['medicine_id'] ?? null,
-                            'medicine_name'    => $med['medicine_name'] ?? null,
-                            'qty'              => isset($med['qty']) ? (int) $med['qty'] : 0,
-                            'available'        => $med['available'] ?? null,
-                            'is_substitute'    => $med['is_substitute'] ?? null,
-                            'image'            => $med['image'] ?? null,
-                            'mrp'              => isset($med['mrp']) ? (float) $med['mrp'] : null,
-                            'price'            => isset($med['price']) ? (float) $med['price'] : null,
-                            'discount_percent' => isset($med['discount_percent']) ? (float) $med['discount_percent'] : null,
-                        ];
+                            return [
+                                'medicine_id' => $med['medicine_id'] ?? null,
+                                'medicine_name' => $med['medicine_name'] ?? null,
+                                'qty' => isset($med['qty']) ? (int) $med['qty'] : 0,
+                                'available' => $med['available'] ?? null,
+                                'is_substitute' => $med['is_substitute'] ?? null,
+                                'image' => $med['image'] ?? null,
+                                'mrp' => isset($med['mrp']) ? (float) $med['mrp'] : null,
+                                'price' => isset($med['price']) ? (float) $med['price'] : null,
+                                'discount_percent' => isset($med['discount_percent']) ? (float) $med['discount_percent'] : null,
+                            ];
 
-                    });
-                } catch (\Exception $e) {
-                    return [['error' => 'Invalid JSON']];
-                }
-            });
+                        });
+                    } catch (\Exception $e) {
+                        return [['error' => 'Invalid JSON']];
+                    }
+                });
 
 
                 $delivery_available = 'no';
@@ -302,7 +303,7 @@ class MedicineSearchController extends Controller
                     'item_price' => $group->sum('total_amount'),
                     'total_discount' => $group->sum('mrp_amount') > 0 ? round(($discount / $group->sum('mrp_amount')) * 100, 2) : 0,
                     'platform_fees' => $platfromfee,
-                    'total_price' => $group->sum('total_amount')  + $platfromfee,
+                    'total_price' => $group->sum('total_amount') + $platfromfee,
                     'rating' => $rating,
                     'distance' => $distance ?? 'Unknown',
                     'delivery_available' => $delivery_available,
@@ -393,14 +394,14 @@ class MedicineSearchController extends Controller
     {
         // Step 1: Get the customer_id from the request
         $customerId = $request->input('customer_id');
-        
+
         if (!$customerId) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Customer ID is required'
             ]);
         }
-        
+
         // Step 2: Check if customer_id exists in request_quotes table
         $requestQuoteExists = DB::table('request_quotes')->where('customer_id', $customerId)->first();
         // dd($requestQuoteExists);
@@ -412,9 +413,9 @@ class MedicineSearchController extends Controller
         }
 
         // Step 3: Fetch all prescriptions for this customer_id
-       $prescriptions = Prescription::where('customer_id', $customerId)
-                            ->where('status', 0)
-                              ->get();
+        $prescriptions = Prescription::where('customer_id', $customerId)
+            ->where('status', 0)
+            ->get();
 
         if ($prescriptions->isEmpty()) {
             return response()->json([
@@ -451,4 +452,43 @@ class MedicineSearchController extends Controller
             'files' => $fileUrls
         ]);
     }
+
+
+    public function orderdetails(Request $request)
+    {
+        $pharmacy = Pharmacies::where('user_id', Auth::user()->id)->first();
+
+        $medicines = Phrmacymedicine::where('phrmacy_id', Auth::user()->id)->get();
+
+        // Fetch orders where pharmacy_id matches current pharmacy
+        //$orders = Order::where('pharmacy_id', Auth::user()->id)->get();
+
+        $orders = Order::with('customer')->where('pharmacy_id', Auth::user()->id)->get();
+
+
+        return view('pharmacist.orderdetails', compact('medicines', 'pharmacy', 'orders'));
+    }
+
+    public function updateOrderStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:1,2',
+        ]);
+
+        $order = Order::findOrFail($id);
+        $order->status = $request->status;
+        $order->save();
+
+        return back()->with('success', 'Order status updated successfully.');
+    }
+
+    public function showMedicines($id)
+    {
+        $order = Order::with('customer')->findOrFail($id);
+        $medicines = json_decode($order->product_details, true);
+
+        return view('pharmacist.medicine_details', compact('order', 'medicines'));
+    }
+
+
 }

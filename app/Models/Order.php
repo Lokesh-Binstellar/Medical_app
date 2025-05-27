@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-   use HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'order_id',
@@ -16,15 +16,23 @@ class Order extends Model
         'items_price',
         'platform_fees',
         'total_price',
-       'delivery_charges',
+        'delivery_charges',
         'delivery_address',
         'delivery_options',
         'add_patient',
         'payment_option',
         'status',
+        'selected_pharmacy_address',
+        'selected_pharmacy_latlong'
     ];
 
     protected $casts = [
         'product_details' => 'array', // Automatically cast JSON to array
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customers::class, 'id');
+    }
+
 }

@@ -217,6 +217,10 @@ Route::group(['middleware' => ['auth']], function () {
     });
     Route::prefix('search-medicine')->group(function () {
         Route::get('/pharmacist/add-medicine', [MedicineSearchController::class, 'index'])->name('add.medicine');
+        Route::get('/pharmacist/order-details', [MedicineSearchController::class, 'orderdetails'])->name('orderdetails');
+        Route::put('/pharmacy/orders/{id}/status', [MedicineSearchController::class, 'updateOrderStatus'])->name('pharmacy.updateOrderStatus');
+        Route::get('/orders/{id}/medicines', [MedicineSearchController::class, 'showMedicines'])->name('orders.medicines');
+
         Route::get('/search-medicine', [MedicineSearchController::class, 'search'])->name('search.medicine');
         Route::post('/add-medicine', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
         Route::post('/medicines/store', [MedicineSearchController::class, 'store'])->name('medicines.store');
