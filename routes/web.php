@@ -242,6 +242,7 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/fetch-cart-by-customer', [MedicineSearchController::class, 'fetchCartByCustomer']);
         Route::get('/fetch-prescription-files', [MedicineSearchController::class, 'fetchPrescriptionFiles'])->name('search.prescription');
+        
     });
 
     // Route::post('/add-medicine/store', [MedicineSearchController::class, 'store'])->name('add.medicine.store');

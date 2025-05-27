@@ -53,7 +53,7 @@ Route::middleware('check.api.key')->group(function () {
         Route::post('/customer/address', [CustomerAddressController::class, 'store']);
         Route::get('/customerAddressFetch', [CustomerAddressController::class, 'getAddress']);
         Route::put('/customerDetails', [AuthController::class, 'update']);
-        Route::get('getcustomerdetails', [AuthController::class, 'getCustomerDetails']);
+        Route::get('/getcustomerdetails', [AuthController::class, 'getCustomerDetails']);
 
         Route::post('/upload-file', [FileUploadController::class, 'upload']);
 

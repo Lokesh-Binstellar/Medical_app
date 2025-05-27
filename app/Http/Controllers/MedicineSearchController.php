@@ -38,14 +38,22 @@ class MedicineSearchController extends Controller
 
         // Get pharmacy info
         $pharmacy = Pharmacies::where('user_id', $user->id)->first();
-        // dd($pharmacy);
+
+        // ✅ Calculate total quantity from all medicine entries
+        $totalQuantity = 0;
+        if (isset($data['medicine']) && is_array($data['medicine'])) {
+            foreach ($data['medicine'] as $medicine) {
+                $totalQuantity += intval($medicine['quantity'] ?? 0);
+            }
+        }
 
         // Save medicine
         $medicine = new Phrmacymedicine();
         $medicine->medicine = json_encode($data['medicine']);
-        $medicine->total_amount = $data['total_amount'];
-        $medicine->mrp_amount = $data['mrp_amount'];
-        $medicine->commission_amount = $data['commission_amount'];
+        $medicine->quantity = $totalQuantity; // ✅ Use calculated total quantity
+        $medicine->total_amount = $data['total_amount'] ?? 0; // ✅ Add fallback
+        $medicine->mrp_amount = $data['mrp_amount'] ?? 0; // ✅ Add fallback
+        $medicine->commission_amount = $data['commission_amount'] ?? 0; // ✅ Add fallback
         $medicine->phrmacy_id = $pharmacy->user_id;
         $medicine->customer_id = $data['customer'][0]['customer_id'];
         $medicine->save();
@@ -133,8 +141,6 @@ class MedicineSearchController extends Controller
 
     }
 
-
-
     public function allPharmacyRequests(Request $request)
     {
         $currentCustomer = $request->get('user_id');  // e.g. 2
@@ -144,8 +150,6 @@ class MedicineSearchController extends Controller
                 $query->where('customer_id', $currentCustomer);
             })
             ->get();
-
-
 
         try {
             $combinations = $getMedicine->map(function ($item) {
@@ -188,8 +192,6 @@ class MedicineSearchController extends Controller
             $cartQuantities = collect($carts)->mapWithKeys(function ($item) {
                 return [$item['product_id'] => $item['quantity']];
             });
-
-
 
             $grouped = $getMedicine->groupBy('phrmacy_id')->map(function ($group, $pharmacyId) use ($cartQuantities, $quoteAddresses, $apiKey, $userId) {
                 $pharmacy = $group->first()->pharmacy;
@@ -354,8 +356,6 @@ class MedicineSearchController extends Controller
         return false;
     }
 
-
-
     public function fetchCartByCustomer(Request $request)
     {
         $customerId = $request->input('customer_id');
@@ -375,34 +375,56 @@ class MedicineSearchController extends Controller
             $packagingDetail = $item['packaging_detail'] ?? '';
             $quantity = $item['quantity'] ?? 1;
 
+            // ✅ First try to find in medicines table
             $medicine = Medicine::where('product_id', $productId)->first();
-            $medName = $medicine->product_name . ' + ' . $medicine->salt_composition;
+            $medName = null;
             $type = 'medicine';
 
-            // If not found in medicines, try otcmedicines
-            if (!$medicine) {
-                $medicine = Otcmedicine::where('otc_id', $productId)->first();
-                $medName = $medicine->name;
-                $type = 'otc';
+            if ($medicine) {
+                // ✅ Check if product_name and salt_composition exist before concatenating
+                $productName = $medicine->product_name ?? 'Unknown Product';
+                $saltComposition = $medicine->salt_composition ?? '';
+                $medName = $saltComposition ? $productName . ' + ' . $saltComposition : $productName;
+            } else {
+                // ✅ If not found in medicines, try otcmedicines
+                $otcMedicine = Otcmedicine::where('otc_id', $productId)->first();
+                if ($otcMedicine) {
+                    $medName = $otcMedicine->name ?? 'Unknown OTC Medicine';
+                    $type = 'otc';
+                }
             }
 
-            if ($medicine) {
+            // ✅ Only add to result if we found a valid medicine
+            if ($medName) {
                 $result[] = [
                     'product_id' => $productId,
                     'type' => $type,
-                    'name' => $medName ?? 'N/A',
+                    'name' => $medName,
+                    'packaging_detail' => $packagingDetail,
+                    'quantity' => $quantity,
+                    'is_substitute' => $isSubstitute,
+                ];
+            } else {
+                // ✅ Log or handle products that don't exist in either table
+                \Log::warning("Product not found in medicines or otcmedicines tables", [
+                    'product_id' => $productId,
+                    'customer_id' => $customerId
+                ]);
+                
+                // ✅ Optionally, you can still add it with a placeholder name
+                $result[] = [
+                    'product_id' => $productId,
+                    'type' => 'unknown',
+                    'name' => 'Product Not Found (ID: ' . $productId . ')',
                     'packaging_detail' => $packagingDetail,
                     'quantity' => $quantity,
                     'is_substitute' => $isSubstitute,
                 ];
             }
         }
-        // dd($result);
 
         return response()->json(['status' => 'success', 'data' => $result]);
     }
-
-
 
     public function fetchPrescriptionFiles(Request $request)
     {
