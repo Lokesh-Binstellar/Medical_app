@@ -9,12 +9,14 @@ use Illuminate\Http\Request;
 use App\Models\Laboratories;
 use App\Models\CustomerAddress;
 use App\Models\Additionalcharges;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Carbon;
 
 class LabRequestQuoteController extends Controller
 {
     public function index()
     {
-        $notifications = DatabaseNotification::all();
+        $notifications =DatabaseNotification::all();
 
         $formattedNotifications = $notifications->map(function ($not) {
             $data = $not->data;
@@ -98,6 +100,7 @@ class LabRequestQuoteController extends Controller
                 if (strcasecmp(trim($lab->city), trim($address->city)) === 0) {
 
                     $labTests = json_decode($lab->test, true);
+            
                     if (!is_array($labTests)) {
                         continue;
                     }

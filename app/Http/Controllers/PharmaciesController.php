@@ -227,7 +227,7 @@ class PharmaciesController extends Controller
         });
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $pharmacyData
         ], 200);
     }

@@ -59,7 +59,7 @@
                     </li>
                 @endif
 
-                @if (in_array('Pharmacies', $permissions) || $isSuperAdmin == 1)
+                @if ( $isSuperAdmin == 1)
                     <li class="menu-item {{ Route::current()->getName() == 'pharmacist.index' ? 'active' : '' }}">
                         <a href="{{ route('pharmacist.index') }}" class="menu-link">
                             <div data-i18n="Pharmacies">Pharmacies</div>

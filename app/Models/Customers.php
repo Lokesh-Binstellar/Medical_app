@@ -14,6 +14,7 @@ class Customers extends Model
         'otp_expires_at',
         'firstName',
         'lastName',
+        'email',
         'mobile_no_verified_at',
     ];
 

@@ -183,7 +183,7 @@
                                                         class="form-control packaging-info" readonly>
                                                 </td>
                                                 <td>
-                                                    <input type="number" name="medicine[0][quantity]" class="form-control">
+                                                    <input type="number" name="medicine[0][quantity]" class="form-control" min="1"> 
                                                 </td>
 
                                                 <td>
