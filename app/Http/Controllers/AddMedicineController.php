@@ -236,10 +236,10 @@ class AddMedicineController extends Controller
             if (!$cart) {
                 return response()->json(
                     [
-                        'status' => false,
-                        'message' => 'No cart records found for customer ID ' . $id,
+                        'status' => true,
+                        'data' => []
                     ],
-                    404,
+                    200,
                 );
             }
 
