@@ -159,7 +159,7 @@
                     <div class="card " style="display:none;" id="cart-details">
                         <h5 class="card-header ">Customer Cart Details</h5>
                         <div class="card-body">
-                            <div class="table-responsive text-nowrap">
+                            <div class="table-responsive">
                                 <table class="table table-bordered">
                                     <thead class="table-light">
                                         <tr>

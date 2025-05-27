@@ -25,6 +25,7 @@ class Laboratories extends Model
         'gstno',
         'nabl_iso_certified',
         'test',
+        'package_details',
         'pickup',
         'status',
     ];

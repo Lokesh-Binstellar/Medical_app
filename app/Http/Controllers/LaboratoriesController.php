@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Laboratories;
 use App\Models\LabTest;
+use App\Models\PackageCategory;
 use App\Models\User;
 use File;
 use Illuminate\Http\Request;
@@ -64,7 +65,9 @@ class LaboratoriesController extends Controller
     public function create()
     {
         $tests = LabTest::all();
-        return view('laboratorie.create', compact('tests'));
+        $categories = PackageCategory::select('id', 'name')->get();
+
+        return view('laboratorie.create', compact('tests', 'categories'));
     }
 
     /**
@@ -74,43 +77,46 @@ class LaboratoriesController extends Controller
     {
         $params = $request->all();
 
-        // Validate
-        $validation = validator($params, [
-            'lab_name' => 'required',
-            'owner_name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'phone' => 'required|min:11|numeric',
-            'city' => 'required',
-            'state' => 'required',
-            'pincode' => 'required',
-            'address' => 'required',
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'image' => 'nullable|file|image|max:10240',
-            'username' => 'required',
-            'password' => 'required',
-            'license' => 'required',
-            'nabl_iso_certified' => 'required|boolean',
-            'pickup' => 'required',
-            'gstno' => 'nullable|string|max:20',
-            'test' => 'nullable|array',
-            'test.*' => 'string',
-            'price' => 'nullable|array',
-            'homeprice' => 'nullable|array',
-            'report' => 'nullable|array',
-            'offer_visiting_price' => 'nullable|array',
-            'offer_home_price' => 'nullable|array',
-            'package_name' => 'nullable|array',
-            'package_name.*' => 'string',
-            'package_test_contains' => 'nullable|array',
-            'package_test_contains.*' => 'string',
-            'package_description' => 'nullable|array',
-            'package_description.*' => 'string',
-        ]);
+        // $validation = validator($params, [
+        //     'lab_name' => 'required|string',
+        //     'owner_name' => 'required|string',
+        //     'email' => 'required|email|unique:users,email',
+        //     'phone' => 'required|numeric|digits_between:11,15',
+        //     'city' => 'required|string',
+        //     'state' => 'required|string',
+        //     'pincode' => 'required|string',
+        //     'address' => 'required|string',
+        //     'latitude' => 'required|string',
+        //     'longitude' => 'required|string',
+        //     'image' => 'nullable|file|image|max:10240',
+        //     'username' => 'required|string',
+        //     'password' => 'required|string',
+        //     'license' => 'required|string',
+        //     'nabl_iso_certified' => 'required|boolean',
+        //     'pickup' => 'required|string',
+        //     'gstno' => 'nullable|string|max:20',
+        //     'test' => 'nullable|array',
+        //     'test.*' => 'string',
+        //     'price' => 'nullable|array',
+        //     'homeprice' => 'nullable|array',
+        //     'report' => 'nullable|array',
+        //     'offer_visiting_price' => 'nullable|array',
+        //     'offer_home_price' => 'nullable|array',
+        //     'package_details.*' => 'string',
+        //     // Package fields:
+        //     'package_name' => 'nullable|array',
+        //     'package_visiting_price' => 'nullable|array',
+        //     'package_home_price' => 'nullable|array',
+        //     'package_report' => 'nullable|array',
+        //     'package_offer_visiting_price' => 'nullable|array',
+        //     'package_offer_home_price' => 'nullable|array',
+        //     'package_description' => 'nullable|array',
+        //     'package_category' => 'nullable|array',
+        // ]);
 
-        if ($validation->fails()) {
-            return back()->withErrors($validation)->withInput();
-        }
+        // if ($validation->fails()) {
+        //     return back()->withErrors($validation)->withInput();
+        // }
 
         $roleId = \App\Models\Role::where('name', 'laboratory')->value('id');
 
@@ -131,6 +137,7 @@ class LaboratoriesController extends Controller
             $image->move($destinationPath, $imageName);
             $params['image'] = $imageName;
         }
+
         //test details
         $testData = [];
         $tests = $request->test ?? [];
@@ -138,7 +145,7 @@ class LaboratoriesController extends Controller
         $homeprices = $request->homeprice ?? [];
         $report = $request->report ?? [];
         $offer_visiting_price = $request->offer_visiting_price ?? [];
-        $offer_home_price = $request->offer_visiting_price ?? [];
+        $offer_home_price = $request->offer_home_price ?? [];
 
         foreach ($tests as $key => $test) {
             $testData[] = [
@@ -151,50 +158,63 @@ class LaboratoriesController extends Controller
             ];
         }
         //package details json data
+
         $packageData = [];
         $package_names = $request->package_name ?? [];
-        $package_test_contains = $request->package_test_contains ?? [];
         $package_descriptions = $request->package_description ?? [];
+        $package_visiting_prices = $request->package_visiting_price ?? [];
+        $package_home_prices = $request->package_home_price ?? [];
+        $package_reports = $request->package_report ?? [];
+        $package_offer_visiting_prices = $request->package_offer_visiting_price ?? [];
+        $package_offer_home_prices = $request->package_offer_home_price ?? [];
+        $package_categories = $request->package_category ?? [];
 
         foreach ($package_names as $key => $name) {
             $packageData[] = [
                 'package_name' => $name,
-                'package_test_contains' => $package_test_contains[$key] ?? null,
                 'package_description' => $package_descriptions[$key] ?? null,
+                'package_visiting_price' => $package_visiting_prices[$key] ?? null,
+                'package_home_price' => $package_home_prices[$key] ?? null,
+                'package_report' => $package_reports[$key] ?? null,
+                'package_offer_visiting_price' => $package_offer_visiting_prices[$key] ?? null,
+                'package_offer_home_price' => $package_offer_home_prices[$key] ?? null,
+                'package_category' => $package_categories[$key] ?? null,
             ];
         }
+        // dd( $packageData);
+
+        // Assuming $testData is prepared somewhere before, else default empty array
+        //$testData = $request->test ?? [];
 
         $params['test'] = json_encode($testData);
         $params['package_details'] = json_encode($packageData);
-        unset($params['price'], $params['homeprice'], $params['report'], $params['offer_visiting_price'], $params['offer_home_price'], $params['package_name'], $params['package_test_contains'], $params['package_description']);
+
+        unset($params['price'], $params['homeprice'], $params['report'], $params['offer_visiting_price'], $params['offer_home_price'], $params['package_name'], $params['package_description'], $params['package_visiting_price'], $params['package_home_price'], $params['package_report'], $params['package_offer_visiting_price'], $params['package_offer_home_price'], $params['package_category']);
 
         Laboratories::create($params);
 
-        // dd( );
         return redirect()->route('laboratorie.index')->with('success', 'Laboratory created successfully.');
     }
 
     /**
      * Display the specified resource.
-     */ public function show($id)
+     */
+    public function show($id)
     {
         // Fetch the laboratory details
         $lab = Laboratories::findOrFail($id);
 
-        // Decode the JSON data from the 'test' column
-        $testData = json_decode($lab->test, true); // Decode the JSON into an array
+        // Decode JSON fields
+        $testData = json_decode($lab->test, true);
+        $packageData = json_decode($lab->package_details, true);
 
-        // Prepare the lab tests with their names and prices
         $labTests = [];
+        $packageDetails = [];
 
+        // Lab Test Processing
         foreach ($testData as $test) {
-            // Fetch the test name from lab_tests table based on test ID
-            $testInfo = \DB::table('lab_tests')
-                ->where('id', $test['test']) // Match test ID
-                ->select('name as test_name')
-                ->first();
+            $testInfo = \DB::table('lab_tests')->where('id', $test['test'])->select('name as test_name')->first();
 
-            // Append the test info to the labTests array
             $labTests[] = [
                 'test_name' => $testInfo ? $testInfo->test_name : 'Unknown',
                 'price' => $test['price'],
@@ -205,8 +225,35 @@ class LaboratoriesController extends Controller
             ];
         }
 
-        // Pass the laboratory details and the parsed tests to the view
-        return view('laboratorie.show', compact('lab', 'labTests'));
+        // Package Processing
+        foreach ($packageData as $package) {
+            $categoryIds = [];
+
+            // Get category IDs as array
+            if (!empty($package['package_category'])) {
+                if (is_string($package['package_category'])) {
+                    $categoryIds = explode(',', $package['package_category']);
+                } elseif (is_array($package['package_category'])) {
+                    $categoryIds = $package['package_category'];
+                }
+            }
+
+            // Get all category names from IDs
+            $categoryNames = PackageCategory::whereIn('id', $categoryIds)->pluck('name')->toArray();
+
+            $packageDetails[] = [
+                'package_name' => $package['package_name'] ?? 'Unknown',
+                'package_description' => $package['package_description'] ?? '',
+                'package_visiting_price' => $package['package_visiting_price'] ?? 0,
+                'package_home_price' => $package['package_home_price'] ?? 0,
+                'package_report' => $package['package_report'] ?? '',
+                'package_offer_visiting_price' => $package['package_offer_visiting_price'] ?? 0,
+                'package_offer_home_price' => $package['package_offer_home_price'] ?? 0,
+                'package_category' => $categoryNames,
+            ];
+        }
+
+        return view('laboratorie.show', compact('lab', 'labTests', 'packageDetails'));
     }
 
     /**
@@ -217,10 +264,14 @@ class LaboratoriesController extends Controller
         $laboratorie = Laboratories::findOrFail($id);
 
         $labTests = json_decode($laboratorie->test, true) ?? [];
-
+        $categories = PackageCategory::select('id', 'name')->get();
+        $cat1 = json_decode($laboratorie->package_details, true) ?? [];
+        // dd($cat1);
+        $cat = $cat1[0]['package_category'] ?? [];
+        // $packageCtegory=PackageCategory::all();
         $allTests = LabTest::all();
 
-        return view('laboratorie.edit', compact('laboratorie', 'labTests', 'allTests'));
+        return view('laboratorie.edit', compact('laboratorie', 'labTests', 'allTests', 'categories', 'cat'));
     }
 
     /**
@@ -254,6 +305,17 @@ class LaboratoriesController extends Controller
             'report.*' => 'nullable|string',
             'offer_visiting_price.*' => 'nullable|string',
             'offer_home_price.*' => 'nullable|string',
+            // Package fields:
+            'package_details.*' => 'string',
+            'package_name.*' => 'nullable|string',
+            'package_visiting_price.*' => 'nullable|string',
+            'package_home_price.*' => 'nullable|string',
+            'package_report.*' => 'nullable|string',
+            'package_offer_visiting_price.*' => 'nullable|string',
+            'package_offer_home_price.*' => 'nullable|string',
+            'package_description.*' => 'nullable|string',
+            'package_category.*' => 'nullable|array',
+            'package_category.*.*' => 'string',
         ]);
 
         $data = $request->only(['lab_name', 'owner_name', 'email', 'phone', 'city', 'state', 'pincode', 'address', 'latitude', 'longitude', 'username', 'license', 'pickup', 'gstno', 'nabl_iso_certified']);
@@ -272,6 +334,7 @@ class LaboratoriesController extends Controller
         }
 
         $existingTests = json_decode($laboratorie->test, true) ?? [];
+        $existingPackage = json_decode($laboratorie->package_details, true) ?? [];
 
         // Prepare test data to update
         $testData = [];
@@ -311,16 +374,71 @@ class LaboratoriesController extends Controller
             }
         }
 
+        $package_names = $request->package_name ?? [];
+        $package_descriptions = $request->package_description ?? [];
+        $package_visiting_prices = $request->package_visiting_price ?? [];
+        $package_home_prices = $request->package_home_price ?? [];
+        $package_reports = $request->package_report ?? [];
+        $package_offer_visiting_prices = $request->package_offer_visiting_price ?? [];
+        $package_offer_home_prices = $request->package_offer_home_price ?? [];
+        $package_categories = $request->package_category ?? [];
+
+        $packageDataToAdd = [];
+
+        foreach ($package_names as $key => $name) {
+            if (!empty($name)) {
+                $found = false;
+
+                foreach ($existingPackage as $index => $existingPkg) {
+                    if ($existingPkg['package_name'] == $name) {
+                        $updatedPkg = [
+                            'package_name' => $name,
+                            'package_description' => $package_descriptions[$key] ?? ($existingPkg['package_description'] ?? null),
+                            'package_visiting_price' => $package_visiting_prices[$key] ?? ($existingPkg['package_visiting_price'] ?? null),
+                            'package_home_price' => $package_home_prices[$key] ?? ($existingPkg['package_home_price'] ?? null),
+                            'package_report' => $package_reports[$key] ?? ($existingPkg['package_report'] ?? null),
+                            'package_offer_visiting_price' => $package_offer_visiting_prices[$key] ?? ($existingPkg['package_offer_visiting_price'] ?? null),
+                            'package_offer_home_price' => $package_offer_home_prices[$key] ?? ($existingPkg['package_offer_home_price'] ?? null),
+                            'package_category' => $package_categories[$key] ?? ($existingPkg['package_category'] ?? null),
+                        ];
+
+                        $existingPackage[$index] = $updatedPkg;
+                        $found = true;
+                        break;
+                    }
+                }
+
+                if (!$found) {
+                    $packageDataToAdd[] = [
+                        'package_name' => $name,
+                        'package_description' => $package_descriptions[$key] ?? null,
+                        'package_visiting_price' => $package_visiting_prices[$key] ?? null,
+                        'package_home_price' => $package_home_prices[$key] ?? null,
+                        'package_report' => $package_reports[$key] ?? null,
+                        'package_offer_visiting_price' => $package_offer_visiting_prices[$key] ?? null,
+                        'package_offer_home_price' => $package_offer_home_prices[$key] ?? null,
+                        'package_category' => $package_categories[$key] ?? null,
+                    ];
+                }
+            }
+        }
+
         $mergedTests = array_merge($existingTests, $testData);
+        $mergedPackages = array_merge($existingPackage, $packageDataToAdd);
 
         $uniqueTests = [];
         foreach ($mergedTests as $test) {
             $uniqueTests[$test['test']] = $test;
         }
 
+        $uniquePackages = [];
+        foreach ($mergedPackages as $pkg) {
+            $uniquePackages[$pkg['package_name']] = $pkg;
+        }
         // Re-index the array
         $testData = array_values($uniqueTests);
-
+        $packageDataFinal = array_values($uniquePackages);
+        $data['package_details'] = json_encode($packageDataFinal);
         $data['test'] = json_encode($testData);
 
         $laboratorie->update($data);
@@ -360,4 +478,63 @@ class LaboratoriesController extends Controller
             return redirect()->route('laboratorie.index')->with('error', 'Failed to delete laboratory');
         }
     }
+
+public function getAllLaboratory()
+{
+    try {
+        $laboratories = Laboratories::all();
+
+        // Correct: Fetch category names from PackageCategory
+        $categories = PackageCategory::pluck('name', 'id')->toArray();
+
+        // Correct: Fetch test names from Test model
+        $tests = LabTest::pluck('name', 'id')->toArray();
+
+        $labs = $laboratories->map(function ($lab) use ($categories, $tests) {
+            // Decode test data
+            $decodedTests = $lab->test ? json_decode($lab->test, true) : [];
+
+            foreach ($decodedTests as &$test) {
+                if (isset($test['test'])) {
+                    $test['test_name'] = $tests[$test['test']] ?? 'Unknown';
+                    unset($test['test']); // hide ID if needed
+                }
+            }
+            $lab->test = $decodedTests;
+
+            // Decode and map package categories
+            $packages = $lab->package_details ? json_decode($lab->package_details, true) : [];
+
+            foreach ($packages as &$package) {
+                if (!empty($package['package_category']) && is_array($package['package_category'])) {
+                    $package['package_category_names'] = array_map(function ($catId) use ($categories) {
+                        return $categories[$catId] ?? 'Unknown';
+                    }, $package['package_category']);
+                } else {
+                    $package['package_category_names'] = [];
+                }
+
+                unset($package['package_category']);
+            }
+
+            $lab->package_details = $packages;
+
+            return $lab;
+        });
+
+        return response()->json([
+            'status' => true,
+            'data' => $labs,
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error in getAllLaboratory: ' . $e->getMessage());
+
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong. Please try again later.',
+            'error' => $e->getMessage(), // remove in production
+        ], 500);
+    }
+}
+
 }
