@@ -7,7 +7,11 @@
 
 @section('content')
     <div class="card">
-        <h5 class="card-header fw-bold">Order Details</h5>
+        <h5 class="card-header fw-bold">Order Details</h5><br>
+        <div class="alert alert-warning" role="alert">
+            <strong>Note:</strong> Once an order is <strong>Accepted</strong>, its details will be visible here.<br>
+            Please ensure to update the order status to <strong>Completed</strong> after the customer has picked up the medicines, or to <strong>Cancelled</strong> if the pickup does not occur within 24 hours.
+        </div>
         <div class="card-body">
             <div class="table-responsive text-nowrap">
                 <table class="table table-bordered">

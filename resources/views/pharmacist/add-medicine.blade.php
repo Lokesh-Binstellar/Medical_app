@@ -233,7 +233,7 @@
                                     <td>
                                         <select name="medicine[0][is_substitute]" class="form-select">
                                             <option value="yes">Yes</option>
-                                            <option value="no">No</option>
+                                            <option value="no" selected>No</option>
                                         </select>
                                     </td>
                                     <td>
@@ -310,7 +310,7 @@
                                         type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $accordionId }}"
                                         aria-expanded="false" aria-controls="collapse{{ $accordionId }}">
 
-                                        <table class="table table-bordered table-sm w-auto">
+                                        <table class="table table-bordered table-sm w-auto" style="border: 1px solid black;">
                                             <tbody>
                                                 <tr>
                                                     <th><strong>Record #</strong></th>
