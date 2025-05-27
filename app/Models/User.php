@@ -99,4 +99,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Laboratories::class);
     }
+
+    public function deliveryProfile()
+    {
+        return $this->hasOne(DeliveryPerson::class, 'user_id', 'id');
+    }
+
 }

@@ -300,7 +300,7 @@
             </li>
         @endif
 
-        @if (in_array('Pharmacies', $permissions))
+        @if (in_array('Pharmacies', $permissions) || $isSuperAdmin == 1 || in_array('Orders', $permissions))
             <li class="menu-item {{ in_array(Route::current()->getName(), ['orderdetails']) ? 'active' : '' }}">
                 <a href="{{ route('orderdetails') }}" class="menu-link">
                     <i class="menu-icon ri ri-list-ordered"></i>

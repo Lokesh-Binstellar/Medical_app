@@ -23,7 +23,8 @@ class Order extends Model
         'payment_option',
         'status',
         'selected_pharmacy_address',
-        'selected_pharmacy_latlong'
+        'selected_pharmacy_latlong',
+        'delivery_person_id'
     ];
 
     protected $casts = [

@@ -15,6 +15,7 @@ use App\Models\Pharmacies;
 use App\Models\Phrmacymedicine;
 use App\Models\Prescription;
 use App\Models\RequestQuote;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -477,9 +478,44 @@ class MedicineSearchController extends Controller
         //$orders = Order::where('pharmacy_id', Auth::user()->id)->get();
 
         $orders = Order::with('customer')->where('pharmacy_id', Auth::user()->id)->get();
+        $roleName = Auth::user()->role->name;
 
 
-        return view('pharmacist.orderdetails', compact('medicines', 'pharmacy', 'orders'));
+        if ($roleName === 'admin') {
+            // Admin: Get all orders
+            $orders = Order::with('customer')->get();
+        } elseif ($roleName === 'pharmacy') {
+            // Pharmacy: Get orders for that pharmacy
+            $orders = Order::with('customer')
+                ->where('pharmacy_id', Auth::id())
+                ->get();
+        } elseif ($roleName === 'laboratory') {
+            // Laboratory: Get orders for that lab
+            $orders = Order::with('customer')
+                ->where('lab_id', Auth::id())
+                ->get();
+        } elseif ($roleName === 'delivery_person') {
+            // Delivery Person: Get only assigned orders
+            $orders = Order::with('customer')
+                ->where('delivery_person_id', Auth::id())
+                ->get();
+        } else {
+            // Unknown or unauthorized role: return empty
+            $orders = collect();
+        }
+
+
+        // $deliveryPersons = User::whereHas('role', function ($q) {
+        //     $q->where('name', 'delivery_person');
+        // })->get();
+
+        $deliveryPersons = User::with('deliveryProfile')->whereHas('role', function ($q) {
+            $q->where('name', 'delivery_person');
+        })->get();
+
+
+
+        return view('pharmacist.orderdetails', compact('medicines', 'pharmacy', 'orders','deliveryPersons'));
     }
 
     public function updateOrderStatus(Request $request, $id)
@@ -502,6 +538,19 @@ class MedicineSearchController extends Controller
 
         return view('pharmacist.medicine_details', compact('order', 'medicines'));
     }
+
+    public function assignDeliveryPerson(Request $request, Order $order)
+    {
+        $request->validate([
+            'delivery_person_id' => 'required|exists:users,id',
+        ]);
+
+        $order->delivery_person_id = $request->delivery_person_id;
+        $order->save();
+
+        return back()->with('success', 'Delivery person assigned successfully.');
+    }
+
 
 
 }

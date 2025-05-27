@@ -67,7 +67,7 @@ class DeliveryPersonController extends Controller
             return back()->withErrors($validation)->withInput();
         }
 
-        $roleId = \App\Models\Role::where('name', 'Delivery person')->value('id');
+        $roleId = \App\Models\Role::where('name', 'delivery_person')->value('id');
 
         $user = User::create([
             'name' => $request->username,

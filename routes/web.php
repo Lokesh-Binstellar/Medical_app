@@ -232,6 +232,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/pharmacist/order-details', [MedicineSearchController::class, 'orderdetails'])->name('orderdetails');
         Route::put('/pharmacy/orders/{id}/status', [MedicineSearchController::class, 'updateOrderStatus'])->name('pharmacy.updateOrderStatus');
         Route::get('/orders/{id}/medicines', [MedicineSearchController::class, 'showMedicines'])->name('orders.medicines');
+        Route::post('/orders/{order}/assign-delivery', [MedicineSearchController::class, 'assignDeliveryPerson'])->name('orders.assignDeliveryPerson');
+
 
         Route::get('/search-medicine', [MedicineSearchController::class, 'search'])->name('search.medicine');
         Route::post('/add-medicine', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
