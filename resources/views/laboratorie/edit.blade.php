@@ -3,6 +3,8 @@
 @section('styles')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/katex.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}" />
 @endsection
 @section('content')
     <div class="container">
@@ -205,11 +207,6 @@
                                 <label class="form-check-label" for="pickup_no">No</label>
                             </div>
                         </div>
-
-
-
-
-
                         {{-- Image --}}
                         <div class="col-md-6">
                             @if ($laboratorie->image)
@@ -230,67 +227,243 @@
                                 <label for="address">Address</label>
                             </div>
                         </div>
-                        <div id="formRepeater">
-                            @foreach ($labTests as $index => $item)
-                                <div class="row g-3 align-items-end mb-3 repeater-group">
-                                    <div class="col-md-2">
-                                        <label class="form-label fw-semibold">Test</label>
-                                        <select name="test[]" class="form-select" required>
-                                            <option value="">Select Test</option>
-                                            @foreach ($allTests as $test)
-                                                <option value="{{ $test->id }}"
-                                                    {{ $test->id == $item['test'] ? 'selected' : '' }}>
-                                                    {{ $test->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label fw-semibold">Visiting Price</label>
-                                        <input type="number" class="form-control" name="price[]" min="0"
-                                            value="{{ $item['price'] ?? '' }}" placeholder="e.g. 10 Rs" required>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label fw-semibold">Home Price</label>
-                                        <input type="number" class="form-control" name="homeprice[]" min="0"
-                                            value="{{ $item['homeprice'] ?? '' }}" placeholder="e.g. 15 Rs" required>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label fw-semibold">Report Time</label>
-                                        <input type="text" class="form-control" name="report[]" min="0"
-                                            value="{{ $item['report'] ?? '' }}" placeholder="Home Price" required>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label fw-semibold">Offer Visiting Price</label>
-                                        <input type="text" class="form-control" name="offer_visiting_price[]"
-                                            min="0" value="{{ $item['offer_visiting_price'] ?? '' }}"
-                                            placeholder="e.g. 5 Rs" required>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label fw-semibold">Offer Home Price</label>
-                                        <input type="text" class="form-control" name="offer_home_price[]"
-                                            min="0" value="{{ $item['offer_home_price'] ?? '' }}"
-                                            placeholder="e.g. 10 Rs" required>
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-end gap-2">
-                                        <button type="button" onclick="removeField(this)"
-                                            class="btn btn-danger waves-effect waves-light">
-                                            Remove
-                                        </button>
+                        <div class="row my-4">
+                            <div class="col-12 ">
 
-                                        <!-- Add Button -->
-                                        <button type="button" onclick="addField()"
-                                            class="btn btn-success waves-effect waves-light">
-                                            Add
-                                        </button>
+                                <div class="accordion " id="collapsibleSection">
+                                    <div class="card accordion-item border border-dark rounded ">
+                                        <h2 class="accordion-header  sticky-element bg-label-secondary rounded d-flex justify-content-sm-between align-items-sm-center flex-column flex-sm-row "
+                                            id="headingDeliveryAddress">
+                                            <button type="button" class="accordion-button rounded-top "
+                                                data-bs-toggle="collapse" data-bs-target="#collapseDeliveryAddress"
+                                                aria-expanded="true" aria-controls="collapseDeliveryAddress"
+                                                style="background-color:#033a62;color:white;">
+                                                Update Test Details
+                                                <span class="ms-2 icon-toggle">
+                                                    <!-- Default Down Arrow -->
+                                                    <i class="fa-solid fa-chevron-down"></i>
+                                                </span>
+                                            </button>
+                                        </h2>
+                                        <div id="collapseDeliveryAddress" class="accordion-collapse collapse show"
+                                            data-bs-parent="#collapsibleSection">
+                                            <div class="accordion-body rounded-bottom" style="background-color: #e9ebee;">
+                                                <div class="row g-4">
+                                                    <div id="formRepeater">
+                                                        @foreach ($labTests as $index => $item)
+                                                            <div class="row g-3 align-items-end mb-3 repeater-group">
+                                                                <div class="col-md-2">
+                                                                    <label class="form-label fw-semibold">Test</label>
+                                                                    <select name="test[]" class="form-select" required>
+                                                                        <option value="">Select Test</option>
+                                                                        @foreach ($allTests as $test)
+                                                                            <option value="{{ $test->id }}"
+                                                                                {{ $test->id == $item['test'] ? 'selected' : '' }}>
+                                                                                {{ $test->name }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <label class="form-label fw-semibold">Visiting
+                                                                        Price</label>
+                                                                    <input type="number" class="form-control"
+                                                                        name="price[]" min="0"
+                                                                        value="{{ $item['price'] ?? '' }}"
+                                                                        placeholder="e.g. 10 Rs" required>
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <label class="form-label fw-semibold">Home
+                                                                        Price</label>
+                                                                    <input type="number" class="form-control"
+                                                                        name="homeprice[]" min="0"
+                                                                        value="{{ $item['homeprice'] ?? '' }}"
+                                                                        placeholder="e.g. 15 Rs" required>
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <label class="form-label fw-semibold">Report
+                                                                        Time</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="report[]" min="0"
+                                                                        value="{{ $item['report'] ?? '' }}"
+                                                                        placeholder="Home Price" required>
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <label class="form-label fw-semibold">Offer Visiting
+                                                                        Price</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="offer_visiting_price[]" min="0"
+                                                                        value="{{ $item['offer_visiting_price'] ?? '' }}"
+                                                                        placeholder="e.g. 5 Rs" required>
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <label class="form-label fw-semibold">Offer Home
+                                                                        Price</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="offer_home_price[]" min="0"
+                                                                        value="{{ $item['offer_home_price'] ?? '' }}"
+                                                                        placeholder="e.g. 10 Rs" required>
+                                                                </div>
+                                                                <div class="col-md-2 d-flex align-items-end gap-2">
+                                                                    <button type="button" onclick="removeField(this)"
+                                                                        class="btn btn-danger waves-effect waves-light">
+                                                                        Remove
+                                                                    </button>
 
+                                                                    <!-- Add Button -->
+                                                                    <button type="button" onclick="addField()"
+                                                                        class="btn btn-success waves-effect waves-light">
+                                                                        Add
+                                                                    </button>
+
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
+                                    <div class="card accordion-item mt-3">
+                                        <h2 class="accordion-header" id="headingPaymentMethod">
+                                            <button type="button" class="accordion-button collapsed"
+                                                data-bs-toggle="collapse" data-bs-target="#collapsePaymentMethod"
+                                                aria-expanded="false" aria-controls="collapsePaymentMethod"
+                                                style="background-color:#033a62;color:white;">
+                                                Add Package Details
+                                                <span class="ms-2 icon-toggle">
+                                                    <!-- Default Down Arrow -->
+                                                    <i class="fa-solid fa-chevron-down"></i>
+                                                </span>
+                                            </button>
+                                        </h2>
+                                        <div id="collapsePaymentMethod" class="accordion-collapse collapse"
+                                            aria-labelledby="headingPaymentMethod" data-bs-parent="#collapsibleSection">
+                                            <div class="accordion-body rounded-bottom" style="background-color: #e9ebee;">
+                                                <div class="row g-4" id="packageRepeater">
+                                                    @php
+                                                        $packages = $laboratorie->package_details
+                                                            ? json_decode($laboratorie->package_details, true)
+                                                            : [];
+                                                        $cat = [];
+                                                        foreach ($packages as $i => $package) {
+                                                            $cat[$i] = $package['package_category'] ?? [];
+                                                        }
+                                                    @endphp
+
+                                                    @forelse ($packages as $index => $package)
+                                                        <div class="repeater-group row g-3 align-items-end mb-3"
+                                                            data-index="{{ $index }}">
+                                                            {{-- Package fields --}}
+                                                            <div class="col-md-2">
+                                                                <label class="form-label fw-semibold">Package Name</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="package_name[]" required
+                                                                    value="{{ old('package_name.' . $index, $package['package_name'] ?? '') }}"
+                                                                    placeholder="Enter Package Name">
+                                                            </div>
+
+                                                            <div class="col-md-2">
+                                                                <label class="form-label fw-semibold">Visiting
+                                                                    Price</label>
+                                                                <input type="number" class="form-control"
+                                                                    name="package_visiting_price[]" required
+                                                                    value="{{ old('package_visiting_price.' . $index, $package['package_visiting_price'] ?? '') }}"
+                                                                    placeholder="e.g. 10 Rs">
+                                                            </div>
+
+                                                            <div class="col-md-2">
+                                                                <label class="form-label fw-semibold">Home Price</label>
+                                                                <input type="number" class="form-control"
+                                                                    name="package_home_price[]" required
+                                                                    value="{{ old('package_home_price.' . $index, $package['package_home_price'] ?? '') }}"
+                                                                    placeholder="e.g. 15 Rs">
+                                                            </div>
+
+                                                            <div class="col-md-2">
+                                                                <label class="form-label fw-semibold">Report Time</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="package_report[]" required
+                                                                    value="{{ old('package_report.' . $index, $package['package_report'] ?? '') }}"
+                                                                    placeholder="e.g. 15 hrs">
+                                                            </div>
+
+                                                            <div class="col-md-2">
+                                                                <label class="form-label fw-semibold">Offer Visiting
+                                                                    Price</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="package_offer_visiting_price[]" required
+                                                                    value="{{ old('package_offer_visiting_price.' . $index, $package['package_offer_visiting_price'] ?? '') }}"
+                                                                    placeholder="e.g. 5 Rs">
+                                                            </div>
+
+                                                            <div class="col-md-2">
+                                                                <label class="form-label fw-semibold">Offer Home
+                                                                    Price</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="package_offer_home_price[]" required
+                                                                    value="{{ old('package_offer_home_price.' . $index, $package['package_offer_home_price'] ?? '') }}"
+                                                                    placeholder="e.g. 10 Rs">
+                                                            </div>
+
+                                                            <div class="col-md-12 mt-3">
+                                                                <label class="form-label fw-semibold">Description</label>
+                                                                <div class="snow-editor" style="height: 200px;"></div>
+                                                                <input type="hidden" name="package_description[]"
+                                                                    class="description"
+                                                                    value="{{ old('package_description.' . $index, $package['package_description'] ?? '') }}">
+                                                            </div>
+
+                                                            {{-- ✅ Dynamic Category --}}
+                                                            <div class="col-md-12">
+                                                                <label class="form-label fw-semibold">Category</label>
+                                                                <div class="d-flex flex-wrap gap-3">
+                                                                    @php $catIds = $cat[$index] ?? []; @endphp
+                                                                    @foreach ($categories as $category)
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input class="form-check-input"
+                                                                                type="checkbox"
+                                                                                name="package_category[{{ $index }}][]"
+                                                                                value="{{ $category->id }}"
+                                                                                id="cat{{ $index }}_{{ $category->id }}"
+                                                                                {{ in_array($category->id, $catIds) ? 'checked' : '' }}>
+                                                                            <label class="form-check-label"
+                                                                                for="cat{{ $index }}_{{ $category->id }}">
+                                                                                {{ $category->name }}
+                                                                            </label>
+                                                                        </div>
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-2 d-flex align-items-end gap-2">
+                                                                <button type="button" onclick="removePackageField(this)"
+                                                                    class="btn btn-danger">Remove</button>
+
+                                                                <button type="button" onclick="addPackageField()"
+                                                                    class="btn btn-success">Add</button>
+
+                                                            </div>
+                                                        </div>
+                                                    @empty
+                                                        {{-- Show one blank form if none exist --}}
+                                                        <div class="repeater-group row g-3 align-items-end mb-3"
+                                                            data-index="0">
+                                                            <!-- You can copy same block above and clear value="..." if needed -->
+                                                        </div>
+                                                    @endforelse
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
-                            @endforeach
+                            </div>
                         </div>
                         {{-- Buttons --}}
                         <div class="card-action">
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn btn-primary submit-btn">Update</button>
                             <button type="button" class="btn btn-primary"
                                 onclick="window.location='{{ route('laboratorie.index') }}'">Cancel</button>
                         </div>
@@ -309,6 +482,8 @@
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/quill/katex.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/quill/quill.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Parsley for the form
@@ -378,5 +553,121 @@
                 button.closest('.repeater-group').remove();
             }
         }
+
+
+        function addPackageField() {
+            const repeater = document.getElementById('packageRepeater');
+            const allGroups = repeater.querySelectorAll('.repeater-group');
+            const newIndex = allGroups.length;
+
+            const firstGroup = allGroups[0];
+            const newGroup = firstGroup.cloneNode(true);
+
+            // Clear input values
+            newGroup.querySelectorAll('input, textarea, select').forEach(input => {
+                if (input.type === 'checkbox') {
+                    input.checked = false;
+                } else {
+                    input.value = '';
+                }
+            });
+
+            // Update the index
+            newGroup.setAttribute('data-index', newIndex);
+
+            // Update names and IDs for inputs and labels
+            newGroup.querySelectorAll('[name]').forEach(input => {
+                if (input.name.startsWith('package_category')) {
+                    input.name = `package_category[${newIndex}][]`;
+                } else if (input.name.includes('package_description')) {
+                    input.name = 'package_description[]';
+                } else {
+                    const baseName = input.name.replace(/\[\]$/, '');
+                    input.name = `${baseName}[]`;
+                }
+            });
+
+            // Update IDs and "for" attributes of checkboxes
+            newGroup.querySelectorAll('.form-check-input').forEach((checkbox) => {
+                const catId = checkbox.value;
+                const newId = `cat${newIndex}_${catId}`;
+                const label = newGroup.querySelector(`label[for="${checkbox.id}"]`);
+
+                checkbox.id = newId;
+                if (label) {
+                    label.setAttribute('for', newId);
+                }
+            });
+
+            repeater.appendChild(newGroup);
+        }
+
+        function removePackageField(button) {
+            const group = button.closest('.repeater-group');
+            const repeater = document.getElementById('packageRepeater');
+            if (repeater.querySelectorAll('.repeater-group').length > 1) {
+                group.remove();
+            } else {
+                alert("At least one package is required.");
+            }
+        }
+        //Snow editor Code
+        let editors = [];
+
+        // Initialize all Quill editors and prefill from hidden inputs
+        $('.snow-editor').each(function(index) {
+            let quill = new Quill(this, {
+                bounds: this,
+                theme: 'snow',
+                placeholder: 'Enter description here...'
+            });
+
+            // Prefill from existing hidden input value
+            let html = $('.description').eq(index).val();
+            if (html && html.trim().length > 0) {
+                quill.root.innerHTML = html;
+            }
+
+            editors.push(quill);
+        });
+
+
+        $('.submit-btn').on('click', function(event) {
+            let valid = true;
+
+            editors.forEach(function(editor, index) {
+                let html = editor.root.innerHTML.trim();
+                let text = editor.getText().trim();
+
+                if (text.length === 0) {
+                    alert('Description cannot be empty in entry #' + (index + 1));
+                    valid = false;
+                }
+
+                $('.description').eq(index).val(html);
+            });
+
+            if (!valid) {
+                event.preventDefault(); // Prevent form if any description is empty
+            }
+        });
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const buttons = document.querySelectorAll(".accordion-button");
+
+            buttons.forEach(button => {
+                button.addEventListener("click", function() {
+                    const icon = button.querySelector(".icon-toggle i");
+                    if (button.classList.contains("collapsed")) {
+                        icon.classList.remove("fa-chevron-up");
+                        icon.classList.add("fa-chevron-down");
+                    } else {
+                        icon.classList.remove("fa-chevron-down");
+                        icon.classList.add("fa-chevron-up");
+                    }
+                });
+            });
+        });
     </script>
 @endsection

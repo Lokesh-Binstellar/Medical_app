@@ -15,7 +15,7 @@
                 <thead >
                   <tr>
                     <th>id</th>
-                    <th>Name</th>
+                    <th>User Name</th>
                     <th>Email</th>
                     <th>Role</th>
                     <th>Action</th>

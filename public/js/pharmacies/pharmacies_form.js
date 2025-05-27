@@ -69,12 +69,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 },
-                password: {
+               password: {
                     validators: {
                         notEmpty: {
-                            message: 'Please enter your password'
-                        }
-                    }
+                            message: "Please enter your password",
+                        },
+                        stringLength: {
+                            min: 6,
+                            message: "Password must be more than 6 characters",
+                        },
+                        regexp: {
+                            regexp: /^[^\s]+$/,
+                            message: "Password must not contain spaces",
+                        },
+                    },
                 },
                 city: {
                     validators: {

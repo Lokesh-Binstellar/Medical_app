@@ -1,11 +1,9 @@
 @extends('layouts.app')
 
 @section('styles')
-
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
-
 @endsection
 
 @section('content')
@@ -31,6 +29,9 @@
                                         <label for="name" class="form-label">Organ Name</label>
                                         <input type="text" name="name" class="form-control" id="name" 
                                             placeholder="Enter organ name">
+                                        {{-- <label for="name" class="form-label">Package Category Name</label>
+                                        <input type="text" name="name" class="form-control" id="name"
+                                            placeholder="Enter category name"> --}}
                                     </div>
 
                                     <div class="col-md-4">
@@ -88,7 +89,7 @@
                         data: 'DT_RowIndex',
                         name: 'id'
                     },
-                    
+
                     {
                         data: 'name',
                         name: 'name'

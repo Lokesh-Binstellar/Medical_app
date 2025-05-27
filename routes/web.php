@@ -10,6 +10,7 @@ use App\Http\Controllers\MedicineSearchController;
 use App\Http\Controllers\AddMedicineController;
 use App\Http\Controllers\AdditionalchargesController;
 use App\Http\Controllers\AppRatingController;
+use App\Http\Controllers\DeliveryPersonController;
 use App\Http\Controllers\OtcController;
 use App\Http\Controllers\packageCategoryController;
 use App\Http\Controllers\PackageController;
@@ -126,6 +127,17 @@ Route::group(['middleware' => ['auth']], function () {
         });
     });
 
+    //DeliveryPerson
+    Route::prefix('DeliveryPerson')->group(function () {
+        Route::get('/', [DeliveryPersonController::class, 'index'])->name('delivery_person.index');
+        Route::get('/create', [DeliveryPersonController::class, 'create'])->name('delivery_person.create');
+        Route::post('/store', [DeliveryPersonController::class, 'store'])->name('delivery_person.store');
+        Route::get('{id}/edit', [DeliveryPersonController::class, 'edit'])->name('delivery_person.edit');
+        Route::put('/{id}', [DeliveryPersonController::class, 'update'])->name('delivery_person.update');
+        Route::delete('/{id}', [DeliveryPersonController::class, 'destroy'])->name('delivery_person.destroy');
+        Route::get('/{id}', [DeliveryPersonController::class, 'show'])->name('delivery_person.show');
+    });
+
     //Medicine
     Route::prefix('medicine')->group(function () {
         Route::get('', [MedicineController::class, 'index'])->name('medicine.index');
@@ -240,10 +252,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/zipcodes/upload', [ZipCodeViceDeliveryController::class, 'uploadZipcodes'])->name('zip_code_vise_delivery.upload');
     Route::delete('/zipcodes/delete-all', [ZipCodeViceDeliveryController::class, 'deleteAll'])->name('zip_code_vise_delivery.deleteAll');
 
-    Route::get('/addLabTest',[AddLabTestController::class, 'index'])->name('addLabTest.index');
-    Route::post('/store', [AddLabTestController::class,'store'])->name('addLabTest.store');
-    Route::get('/addLabTestSearch',[AddLabTestController::class, 'search'])->name('addLabTest.search');
-    Route::get('/get-contains', [AddLabTestController::class,'getContains'])->name('addLabTest.contains');
+    Route::get('/addLabTest', [AddLabTestController::class, 'index'])->name('addLabTest.index');
+    Route::post('/store', [AddLabTestController::class, 'store'])->name('addLabTest.store');
+    Route::get('/addLabTestSearch', [AddLabTestController::class, 'search'])->name('addLabTest.search');
+    Route::get('/get-contains', [AddLabTestController::class, 'getContains'])->name('addLabTest.contains');
 });
 
 require __DIR__ . '/auth.php';

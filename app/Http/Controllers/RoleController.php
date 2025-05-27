@@ -160,6 +160,9 @@ class RoleController extends Controller
             if ($tablesArr['pharmacies']) {
                 $filterArr['Pharmacies'] = 'Pharmacies';
             }
+             if ($tablesArr['delivery_person']) {
+                $filterArr['DeliveryPerson'] = 'DeliveryPerson';
+            }
             if ($tablesArr['roles']) {
                 $filterArr['Roles'] = 'Roles';
             }

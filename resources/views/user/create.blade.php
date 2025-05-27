@@ -49,12 +49,16 @@
 
                         <div class="col-md-6">
                             <div class="form-floating form-floating-outline">
-                                <select id="role_id" name="role_id" class="form-select select2" data-allow-clear="true">
+                                <select id="role_id" name="role_id" class="form-select select2" readonly disabled>
                                     <option value="">Select Role</option>
                                     @foreach ($roles as $role)
-                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                        @if ($role->name === 'admin')
+                                            <option value="{{ $role->id }} " selected>{{ $role->name }}</option>
+                                        @endif
                                     @endforeach
                                 </select>
+
+
                                 <label for="role_id">Role</label>
                             </div>
                         </div>

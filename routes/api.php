@@ -4,6 +4,7 @@ use App\Events\MyEvent;
 use App\Http\Controllers\AddMedicineController;
 use App\Http\Controllers\AppRatingController;
 use App\Http\Controllers\AddLabTestController;
+use App\Http\Controllers\LaboratoriesController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AuthTokenController;
 use App\Http\Controllers\CustomerAddressController;
@@ -102,6 +103,13 @@ Route::middleware('check.api.key')->group(function () {
     Route::get('/placeOrder', [MedicineSearchController::class, 'placeOrder']);
     Route::get('/brand/filter', [PopularBrandController::class, 'getFilters']);
     Route::get('/category/filter', [OtcController::class, 'getFilters']);
+
+
+
+
+//    Laboratory
+
+  Route::get('/getAllLaboratory', [LaboratoriesController::class, 'getAllLaboratory']);
 
 
 });
