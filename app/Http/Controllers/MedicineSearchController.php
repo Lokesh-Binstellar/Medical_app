@@ -188,6 +188,8 @@ class MedicineSearchController extends Controller
                 return [$item['product_id'] => $item['quantity']];
             });
 
+
+
             $grouped = $getMedicine->groupBy('phrmacy_id')->map(function ($group, $pharmacyId) use ($cartQuantities, $quoteAddresses, $apiKey, $userId) {
                 $pharmacy = $group->first()->pharmacy;
                 $customerId = $group->first()->customer_id;
@@ -216,12 +218,22 @@ class MedicineSearchController extends Controller
                         return collect($decodedArray)->map(function ($med) use ($cartQuantities) {
                             $medId = $med['medicine_id'];
 
+
                             $image = Medicine::where('product_id', $medId)->value('image_url');
                             if (!$image) {
                                 $image = Otcmedicine::where('otc_id', $medId)->value('image_url');
                             }
 
                             $med['image'] = $image ? asset('storage/' . $image) : null;
+
+                            $medicine = Medicine::where('product_id', $medId)->first();
+
+                            $prescription = 'No';
+                            if ($medicine && $medicine->prescription_required === 'Prescription Required') {
+                                $prescription = 'Yes';
+                            }
+
+
                             $med['qty'] = $cartQuantities[$medId] ?? 0;
                             $med['price'] = $med['discount'] ?? 0;
                             unset($med['discount']);
@@ -233,6 +245,7 @@ class MedicineSearchController extends Controller
                                 'available' => $med['available'] ?? null,
                                 'is_substitute' => $med['is_substitute'] ?? null,
                                 'image' => $med['image'] ?? null,
+                                'prescription' => $prescription,
                                 'mrp' => isset($med['mrp']) ? (float) $med['mrp'] : null,
                                 'price' => isset($med['price']) ? (float) $med['price'] : null,
                                 'discount_percent' => isset($med['discount_percent']) ? (float) $med['discount_percent'] : null,

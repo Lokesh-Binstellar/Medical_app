@@ -94,7 +94,7 @@
         @if (in_array('Pharmacies', $permissions))
             <li class="menu-item {{ in_array(Route::current()->getName(), ['orderdetails']) ? 'active' : '' }}">
                 <a href="{{ route('orderdetails') }}" class="menu-link">
-                    <i class="menu-icon tf-icons mdi mdi-pill"></i>
+                    <i class="menu-icon ri ri-list-ordered"></i>
                     <div data-i18n="Order Details ">Order Details </div>
                 </a>
             </li>
