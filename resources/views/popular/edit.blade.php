@@ -62,7 +62,7 @@
                                 <div class="form-group col-md-6 d-flex justify-content-center flex-column">
                                     @if ($brand->logo)
                                         <div class="mb-2">
-                                            <img id="logo" src="{{url('storage/brand/' .$brand->logo)}}" alt="Brand Image" class="img-thumbnail"
+                                            <img id="logo" src="{{url('popular/brands/' .$brand->logo)}}" alt="Brand Image" class="img-thumbnail"
                                                 style="max-height: 150px;">
                                         </div>
                                     @endif
