@@ -88,6 +88,7 @@ Route::middleware('check.api.key')->group(function () {
         Route::put('/patients/{id}', [PatientController::class, 'update']);
 
         // zip_code_vise_delivery
+        Route::get('/zipcodes', [ZipCodeViceDeliveryController::class, 'getZipcodes']);
         Route::post('/ratings', [RatingController::class, 'store']);
         Route::get('/allPharmacyRequests', [MedicineSearchController::class, 'allPharmacyRequests']); 
         
@@ -95,7 +96,7 @@ Route::middleware('check.api.key')->group(function () {
         Route::post('/placeOrder', [OrderController::class, 'placeOrder']);
         
         // MyOrders
-        Route::get('customer/pharmacy-orders', [MyOrderController::class, 'getUserPharmacyOrders']);
+        Route::get('/pharmacyMyOrders', [MyOrderController::class, 'getUserPharmacyOrders']);
 
     });
  

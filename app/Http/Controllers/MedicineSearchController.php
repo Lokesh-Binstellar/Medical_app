@@ -51,6 +51,7 @@ class MedicineSearchController extends Controller
         $medicine = new Phrmacymedicine();
         $medicine->medicine = json_encode($data['medicine']);
         //$medicine->quantity = $totalQuantity; // ✅ Use calculated total quantity
+        // $medicine->quantity = $totalQuantity; 
         $medicine->total_amount = $data['total_amount'] ?? 0; // ✅ Add fallback
         $medicine->mrp_amount = $data['mrp_amount'] ?? 0; // ✅ Add fallback
         $medicine->commission_amount = $data['commission_amount'] ?? 0; // ✅ Add fallback

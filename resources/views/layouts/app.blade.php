@@ -121,9 +121,9 @@
             left: 17.63rem !important;
         }
 
-        .layout-navbar-fixed .layout-navbar.navbar-detached {
+        /* .layout-navbar-fixed .layout-navbar.navbar-detached {
             width: 84% !important;
-        }
+        } */
 
         .align {
             text-align: left !important;
