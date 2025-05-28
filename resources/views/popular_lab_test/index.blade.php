@@ -1,15 +1,19 @@
 @extends('layouts.app')
 @section('styles')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" /> --}}
     <style>
-        .select2 {
+        /* .select2 {
             width: 300px !important;
         }
 
         body>span.select2-container.select2-container--default.select2-container--open {
             width: auto !important;
+        } */
+
+        .fv-plugins-message-container.fv-plugins-message-container--enabled.invalid-feedback {
+            min-height: 1.5rem;
         }
     </style>
 @endsection
@@ -26,12 +30,13 @@
 
                         </div>
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="">
                                 <form action="{{ route('popular_lab_test.store') }}" method="POST"
-                                    enctype="multipart/form-data" class="d-flex gap-2 align-items-center" id="importForm">
+                                    enctype="multipart/form-data" class="row g-3 align-items-center" id="importForm">
                                     @csrf
-                                    <div class="error-msg">
-                                        <select name="name" class="form-control select2" id="lab-test-select" required>
+                                    <div class="error-msg col-md-4">
+                                        <option value="">Select Lab test</option>
+                                        <select name="name" class="form-control select2" id="lab-test-select" >
                                             <option value="">Select Lab Test</option>
                                             @foreach ($labTests as $item)
                                                 <option value="{{ $item->id }}" data-contains="{{ $item->contains }}">
@@ -39,15 +44,16 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    {{-- <input type="file" name="logo" class="form-control" id="logo"> --}}
-                                    <button type="submit" class="btn btn-primary  text-nowrap px-5">+ Add
-                                        Lab Test</button>
+                                    <div class="d-flex align-items-end col-md-4">
+                                        <button type="submit" class="btn btn-primary  text-nowrap px-5">+ Add
+                                            Lab Test</button>
+                                    </div>
                                 </form>
                             </div>
 
 
 
-                            
+
                             @if (session('success'))
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                                     {{ session('success') }}
@@ -59,23 +65,23 @@
                                     {{ session('error') }}
                                 </div>
                             @endif
-<div class="card-body">
-                            <div class="table-responsive">
-                                <table id="add-row" class="display table table-striped table-hover data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Id</th>
-                                            <th>Lab Test Name</th>
-                                            <th>Contains</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="add-row" class="display table table-striped table-hover data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Id</th>
+                                                <th>Lab Test Name</th>
+                                                <th>Contains</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
 
+                                </div>
                             </div>
-</div>
                         </div>
                     </div>
                 </div>
@@ -176,4 +182,5 @@
             });
         });
     </script>
+    <script src="{{ asset('js/popularlabtest/popularlabtest_form.js') }}"></script>
 @endsection

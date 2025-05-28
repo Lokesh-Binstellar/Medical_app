@@ -1,8 +1,8 @@
 @extends('layouts.app')
 @section('styles')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" /> --}}
     <style>
         /* .select2 {
             width: 300px !important;
@@ -175,12 +175,12 @@
         });
     </script>
     <script src="{{ asset('js/popularcategory/popularcategory_form.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
+{{-- <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
 @endsection

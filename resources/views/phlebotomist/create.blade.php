@@ -58,5 +58,6 @@
             });
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/parsleyjs"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/parsleyjs"></script> --}}
+    <script src="{{ asset('assets/js/parsley.min.js') }}"></script>
 @endsection

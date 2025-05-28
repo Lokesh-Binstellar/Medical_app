@@ -18,9 +18,10 @@ class PhlebotomistController extends Controller
         $userId = Auth::user();
         if ($request->ajax()) {
             $laboratory = Laboratories::where('user_id', $userId->id)->first();
+            // dd($userId->id);
 
 
-            // dd($laboratory->id);
+      
             $data = Phlebotomist::where('laboratory_id', $laboratory->id)->latest();
 
             return DataTables::of($data)

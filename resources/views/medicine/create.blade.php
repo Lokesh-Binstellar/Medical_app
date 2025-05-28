@@ -114,26 +114,24 @@
                                         <!-- Name -->
                                         <div class="form-group">
                                             <label for="name">Name</label>
-                                            <input type="text" name="name" class="form-control" id="name" required
-                                                
-                                                data-parsley-required-message="The name field is required." />
+                                            <input type="text" name="name" class="form-control" id="name"
+                                                required data-parsley-required-message="The name field is required." />
                                         </div>
 
                                         <!-- Email -->
                                         <div class="form-group">
                                             <label for="email">Email</label>
                                             <input type="email" name="email" class="form-control" id="email"
-                                                required
-                                                data-parsley-pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$"
+                                                required data-parsley-pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$"
                                                 data-parsley-pattern-message="Email must be in the format like name@domain.com"
                                                 data-parsley-required-message="The email field is required." />
-                                        
+
                                             {{-- Laravel backend error --}}
                                             @error('email')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
-                                        
+
 
                                         <!-- Password -->
                                         <div class="form-group">
@@ -146,18 +144,19 @@
 
                                         </div>
 
-                                        
+
                                         <div class="form-group mb-3">
                                             <label for="inputGroupSelect01">Role</label>
                                             <select class="form-control select2" id="inputGroupSelect01" name="role_id"
-                                                style="appearance: auto;" placeholder="Select Role" required data-parsley-required-message="The role field is required." >
+                                                style="appearance: auto;" placeholder="Select Role" required
+                                                data-parsley-required-message="The role field is required.">
                                                 <option value="">Select Role</option>
                                                 @foreach ($roles as $role)
                                                     <option value="{{ $role->id }}">{{ $role->name }}</option>
                                                 @endforeach
                                             </select>
-                                        </div> 
-                                       
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -179,9 +178,6 @@
             // Initialize Parsley for the form
             $('#userCreateForm').parsley();
         });
-    </script>
-    <!-- Script to trim on input blur -->
-    <script>
         document.getElementById('name').addEventListener('blur', function() {
             this.value = this.value.trim().replace(/\s+/g, ' ');
         });
