@@ -9,6 +9,7 @@ class LabTest extends Model
     protected $fillable = [
         'name',
         'description',
+        'organ',
         'price',
         'home_price',
         'contains',

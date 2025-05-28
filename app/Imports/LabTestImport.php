@@ -21,6 +21,7 @@ class LabTestImport implements ToModel,WithHeadingRow
            $data=[
             'name' => $row['name'],
             'description' => $row['description'],
+            'organ' => $row['organ'],
             'contains' => $row['contains'],
             'gender' => $row['gender'],
             // 'reports_in' => $row['reports_in'],

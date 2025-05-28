@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-4">
+<div>
     <div class="card">
         <div class="card-header text-white bg-primary">
             <strong>Order #{{ $order->order_id }} - Medicines</strong>

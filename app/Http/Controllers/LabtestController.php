@@ -42,7 +42,7 @@ class LabtestController extends Controller
     }
 
     public function import(Request $request)
-    {
+    { 
         // Validate incoming request data
         $request->validate([
             'file' => 'required|max:2048',

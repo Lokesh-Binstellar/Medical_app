@@ -27,6 +27,10 @@
                                 <td>{{ $tests->description }}</td>
                             </tr>
                             <tr>
+                                <th>Organ</th>
+                                <td>{{ $tests->organ }}</td>
+                            </tr>
+                            <tr>
                                 <th>Contains</th>
                                 <td>{{ $tests->contains }}</td>
                             </tr>
