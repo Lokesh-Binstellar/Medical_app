@@ -126,7 +126,7 @@
 @endsection
 @section('content')
 
-    <div class="container mt-4">
+    
         <div class="card shadow-xl rounded-3">
             <!-- Blue Header Title -->
             <div class="card-header text-white fw-bold fs-5">
@@ -272,9 +272,9 @@
                 </form>
             </div>
         </div>
-    </div>
+   
 
-    <div class="container">
+    
         <div class="card shadow-xl my-5">
             <div class="card-header text-white">
                 <h5 class="mb-0">Medicine Data</h5>
@@ -395,7 +395,7 @@
                 @endif
             </div>
         </div>
-    </div>
+  
 
 @endsection
 

@@ -4,7 +4,7 @@
 ******************************************************************************/
 
 .light-style .menu .app-brand.demo {
-    height: 150px;
+    height: 100px;
 }
 
 .dark-style .menu .app-brand.demo {
@@ -12,17 +12,17 @@
 }
 
 .app-brand-logo.demo svg {
-    width: 38px;
-    height: 20px;
+    width: 35px;
+    height: 44px;
 }
-
 .app-brand-text.demo {
-    font-size: 1.25rem;
+    font-size: 2.25rem;
 }
 
 /* ! For .layout-navbar-fixed added fix padding top tpo .layout-page */
 .layout-navbar-fixed .layout-wrapper:not(.layout-without-menu) .layout-page {
-    padding-top: 64px !important;
+    /* padding-top: 64px !important; */
+    padding-top: 110px !important;
 }
 
 /* Navbar page z-index issue solution */

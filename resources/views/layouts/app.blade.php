@@ -143,15 +143,15 @@
         }
 
         @media screen and (max-width: 1440px) {
-            .layout-navbar-fixed .layout-navbar.navbar-detached {
+            /* .layout-navbar-fixed .layout-navbar.navbar-detached {
                 width: 79% !important;
-            }
+            } */
         }
 
         @media screen and (max-width: 1366px) {
-            .layout-navbar-fixed .layout-navbar.navbar-detached {
+            /* .layout-navbar-fixed .layout-navbar.navbar-detached {
                 width: 78% !important;
-            }
+            } */
         }
 
         @media screen and (max-width: 1024px) {
@@ -169,9 +169,9 @@
                 left: 0 !important;
             }
 
-            .layout-navbar-fixed .layout-navbar.navbar-detached {
+            /* .layout-navbar-fixed .layout-navbar.navbar-detached {
                 width: 100% !important;
-            }
+            } */
 
         }
 
@@ -334,6 +334,7 @@
 
         });
     </script>
+   
     {{-- <script>
         function markAllAsRead() {
             fetch('/notifications/mark-all-as-read', {

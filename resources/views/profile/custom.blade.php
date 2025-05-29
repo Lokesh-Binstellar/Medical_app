@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mt-4">
+    
         <div class="card shadow rounded">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">
@@ -119,5 +119,5 @@
                 </div>
             </div>
         </div>
-    </div>
+    
 @endsection

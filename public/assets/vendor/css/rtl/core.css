@@ -25708,7 +25708,7 @@ html:not([dir=rtl]) .menu-horizontal .menu-inner>.menu-item .menu-sub .menu-togg
     position: relative;
     padding-top: 0.25rem;
     padding-bottom: 0.2rem;
-    height: 4rem;
+    height: 6rem;
     flex-wrap: nowrap;
     color: #828393;
     z-index: 2;
@@ -26378,6 +26378,7 @@ html:not(.layout-navbar-fixed) .layout-content-navbar .layout-page {
 
 html:not(.layout-footer-fixed) .content-wrapper {
     padding-bottom: 0 !important;
+    /* padding: 2rem 0; */
 }
 
 @media (max-width: 1199.98px) {
@@ -26457,7 +26458,7 @@ html:not(.layout-footer-fixed) .content-wrapper {
 
     .layout-navbar-fixed.layout-menu-collapsed:not(.layout-menu-offcanvas):not(.layout-menu-fixed-offcanvas) .layout-content-navbar .layout-navbar,
     .layout-menu-fixed.layout-navbar-fixed.layout-menu-collapsed .layout-content-navbar .layout-navbar {
-        left: 5rem;
+        left: 6.5rem;
     }
 
     .layout-navbar-fixed.layout-menu-collapsed:not(.layout-menu-offcanvas):not(.layout-menu-fixed-offcanvas).layout-menu-flipped .layout-content-navbar .layout-navbar,

@@ -23,7 +23,7 @@
     </style>
 @endsection
 @section('content')
-    <div class="container">
+    <div>
         @if (session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
@@ -35,41 +35,37 @@
                 {{ session('error') }}
             </div>
         @endif
-        <div class="page-inner px-0">
-            <div class="row justify-content-center">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header rounded-top">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <h4 class="card-title mb-0  text-white">Prescriptions</h4>
-                                {{-- <a href="{{ route('laboratorie.create') }}" class="btn btn-primary text-white  addButton ">+ Add
+
+        <div class="card">
+            <div class="card-header rounded-top">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h4 class="card-title mb-0  text-white">Prescriptions</h4>
+                    {{-- <a href="{{ route('laboratorie.create') }}" class="btn btn-primary text-white  addButton ">+ Add
                                     Laboratory</a> --}}
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="add-row" class="display table table-striped table-hover data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Prescription Id</th>
-                                            <th>Customer Name</th>
-                                            <th>Customer Phone no.</th>
-                                            <th>Prescription</th>
-                                            <th>Valid</th>
-                                            <th>Status</th>
-                                            {{-- <th style="width: 10%">Action</th> --}}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="add-row" class="display table table-striped table-hover data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Prescription Id</th>
+                                <th>Customer Name</th>
+                                <th>Customer Phone no.</th>
+                                <th>Prescription</th>
+                                <th>Valid</th>
+                                <th>Status</th>
+                                {{-- <th style="width: 10%">Action</th> --}}
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
+
     </div>
 @endsection
 @section('scripts')

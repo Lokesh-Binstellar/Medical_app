@@ -4,7 +4,7 @@
 @endsection
 @section('content')
 
-<div class="container mt-4">
+
     <div class="card shadow-xl rounded-3">
         <!-- Blue Header Title -->
         <div class="card-header bg-primary text-white fw-bold fs-5">
@@ -30,7 +30,7 @@
             
         </div>
     </div>
-</div>
+
 
 @endsection
 

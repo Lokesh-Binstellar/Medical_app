@@ -7,9 +7,7 @@
 @endsection
 
 @section('content')
-    <div class="container">
-        <div class="page-inner">
-            <div class="row justify-content-center">
+
                 <div class="col-md-12">
                     <div class="card shadow-lg">
                         <div class="card-header bg-primary text-white">
@@ -71,10 +69,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    </div>
+            
 @endsection
 
 @section('scripts')

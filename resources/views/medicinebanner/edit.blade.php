@@ -1,9 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
+
             <div class="card">
                 <div class="card-header">
                     <h4>Edit Banner</h4>
@@ -41,7 +39,7 @@
                         <div class="mb-3">
                             <label for="current_image" class="form-label">Current Banner</label>
                             <div>
-                                <img src="{{ asset('storage/banners/' . $banner->image) }}" alt="Current Banner" class="img-fluid" style="max-width: 100%; height: auto;">
+                                <img src="{{ asset('banners/' . $banner->image) }}" alt="Current Banner" class="img-fluid" style="max-width: 100%; height: auto;">
                             </div>
                         </div>
                     
@@ -54,9 +52,7 @@
                     
                 </div>
             </div>
-        </div>
-    </div>
-</div>
+        
 @endsection
 @section('scripts')
     <script src="{{ asset('js/homebanner/homebanner_form.js') }}"></script>

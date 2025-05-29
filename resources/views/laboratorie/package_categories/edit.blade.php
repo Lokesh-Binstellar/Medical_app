@@ -6,10 +6,7 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" /> --}}
 @endsection
 @section('content')
-    <div class="container mt-5">
-        <div class="page-inner">
-            <div class="row justify-content-center">
-                <div class="col-12">
+
 
 
 
@@ -55,10 +52,7 @@
                             </form>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                
 @endsection
 @section('scripts')
     <script src="{{ asset('js/packagecategory/packagecategory_form.js') }}"></script>

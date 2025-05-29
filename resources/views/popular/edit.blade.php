@@ -7,10 +7,7 @@
 
 @endsection
 @section('content')
-    <div class="container mt-5">
-        <div class="page-inner">
-            <div class="row justify-content-center">
-                <div class="col-12">
+
                     {{-- <div class="card shadow">
                         <div class="card-header">
                             <h4 class="card-title mb-0 ">Edit Brand</h4>
@@ -81,10 +78,7 @@
                             </form>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                
 @endsection
 
 @section('scripts')

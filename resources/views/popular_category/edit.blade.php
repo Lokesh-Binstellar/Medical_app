@@ -7,10 +7,7 @@
 
 @endsection
 @section('content')
-    <div class="container">
-        <div class="page-inner">
-            <div class="row justify-content-center">
-                <div class="col-12">
+
 
 
 
@@ -55,10 +52,7 @@
                             </form>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                
 @endsection
 
 @section('scripts')

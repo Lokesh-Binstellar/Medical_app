@@ -4,8 +4,7 @@
 
 @endsection
 @section('content')
-<div class="container">
-    <div class="col-12">
+
         <div class="card">
             <h5 class="card-header">Delivery Person Update Form</h5>
             <div class="card-body">
@@ -137,8 +136,7 @@
                 </form>
             </div>
         </div>
-    </div>
-</div>
+
 @endsection
 @section('scripts')
     <script src="{{ asset('js/delivery_person/delivery_person_form.js') }}"></script>

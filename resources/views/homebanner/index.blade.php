@@ -15,10 +15,7 @@
     </style>
 @endsection
 @section('content')
-    <div class="container ">
-        <div class="page-inner">
-            <div class="row justify-content-center">
-                <div class="col-md-12">
+
                     <div class="card shadow">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title mb-0 ">Home Screen Banner </h4>
@@ -80,10 +77,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                
 @endsection
 
 @section('scripts')

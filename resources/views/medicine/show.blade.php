@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container">
+   
         <div class="card shadow-lg rounded">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Medicine Details</h5>
@@ -160,5 +160,5 @@
 
             </div>
         </div>
-    </div>
+    
 @endsection

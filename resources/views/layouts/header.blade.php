@@ -15,7 +15,7 @@
     </style>
 @endsection
 
-<nav class="layout-navbar navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
+<nav class="layout-navbar navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme " id="layout-navbar">
     <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
         <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
             <i class="mdi mdi-menu mdi-24px"></i>
@@ -23,40 +23,40 @@
     </div>
     {{-- @livewire('notifications') --}}
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-        @if (Route::current()->getName() == 'dashboard')
-            <!-- Welcome Text -->
-            <div class="navbar-nav align-items-center">
-                <div class="nav-item navbar-search-wrapper mb-0 mt-4 ">
-                    @auth
-                        <h3 class="fw-bold text-primary">Welcome @if (Auth::user()->laboratories)
-                                {{ Auth::user()->laboratories->lab_name }}
-                            @elseif(Auth::user()->pharmacies)
-                                {{ Auth::user()->pharmacies->pharmacy_name }}
-                            @else
-                                {{ auth()->user()->name }}
-                            @endif !</h3>
-                    @else
+        {{-- @if (Route::current()->getName() == 'dashboard') --}}
+        <!-- Welcome Text -->
+        <div class="navbar-nav align-items-center">
+            <div class="nav-item navbar-search-wrapper mb-0 ">
+                @auth
+                    <h3 class="fw-bold text-primary mb-0">Welcome @if (Auth::user()->laboratories)
+                            {{ Auth::user()->laboratories->lab_name }}
+                        @elseif(Auth::user()->pharmacies)
+                            {{ Auth::user()->pharmacies->pharmacy_name }}
+                        @else
+                            {{ auth()->user()->name }}
+                        @endif !</h3>
+                @else
+                    <span class="fw-bold text-primary">
+                        Welcome, Guest!
+                    </span>
+                @endauth
+
+                @auth
+                    @if (Auth::user()->pharmacies)
                         <span class="fw-bold text-primary">
-                            Welcome, Guest!
+                            Address :
+                            {{ Auth::user()->pharmacies->address }}
+
                         </span>
-                    @endauth
-
-                    @auth
-                        @if (Auth::user()->pharmacies)
-                            <span class="fw-bold text-primary">
-                                Address :
-                                {{ Auth::user()->pharmacies->address }}
-
-                            </span>
-                        @endif
-                    @endauth
-
-                </div>
-
+                    @endif
+                @endauth
 
             </div>
-            <!-- /Welcome Text -->
-        @endif
+
+
+        </div>
+        <!-- /Welcome Text -->
+        {{-- @endif --}}
 
         </li>
         <!--/ Notification -->
@@ -245,6 +245,7 @@
         </ul>
     </div>
 
+    
     <!-- Search Small Screens -->
     <div class="navbar-search-wrapper search-input-wrapper d-none">
         <input autocomplete="off" type="text" class="form-control search-input container-xxl border-0"
@@ -286,19 +287,18 @@
     // Enable Pusher logging - disable in production!
     Pusher.logToConsole = true;
 
-   
 
-        var pusher = new Pusher('7ba4a23b60749764133c', {
-            cluster: 'ap1'
-        });
 
-        var channel = pusher.subscribe('my-channel');
+    var pusher = new Pusher('7ba4a23b60749764133c', {
+        cluster: 'ap1'
+    });
 
-        channel.bind('my-event', function() {
-            console.log('Pusher callback called');
+    var channel = pusher.subscribe('my-channel');
 
-            // Optional: prevent multiple reloads in a short time
-           location.reload(true);
-        });
-    
+    channel.bind('my-event', function() {
+        console.log('Pusher callback called');
+
+        // Optional: prevent multiple reloads in a short time
+        location.reload(true);
+    });
 </script>

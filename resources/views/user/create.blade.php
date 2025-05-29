@@ -5,8 +5,7 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" /> --}}
 @endsection
 @section('content')
-    <div class="container">
-        <div class="col-12">
+ 
             <div class="card">
                 <h5 class="card-header">User From</h5>
                 <div class="card-body">
@@ -73,8 +72,7 @@
                     </form>
                 </div>
             </div>
-        </div>
-    </div>
+        
 @endsection
 @section('scripts')
     <script src="{{ asset('js/user/user_form.js') }}"></script>

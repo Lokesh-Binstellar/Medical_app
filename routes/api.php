@@ -91,7 +91,7 @@ Route::middleware('check.api.key')->group(function () {
 
         // zip_code_vise_delivery
         Route::get('/zipcodes', [ZipCodeViceDeliveryController::class, 'getZipcodes']);
-        Route::post('/ratings', [RatingController::class, 'store']);
+        // Route::post('/ratings', [RatingController::class, 'store']);
         Route::get('/allPharmacyRequests', [MedicineSearchController::class, 'allPharmacyRequests']); 
         
         // Orders

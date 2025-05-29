@@ -2,7 +2,7 @@
 * Pages Mixins
 */
 body {
-    background: #fefefe;
+    background: #f7f7f9;
 }
 
 .bg-body {
@@ -1579,7 +1579,7 @@ li.ui-timepicker-selected,
 } */
 
 .bg-menu-theme {
-    background-color: #fefefe !important;
+    background-color: #f7f7f9 !important;
     color: #636578;
 }
 
