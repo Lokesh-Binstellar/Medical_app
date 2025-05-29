@@ -19,7 +19,7 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
 
     <div class="app-brand demo">
-        <a href="index.html" class="app-brand-link">
+        <a href="{{ route('dashboard') }}" class="app-brand-link">
             <span class="app-brand-logo demo">
                 <span style="color: var(--bs-primary)">
                     <svg width="195" height="238" viewBox="0 0 195 238" fill="none"
@@ -80,6 +80,7 @@
 
 
         {{-- User Management --}}
+         @if (in_array('Users', $permissions) || $isSuperAdmin == 1)
         <li
             class="menu-item {{ in_array(Route::current()->getName(), ['user.index', 'pharmacist.index', 'laboratorie.index', 'delivery_person.index']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -120,6 +121,7 @@
                 @endif
             </ul>
         </li>
+        @endif  
 
 
         {{-- Pharmacy Management --}}
@@ -341,7 +343,7 @@
         @if (in_array('Pharmacies', $permissions) || $isSuperAdmin == 1 || in_array('Orders', $permissions))
             <li class="menu-item {{ in_array(Route::current()->getName(), ['orderdetails']) ? 'active' : '' }}">
                 <a href="{{ route('orderdetails') }}" class="menu-link">
-                    <i class="menu-icon ri ri-list-ordered"></i>
+                    <i class="menu-icon tf-icons mdi mdi-view-list"></i>
                     <div data-i18n="Order Details ">Order Details </div>
                 </a>
             </li>

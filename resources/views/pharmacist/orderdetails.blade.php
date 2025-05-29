@@ -3,52 +3,57 @@
 @section('styles')
     {{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" /> --}}
+    <style>
+        .btn.btn-primary:hover .mdi {
+            color: #fff;
+        }
+    </style>
 @endsection
 
 @section('content')
     <div class="card">
         <h5 class="card-header fw-bold">Order Details</h5><br>
         @if (Auth::user()->role->name === 'pharmacy')
-        <div class="alert alert-warning" role="alert">
+        <div class="alert alert-warning text-black" role="alert">
             <strong>Note:</strong> Once an order is <strong>Accepted</strong>, its details will be visible here.<br>
             Please ensure to update the order status to <strong>Completed</strong> after the customer has picked up the
             medicines, or to <strong>Cancelled</strong> if the pickup does not occur within 24 hours.
         </div>
         @elseif (Auth::user()->role->name === 'admin')
-        <div class="alert alert-warning" role="alert">
+        <div class="alert alert-warning text-black" role="alert">
             <strong>Note:</strong> Once an order is <strong>Accepted</strong>, its details will be visible here.<br>
             Please ensure to update the order status to <strong>Completed</strong> after the delivery boy has delivered the medicines, or to <strong>Cancelled</strong>.
         </div>
         @elseif (Auth::user()->role->name === 'delivery_person')
-        <div class="alert alert-warning" role="alert">
+        <div class="alert alert-warning text-black" role="alert">
             <strong>Note:</strong> Once an order is <strong>assigned</strong>, its details will be visible here.<br>
             Please ensure to update the order status to <strong>Completed</strong> after the delivery.
         </div>
         @endif
         <div class="card-body">
             <div class="table-responsive text-nowrap" style="overflow-x: auto;">
-                <table class="table table-bordered" style="border: 1px solid black;">
+                <table class="table table-bordered text-align-center " style="border: 1px solid black;">
                     <thead>
-                        <tr style="background-color: rgb(245, 245, 247);">
-                            <th class="fw-bold">Order ID</th>
-                            <th class="fw-bold">Customer Details</th>
-                            <th class="fw-bold">Total Price</th>
-                            <th class="fw-bold">Order Status</th>
-                            <th class="fw-bold">Delivery Method</th>
+                        <tr style="background-color: rgb(245, 245, 247);" class="align-middle">
+                            <th class="fw-bold fs-6">Order ID</th>
+                            <th class="fw-bold fs-6">Customer Details</th>
+                            <th class="fw-bold fs-6">Total Price</th>
+                            <th class="fw-bold fs-6">Order Status</th>
+                            <th class="fw-bold fs-6">Delivery Method</th>
                             @if (Auth::user()->role->name === 'admin')
-                                <th class="fw-bold">Assign Delivery Person</th>
+                                <th class="fw-bold fs-6 ">Assign Delivery Person</th>
                             @endif
 
-                            <th class="fw-bold">Payment Method</th>
-                            <th class="fw-bold">Update Status</th>
-                            <th class="fw-bold">View</th>
+                            <th class="fw-bold fs-6">Payment Method</th>
+                            <th class="fw-bold fs-6">Update Status</th>
+                            <th class="fw-bold fs-6">View</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($orders as $order)
                             <tr>
-                                <td>{{ $order->order_id }}</td>
-                                <td>
+                                <td class="fw-bold text-black">{{ $order->order_id }}</td>
+                                <td class="fw-bold text-black">
                                     @if($order->customer)
                                         {{ $order->customer->firstName }} {{ $order->customer->lastName }}<br>
                                         <small>{{ $order->customer->mobile_no }}</small>
@@ -56,10 +61,10 @@
                                         <em>Not found</em>
                                     @endif
                                 </td>
-                                <td>
+                                <td class="fw-bold text-black">
                                     ₹{{ number_format($order->total_price, 2) }}
                                 </td>
-                                <td>@if ($order->status == 0)
+                                <td class="text-center">@if ($order->status == 0)
                                     <span class="badge bg-warning">Request Accepted</span>
                                 @elseif ($order->status == 1)
                                         <span class="badge bg-success">Completed</span>
@@ -67,17 +72,17 @@
                                         <span class="badge bg-danger">Cancelled</span>
                                     @endif
                                 </td>
-                                <td>
+                                <td class="fw-bold text-black">
                                     {{ ucfirst(str_replace('_', ' ', $order->delivery_options)) }}
                                 </td>
                                 @if (Auth::user()->role->name === 'admin')
                                 @if($order->delivery_options === 'home_delivery' && $order->status == 0)
-                                    <td>
+                                    <td >
                                         <form action="{{ route('orders.assignDeliveryPerson', $order->id) }}" method="POST">
                                             @csrf
                                             <div class="d-flex align-items-center">
-                                                <select name="delivery_person_id" class="form-select form-select-sm me-2" required>
-                                                    <option value="">-- Select Delivery Person --</option>
+                                                <select name="delivery_person_id" class="form-select form-select-sm me-2 fw-bold text-black border border-dark"required>
+                                                    <option  value=""> - Select Delivery Person - </option>
                                                     @foreach($deliveryPersons as $person)
                                                         <option value="{{ $person->id }}" {{ $order->delivery_person_id == $person->id ? 'selected' : '' }}>
                                                             {{ $person->name }}
@@ -89,11 +94,11 @@
                                         </form>
                                     </td>
                                 @else
-                                    <td>
+                                    <td class="fw-bold text-black text-center">
                                         @if($order->status == 1)
-                                            <span class="text-success fw-semibold">Order is Delivered</span>
+                                            <span class="badge bg-success">Order is Delivered</span>
                                         @elseif($order->status == 2)
-                                            <span class="text-danger fw-semibold">Order is Cancelled</span>
+                                            <span class="badge bg-danger">Order is Cancelled</span>
                                         @else
                                             {{ ucfirst(str_replace('_', ' ', $order->delivery_options)) }}
                                         @endif
@@ -102,16 +107,16 @@
                             @endif
 
                                 
-                                <td>
+                                <td class="fw-bold text-black">
                                     {{ ucfirst(str_replace('_', ' ', $order->payment_option)) }}
                                 </td>
-                                <td>
+                                <td class="text-center">
                                 @if ($order->status == 0)
                                     <form action="{{ route('pharmacy.updateOrderStatus', $order->id) }}" method="POST"
                                         class="d-inline-block status-form">
                                         @csrf
                                         @method('PUT')
-                                        <select name="status" class="form-select form-select-sm me-2 status-select">
+                                        <select name="status" class="form-select form-select-sm me-2 fw-bold text-black border border-dark status-select">
                                             <option value="">-- Update Status --</option>
 
                                             @if (Auth::user()->role->name === 'delivery_person')
@@ -134,11 +139,11 @@
 
                                 <td>
                                     <a href="{{ route('orders.medicines', $order->id) }}"
-                                    class="btn btn-sm view-meds-btn bg-primary text-white"
+                                    class="btn btn-primary waves-effect waves-light"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top"
                                     title="View Medicines Details">
-                                        <i class="ri-eye-line"></i>
+                                        <i class="tf-icons mdi mdi-eye"></i>
                                     </a>
                                 </td>
                             </tr>

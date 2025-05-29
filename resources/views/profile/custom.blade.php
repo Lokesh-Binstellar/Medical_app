@@ -31,9 +31,9 @@
                         @if ($entity->image)
                             {{-- {{ $entity->image }} --}}
                             <div class="col-md-4 text-center mb-4">
-                                <img src="{{ $entity->image }}" alt="Image" class="img-fluid rounded shadow"
+                                <img src="{{ asset('assets/image/' . $entity->image) }}" alt="{{ $entity->pharmacy_name ?? ($entity->lab_name ?? '-') }}" class="img-fluid rounded shadow"
                                     style="max-height: 250px;">
-                                <p class="mt-2"><strong>Image</strong></p>
+                                <!-- <p class="mt-2"><strong>Image</strong></p> -->
                             </div>
                         @endif
 

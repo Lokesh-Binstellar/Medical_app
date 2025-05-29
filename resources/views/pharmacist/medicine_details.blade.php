@@ -7,18 +7,18 @@
             <strong>Order #{{ $order->order_id }} - Medicines</strong>
         </div>
         <div class="card-body">
-            <p><strong>Customer:</strong> {{ $order->customer->firstName }} {{ $order->customer->lastName }} ({{ $order->customer->mobile_no }})</p>
+            <p class="fw-bold text-black">Customer: {{ $order->customer->firstName }} {{ $order->customer->lastName }} ({{ $order->customer->mobile_no }})</p>
 
             @if (!empty($medicines))
-                <table class="table table-bordered table-sm">
-                    <thead>
-                        <tr>
-                            <th>Medicine</th>
-                            <th>MRP (₹)</th>
-                            <th>Discount (%)</th>
-                            <th>Final Price (₹)</th>
-                            <th>Substitute</th>
-                            <th>Availability</th>
+                <table class="table table-bordered border border-dark">
+                    <thead class="">
+                        <tr >
+                            <th class="fw-bold text-black fs-5">Medicine</th>
+                            <th class="fw-bold text-black fs-5">MRP (₹)</th>
+                            <th class="fw-bold text-black fs-5">Discount (%)</th>
+                            <th class="fw-bold text-black fs-5">Final Price (₹)</th>
+                            <th class="fw-bold text-black fs-5">Substitute</th>
+                            <th class="fw-bold text-black fs-5">Availability</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -28,13 +28,13 @@
                                 $discount = (float) ($item['discount'] ?? 0);
                                 $finalPrice = $mrp - $discount;
                             @endphp
-                            <tr>
-                                <td style="max-width: 300px; word-break: break-word;">{{ $item['medicine_name'] ?? 'N/A' }}</td>
-                                <td>{{ number_format($mrp, 2) }}</td>
-                                <td>{{ $item['discount_percent'] ?? '0' }}%</td>
-                                <td>{{ number_format($finalPrice, 2) }}</td>
-                                <td>{{ ucfirst($item['is_substitute'] ?? 'no') }}</td>
-                                <td>
+                            <tr >
+                                <td style="max-width: 300px; word-break: break-word;" class="fw-bold text-black">{{ $item['medicine_name'] ?? 'N/A' }}</td>
+                                <td class="fw-bold text-black">{{ number_format($mrp, 2) }}</td>
+                                <td class="fw-bold text-black">{{ $item['discount_percent'] ?? '0' }}%</td>
+                                <td class="fw-bold text-black">{{ number_format($finalPrice, 2) }}</td>
+                                <td class="fw-bold text-black">{{ ucfirst($item['is_substitute'] ?? 'no') }}</td>
+                                <td class="fw-bold text-black">
                                     @if (($item['available'] ?? 'no') == 'yes')
                                         <span class="badge bg-success">Available</span>
                                     @else

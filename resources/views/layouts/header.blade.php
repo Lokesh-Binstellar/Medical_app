@@ -42,13 +42,17 @@
                 @endauth
 
                 @auth
+                <span class="fw-bold text-primary">
+                    
                     @if (Auth::user()->pharmacies)
-                        <span class="fw-bold text-primary">
                             Address :
                             {{ Auth::user()->pharmacies->address }}
-
+ 
+                            @elseif (Auth::user()->laboratories)
+                            Address :
+                            {{ Auth::user()->laboratories->lab_name }}
+                            @endif
                         </span>
-                    @endif
                 @endauth
 
             </div>
@@ -187,7 +191,7 @@
                 </div>
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
-                <li>
+                <!-- <li>
                     <a class="dropdown-item" href="{{ route('dashboard') }}">
                         <div class="d-flex">
                             <div class="flex-shrink-0 me-3">
@@ -213,7 +217,7 @@
                             </div>
                         </div>
                     </a>
-                </li>
+                </li> -->
                 <li>
                     <div class="dropdown-divider"></div>
                 </li>
