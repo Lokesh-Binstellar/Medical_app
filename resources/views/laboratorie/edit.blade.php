@@ -231,16 +231,15 @@
                             <div class="col-12 ">
 
                                 <div class="accordion " id="collapsibleSection">
-                                    <div class="card accordion-item border border-dark rounded ">
-                                        <h2 class="accordion-header  sticky-element bg-label-secondary rounded d-flex justify-content-sm-between align-items-sm-center flex-column flex-sm-row "
+                                    <div class="card accordion-item border border-dark rounded">
+                                        <h2 class="accordion-header sticky-element bg-label-secondary rounded d-flex justify-content-sm-between align-items-sm-center flex-column flex-sm-row"
                                             id="headingDeliveryAddress">
-                                            <button type="button" class="accordion-button rounded-top "
+                                            <button type="button" class="accordion-button rounded-top"
                                                 data-bs-toggle="collapse" data-bs-target="#collapseDeliveryAddress"
                                                 aria-expanded="true" aria-controls="collapseDeliveryAddress"
                                                 style="background-color:#033a62;color:white;">
                                                 Update Test Details
                                                 <span class="ms-2 icon-toggle">
-                                                    <!-- Default Down Arrow -->
                                                     <i class="fa-solid fa-chevron-down"></i>
                                                 </span>
                                             </button>
@@ -250,7 +249,7 @@
                                             <div class="accordion-body rounded-bottom" style="background-color: #e9ebee;">
                                                 <div class="row g-4">
                                                     <div id="formRepeater">
-                                                        @foreach ($labTests as $index => $item)
+                                                        @forelse ($labTests as $index => $item)
                                                             <div class="row g-3 align-items-end mb-3 repeater-group">
                                                                 <div class="col-md-2">
                                                                     <label class="form-label fw-semibold">Test</label>
@@ -284,9 +283,9 @@
                                                                     <label class="form-label fw-semibold">Report
                                                                         Time</label>
                                                                     <input type="text" class="form-control"
-                                                                        name="report[]" min="0"
+                                                                        name="report[]"
                                                                         value="{{ $item['report'] ?? '' }}"
-                                                                        placeholder="Home Price" required>
+                                                                        placeholder="e.g. 15 hrs" required>
                                                                 </div>
                                                                 <div class="col-md-2">
                                                                     <label class="form-label fw-semibold">Offer Visiting
@@ -309,22 +308,77 @@
                                                                         class="btn btn-danger waves-effect waves-light">
                                                                         Remove
                                                                     </button>
-
-                                                                    <!-- Add Button -->
                                                                     <button type="button" onclick="addField()"
                                                                         class="btn btn-success waves-effect waves-light">
                                                                         Add
                                                                     </button>
-
                                                                 </div>
                                                             </div>
-                                                        @endforeach
+                                                        @empty
+                                                            <div class="row g-3 align-items-end mb-3 repeater-group">
+                                                                <div class="col-md-2">
+                                                                    <label class="form-label fw-semibold">Test</label>
+                                                                    <select name="test[]" class="form-select" required>
+                                                                        <option value="">Select Test</option>
+                                                                        @foreach ($allTests as $test)
+                                                                            <option value="{{ $test->id }}">
+                                                                                {{ $test->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <label class="form-label fw-semibold">Visiting
+                                                                        Price</label>
+                                                                    <input type="number" class="form-control"
+                                                                        name="price[]" min="0"
+                                                                        placeholder="e.g. 10 Rs" required>
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <label class="form-label fw-semibold">Home
+                                                                        Price</label>
+                                                                    <input type="number" class="form-control"
+                                                                        name="homeprice[]" min="0"
+                                                                        placeholder="e.g. 15 Rs" required>
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <label class="form-label fw-semibold">Report
+                                                                        Time</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="report[]" placeholder="e.g. 15 hrs"
+                                                                        required>
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <label class="form-label fw-semibold">Offer Visiting
+                                                                        Price</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="offer_visiting_price[]"
+                                                                        placeholder="e.g. 5 Rs" required>
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <label class="form-label fw-semibold">Offer Home
+                                                                        Price</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="offer_home_price[]" placeholder="e.g. 10 Rs"
+                                                                        required>
+                                                                </div>
+                                                                <div class="col-md-2 d-flex align-items-end gap-2">
+                                                                    <button type="button" onclick="removeField(this)"
+                                                                        class="btn btn-danger waves-effect waves-light">
+                                                                        Remove
+                                                                    </button>
+                                                                    <button type="button" onclick="addField()"
+                                                                        class="btn btn-success waves-effect waves-light">
+                                                                        Add
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        @endforelse
                                                     </div>
-
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+
                                     <div class="card accordion-item mt-3">
                                         <h2 class="accordion-header" id="headingPaymentMethod">
                                             <button type="button" class="accordion-button collapsed"
@@ -333,7 +387,6 @@
                                                 style="background-color:#033a62;color:white;">
                                                 Add Package Details
                                                 <span class="ms-2 icon-toggle">
-                                                    <!-- Default Down Arrow -->
                                                     <i class="fa-solid fa-chevron-down"></i>
                                                 </span>
                                             </button>
@@ -409,7 +462,7 @@
 
                                                             <div class="col-md-12 mt-3">
                                                                 <label class="form-label fw-semibold">Description</label>
-                                                                <div class="snow-editor" style="height: 200px;"></div>
+                                                                <div class="snow-editor" ></div>
                                                                 <input type="hidden" name="package_description[]"
                                                                     class="description"
                                                                     value="{{ old('package_description.' . $index, $package['package_description'] ?? '') }}">
@@ -440,23 +493,98 @@
                                                             <div class="col-md-2 d-flex align-items-end gap-2">
                                                                 <button type="button" onclick="removePackageField(this)"
                                                                     class="btn btn-danger">Remove</button>
-
                                                                 <button type="button" onclick="addPackageField()"
                                                                     class="btn btn-success">Add</button>
-
                                                             </div>
                                                         </div>
                                                     @empty
-                                                        {{-- Show one blank form if none exist --}}
+                                                        {{-- Show one blank package form --}}
                                                         <div class="repeater-group row g-3 align-items-end mb-3"
                                                             data-index="0">
-                                                            <!-- You can copy same block above and clear value="..." if needed -->
+                                                            <div class="col-md-2">
+                                                                <label class="form-label fw-semibold">Package Name</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="package_name[]" required
+                                                                    placeholder="Enter Package Name">
+                                                            </div>
+
+                                                            <div class="col-md-2">
+                                                                <label class="form-label fw-semibold">Visiting
+                                                                    Price</label>
+                                                                <input type="number" class="form-control"
+                                                                    name="package_visiting_price[]" required
+                                                                    placeholder="e.g. 10 Rs">
+                                                            </div>
+
+                                                            <div class="col-md-2">
+                                                                <label class="form-label fw-semibold">Home Price</label>
+                                                                <input type="number" class="form-control"
+                                                                    name="package_home_price[]" required
+                                                                    placeholder="e.g. 15 Rs">
+                                                            </div>
+
+                                                            <div class="col-md-2">
+                                                                <label class="form-label fw-semibold">Report Time</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="package_report[]" required
+                                                                    placeholder="e.g. 15 hrs">
+                                                            </div>
+
+                                                            <div class="col-md-2">
+                                                                <label class="form-label fw-semibold">Offer Visiting
+                                                                    Price</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="package_offer_visiting_price[]" required
+                                                                    placeholder="e.g. 5 Rs">
+                                                            </div>
+
+                                                            <div class="col-md-2">
+                                                                <label class="form-label fw-semibold">Offer Home
+                                                                    Price</label>
+                                                                <input type="text" class="form-control"
+                                                                    name="package_offer_home_price[]" required
+                                                                    placeholder="e.g. 10 Rs">
+                                                            </div>
+
+                                                            <div class="col-md-12 mt-3">
+                                                                <label class="form-label fw-semibold">Description</label>
+                                                                <div class="snow-editor"></div>
+                                                                <input type="hidden" name="package_description[]"
+                                                                    class="description" value="">
+                                                            </div>
+
+                                                            <div class="col-md-12">
+                                                                <label class="form-label fw-semibold">Category</label>
+                                                                <div class="d-flex flex-wrap gap-3">
+                                                                    @foreach ($categories as $category)
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input class="form-check-input"
+                                                                                type="checkbox"
+                                                                                name="package_category[0][]"
+                                                                                value="{{ $category->id }}"
+                                                                                id="cat0_{{ $category->id }}">
+                                                                            <label class="form-check-label"
+                                                                                for="cat0_{{ $category->id }}">
+                                                                                {{ $category->name }}
+                                                                            </label>
+                                                                        </div>
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-2 d-flex align-items-end gap-2">
+                                                                <button type="button" onclick="removePackageField(this)"
+                                                                    class="btn btn-danger">Remove</button>
+                                                                <button type="button" onclick="addPackageField()"
+                                                                    class="btn btn-success">Add</button>
+                                                            </div>
                                                         </div>
                                                     @endforelse
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+
 
                                 </div>
                             </div>

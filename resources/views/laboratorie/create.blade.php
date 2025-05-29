@@ -353,7 +353,7 @@
                                                             </div>
                                                             <div class="col-md-12 mt-3">
                                                                 <label class="form-label fw-semibold">Description</label>
-                                                                <div class="snow-editor" style="height: 200px;"></div>
+                                                                <div class="snow-editor"></div>
                                                                 <input type="hidden" name="package_description[]"
                                                                     class="description">
                                                             </div>
@@ -550,70 +550,72 @@
             newGroup.querySelectorAll('[name^="package_category["]').forEach(cb => {
                 cb.name = `package_category[${newIndex}][]`;
             });
-
-            repeater.appendChild(newGroup);
-        }
-
-        function removePackageField(button) {
-            const group = button.closest('.repeater-group');
-            const repeater = document.getElementById('packageRepeater');
-            if (repeater.querySelectorAll('.repeater-group').length > 1) {
-                group.remove();
-            } else {
-                alert("At least one package is required.");
-            }
-        }
-
-//snow form editor
-
-        let editors = [];
-
-        $('.snow-editor').each(function(index) {
-            let quill = new Quill(this, {
-                bounds: this,
-                theme: 'snow',
-                placeholder: 'Enter description here...'
-            });
-            editors.push(quill);
-        });
-
-        $('.submit_btn').on('click', function(event) {
-            let valid = true;
-
-            editors.forEach(function(editor, index) {
-                let html = editor.root.innerHTML.trim();
-                let text = editor.getText().trim();
-
-                if (text.length === 0) {
-                    alert('Description cannot be empty in entry #' + (index + 1));
-                    valid = false;
+            newGroup.querySelectorAll('input.description').forEach(desc => {
+                        desc.name = `package_description[${newIndex}]`;
+                        desc.value = '';
+                        repeater.appendChild(newGroup);
+                    });
                 }
 
-                // Set HTML content to corresponding hidden input
-                $('.description').eq(index).val(html);
-            });
-
-            if (!valid) {
-                event.preventDefault(); // prevent form if any invalid
-            }
-        });
-
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const buttons = document.querySelectorAll(".accordion-button");
-
-            buttons.forEach(button => {
-                button.addEventListener("click", function() {
-                    const icon = button.querySelector(".icon-toggle i");
-                    if (button.classList.contains("collapsed")) {
-                        icon.classList.remove("fa-chevron-up");
-                        icon.classList.add("fa-chevron-down");
-                    } else {
-                        icon.classList.remove("fa-chevron-down");
-                        icon.classList.add("fa-chevron-up");
+                    function removePackageField(button) {
+                        const group = button.closest('.repeater-group');
+                        const repeater = document.getElementById('packageRepeater');
+                        if (repeater.querySelectorAll('.repeater-group').length > 1) {
+                            group.remove();
+                        } else {
+                            alert("At least one package is required.");
+                        }
                     }
-                });
-            });
-        });
+
+                    //snow form editor
+
+                    let editors = [];
+                    console.log("index":editors );
+
+                    $('.snow-editor').each(function(index) {
+                        let quill = new Quill(this, {
+                            bounds: this,
+                            theme: 'snow',
+                            placeholder: 'Enter description here...'
+                        });
+                        editors.push(quill);
+                    });
+
+                    $('.submit_btn').on('click', function(event) {
+                        let valid = true;
+
+                        editors.forEach(function(editor, index) {
+                            let html = editor.root.innerHTML.trim();
+                            let text = editor.getText().trim();
+
+
+
+
+                            // Set HTML content to corresponding hidden input
+                            $('.description').eq(index).val(html);
+                        });
+
+                        if (!valid) {
+                            event.preventDefault(); // prevent form if any invalid
+                        }
+                    });
+
+
+                    document.addEventListener("DOMContentLoaded", function() {
+                        const buttons = document.querySelectorAll(".accordion-button");
+
+                        buttons.forEach(button => {
+                            button.addEventListener("click", function() {
+                                const icon = button.querySelector(".icon-toggle i");
+                                if (button.classList.contains("collapsed")) {
+                                    icon.classList.remove("fa-chevron-up");
+                                    icon.classList.add("fa-chevron-down");
+                                } else {
+                                    icon.classList.remove("fa-chevron-down");
+                                    icon.classList.add("fa-chevron-up");
+                                }
+                            });
+                        });
+                    });
     </script>
 @endsection

@@ -20,21 +20,31 @@ class RequestQuoteController extends Controller
 
     //view all Notification
 
-    public function index()
-    {
-        $notifications = DatabaseNotification::all();
+public function index()
+{
+    $user = auth()->user();
 
-        $formattedNotifications = $notifications->map(function ($not) {
-           $data = $not->data;
-            return [
-                'title' => $data['title'] ?? 'Notification',
-                'message' => $data['message'] ?? '',
-                'datetime' => Carbon::parse($not->created_at)->format('d M Y, h:i A'),
-            ];
-        });
 
-        return view('view_notifications.index', compact('formattedNotifications'));
-    }
+    
+    // User ki notifications le rahe hain
+    $notifications = $user->notifications;
+
+    $formattedNotifications = $notifications->map(function ($not) {
+        $data = $not->data;
+
+        return [
+            'title' => $data['title'] ?? 'Notification',
+            'message' => $data['message'] ?? '',
+            'datetime' => Carbon::parse($not->created_at)->format('d M Y, h:i A'),
+            'role' => $data['role'] ?? null,
+            'pharmacy_id' => $data['pharmacy_id'] ?? null,
+            'laboratory_id' => $data['laboratory_id'] ?? null,
+        ];
+    });
+
+    return view('view_notifications.index', compact('formattedNotifications', 'user'));
+}
+
 
 
     public function getRoadDistance($lat1, $lon1, $lat2, $lon2, $apiKey)

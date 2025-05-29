@@ -19,7 +19,6 @@ class PharmaciesController extends Controller
     public function index(Request $request)
     {
 
-        event(new MyEvent("hello world"));
         if ($request->ajax()) {
             $data = Pharmacies::all();
             // dd($data);
