@@ -92,13 +92,15 @@ class LabRequestQuoteController extends Controller
         $matchingLabs = [];
 
         $laboratories = Laboratories::all();
+        
 
         foreach ($laboratories as $lab) {
             // Ensure both cities are available
             if (!empty($lab->city) && !empty($address->city)) {
+                
                 // Case-insensitive city comparison
                 if (strcasecmp(trim($lab->city), trim($address->city)) === 0) {
-
+                    
                     $labTests = json_decode($lab->test, true);
             
                     if (!is_array($labTests)) {
@@ -114,7 +116,7 @@ class LabRequestQuoteController extends Controller
                             $distance = null;
                         }
                     }
-
+                    
                     $matchedTests = collect($labTests)
                         ->filter(function ($labTest) use ($testIds) {
                             return isset($labTest['test']) && $testIds->contains($labTest['test']);

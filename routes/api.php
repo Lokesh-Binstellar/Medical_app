@@ -40,6 +40,7 @@ Route::middleware('check.api.key')->group(function () {
     Route::get('/filterbyorgan', [LabPackageAndTestDetailsController::class, 'getpackageandtestbyorgan'])->name('filterbyorgan');
     Route::post('/getPacakgesAndTestByOrgan/{id}', [LabPackageAndTestDetailsController::class, 'getPacakgesAndTestByOrgan']);
     
+    
     Route::get('/medicines/search', [MedicineController::class, 'search']);
     // Route::get('/medicines/searchById', [MedicineController::class, 'medicineByProductId']);
     Route::get('/medicines/{id}', [MedicineController::class, 'medicineByProductId']);
@@ -55,6 +56,7 @@ Route::middleware('check.api.key')->group(function () {
     
     // with jwt token
     Route::middleware('authTest')->group(function () {
+      Route::post('/bookpackageorlabtest', [LabPackageAndTestDetailsController::class, 'bookpackageorlabtest']);
         Route::post('/customer/address', [CustomerAddressController::class, 'store']);
         Route::get('/customerAddressFetch', [CustomerAddressController::class, 'getAddress']);
         Route::put('/customerDetails', [AuthController::class, 'update']);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LabCart;
 use App\Models\Laboratories;
 use App\Models\LabTest;
 use App\Models\PackageCategory;
@@ -113,4 +114,96 @@ class LabPackageAndTestDetailsController extends Controller
         ], 200);
 
     }
+
+    public function bookpackageorlabtest(Request $request)
+    {
+        $customerId = $request->get('user_id');
+        $labId = $request->input('lab_id');
+        $testId = $request->input('test_id');
+        $packageName = $request->input('package_name');
+        $contains = $request->input('contains');
+
+        // 1. Retrieve or create LabCart for the customer
+        $labCart = LabCart::firstOrCreate(
+            ['customer_id' => $customerId],
+            [
+                'test_details' => json_encode([]),
+                'prescription_id' => null,
+            ]
+        );
+
+        // 2. Decode current test_details
+        $testDetails = json_decode($labCart->test_details, true) ?? [];
+
+        // 3. Check if another lab already exists in cart
+        $existingLabId = null;
+        foreach ($testDetails as $item) {
+            if (isset($item['lab_id'])) {
+                $existingLabId = $item['lab_id'];
+                break;
+            }
+        }
+
+        if ($existingLabId && $labId && $labId != $existingLabId) {
+            $existingLabName = Laboratories::where('id', $existingLabId)->value('lab_name');
+            return response()->json([
+                'status' => false,
+                'message' => "Lab '$existingLabName' already exists in cart. Please clear cart before adding from a new lab.",
+            ], 200);
+        }
+
+        // 4. If lab_id still not present, assign existing
+        if (!$labId && $existingLabId) {
+            $labId = $existingLabId;
+        }
+
+        // 5. Check and update or add entry
+        $updated = false;
+
+        if ($testId) {
+            foreach ($testDetails as &$item) {
+                if (isset($item['test_id']) && $item['test_id'] == $testId) {
+                    $item['contains'] = $contains;
+                    $updated = true;
+                    break;
+                }
+            }
+            unset($item);
+
+            if (!$updated) {
+                $testDetails[] = [
+                    'test_id' => (string) $testId,
+                    'contains' => (string) $contains,
+                    'lab_id' => (string) $labId,
+                ];
+            }
+
+        } elseif ($packageName) {
+            foreach ($testDetails as &$item) {
+                if (isset($item['package_name']) && $item['package_name'] == $packageName) {
+                    $updated = true;
+                    break;
+                }
+            }
+            unset($item);
+
+            if (!$updated) {
+                $testDetails[] = [
+                    'package_name' => $packageName,
+                    'lab_id' => (string) $labId,
+                ];
+            }
+        }
+
+        // 6. Save updated test_details
+        $labCart->test_details = json_encode($testDetails);
+        $labCart->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Lab cart updated successfully.',
+            'updated_test_details' => $testDetails,
+        ]);
+    }
+
 }
