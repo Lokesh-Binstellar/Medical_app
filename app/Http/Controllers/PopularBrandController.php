@@ -6,7 +6,6 @@ use App\Models\Otcmedicine;
 use App\Models\PopularBrand;
 use App\Models\Medicine;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -22,7 +21,7 @@ class PopularBrandController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('logo', function ($brand) {
-                    return '<img src="' . asset('popular/brands/' . $brand->logo) . '" border="0" width="40" class="img-rounded" align="center" />';
+                    return '<img src="' . asset('storage/brands/' . $brand->logo) . '" border="0" width="40" class="img-rounded" align="center" />';
                 })
                 ->addColumn('action', function ($row) {
                     return '
@@ -30,14 +29,10 @@ class PopularBrandController extends Controller
                         <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
                         <ul class="dropdown-menu">
                             <li>
-                                <a href="' .
-                        route('popular.edit', $row->id) .
-                        '" class="dropdown-item">Edit</a>
+                                <a href="' . route('popular.edit', $row->id) . '" class="dropdown-item">Edit</a>
                             </li>
                             <li>
-                                <button type="button" onclick="deleteUser(' .
-                        $row->id .
-                        ')" class="dropdown-item text-danger">Delete</button>
+                                <button type="button" onclick="deleteUser(' . $row->id . ')" class="dropdown-item text-danger">Delete</button>
                             </li>
                         </ul>
                     </div>';
@@ -46,15 +41,24 @@ class PopularBrandController extends Controller
                 ->make(true);
         }
 
-        $medicineMarketers = Medicine::select('marketer')->whereNotNull('marketer')->distinct()->pluck('marketer');
+        $medicineMarketers = Medicine::select('marketer')
+            ->whereNotNull('marketer')
+            ->distinct()
+            ->pluck('marketer');
 
-        $otcManufacturers = Otcmedicine::select('manufacturers')->whereNotNull('manufacturers')->distinct()->pluck('manufacturers');
+        $otcManufacturers = Otcmedicine::select('manufacturers')
+            ->whereNotNull('manufacturers')
+            ->distinct()
+            ->pluck('manufacturers');
 
         $popularBrands = $medicineMarketers->merge($otcManufacturers)->unique()->values();
         $AddedBrands = PopularBrand::all();
 
         return view('popular.index', compact('popularBrands', 'AddedBrands'));
     }
+
+
+
 
     public function store(Request $request)
     {
@@ -85,6 +89,7 @@ class PopularBrandController extends Controller
             $brand->logo = $saveName;
         }
 
+
         $brand->save();
 
         return redirect()->route('popular.index')->with('success', 'Brand added successfully.');
@@ -109,28 +114,14 @@ class PopularBrandController extends Controller
         $brand->name = $request->name;
 
         if ($request->hasFile('logo')) {
-            $file = $request->file('logo');
-            $originalName = $file->getClientOriginalName();
-            $destinationPath = public_path('popular/brands');
-
-            // Ensure directory exists
-            if (!file_exists($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
+            // Delete old logo if exists
+            if ($brand->logo && Storage::disk('public')->exists($brand->logo)) {
+                Storage::disk('public')->delete($brand->logo);
             }
 
-            $saveName = $originalName;
+            $path = $request->file('logo')->store('brands', 'public');
 
-            // Delete old logo if it exists
-            $oldLogoPath = public_path('popular/brands/' . $brand->logo);
-            if ($brand->logo && file_exists($oldLogoPath)) {
-                unlink($oldLogoPath);
-            }
-
-            // Move new logo to destination
-            $file->move($destinationPath, $saveName);
-
-            // Save only the file name
-            $brand->logo = $saveName;
+            $brand->logo = $path;
         }
 
         $brand->save();
@@ -158,21 +149,21 @@ class PopularBrandController extends Controller
             return [
                 'id' => $brand->id,
                 'name' => $brand->name,
-                'logo' => $brand->logo ? url('popular/brands/' . basename($brand->logo)) : [],
+                'logo' => $brand->logo ? url('storage/brands/' . basename($brand->logo)) : [],
+
             ];
         });
 
-        return response()->json(
-            [
-                'status' => true,
-                'data' => $brandsData,
-            ],
-            200,
-        );
+        return response()->json([
+            'status' => true,
+            'data' => $brandsData
+        ], 200);
     }
 
     public function productListByBrand(Request $request, $brandName)
     {
+
+
         $page = $request->query('page', 1);
         $perPage = $request->query('per_page', 20);
 
@@ -180,13 +171,10 @@ class PopularBrandController extends Controller
         $productFormFilter = $request->query('product_form');
 
         if (!$brandName) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => 'Brand parameter is required.',
-                ],
-                400,
-            );
+            return response()->json([
+                'status' => false,
+                'message' => 'Brand parameter is required.'
+            ], 400);
         }
 
         $baseUrl = url('medicines');
@@ -196,16 +184,18 @@ class PopularBrandController extends Controller
         $medicines = Medicine::where('marketer', $brandName)
             ->when($packageFilter, fn($q) => $q->where('package', $packageFilter))
             ->when($productFormFilter, fn($q) => $q->where('product_form', $productFormFilter))
-            ->select('product_id', 'product_name', 'salt_composition', 'packaging_detail', 'image_url', 'marketer', 'product_form')
+            ->select('product_id', 'product_name', 'salt_composition', 'package', 'image_url', 'marketer', 'product_form')
             ->get()
             ->map(function ($item) use ($baseUrl, $defaultImage) {
                 return [
                     'product_id' => $item->product_id,
                     'product_name' => $item->product_name,
                     'salt_composition' => $item->salt_composition,
-                    'packaging_detail' => $item->packaging_detail,
+                    'packaging_detail' => $item->package,
                     'product_form' => $item->product_form,
-                    'image_url' => $item->image_url ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img))) : [$defaultImage],
+                    'image_url' => $item->image_url
+                        ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
+                        : [$defaultImage],
                     'type' => 'medicine',
                     'brand' => $item->marketer ?? '',
                 ];
@@ -215,16 +205,18 @@ class PopularBrandController extends Controller
         $otc = Otcmedicine::where('manufacturers', $brandName)
             ->when($packageFilter, fn($q) => $q->where('package', $packageFilter))
             ->when($productFormFilter, fn($q) => $q->where('product_form', $productFormFilter))
-            ->select('otc_id', 'name', 'packaging', 'image_url', 'manufacturers', 'product_form')
+            ->select('otc_id', 'name', 'package', 'image_url', 'manufacturers', 'product_form')
             ->get()
             ->map(function ($item) use ($baseUrl, $defaultImage) {
                 return [
                     'product_id' => $item->otc_id,
                     'product_name' => $item->name,
                     'salt_composition' => null,
-                    'packaging_detail' => $item->packaging,
+                    'packaging_detail' => $item->package,
                     'product_form' => $item->product_form,
-                    'image_url' => $item->image_url ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img))) : [$defaultImage],
+                    'image_url' => $item->image_url
+                        ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
+                        : [$defaultImage],
                     'type' => 'otc',
                     'brand' => $item->manufacturers ?? '',
                 ];
@@ -237,19 +229,27 @@ class PopularBrandController extends Controller
         $paginated = $merged->slice(($page - 1) * $perPage, $perPage)->values();
 
         // --- Paginate manually ---
-        $paginator = new LengthAwarePaginator($paginated, $total, $perPage, $page, ['path' => url()->current(), 'query' => $request->query()]);
+        $paginator = new LengthAwarePaginator(
+            $paginated,
+            $total,
+            $perPage,
+            $page,
+            ['path' => url()->current(), 'query' => $request->query()]
+        );
 
         // --- Return JSON response ---
         return response()->json([
-            'status' => true,
+            'success' => true,
             'data' => $paginator->items(),
             'meta' => [
                 'total' => $paginator->total(),
                 'per_page' => $paginator->perPage(),
                 'current_page' => $paginator->currentPage(),
                 'last_page' => $paginator->lastPage(),
-            ],
+            ]
         ]);
+
+
     }
 
     public function destroy($id)
@@ -266,19 +266,46 @@ class PopularBrandController extends Controller
         return response()->json(['status' => true, 'message' => 'Brand deleted successfully.']);
     }
 
-    public function getFilters()
+    public function getFilters(Request $request)
     {
-        // Unique product forms
-        $medicineForms = Medicine::whereNotNull('product_form')->where('product_form', '!=', '')->distinct()->pluck('product_form');
+        $brandName = $request->name;
 
-        $otcForms = Otcmedicine::whereNotNull('product_form')->where('product_form', '!=', '')->distinct()->pluck('product_form');
+        // Filtered query based on brand name if provided
+        $medicineQuery = Medicine::query();
+        $otcQuery = Otcmedicine::query();
+
+        if ($brandName) {
+            $medicineQuery->where('marketer', 'LIKE', "%$brandName%");
+            $otcQuery->where('manufacturers', 'LIKE', "%$brandName%");
+        }
+
+        // Unique product forms
+        $medicineForms = (clone $medicineQuery)
+            ->whereNotNull('product_form')
+            ->where('product_form', '!=', '')
+            ->distinct()
+            ->pluck('product_form');
+
+        $otcForms = (clone $otcQuery)
+            ->whereNotNull('product_form')
+            ->where('product_form', '!=', '')
+            ->distinct()
+            ->pluck('product_form');
 
         $productForms = $medicineForms->merge($otcForms)->unique()->values();
 
         // Unique package details
-        $medicinePackages = Medicine::whereNotNull('package')->where('package', '!=', '')->distinct()->pluck('package');
+        $medicinePackages = (clone $medicineQuery)
+            ->whereNotNull('package')
+            ->where('package', '!=', '')
+            ->distinct()
+            ->pluck('package');
 
-        $otcPackages = Otcmedicine::whereNotNull('package')->where('package', '!=', '')->distinct()->pluck('package');
+        $otcPackages = (clone $otcQuery)
+            ->whereNotNull('package')
+            ->where('package', '!=', '')
+            ->distinct()
+            ->pluck('package');
 
         $package = $medicinePackages->merge($otcPackages)->unique()->values();
 
@@ -286,8 +313,8 @@ class PopularBrandController extends Controller
             'status' => true,
             'filters' => [
                 'product_forms' => $productForms,
-                'package' => $package,
-            ],
+                'package' => $package
+            ]
         ]);
     }
 }

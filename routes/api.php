@@ -36,7 +36,7 @@ Route::post('/login', [AuthTokenController::class, 'login']);
 
 //fetch apis
 Route::middleware('check.api.key')->group(function () {
-    Route::get('/getAllPharmacy', [PharmaciesController::class, 'getPharmacy'])->name('pharmacy.getPharmacy');
+    Route::post('/getAllPharmacy', [PharmaciesController::class, 'getPharmacy'])->name('pharmacy.getPharmacy');
     Route::get('/filterbyorgan', [LabPackageAndTestDetailsController::class, 'getpackageandtestbyorgan'])->name('filterbyorgan');
     Route::post('/getPacakgesAndTestByOrgan/{id}', [LabPackageAndTestDetailsController::class, 'getPacakgesAndTestByOrgan']);
     
@@ -117,15 +117,15 @@ Route::middleware('check.api.key')->group(function () {
     Route::post('/join-us', [JoinUsController::class, 'store']);
 
     Route::get('/placeOrder', [MedicineSearchController::class, 'placeOrder']);
-    Route::get('/brand/filter', [PopularBrandController::class, 'getFilters']);
-    Route::get('/category/filter', [OtcController::class, 'getFilters']);
+    Route::post('/brand/filter', [PopularBrandController::class, 'getFilters']);
+    Route::post('/category/filter', [OtcController::class, 'getFilters']);
 
 
 
 
 //    Laboratory
 
-  Route::get('/getAllLaboratory', [LaboratoriesController::class, 'getAllLaboratory']);
+  Route::post('/getAllLaboratory', [LaboratoriesController::class, 'getAllLaboratory']);
 
 
 });

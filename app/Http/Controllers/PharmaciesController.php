@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\MyEvent;
 use App\Events\TestEvent;
 use App\Models\Pharmacies;
+use App\Models\Rating;
 use App\Models\User;
 use File;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ class PharmaciesController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-    return '
+                    return '
     <div class="dropdown">
         <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown" aria-expanded="false">
             Action
@@ -41,7 +42,7 @@ class PharmaciesController extends Controller
             </li>
         </ul>
     </div>';
-})
+                })
 
                 ->rawColumns(['action'])
                 ->make(true);
@@ -210,25 +211,69 @@ class PharmaciesController extends Controller
     }
 
     // Api
-    public function getPharmacy()
+    public function getPharmacy(Request $request)
     {
+        $latlong = $request->latlong;
+        if (!$latlong) {
+            return response()->json(['status' => false, 'message' => 'latlong is required'], 400);
+        }
+
+        [$userLat, $userLon] = explode(',', $latlong);
+        $userLat = trim($userLat);
+        $userLon = trim($userLon);
+
+        $apiKey = env('GOOGLE_MAPS_API_KEY'); // Set this in your .env
+
         $pharmacies = Pharmacies::all();
 
-        $pharmacyData = $pharmacies->map(function ($pharmacy) {
-            return [
-                'id' => $pharmacy->id,
-                'pharmacy_name' => $pharmacy->pharmacy_name,
-                'latitude' => $pharmacy->latitude,
-                'longitude' => $pharmacy->longitude,
-                'image' => $pharmacy->image
-                    ? [url('assets/image/' . basename($pharmacy->image))]
-                    : [],
-            ];
-        });
+        $nearbyPharmacies = [];
+
+        foreach ($pharmacies as $pharmacy) {
+            $pharmacyLat = $pharmacy->latitude;
+            $pharmacyLon = $pharmacy->longitude;
+
+            $url = "https://maps.googleapis.com/maps/api/directions/json?origin=$userLat,$userLon&destination=$pharmacyLat,$pharmacyLon&key=$apiKey";
+
+            $response = file_get_contents($url);
+            $data = json_decode($response, true);
+
+            if ($data['status'] === 'OK') {
+                $distanceMeters = $data['routes'][0]['legs'][0]['distance']['value'];
+                $distanceKm = $distanceMeters / 1000;
+
+
+
+
+                if ($distanceKm <= 10) {
+
+                    // Fetch rating info
+                    $ratingData = Rating::where('rateable_type', 'Pharmacy')
+                        ->where('rateable_id', $pharmacy->user_id)
+                        ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as rating_count')
+                        ->first();
+
+                    $formattedRating = $ratingData->rating_count > 0
+                        ? round($ratingData->avg_rating, 1) . ' (' . $ratingData->rating_count . ')'
+                        : null;
+
+                    $nearbyPharmacies[] = [
+                        'id' => $pharmacy->id,
+                        'pharmacy_name' => $pharmacy->pharmacy_name,
+                        'latitude' => $pharmacy->latitude,
+                        'longitude' => $pharmacy->longitude,
+                        'distance_km' => round($distanceKm, 2),
+                        'image' => $pharmacy->image
+                            ? [url('assets/image/' . basename($pharmacy->image))]
+                            : [],
+                        'rating' => $formattedRating,
+                    ];
+                }
+            }
+        }
 
         return response()->json([
             'status' => true,
-            'data' => $pharmacyData
+            'data' => $nearbyPharmacies
         ], 200);
     }
 
@@ -237,30 +282,30 @@ class PharmaciesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-   public function destroy($id, Request $request)
-{
-    try {
-        $pharmacist = Pharmacies::findOrFail($id);
-        $pharmacist->delete();
+    public function destroy($id, Request $request)
+    {
+        try {
+            $pharmacist = Pharmacies::findOrFail($id);
+            $pharmacist->delete();
 
-        if ($request->ajax()) {
-            return response()->json([
-                'status' => true,
-                'message' => 'Pharmacist deleted successfully'
-            ]);
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Pharmacist deleted successfully'
+                ]);
+            }
+
+            return redirect()->route('pharmacist.index')->with('success', 'Pharmacist deleted successfully');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Failed to delete pharmacist. Error: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->route('pharmacist.index')->with('error', 'Failed to delete pharmacist');
         }
-
-        return redirect()->route('pharmacist.index')->with('success', 'Pharmacist deleted successfully');
-    } catch (\Exception $e) {
-        if ($request->ajax()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Failed to delete pharmacist. Error: ' . $e->getMessage()
-            ], 500);
-        }
-
-        return redirect()->route('pharmacist.index')->with('error', 'Failed to delete pharmacist');
     }
-}
 
 }

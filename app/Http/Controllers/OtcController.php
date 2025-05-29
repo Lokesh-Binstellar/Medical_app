@@ -172,10 +172,20 @@ class OtcController extends Controller
         //
     }
 
-    public function getFilters()
+    public function getFilters(Request $request)
     {
+        $categoryName = $request->name;
+
+        // Base query with optional category filter
+        $otcQuery = Otcmedicine::query();
+
+        if ($categoryName) {
+            $otcQuery->where('category', 'LIKE', "%$categoryName%");
+        }
+
         // Unique product forms from OTC
-        $productForms = Otcmedicine::whereNotNull('product_form')
+        $productForms = (clone $otcQuery)
+            ->whereNotNull('product_form')
             ->where('product_form', '!=', '')
             ->distinct()
             ->pluck('product_form')
@@ -183,7 +193,8 @@ class OtcController extends Controller
             ->values();
 
         // Unique packages from OTC
-        $package = Otcmedicine::whereNotNull('package')
+        $package = (clone $otcQuery)
+            ->whereNotNull('package')
             ->where('package', '!=', '')
             ->distinct()
             ->pluck('package')
@@ -197,5 +208,6 @@ class OtcController extends Controller
                 'package' => $package,
             ]
         ]);
+
     }
 }
