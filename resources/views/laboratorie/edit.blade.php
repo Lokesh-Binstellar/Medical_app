@@ -1,10 +1,19 @@
 @extends('layouts.app')
 
 @section('styles')
-    {{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" /> --}}
+
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/katex.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}" />
+
+    {{-- <style>
+    .snow-editor {
+        min-height: 150px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 10px;
+        background-color: #fff;
+    }
+</style> --}}
 @endsection
 @section('content')
     <div class="container">
@@ -462,7 +471,7 @@
 
                                                             <div class="col-md-12 mt-3">
                                                                 <label class="form-label fw-semibold">Description</label>
-                                                                <div class="snow-editor" ></div>
+                                                                <div class="snow-editor"></div>
                                                                 <input type="hidden" name="package_description[]"
                                                                     class="description"
                                                                     value="{{ old('package_description.' . $index, $package['package_description'] ?? '') }}">
@@ -564,9 +573,7 @@
                                                                                 value="{{ $category->id }}"
                                                                                 id="cat0_{{ $category->id }}">
                                                                             <label class="form-check-label"
-                                                                                for="cat0_{{ $category->id }}">
-                                                                                {{ $category->name }}
-                                                                            </label>
+                                                                                for="cat0_{{ $category->id }}">{{ $category->name }}</label>
                                                                         </div>
                                                                     @endforeach
                                                                 </div>
@@ -584,21 +591,21 @@
                                             </div>
                                         </div>
                                     </div>
-
-
                                 </div>
+
                             </div>
                         </div>
-                        {{-- Buttons --}}
-                        <div class="card-action">
-                            <button type="submit" class="btn btn-primary submit-btn">Update</button>
-                            <button type="button" class="btn btn-primary"
-                                onclick="window.location='{{ route('laboratorie.index') }}'">Cancel</button>
-                        </div>
-                    </form>
                 </div>
+                {{-- Buttons --}}
+                <div class="card-action">
+                    <button type="submit" class="btn btn-primary submit-btn">Update</button>
+                    <button type="button" class="btn btn-primary"
+                        onclick="window.location='{{ route('laboratorie.index') }}'">Cancel</button>
+                </div>
+                </form>
             </div>
         </div>
+    </div>
     </div>
 @endsection
 @section('scripts')
@@ -683,103 +690,110 @@
         }
 
 
+        let packageIndex = {{ count($packages) ?: 1 }};
+
         function addPackageField() {
             const repeater = document.getElementById('packageRepeater');
-            const allGroups = repeater.querySelectorAll('.repeater-group');
-            const newIndex = allGroups.length;
 
-            const firstGroup = allGroups[0];
-            const newGroup = firstGroup.cloneNode(true);
+            const html = `
+        <div class="repeater-group row g-3 align-items-end mb-3" data-index="${packageIndex}">
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Package Name</label>
+                <input type="text" class="form-control" name="package_name[]" required placeholder="Enter Package Name">
+            </div>
 
-            // Clear input values
-            newGroup.querySelectorAll('input, textarea, select').forEach(input => {
-                if (input.type === 'checkbox') {
-                    input.checked = false;
-                } else {
-                    input.value = '';
-                }
-            });
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Visiting Price</label>
+                <input type="number" class="form-control" name="package_visiting_price[]" required placeholder="e.g. 10 Rs">
+            </div>
 
-            // Update the index
-            newGroup.setAttribute('data-index', newIndex);
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Home Price</label>
+                <input type="number" class="form-control" name="package_home_price[]" required placeholder="e.g. 15 Rs">
+            </div>
 
-            // Update names and IDs for inputs and labels
-            newGroup.querySelectorAll('[name]').forEach(input => {
-                if (input.name.startsWith('package_category')) {
-                    input.name = `package_category[${newIndex}][]`;
-                } else if (input.name.includes('package_description')) {
-                    input.name = 'package_description[]';
-                } else {
-                    const baseName = input.name.replace(/\[\]$/, '');
-                    input.name = `${baseName}[]`;
-                }
-            });
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Report Time</label>
+                <input type="text" class="form-control" name="package_report[]" required placeholder="e.g. 15 hrs">
+            </div>
 
-            // Update IDs and "for" attributes of checkboxes
-            newGroup.querySelectorAll('.form-check-input').forEach((checkbox) => {
-                const catId = checkbox.value;
-                const newId = `cat${newIndex}_${catId}`;
-                const label = newGroup.querySelector(`label[for="${checkbox.id}"]`);
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Offer Visiting Price</label>
+                <input type="text" class="form-control" name="package_offer_visiting_price[]" required placeholder="e.g. 5 Rs">
+            </div>
 
-                checkbox.id = newId;
-                if (label) {
-                    label.setAttribute('for', newId);
-                }
-            });
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Offer Home Price</label>
+                <input type="text" class="form-control" name="package_offer_home_price[]" required placeholder="e.g. 10 Rs">
+            </div>
 
+            <div class="col-md-12 mt-3">
+                <label class="form-label fw-semibold">Description</label>
+                <div class="snow-editor" id="editor-${packageIndex}"></div>
+                <input type="hidden" name="package_description[]" class="description" value="">
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label fw-semibold">Category</label>
+                <div class="d-flex flex-wrap gap-3">
+                    @foreach ($categories as $category)
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="package_category[${packageIndex}][]" value="{{ $category->id }}" id="cat${packageIndex}_{{ $category->id }}">
+                            <label class="form-check-label" for="cat${packageIndex}_{{ $category->id }}">{{ $category->name }}</label>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end gap-2">
+                <button type="button" onclick="removePackageField(this)" class="btn btn-danger">Remove</button>
+                <button type="button" onclick="addPackageField()" class="btn btn-success">Add</button>
+            </div>
+        </div>`;
+
+            // Create a container div and append it
+            const temp = document.createElement('div');
+            temp.innerHTML = html.trim();
+            const newGroup = temp.firstChild;
+
+            // Append to repeater
             repeater.appendChild(newGroup);
+
+            // Init Quill editor
+            const quill = new Quill(`#editor-${packageIndex}`, {
+                theme: 'snow'
+            });
+
+            // Bind input sync
+            const hiddenInput = newGroup.querySelector('input.description');
+            quill.on('text-change', function() {
+                hiddenInput.value = quill.root.innerHTML;
+            });
+
+            packageIndex++;
         }
 
         function removePackageField(button) {
-            const group = button.closest('.repeater-group');
             const repeater = document.getElementById('packageRepeater');
             if (repeater.querySelectorAll('.repeater-group').length > 1) {
-                group.remove();
-            } else {
-                alert("At least one package is required.");
+                button.closest('.repeater-group').remove();
             }
         }
-        //Snow editor Code
-        let editors = [];
 
-        // Initialize all Quill editors and prefill from hidden inputs
-        $('.snow-editor').each(function(index) {
-            let quill = new Quill(this, {
-                bounds: this,
-                theme: 'snow',
-                placeholder: 'Enter description here...'
+        // Initialize editors on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.snow-editor').forEach((editor, i) => {
+                const quill = new Quill(editor, {
+                    theme: 'snow'
+                });
+                const hiddenInput = editor.parentNode.querySelector('input.description');
+                quill.root.innerHTML = hiddenInput.value;
+
+                quill.on('text-change', function() {
+                    hiddenInput.value = quill.root.innerHTML;
+                });
             });
-
-            // Prefill from existing hidden input value
-            let html = $('.description').eq(index).val();
-            if (html && html.trim().length > 0) {
-                quill.root.innerHTML = html;
-            }
-
-            editors.push(quill);
-        });
-
-
-        $('.submit-btn').on('click', function(event) {
-            let valid = true;
-
-            editors.forEach(function(editor, index) {
-                let html = editor.root.innerHTML.trim();
-                let text = editor.getText().trim();
-
-                if (text.length === 0) {
-                    alert('Description cannot be empty in entry #' + (index + 1));
-                    valid = false;
-                }
-
-                $('.description').eq(index).val(html);
-            });
-
-            if (!valid) {
-                event.preventDefault(); // Prevent form if any description is empty
-            }
-        });
-
+        })
 
         document.addEventListener("DOMContentLoaded", function() {
             const buttons = document.querySelectorAll(".accordion-button");
