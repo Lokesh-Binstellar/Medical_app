@@ -6,17 +6,17 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport"
-    content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-       <meta name="csrf-token" content="{{ csrf_token() }}">
+        content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="" />
-   
+
 
     @yield('token')
     <title>@yield('title')</title>
     {{-- <title>Dashboard - {{ config('app.name', 'Laravel') }}</title> --}}
 
 
-    
+
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="assets/img/kaiadmin/favicon.ico" />
@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/materialdesignicons.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/fontawesome.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/flag-icons.css') }}" />
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    {{-- <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet"> --}}
 
 
     <!-- Menu waves for no-customizer fix -->
@@ -61,9 +61,14 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
+    {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
 
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/@form-validation/umd/styles/index.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/parsleyjs/src/parsley.css"> --}}
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css"> --}}
     <style>
         /* ::-webkit-scrollbar-track {
             -webkit-box-shadow: inset 0 0 6px #033a62;
@@ -96,11 +101,11 @@
 
         .parsley-required,
         .parsley-type,
-        .parsley-errors-list  {
+        .parsley-errors-list {
             color: red !important;
         }
 
-        .parsley-errors-list{
+        .parsley-errors-list {
             font-size: 12px !important;
         }
 
@@ -121,9 +126,9 @@
             left: 17.63rem !important;
         }
 
-        .layout-navbar-fixed .layout-navbar.navbar-detached {
+        /* .layout-navbar-fixed .layout-navbar.navbar-detached {
             width: 84% !important;
-        }
+        } */
 
         .align {
             text-align: left !important;
@@ -202,7 +207,7 @@
             }
         }
     </style>
-     @livewireStyles
+    @livewireStyles
 
     @yield('styles')
 
@@ -289,20 +294,27 @@
     <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
 
     <script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script> --}}
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
+
+
+    <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/parsleyjs"></script>/ --}}
     {{-- <script src="https://code.highcharts.com/highcharts.js"></script> --}}
     {{-- <script
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1mG52tiHM3duCJupl0CtEB3xpzUGiohQ&callback=initAutocomplete&libraries=places&v=weekly"
     defer
   ></script> --}}
 
-     
-  
+
+
 
     @yield('scripts')
- @livewireScripts
+    @livewireScripts
     <script>
         $(document).ready(function() {
 
@@ -378,7 +390,7 @@
 
 
 
-   
+
 </body>
 
 </html>

@@ -2,8 +2,6 @@
 @section('styles')
     {{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" /> --}}
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/parsleyjs/src/parsley.css">
 @endsection
 @section('content')
     <div class="container">
@@ -13,18 +11,23 @@
                     <div class="card shadow">
                         <div class="card-header d-flex justify-content-between align-items-center rounded-top">
                             <h4 class="card-title mb-0 text-white">Medicine</h4>
+                            <div class="d-flex justify-content-between align-items-center">
                             <form action="{{ route('medicine.import') }}" id="importForm" method="POST"
-                                enctype="multipart/form-data" class="d-flex align-items-center gap-2" data-parsley-validate>
+                                enctype="multipart/form-data" class="d-flex gap-2">
 
                                 @csrf
+                                <div class="error-msg">
 
-                                <input type="file" name="file" class="form-control" id="file" required
-                                    data-parsley-required-message="Please select a file.">
+                                    <input type="file" name="file" class="form-control" id="file" required>
+                                </div>
+                                <div>
 
-                                <button type="submit" class="btn btn-primary addButton text-nowrap px-5">
-                                    + Import Medicine
-                                </button>
+                                    <button type="submit" class="btn btn-primary addButton text-nowrap px-5">
+                                        + Import Medicine
+                                    </button>
+                                </div>
                             </form>
+                            </div>
 
                         </div>
 
@@ -86,16 +89,16 @@
                 ]
             });
 
-            $(document).ready(function() {
-                $('#importForm').parsley();
-            });
+            // $(document).ready(function() {
+            //     $('#importForm').parsley();
+            // });
 
         });
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/parsleyjs"></script>
-    {{-- <script src="{{ asset('js/medicine/medicine_form.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
+
+    <script src="{{ asset('js/medicine/medicine_form.js') }}"></script>
+    {{-- <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>

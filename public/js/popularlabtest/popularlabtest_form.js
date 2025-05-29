@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 validators: {
                     notEmpty: {
                         message: 'Please select a lab test.'
-                    }``
+                    }
                 }
             }
         },
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
             trigger: new FormValidation.plugins.Trigger(),
             bootstrap5: new FormValidation.plugins.Bootstrap5({
                 eleValidClass: '',
-                rowSelector: '.col-md-6, .col-md-12,.error-msg'
+                rowSelector: '.error-msg'
             }),
             submitButton: new FormValidation.plugins.SubmitButton(),
             defaultSubmit: new FormValidation.plugins.DefaultSubmit(),

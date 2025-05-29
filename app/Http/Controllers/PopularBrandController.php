@@ -99,44 +99,44 @@ class PopularBrandController extends Controller
     }
 
     public function update(Request $request, $id)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-    ]);
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
 
-    $brand = PopularBrand::findOrFail($id);
-    $brand->name = $request->name;
+        $brand = PopularBrand::findOrFail($id);
+        $brand->name = $request->name;
 
-    if ($request->hasFile('logo')) {
-        $file = $request->file('logo');
-        $originalName = $file->getClientOriginalName();
-        $destinationPath = public_path('popular/brands');
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            $originalName = $file->getClientOriginalName();
+            $destinationPath = public_path('popular/brands');
 
-        // Ensure directory exists
-        if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0755, true);
+            // Ensure directory exists
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            $saveName = $originalName;
+
+            // Delete old logo if it exists
+            $oldLogoPath = public_path('popular/brands/' . $brand->logo);
+            if ($brand->logo && file_exists($oldLogoPath)) {
+                unlink($oldLogoPath);
+            }
+
+            // Move new logo to destination
+            $file->move($destinationPath, $saveName);
+
+            // Save only the file name
+            $brand->logo = $saveName;
         }
 
-        $saveName = $originalName;
+        $brand->save();
 
-        // Delete old logo if it exists
-        $oldLogoPath = public_path('popular/brands/' . $brand->logo);
-        if ($brand->logo && file_exists($oldLogoPath)) {
-            unlink($oldLogoPath);
-        }
-
-        // Move new logo to destination
-        $file->move($destinationPath, $saveName);
-
-        // Save only the file name
-        $brand->logo = $saveName;
+        return redirect()->route('popular.index')->with('success', 'Brand updated successfully.');
     }
-
-    $brand->save();
-
-    return redirect()->route('popular.index')->with('success', 'Brand updated successfully.');
-}
 
     public function brandSearch(Request $request)
     {

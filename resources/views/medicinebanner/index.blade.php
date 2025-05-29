@@ -1,13 +1,16 @@
 @extends('layouts.app')
 @section('styles')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
     <style>
-        .select2 {
+        /* .select2 {
             width: 300px !important;
         }
 
         body>span.select2-container.select2-container--default.select2-container--open {
             width: auto !important;
+        } */
+         .fv-plugins-message-container.fv-plugins-message-container--enabled.invalid-feedback {
+            min-height: 1.5rem;
         }
     </style>
 @endsection
@@ -19,31 +22,42 @@
                     <div class="card shadow">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title mb-0 ">Medicine Screen Banner </h4>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <form action="{{ route('medicinebanner.store') }}" method="POST"
-                                    enctype="multipart/form-data" class="d-flex gap-2 " id="importForm">
-                                    @csrf
 
-                                    <div class="error-msg">
-                                        <input type="file" name="image" class="form-control" required>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="">
+                                @if ($errors->any())
+                                    <div class="alert alert-danger">
+                                        <ul class="mb-0">
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
                                     </div>
-                                    <div class="error-msg">
+                                @endif
+                                <form action="{{ route('medicinebanner.store') }}" method="POST"
+                                    enctype="multipart/form-data" class="row g-3 align-items-center" id="importForm">
+                                    @csrf
+                                    <div class="error-msg col-md-4">
+                                        <label for="logo" class="form-label"> Banner
+                                            (jpeg,png,jpg,gif,svg)</label>
+                                        <input type="file" name="image" class="form-control" required>
+
+                                    </div>
+                                    <div class="error-msg col-md-4">
+                                        <label for="name" class="form-label">Select priority</label>
                                         <input type="number" name="priority" class="form-control" placeholder="Priority"
                                             min="0" required>
                                     </div>
 
-                                    <div>
-
-                                        <button type="submit" class="btn btn-primary addButton text-nowrap px-5">+ Add
-                                            Banner</button>
+                                    <div class="col-md-4 d-flex align-items-end">
+                                        <button type="submit" class="btn btn-primary ">+ Add Banner</button>
                                     </div>
 
                                 </form>
                             </div>
 
-                        </div>
-
-                        <div class="card-body">
                             @if (session('success'))
                                 <div class="alert alert-success">{{ session('success') }}</div>
                             @endif
@@ -149,4 +163,5 @@
             };
         });
     </script>
+    <script src="{{ asset('js/homebanner/homebanner_form.js') }}"></script>
 @endsection

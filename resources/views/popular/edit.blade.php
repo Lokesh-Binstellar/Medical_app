@@ -1,9 +1,9 @@
 @extends('layouts.app')
 @section('styles')
 
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" /> --}}
 
 @endsection
 @section('content')
@@ -66,9 +66,9 @@
                                                 style="max-height: 150px;">
                                         </div>
                                     @endif
-                                    <input type="file" name="logo" class="form-control"
-                                        data-parsley-required="{{ $brand->logo ? 'false' : 'true' }}"
-                                        data-parsley-required-message="The image field is required.">
+                                    <input type="file" name="logo" class="form-control">
+                                        {{-- data-parsley-required="{{ $brand->logo ? 'false' : 'true' }}"
+                                        data-parsley-required-message="The image field is required."> --}}
                                     <small class="text-muted">Leave blank to keep existing image</small>
                                 </div>
             
@@ -88,13 +88,6 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('js/popularbrands/popularbrands_form.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{{-- <script src="{{ asset('js/popularbrands/popularbrands_form.js') }}"></script> --}}
+
 @endsection

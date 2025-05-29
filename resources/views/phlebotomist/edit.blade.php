@@ -45,7 +45,8 @@
 @endsection
 
 @section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/parsleyjs"></script>
+
+    <script src="{{ asset('assets/js/parsley.min.js') }}"></script>
     <script>
         $(document).ready(function () {
             $('form[data-parsley-validate]').parsley({

@@ -26,13 +26,13 @@
                         @csrf
                         @method('PUT')
                     
-                        <div class="mb-3">
+                        <div class="mb-3 error-msg">
                             <label for="image" class="form-label">Banner Image</label>
                             <input type="file" class="form-control" id="image" name="image" accept="image/*">
                             <small class="text-muted">Allowed formats: jpeg, png, jpg</small>
                         </div>
                     
-                        <div class="mb-3">
+                        <div class="mb-3 error-msg">
                             <label for="priority" class="form-label">Priority</label>
                             <input type="number" name="priority" id="priority" class="form-control" value="{{ old('priority', $banner->priority ?? 0) }}" min="0">
                             <small class="text-muted">Higher priority banners appear first</small>
@@ -57,4 +57,7 @@
         </div>
     </div>
 </div>
+@endsection
+@section('scripts')
+    <script src="{{ asset('js/homebanner/homebanner_form.js') }}"></script>
 @endsection

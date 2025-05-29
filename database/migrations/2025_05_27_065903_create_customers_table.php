@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('mobile_no')->unique();
             $table->string('otp_code')->nullable();
-            $table->timestamp('otp_expires_at')->nullable(); // OTP expiry
+            $table->timestamp('otp_expires_at')->nullable();  
             $table->string('firstName')->nullable();
             $table->string('lastName')->nullable();
             $table->string('email')->nullable();

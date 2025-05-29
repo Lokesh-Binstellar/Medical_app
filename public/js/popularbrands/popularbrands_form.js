@@ -2,11 +2,11 @@ const getFileValidators = (label = 'file') => ({
     notEmpty: {
         message: `Please upload your ${label}.`
     },
-    // file: {
-    //     extension: 'csv,xlsx,xls,pdf,doc,docx,zip', // or leave out extension if no restrictions
-    //     maxSize: 5 * 1024 * 1024, 
-    //     message: 'Please upload a valid file (max 5MB).'
-    // }
+    file: {
+        extension: 'csv,xlsx,xls,pdf,doc,docx,zip', // or leave out extension if no restrictions
+        // maxSize: 5 * 1024 * 1024, 
+        // message: 'Please upload a valid file (max 5MB).'
+    }
 });
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
             trigger: new FormValidation.plugins.Trigger(),
             bootstrap5: new FormValidation.plugins.Bootstrap5({
                 eleValidClass: '',
-                rowSelector: ' .error-msg'
+                rowSelector: '.error-msg'
             }),
             submitButton: new FormValidation.plugins.SubmitButton(),
             defaultSubmit: new FormValidation.plugins.DefaultSubmit(),

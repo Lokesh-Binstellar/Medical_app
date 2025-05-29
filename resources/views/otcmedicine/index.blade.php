@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('styles')
-<link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
+{{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" /> --}}
  
 @endsection
 @section('content')
@@ -12,12 +12,20 @@
                     <div class="card shadow">
                         <div class="card-header d-flex justify-content-between align-items-center rounded-top">
                             <h4 class="card-title mb-0 text-white">Otcmedicine</h4>
+                            <div class="d-flex justify-content-between align-items-center">
                             <form action="{{ route('otcmedicine.import') }}" id="importForm" method="POST"
-                                enctype="multipart/form-data" class="d-flex align-items-center gap-2">
+                                enctype="multipart/form-data" class="d-flex gap-2">
                                 @csrf
-                                <input type="file" name="file" class="form-control" id="file">
-                                <button type="submit" class="btn btn-primary addButton text-nowrap px-5">+ Import Medicine</button>
+                                <div class="error-msg">
+
+                                    <input type="file" name="file" class="form-control" id="file">
+                                </div>
+                                <div>
+
+                                    <button type="submit" class="btn btn-primary addButton text-nowrap px-5">+ Import Medicine</button>
+                                </div>
                             </form>
+                            </div>
                         </div>
                         {{-- <div class="card-header d-flex justify-content-between align-items-center rounded-top" style="background-color:#5ecbd8">
                             <h4 class="card-title mb-0 text-white">OTC</h4>
@@ -99,12 +107,12 @@
         });
     </script>
 <script src="{{ asset('js/otc/otc_form.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
+{{-- <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script> --}}
 @endsection
 

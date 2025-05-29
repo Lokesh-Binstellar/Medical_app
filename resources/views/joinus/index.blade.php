@@ -1,95 +1,8 @@
-{{-- @extends('layouts.app')
-
-@section('content')
-    <div class="container">
-        <h4 class="mb-4">Join Us Requests</h4>
-
-        <div class="table-responsive">
-            <table class="table table-bordered data-table">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Type</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Message</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-    </div>
-@endsection
-
-@section('scripts')
-    <script>
-        $(function() {
-            let table = $('.data-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{{ route('joinus.index') }}",
-                columns: [{
-                        data: 'DT_RowIndex'
-                    },
-                    {
-                        data: 'type'
-                    },
-                    {
-                        data: 'first_name',
-                        render: function(data, type, row) {
-                            return row.first_name + ' ' + row.last_name;
-                        }
-                    },
-                    {
-                        data: 'email'
-                    },
-                    {
-                        data: 'phone_number'
-                    },
-                    {
-                        data: 'message'
-                    },
-                    {
-                        data: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
-                ]
-            });
-        });
-
-        function deleteJoinUs(id) {
-            if (confirm('Are you sure you want to delete?')) {
-                $.ajax({
-                    url: '/admin/join-us/' + id,
-                    type: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function() {
-                        $('.data-table').DataTable().ajax.reload();
-                    }
-                });
-            }
-        }
-    </script>
-@endsection --}}
 
 
 @extends('layouts.app')
 @section('styles')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
-    <style>
-        .select2 {
-            width: 300px !important;
-        }
 
-        body>span.select2-container.select2-container--default.select2-container--open {
-            width: auto !important;
-        }
-    </style>
 @endsection
 @section('content')
     <div class="container ">
@@ -358,5 +271,5 @@
             });
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+
 @endsection
