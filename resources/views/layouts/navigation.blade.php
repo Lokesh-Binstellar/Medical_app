@@ -220,6 +220,14 @@
                             </a>
                         </li>
                     @endif
+                    @if (in_array('Prescriptions', $permissions) || $isSuperAdmin == 1)
+                        <li
+                            class="menu-item {{ Route::current()->getName() == 'prescriptions.upload' ? 'active' : '' }}">
+                            <a href="{{ route('prescriptions.upload') }}" class="menu-link">
+                                <div data-i18n="Upload Prescription">Upload Prescription</div>
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </li>
         @endif

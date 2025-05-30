@@ -16,6 +16,7 @@ use App\Models\Phrmacymedicine;
 use App\Models\Prescription;
 use App\Models\RequestQuote;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -411,7 +412,7 @@ class MedicineSearchController extends Controller
                     'product_id' => $productId,
                     'customer_id' => $customerId
                 ]);
-                
+
                 // ✅ Optionally, you can still add it with a placeholder name
                 $result[] = [
                     'product_id' => $productId,
@@ -538,7 +539,7 @@ class MedicineSearchController extends Controller
 
 
 
-        return view('pharmacist.orderdetails', compact('medicines', 'pharmacy', 'orders','deliveryPersons'));
+        return view('pharmacist.orderdetails', compact('medicines', 'pharmacy', 'orders', 'deliveryPersons'));
     }
 
     public function updateOrderStatus(Request $request, $id)
@@ -572,6 +573,23 @@ class MedicineSearchController extends Controller
         $order->save();
 
         return back()->with('success', 'Delivery person assigned successfully.');
+    }
+
+    public function downloadInvoice($id)
+    {
+        $order = Order::where('order_id', $id)
+            ->with(['customer', 'pharmacy'])
+            ->firstOrFail();
+
+        $pdf = Pdf::setOptions([
+            'defaultFont' => 'DejaVu Sans',
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+        ])->loadView('invoice.invoice', compact('order'));
+
+        return $pdf->download("invoice-{$order->order_number}.pdf");
+
+
     }
 
 

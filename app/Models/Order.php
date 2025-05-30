@@ -18,8 +18,9 @@ class Order extends Model
     {
         return $this->belongsTo(Customers::class, 'user_id', 'id');
     }
- public function pharmacy()
-{
-    return $this->belongsTo(Pharmacies::class, 'pharmacy_id');
-}
+    public function pharmacy()
+    {
+        return $this->belongsTo(Pharmacies::class, 'pharmacy_id', 'user_id');
+    }
+
 }

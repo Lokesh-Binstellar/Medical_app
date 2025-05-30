@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customers;
 use App\Models\Prescription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\public;
@@ -32,8 +33,8 @@ class FileUploadController extends Controller
 
                     // Check if the file is an image
                     if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-                        return '<a href="' .asset('uploads/' . $fileUrl). '" target="_blank">
-                                        <img src="' . asset('uploads/' . $fileUrl). '" alt="Prescription Image" style="max-width: 60px; height: auto;" class="img-thumbnail">
+                        return '<a href="' . asset('uploads/' . $fileUrl) . '" target="_blank">
+                                        <img src="' . asset('uploads/' . $fileUrl) . '" alt="Prescription Image" style="max-width: 60px; height: auto;" class="img-thumbnail">
                                     </a>';
                     }
                     // Check if the file is a PDF
@@ -44,7 +45,7 @@ class FileUploadController extends Controller
                     }
                     // For other file types
                     else {
-                        return '<a href="' . asset('uploads/' . $fileUrl). '" target="_blank">View File</a>';
+                        return '<a href="' . asset('uploads/' . $fileUrl) . '" target="_blank">View File</a>';
                     }
                 })
                 ->editColumn('prescription_status', function ($row) {
@@ -134,5 +135,58 @@ class FileUploadController extends Controller
             'status' => true,
             'message' => 'Status updated successfully.'
         ]);
+    }
+
+    public function uploadprescription()
+    {
+        return view('prescriptions.upload');
+    }
+
+    public function search(Request $request)
+    {
+        $term = $request->input('q');
+
+        $customers = Customers::where('firstName', 'like', "%{$term}%")
+            ->orWhere('lastName', 'like', "%{$term}%")
+            ->orWhere('mobile_no', 'like', "%{$term}%")
+            ->select('id', 'firstName', 'lastName', 'mobile_no')
+            ->limit(10)
+            ->get();
+
+        $results = $customers->map(function ($customer) {
+            return [
+                'id' => $customer->id,
+                'text' => "{$customer->firstName} {$customer->lastName} - {$customer->mobile_no}",
+            ];
+        });
+
+        return response()->json(['results' => $results]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'prescription' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ]);
+
+        $file = $request->file('prescription');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $destinationPath = public_path('uploads'); // => {{root}}/public/uploads/
+
+        // Ensure the uploads folder exists
+        if (!file_exists($destinationPath)) {
+            mkdir($destinationPath, 0755, true);
+        }
+
+        $file->move($destinationPath, $filename);
+
+        // Save relative path in DB
+        $prescription = Prescription::create([
+            'customer_id' => $request->customer_id,
+            'prescription_file' => $filename,
+        ]);
+
+        return redirect()->back()->with('success', 'Prescription uploaded successfully!');
     }
 }

@@ -233,6 +233,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('/pharmacy/orders/{id}/status', [MedicineSearchController::class, 'updateOrderStatus'])->name('pharmacy.updateOrderStatus');
         Route::get('/orders/{id}/medicines', [MedicineSearchController::class, 'showMedicines'])->name('orders.medicines');
         Route::post('/orders/{order}/assign-delivery', [MedicineSearchController::class, 'assignDeliveryPerson'])->name('orders.assignDeliveryPerson');
+        Route::get('/search-medicine/invoice/download/{id}', [MedicineSearchController::class, 'downloadInvoice'])->name('invoice.download');
 
 
         Route::get('/search-medicine', [MedicineSearchController::class, 'search'])->name('search.medicine');
@@ -274,6 +275,10 @@ Route::prefix('phlebotomist')->group(function () {
 });
 
 Route::get('/prescriptions', [FileUploadController::class, 'index'])->name('prescriptions.index');
+Route::get('/uploadprescription', [FileUploadController::class, 'uploadprescription'])->name('prescriptions.upload');
+Route::get('/customers/search', [FileUploadController::class, 'search']);
+Route::post('/admin/store/prescriptions', [FileUploadController::class, 'store'])->name('admin.prescription.store');
+
 Route::post('/prescriptions/update-status/{id}', [FileUploadController::class, 'updateStatus']);
 
 //popular Lab test
