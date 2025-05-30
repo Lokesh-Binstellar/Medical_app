@@ -67,7 +67,7 @@
 
         <ul class="navbar-nav flex-row align-items-center ms-auto">
 
-
+<div id="pusher-message" style="display:none;padding:10px; background:#dff0d8; color:#3c763d; border:1px solid #d6e9c6; margin:10px 0;">messahge</div>
             <!-- Notification -->
             <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-2 me-xl-1">
                 @auth
@@ -289,20 +289,36 @@
 </script>
 <script>
     // Enable Pusher logging - disable in production!
-    Pusher.logToConsole = true;
+   Pusher.logToConsole = true;
 
+var pusher = new Pusher('7ba4a23b60749764133c', {
+    cluster: 'ap1'
+});
 
+var channel = pusher.subscribe('my-channel');
 
-    var pusher = new Pusher('7ba4a23b60749764133c', {
-        cluster: 'ap1'
-    });
+channel.bind('my-event', function () {
+    // Save message in localStorage
+    localStorage.setItem('pusher_message','You have received a new quote.');
 
-    var channel = pusher.subscribe('my-channel');
+    // Reload the page
+    location.reload(true);
+});
 
-    channel.bind('my-event', function() {
-        console.log('Pusher callback called');
+// On page load
+window.onload = function () {
+    var message = localStorage.getItem('pusher_message');
+    if (message) {
+        var messageDiv = document.getElementById('pusher-message');
+        messageDiv.textContent = message;
+        messageDiv.style.display = 'block';
 
-        // Optional: prevent multiple reloads in a short time
-        location.reload(true);
-    });
+        // Optionally, clear message after some time
+        setTimeout(function () {
+            messageDiv.style.display = 'none';
+            localStorage.removeItem('pusher_message');
+        }, 20000); // Hide after 5 seconds
+    }
+};
+
 </script>
