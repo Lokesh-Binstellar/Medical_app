@@ -42,9 +42,9 @@
                 @endauth
 
                 @auth
-                    <span class="fw-bold text-primary">
-
-                        @if (Auth::user()->pharmacies)
+                <span class="fw-bold text-primary">
+                     
+                    @if (Auth::user()->pharmacies)
                             Address :
                             {{ Auth::user()->pharmacies->address }}
                         @elseif (Auth::user()->laboratories)

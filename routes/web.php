@@ -47,9 +47,17 @@ Route::get('/', function () {
 Route::get('/', [DashboardController::class, 'index'])
     ->name('dashboard')
     ->middleware(['auth', 'verified']);
- Route::get('/dasuser', [DashboardController::class, 'dasindex'])->name('dashboard.dasindex');
+
+
+
+    Route::get('get-dashboard-graph-data', [DashboardController::class, 'getAllGraphData'])->name('dashboard.graph.data');
 Auth::routes();
 Route::group(['middleware' => ['auth']], function () {
+
+
+
+
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -243,7 +251,6 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/fetch-cart-by-customer', [MedicineSearchController::class, 'fetchCartByCustomer']);
         Route::get('/fetch-prescription-files', [MedicineSearchController::class, 'fetchPrescriptionFiles'])->name('search.prescription');
-        
     });
 
     // Route::post('/add-medicine/store', [MedicineSearchController::class, 'store'])->name('add.medicine.store');

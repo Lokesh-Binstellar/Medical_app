@@ -4458,7 +4458,7 @@ fieldset:disabled .btn {
     /* background: #033a62; */
     border-radius: var(--bs-card-inner-border-radius);
 }
-.dassbord h4 ,.dassbord h6  {
+.dassbord h4 ,.dassbord h6,.dassbord h5  {
     color: #636578;
 }
 .dassbord small{
