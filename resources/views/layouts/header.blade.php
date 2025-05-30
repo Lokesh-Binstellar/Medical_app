@@ -28,13 +28,15 @@
         <div class="navbar-nav align-items-center">
             <div class="nav-item navbar-search-wrapper mb-0 ">
                 @auth
-                    <h3 class="fw-bold text-primary mb-0">Welcome @if (Auth::user()->laboratories)
+                    <h3 class="fw-bold text-primary mb-0">Welcome
+                        @if (Auth::user()->laboratories)
                             {{ Auth::user()->laboratories->lab_name }}
                         @elseif(Auth::user()->pharmacies)
                             {{ Auth::user()->pharmacies->pharmacy_name }}
                         @else
                             {{ auth()->user()->name }}
-                        @endif !</h3>
+                        @endif !
+                    </h3>
                 @else
                     <span class="fw-bold text-primary">
                         Welcome, Guest!
@@ -249,7 +251,7 @@
         </ul>
     </div>
 
-    
+
     <!-- Search Small Screens -->
     <div class="navbar-search-wrapper search-input-wrapper d-none">
         <input autocomplete="off" type="text" class="form-control search-input container-xxl border-0"

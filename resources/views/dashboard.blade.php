@@ -1,110 +1,183 @@
 @extends('layouts.app')
+
 @section('content')
     <div class="page-inner">
         @php
-        use App\Models\Role;
-        use App\Models\Permission;
-        use App\Models\User;
-    
-        $loggedInUser = Auth::user();
-        $permissions = [];
-        $roleId = User::where('id', Auth::user()->id)->value('role_id');
-        $data = Permission::where('role_id', $roleId)->pluck('module', 'id')->toArray();
-        $permissions = array_unique($data);
-    
-        $isSuperAdmin = 0;
-        if ($loggedInUser->role_id == 1) {
-            $isSuperAdmin = 1;
-        }
-        // dd(Auth::user());
-    @endphp
-        <div class="row">
-            <div class="col-sm-6 col-md-3  @if (!in_array('Roles', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
-                <div class="card card-stats card-round">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-icon">
-                                <div class="icon-big text-center icon-primary bubble-shadow-small">
-                                    <i class="fas fa-users"></i>
+            use App\Models\Permission;
+            use App\Models\User;
+
+            $loggedInUser = Auth::user();
+            $permissions = [];
+            $roleId = User::where('id', Auth::user()->id)->value('role_id');
+            $data = Permission::where('role_id', $roleId)->pluck('module', 'id')->toArray();
+            $permissions = array_unique($data);
+
+            $isSuperAdmin = $loggedInUser->role_id == 1 ? 1 : 0;
+        @endphp
+
+        <div class="row dassbord">
+            <div class="col-lg-9">
+                <div class="card h-100">
+                    <div class="card-header-das">
+                        <div class="d-flex justify-content-between">
+                            <h4 class="mb-2">Users Overview</h4>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <small class="me-2">Total {{ $totalUsers }} Users</small>
+
+                        </div>
+                    </div>
+
+                    <div class="card-body d-flex justify-content-between flex-wrap gap-3">
+                        <div class="d-flex gap-3">
+                            <div class="avatar">
+                                <div class="avatar-initial bg-label-info rounded">
+                                    <i class="mdi mdi-shield-account-outline mdi-24px"></i>
                                 </div>
                             </div>
-                            <div class="col col-stats ms-3 ms-sm-0">
-                                <div class="numbers">
-                                    <p class="card-category">Total User</p>
-                                    <a href="{{ route('user.index') }}"></a>
-                                    <h4 class="card-title">1,294</h4>
+                            <div class="card-info">
+                                <h4 class="mb-0">{{ $totalAdmins }}</h4>
+                                <small>Total Admin</small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <div class="avatar">
+                                <div class="avatar-initial bg-label-success rounded">
+                                    <i class="mdi mdi-account-multiple-outline mdi-24px"></i>
                                 </div>
+                            </div>
+                            <div class="card-info">
+                                <h4 class="mb-0">{{ $totalCustomers }}</h4>
+                                <small>Total Customers</small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <div class="avatar">
+                                <div class="avatar-initial bg-label-warning rounded">
+                                    <i class="mdi mdi-hospital-building mdi-24px"></i>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <h4 class="mb-0">{{ $totalPharmacies }}</h4>
+                                <small>Total Pharmacies</small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <div class="avatar">
+                                <div class="avatar-initial bg-label-danger rounded">
+                                    <i class="mdi mdi-microscope mdi-24px"></i>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <h4 class="mb-0">{{ $totalLabs }}</h4>
+                                <small>Total Laboratories</small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <div class="avatar">
+                                <div class="avatar-initial bg-label-secondary rounded">
+                                    <i class="mdi mdi-truck-delivery-outline mdi-24px"></i>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <h4 class="mb-0">{{ $totalDelivery }}</h4>
+                                <small>Total Delivery Persons</small>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            
-            <div class="col-sm-6 col-md-3  @if (!in_array('Pharmacies', $permissions)) d-none @endif">
-                <div class="card card-stats card-round">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-icon">
-                                <div class="icon-big text-center icon-success bubble-shadow-small">
-                                    <i class="fas fa-luggage-cart"></i>
+
+
+
+            <div class="col-lg-3 col-sm-6">
+                <div class="card h-100">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card-body">
+                                <div class="card-info mb-3 py-2 mb-lg-1 mb-xl-3">
+                                    <h4 class="mb-3 mb-lg-2 mb-xl-3 text-nowrap">Average Rating</h4>
+                                    <div class="badge bg-label-primary rounded-pill lh-xs">All Time</div>
+                                </div>
+                                <div class="d-flex align-items-end flex-wrap gap-1">
+                                    <h4 class="mb-0">{{ $averageRating ?? '0.00' }}</h4>
+                                    <small class="text-success">Average</small>
                                 </div>
                             </div>
-                            <div class="col col-stats ms-3 ms-sm-0">
-                                <div class="numbers">
-                                    <p class="card-category">Total laboratories</p>
-                                    <h4 class="card-title">1,345</h4>
-                                </div>
+                        </div>
+                        <div class="col-6 text-end d-flex align-items-end justify-content-center">
+                            <div class="card-body pb-0 pt-3 position-absolute bottom-0">
+                                <img src="{{ asset('assets/img/artingdasmg.png') }}" alt="Ratings" width="95">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {{-- @php
-                $chk = \App\Models\Permission::checkCRUDPermissionToUser('pharmacies', 'create');
-                echo $chk;
-            @endphp --}}
-         
-            <div class="col-sm-6 col-md-3  @if (!in_array('Laboratories', $permissions) &&  $isSuperAdmin != 1) d-none @endif">
-                <div class="card card-stats card-round">
+
+
+
+
+            <div class="col-xl-8 col-md-6">
+                <div class="card overflow-hidden">
                     <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-icon">
-                                <div class="icon-big text-center icon-success bubble-shadow-small">
-                                    <i class="fas fa-luggage-cart"></i>
-                                </div>
-                            </div>
-                            <div class="col col-stats ms-3 ms-sm-0">
-                                <div class="numbers">
-                                    <p class="card-category">Total laboratories</p>
-                                    <h4 class="card-title">1,345</h4>
-                                </div>
-                            </div>
+                        <div class="table-responsive">
+                            <table class="display table table-striped table-hover " id="usersTable">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>id</th>
+                                        <th>User Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-            {{-- <img src="{{asset('storage/medicines/fNA5PHJZ4X_DRS000012_2.jpg')}}" alt=""> --}}
-            {{-- order --}}
-            {{-- <div class="col-sm-6 col-md-3">
-                <div class="card card-stats card-round">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-icon">
-                                <div class="icon-big text-center icon-secondary bubble-shadow-small">
-                                    <i class="far fa-check-circle"></i>
-                                </div>
-                            </div>
-                            <div class="col col-stats ms-3 ms-sm-0">
-                                <div class="numbers">
-                                    <p class="card-category">Order</p>
-                                    <h4 class="card-title">576</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> --}}
+
+
+           
+
         </div>
     </div>
+@endsection
+
+
+@section('scripts')
+    <!-- DataTables Scripts -->
+    <script>
+        $(document).ready(function() {
+            var table = $('#usersTable').DataTable({
+                processing: true,
+                serverSide: true,
+               responsive: {
+                    details: {
+                        type: 'column',
+                        target: 0 // Set the control to column 0
+                    }
+                },
+                columnDefs: [{
+                    targets: 0,
+                    className: 'control', // Enables the plus icon in this column
+                    orderable: false
+                }],
+                ajax: "{{ route('dashboard.dasindex') }}",
+                columns: [ {data: 'id', name:'id'},{ data: 'DT_RowIndex', name: 'DT_RowIndex' },
+            { data: 'name', name: 'name', orderable: false },
+            { data: 'email', name: 'email' },
+            { data: 'role', name: 'role', orderable: false },
+
+                ]
+            });
+
+        });
+    </script>
 @endsection

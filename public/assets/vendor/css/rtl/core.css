@@ -4439,7 +4439,7 @@ fieldset:disabled .btn {
     margin-left: var(--bs-card-spacer-x);
 }
 
-.card-header {
+.card-header,.card-header-das {
     padding: var(--bs-card-cap-padding-y) var(--bs-card-cap-padding-x);
     margin-bottom: 0;
     color: var(--bs-card-cap-color);
@@ -4453,7 +4453,18 @@ fieldset:disabled .btn {
     border-radius: var(--bs-card-inner-border-radius);
     background: #033a62;
 }
+.card-header-das{
+    background: #fefefe;
+    /* background: #033a62; */
+    border-radius: var(--bs-card-inner-border-radius);
+}
+.dassbord h4 ,.dassbord h6  {
+    color: #636578;
+}
+.dassbord small{
+    color: #636578;
 
+}
 .card-footer {
     padding: var(--bs-card-cap-padding-y) var(--bs-card-cap-padding-x);
     color: var(--bs-card-cap-color);

@@ -47,7 +47,7 @@ Route::get('/', function () {
 Route::get('/', [DashboardController::class, 'index'])
     ->name('dashboard')
     ->middleware(['auth', 'verified']);
-
+ Route::get('/dasuser', [DashboardController::class, 'dasindex'])->name('dashboard.dasindex');
 Auth::routes();
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
