@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customers;
+use App\Events\AdminEvent;
+use App\Events\MyEvent;
 use App\Models\Prescription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\public;
@@ -12,11 +14,8 @@ class FileUploadController extends Controller
 {
     public function index(Request $request)
     {
-
-
         if ($request->ajax()) {
             $data = Prescription::with('customers');
-
 
             //dd($data);
             return DataTables::of($data)
@@ -31,16 +30,21 @@ class FileUploadController extends Controller
                     $fileUrl = $row->prescription_file;
                     $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
 
-                    // Check if the file is an image
                     if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-                        return '<a href="' . asset('uploads/' . $fileUrl) . '" target="_blank">
-                                        <img src="' . asset('uploads/' . $fileUrl) . '" alt="Prescription Image" style="max-width: 60px; height: auto;" class="img-thumbnail">
+                        return '<a href="' .
+                            asset('uploads/' . $fileUrl) .
+                            '" target="_blank">
+                                        <img src="' .
+                            asset('uploads/' . $fileUrl) .
+                            '" alt="Prescription Image" style="max-width: 60px; height: auto;" class="img-thumbnail">
                                     </a>';
-                    }
-                    // Check if the file is a PDF
-                    elseif (strtolower($extension) === 'pdf') {
-                        return '<a href="' . asset('uploads/' . $fileUrl) . '" target="_blank">
-                                        <img src="' . asset('assets/pdf-icon.png') . '" style="width: 40px;" alt="PDF Preview">
+                    } elseif (strtolower($extension) === 'pdf') {
+                        return '<a href="' .
+                            asset('uploads/' . $fileUrl) .
+                            '" target="_blank">
+                                        <img src="' .
+                            asset('assets/pdf-icon.png') .
+                            '" style="width: 40px;" alt="PDF Preview">
                                     </a>';
                     }
                     // For other file types
@@ -54,12 +58,22 @@ class FileUploadController extends Controller
                     $disabled = $selectedValue === 1 ? 'disabled' : '';
 
                     return '<select class="form-control custom-dropdown rounded"
-                                    onchange="updateStatus(this, ' . $row->id . ')"
+                                    onchange="updateStatus(this, ' .
+                        $row->id .
+                        ')"
                                     onfocus="this.setAttribute(\'data-prev\', this.value)"
-                                    ' . $disabled . '>
-                                <option value="" disabled ' . (is_null($selectedValue) ? 'selected' : '') . '>Please select</option>
-                                <option value="0" ' . ($selectedValue === 0 ? 'selected' : '') . '>Yes</option>
-                                <option value="1" ' . ($selectedValue === 1 ? 'selected' : '') . '>No</option>
+                                    ' .
+                        $disabled .
+                        '>
+                                <option value="" disabled ' .
+                        (is_null($selectedValue) ? 'selected' : '') .
+                        '>Please select</option>
+                                <option value="0" ' .
+                        ($selectedValue === 0 ? 'selected' : '') .
+                        '>Yes</option>
+                                <option value="1" ' .
+                        ($selectedValue === 1 ? 'selected' : '') .
+                        '>No</option>
                             </select>';
                 })
                 ->editColumn('status', function ($row) {
@@ -81,41 +95,36 @@ class FileUploadController extends Controller
         $userId = $request->get('user_id');
 
         if ($request->hasFile('file')) {
-
-            // Get the original file name
             $originalFileName = $request->file('file')->getClientOriginalName();
             $path = $request->file('file')->move(public_path('uploads'), $originalFileName);
 
-            // Get the prescription status from the request
             $prescription_status = $request->get('prescription_status', null);
 
-            // Create a new prescription record, storing only the file name
             $prescription = Prescription::create([
                 'customer_id' => $userId,
-                'prescription_file' => $originalFileName,  // Store only file name
+                'prescription_file' => $originalFileName,
                 'prescription_status' => $prescription_status,
             ]);
+            event(new MyEvent('admin', 'New Prescription Received'));
 
-            // Return response with file name
             return response()->json([
                 'status' => true,
                 'message' => 'File uploaded successfully',
-                'file_name' => $originalFileName, // Return the file name
+                'file_name' => $originalFileName,
             ]);
         } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'No file found in request',
-            ], 400);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'No file found in request',
+                ],
+                400,
+            );
         }
     }
 
-
-
-
     public function updateStatus(Request $request, $id)
     {
-
         $request->validate([
             'prescription_status' => 'required|in:0,1',
             'reason' => 'required_if:prescription_status,1|string|nullable',
@@ -133,7 +142,7 @@ class FileUploadController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Status updated successfully.'
+            'message' => 'Status updated successfully.',
         ]);
     }
 

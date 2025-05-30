@@ -28,15 +28,13 @@
         <div class="navbar-nav align-items-center">
             <div class="nav-item navbar-search-wrapper mb-0 ">
                 @auth
-                    <h3 class="fw-bold text-primary mb-0">Welcome
-                        @if (Auth::user()->laboratories)
+                    <h3 class="fw-bold text-primary mb-0">Welcome @if (Auth::user()->laboratories)
                             {{ Auth::user()->laboratories->lab_name }}
                         @elseif(Auth::user()->pharmacies)
                             {{ Auth::user()->pharmacies->pharmacy_name }}
                         @else
                             {{ auth()->user()->name }}
-                        @endif !
-                    </h3>
+                        @endif !</h3>
                 @else
                     <span class="fw-bold text-primary">
                         Welcome, Guest!
@@ -44,17 +42,16 @@
                 @endauth
 
                 @auth
-                <span class="fw-bold text-primary">
-                    
-                    @if (Auth::user()->pharmacies)
+                    <span class="fw-bold text-primary">
+
+                        @if (Auth::user()->pharmacies)
                             Address :
                             {{ Auth::user()->pharmacies->address }}
- 
-                            @elseif (Auth::user()->laboratories)
+                        @elseif (Auth::user()->laboratories)
                             Address :
                             {{ Auth::user()->laboratories->lab_name }}
-                            @endif
-                        </span>
+                        @endif
+                    </span>
                 @endauth
 
             </div>
@@ -69,7 +66,9 @@
 
         <ul class="navbar-nav flex-row align-items-center ms-auto">
 
-<div id="pusher-message" style="display:none;padding:10px; background:#dff0d8; color:#3c763d; border:1px solid #d6e9c6; margin:10px 0;">messahge</div>
+            <div id="pusher-message"
+                style="display:none;padding:10px; background:#dff0d8; color:#3c763d; border:1px solid #d6e9c6; margin:10px 0;">
+                messahge</div>
             <!-- Notification -->
             <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-2 me-xl-1">
                 @auth
@@ -207,12 +206,12 @@
                             <div class="flex-grow-1">
                                 <span class="fw-medium d-block">
                                     @if (Auth::user()->laboratories)
-                                        {{ Auth::user()->laboratories->owner_name }}
-                                    @elseif(Auth::user()->pharmacies)
-                                        {{ Auth::user()->pharmacies->owner_name }}
-                                    @else
-                                        {{ Auth::user()->name }}
-                                    @endif
+{{ Auth::user()->laboratories->owner_name }}
+@elseif(Auth::user()->pharmacies)
+{{ Auth::user()->pharmacies->owner_name }}
+@else
+{{ Auth::user()->name }}
+@endif
                                 </span>
                                 <small
                                     class="text-muted">{{ Auth::user()->role ? Auth::user()->role->name : '' }}</small>
@@ -288,39 +287,50 @@
             });
         });
     }
-</script>
-<script>
-    // Enable Pusher logging - disable in production!
-   Pusher.logToConsole = true;
 
-var pusher = new Pusher('7ba4a23b60749764133c', {
-    cluster: 'ap1'
-});
 
-var channel = pusher.subscribe('my-channel');
+    // Initialize Pusher
+    Pusher.logToConsole = true;
 
-channel.bind('my-event', function () {
-    // Save message in localStorage
-    localStorage.setItem('pusher_message','You have received a new quote.');
+    var pusher = new Pusher('7ba4a23b60749764133c', {
+        cluster: 'ap1'
+    });
 
-    // Reload the page
-    location.reload(true);
-});
 
-// On page load
-window.onload = function () {
-    var message = localStorage.getItem('pusher_message');
-    if (message) {
+    var userRole = @json(auth()->user()->role->name ?? 'guest');
+    console.log('User Role:', userRole);
+
+
+    var channel = pusher.subscribe('my-channel.' + userRole);
+    channel.bind('my-event', function(data) {
+        localStorage.setItem('pusher_message', data.message || 'You have received a new quote.');
+        location.reload(true);
+    });
+
+
+    var adminChannel = pusher.subscribe('admin-channel');
+    adminChannel.bind('admin-event', function() {
         var messageDiv = document.getElementById('pusher-message');
-        messageDiv.textContent = message;
+        messageDiv.textContent = 'Admin has triggered an update.';
         messageDiv.style.display = 'block';
 
-        // Optionally, clear message after some time
-        setTimeout(function () {
+        setTimeout(function() {
             messageDiv.style.display = 'none';
-            localStorage.removeItem('pusher_message');
-        }, 20000); // Hide after 5 seconds
-    }
-};
+        }, 20000);
+    });
 
+    // Show stored message on page load
+    window.onload = function() {
+        var message = localStorage.getItem('pusher_message');
+        if (message) {
+            var messageDiv = document.getElementById('pusher-message');
+            messageDiv.textContent = message;
+            messageDiv.style.display = 'block';
+
+            setTimeout(function() {
+                messageDiv.style.display = 'none';
+                localStorage.removeItem('pusher_message');
+            }, 20000);
+        }
+    };
 </script>
