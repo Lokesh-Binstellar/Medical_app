@@ -17,35 +17,30 @@ use Illuminate\Support\Facades\Notification;
 
 class RequestQuoteController extends Controller
 {
-
     //view all Notification
 
-public function index()
-{
-    $user = auth()->user();
+    public function index()
+    {
+        $user = auth()->user();
 
+        // User ki notifications le rahe hain
+        $notifications = $user->notifications;
 
-    
-    // User ki notifications le rahe hain
-    $notifications = $user->notifications;
+        $formattedNotifications = $notifications->map(function ($not) {
+            $data = $not->data;
 
-    $formattedNotifications = $notifications->map(function ($not) {
-        $data = $not->data;
+            return [
+                'title' => $data['title'] ?? 'Notification',
+                'message' => $data['message'] ?? '',
+                'datetime' => Carbon::parse($not->created_at)->format('d M Y, h:i A'),
+                'role' => $data['role'] ?? null,
+                'pharmacy_id' => $data['pharmacy_id'] ?? null,
+                'laboratory_id' => $data['laboratory_id'] ?? null,
+            ];
+        });
 
-        return [
-            'title' => $data['title'] ?? 'Notification',
-            'message' => $data['message'] ?? '',
-            'datetime' => Carbon::parse($not->created_at)->format('d M Y, h:i A'),
-            'role' => $data['role'] ?? null,
-            'pharmacy_id' => $data['pharmacy_id'] ?? null,
-            'laboratory_id' => $data['laboratory_id'] ?? null,
-        ];
-    });
-
-    return view('view_notifications.index', compact('formattedNotifications', 'user'));
-}
-
-
+        return view('view_notifications.index', compact('formattedNotifications', 'user'));
+    }
 
     public function getRoadDistance($lat1, $lon1, $lat2, $lon2, $apiKey)
     {
@@ -64,27 +59,30 @@ public function index()
 
     public function requestAQuote(Request $request)
     {
-
         $addressType = $request->input('address_type');
 
         $userId = $request->get('user_id');
         $apiKey = env('GOOGLE_MAPS_API_KEY');
-        $address = CustomerAddress::where('customer_id', $userId)
-            ->where('address_type', $addressType)
-            ->first();
+        $address = CustomerAddress::where('customer_id', $userId)->where('address_type', $addressType)->first();
 
         if (!$address) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Work address not found.'
-            ], 404);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Work address not found.',
+                ],
+                404,
+            );
         }
 
         if (!$address || !$address->lat || !$address->lng) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Customer location not found.'
-            ], 404);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Customer location not found.',
+                ],
+                404,
+            );
         }
 
         $nearby = [];
@@ -93,13 +91,7 @@ public function index()
 
         foreach ($pharmacies as $pharmacy) {
             if ($pharmacy->latitude && $pharmacy->longitude) {
-                $distance = $this->getRoadDistance(
-                    $address->lat,
-                    $address->lng,
-                    $pharmacy->latitude,
-                    $pharmacy->longitude,
-                    $apiKey
-                );
+                $distance = $this->getRoadDistance($address->lat, $address->lng, $pharmacy->latitude, $pharmacy->longitude, $apiKey);
 
                 if ($distance !== false && $distance <= 10) {
                     $pharmacy->road_distance_km = round($distance, 2);
@@ -108,31 +100,32 @@ public function index()
             }
         }
         if (empty($nearby)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'No pharmacy found within 10 km radius.'
-            ], 404);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'No pharmacy found within 10 km radius.',
+                ],
+                404,
+            );
         }
         foreach ($nearby as $pharmacy) {
-            $exists = RequestQuote::where('customer_id', $userId)
-                ->where('pharmacy_id', $pharmacy->user_id)
-                ->exists();
+            $exists = RequestQuote::where('customer_id', $userId)->where('pharmacy_id', $pharmacy->user_id)->exists();
 
             $pharmacyUser = User::where('id', $pharmacy->user_id)->first();
             $customer = Customers::find($userId); // assuming $userId is the customer
             $pharmacyUser->notify(new QuoteRequested($customer));
 
             //Event call for refresh the page
-            event(new MyEvent('hello world'));
+            event(new MyEvent('pharmacy', 'You have received a new quote.'));
             if (!$exists) {
                 RequestQuote::create([
                     'customer_id' => $userId,
                     'pharmacy_id' => $pharmacy->user_id,
-                     'customer_address' => json_encode([
+                    'customer_address' => json_encode([
                         'type' => $addressType,
                         'lat' => $address->lat,
-                        'lng' => $address->lng
-                    ])
+                        'lng' => $address->lng,
+                    ]),
                 ]);
                 $pharmacyUser = User::where('id', $pharmacy->user_id)->first();
                 $requestingUser = User::find($userId);
@@ -143,14 +136,12 @@ public function index()
                     // $pharmacyUser->notify(new QuoteRequested($requestingUser));
                     Notification::send($pharmacyUser, new QuoteRequested($requestingUser));
                 }
-
             }
         }
         return response()->json([
-            'status' => true
+            'status' => true,
         ]);
     }
-
 
     public function markAsRead($id)
     {
@@ -159,16 +150,8 @@ public function index()
         if ($notification && $notification->notifiable_id == Auth::user()->pharmacies->user_id) {
             $notification->markAsRead();
             return response()->json(['success' => true]);
-
         }
         // event(new MyEvent('remove'));
         return response()->json(['success' => false], 404);
     }
-
-
-
-
-
-
-
 }

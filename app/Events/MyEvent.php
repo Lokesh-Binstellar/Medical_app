@@ -13,38 +13,46 @@ class MyEvent implements ShouldBroadcastNow
 {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
-  public $message;
+   public $message;
+    public $role;
 
-  public function __construct($message)
-  {
-      $this->message = $message;
-  }
-  /**
+    public function __construct($role, $message)
+    {
+        $this->message = $message;
+        $this->role = $role;
+    }
+
+    /**
      * The channel the event should broadcast on.
      *
      * @return Channel
      */
-  public function broadcastOn()
-  {
-      return new Channel('my-channel');
-  }
- /**
+    public function broadcastOn()
+    {
+        // Role-based dynamic channel
+        return new Channel('my-channel.' . $this->role);
+    }
+
+    /**
      * The event's broadcast name.
      *
      * @return string
      */
-  public function broadcastAs()
-  {
-      return 'my-event';
-  }
+    public function broadcastAs()
+    {
+        return 'my-event';
+    }
 
-     /**
+    /**
      * Get the data to broadcast.
      *
      * @return array
      */
-    // public function broadcastWith(): array
-    // {
-    //     return $this->message;
-    // }
+    public function broadcastWith(): array
+    {
+        return [
+            'role' => $this->role,
+            'message' => $this->message,
+        ];
+    }
 }
