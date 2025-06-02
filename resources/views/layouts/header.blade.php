@@ -290,23 +290,22 @@
 
 
     // Initialize Pusher
-    Pusher.logToConsole = true;
+   Pusher.logToConsole = true;
 
     var pusher = new Pusher('7ba4a23b60749764133c', {
         cluster: 'ap1'
     });
 
-
     var userRole = @json(auth()->user()->role->name ?? 'guest');
+    var userId = @json(auth()->user()->id ?? 0);
     console.log('User Role:', userRole);
+    console.log('User ID:', userId);
 
-
-    var channel = pusher.subscribe('my-channel.' + userRole);
+    var channel = pusher.subscribe('my-channel.' + userRole + '.user.' + userId);
     channel.bind('my-event', function(data) {
         localStorage.setItem('pusher_message', data.message || 'You have received a new quote.');
         location.reload(true);
     });
-
 
     var adminChannel = pusher.subscribe('admin-channel');
     adminChannel.bind('admin-event', function() {
@@ -319,7 +318,6 @@
         }, 20000);
     });
 
-    // Show stored message on page load
     window.onload = function() {
         var message = localStorage.getItem('pusher_message');
         if (message) {

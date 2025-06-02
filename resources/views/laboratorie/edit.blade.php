@@ -70,27 +70,27 @@
                 </div>
 
                 {{-- Username --}}
-                {{-- <div class="col-md-6">
+                <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
                             <input type="text" name="username" id="username" class="form-control" placeholder="Username"
                                 value="{{ $laboratorie->username }}" />
                             <label for="username">Username</label>
                         </div>
-                    </div> --}}
+                    </div>
 
                 {{-- Password --}}
-                {{-- <div class="col-md-6">
+                <div class="col-md-6">
                         <div class="form-password-toggle">
                             <div class="input-group input-group-merge">
                                 <div class="form-floating form-floating-outline">
-                                    <input type="password" name="password" id="password" class="form-control"
+                                    <input type="password" name="password" id="password"  class="form-control"
                                         placeholder="Password" />
                                     <label for="password">Password</label>
                                 </div>
                                 <span class="input-group-text cursor-pointer"><i class="mdi mdi-eye-off-outline"></i></span>
                             </div>
                         </div>
-                    </div> --}}
+                    </div>
 
                 {{-- City --}}
                 <div class="col-md-6">

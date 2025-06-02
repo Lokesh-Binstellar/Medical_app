@@ -11,15 +11,17 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class MyEvent implements ShouldBroadcastNow
 {
-  use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
 
-   public $message;
     public $role;
+    public $userId;
+    public $message;
 
-    public function __construct($role, $message)
+    public function __construct($role,$userId ,$message)
     {
         $this->message = $message;
         $this->role = $role;
+        $this->userId = $userId;
     }
 
     /**
@@ -30,6 +32,12 @@ class MyEvent implements ShouldBroadcastNow
     public function broadcastOn()
     {
         // Role-based dynamic channel
+        // return new Channel('my-channel.' . $this->role);
+
+
+         if ($this->userId) {
+        return new Channel('my-channel.' . $this->role . '.user.' . $this->userId);
+    }
         return new Channel('my-channel.' . $this->role);
     }
 
