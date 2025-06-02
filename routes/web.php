@@ -44,13 +44,16 @@ Route::get('/', function () {
 // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified', 'permission:pharmacies,create']);
 
 // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified']);
-Route::get('/', [DashboardController::class, 'index'])
-    ->name('dashboard')
-    ->middleware(['auth', 'verified']);
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/get-dashboard-graph-data', [DashboardController::class, 'getAllGraphData'])->name('dashboard.graph.data');
+    Route::get('/orders-data', [DashboardController::class, 'getOrdersData'])->name('dashboard.orders.data');
+    Route::get('/pending-quotes-data', [DashboardController::class, 'pendingQuotesData'])->name('pending.quotes.data');
+Route::get('/fetch-ratings', [DashboardController::class, 'fetchRatings']);
+
+});
 
 
-
-    Route::get('get-dashboard-graph-data', [DashboardController::class, 'getAllGraphData'])->name('dashboard.graph.data');
 Auth::routes();
 Route::group(['middleware' => ['auth']], function () {
 
