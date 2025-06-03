@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\LocationHelper;
 use App\Models\LabCart;
 use App\Models\Laboratories;
 use App\Models\LabTest;
@@ -30,7 +31,8 @@ class LabPackageAndTestDetailsController extends Controller
     }
 
     public function getPacakgesAndTestByOrgan(Request $request, $organId)
-    {
+    {   
+        $city = LocationHelper::getCityofCurrentUser($request);
         // 1. Get organ name from package_categories
         $organ = PackageCategory::find($organId);
         $organName = $organ ? $organ->name : null;
@@ -46,7 +48,7 @@ class LabPackageAndTestDetailsController extends Controller
 
         $labTests = [];
 
-        $labs = Laboratories::all();
+        $labs = Laboratories::where('city', $city)->get();
 
         foreach ($labs as $lab) {
             $tests = json_decode($lab->test, true);
