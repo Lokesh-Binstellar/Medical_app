@@ -31,7 +31,6 @@ use App\Http\Controllers\ZipCodeViceDeliveryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-
 Route::post('/login', [AuthTokenController::class, 'login']);
 
 //fetch apis
@@ -40,8 +39,7 @@ Route::middleware('check.api.key')->group(function () {
     Route::post('/popularpharmacydetails/{id}', [PharmaciesController::class, 'popularpharmacydetails'])->name('pharmacy.popularpharmacydetails');
     Route::get('/filterbyorgan', [LabPackageAndTestDetailsController::class, 'getpackageandtestbyorgan'])->name('filterbyorgan');
     Route::post('/getPacakgesAndTestByOrgan/{id}', [LabPackageAndTestDetailsController::class, 'getPacakgesAndTestByOrgan']);
-    
-    
+
     Route::get('/medicines/search', [MedicineController::class, 'search']);
     // Route::get('/medicines/searchById', [MedicineController::class, 'medicineByProductId']);
     Route::get('/medicines/{id}', [MedicineController::class, 'medicineByProductId']);
@@ -52,15 +50,15 @@ Route::middleware('check.api.key')->group(function () {
     Route::get('/popular-lab-tests', [PopularLabTestController::class, 'getAll']);
     Route::post('/listlabtest/{test_id}', [PopularLabTestController::class, 'listLabTest']);
 
-    
     Route::post('/send-otp', [AuthController::class, 'sendOtp']);
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
-    
+
     // with jwt token
     Route::middleware('authTest')->group(function () {
-      Route::post('/bookpackageorlabtest', [LabPackageAndTestDetailsController::class, 'bookpackageorlabtest']);
+        Route::post('/bookpackageorlabtest', [LabPackageAndTestDetailsController::class, 'bookpackageorlabtest']);
         Route::post('/customer/address', [CustomerAddressController::class, 'store']);
         Route::get('/customerAddressFetch', [CustomerAddressController::class, 'getAddress']);
+        Route::delete('/deleteAddress', [CustomerAddressController::class, 'deleteAddress']);
         Route::put('/customerDetails', [AuthController::class, 'update']);
         Route::get('/getcustomerdetails', [AuthController::class, 'getCustomerDetails']);
 
@@ -70,15 +68,13 @@ Route::middleware('check.api.key')->group(function () {
         Route::post('/add-to-cart', [AddMedicineController::class, 'frontendAddToCart']);
         Route::get('/getUserCart', [AddMedicineController::class, 'getAddToCart'])->name('getUserCart.getAddToCart');
         Route::post('/requestAQuote', [RequestQuoteController::class, 'requestAQuote']);
-   
+
         Route::delete('/medicineCart/remove-product/{id}', [AddMedicineController::class, 'removeCartProduct']);
         Route::post('/labRequestAQuote', [LabRequestQuoteController::class, 'searchlabs']);
-        
+
         //lab Cart
         Route::get('/getUserLabCart', [AddLabTestController::class, 'getUserlabcart'])->name('userCart.getUserLabCart');
         Route::delete('/deleteTestFromLabCart/{id}', [AddLabTestController::class, 'deleteTestFromLabCart'])->name('userCart.deleteTestFromLabCart');
-
-
 
         // rating
         Route::post('/ratings', [RatingController::class, 'store']);
@@ -94,22 +90,18 @@ Route::middleware('check.api.key')->group(function () {
         // zip_code_vise_delivery
         Route::get('/zipcodes', [ZipCodeViceDeliveryController::class, 'getZipcodes']);
         // Route::post('/ratings', [RatingController::class, 'store']);
-        Route::get('/allPharmacyRequests', [MedicineSearchController::class, 'allPharmacyRequests']); 
-        
+        Route::get('/allPharmacyRequests', [MedicineSearchController::class, 'allPharmacyRequests']);
+
         // Orders
         Route::post('/placeOrder', [OrderController::class, 'placeOrder']);
-        
+
         // MyOrders
         Route::get('/pharmacyMyOrders', [MyOrderController::class, 'getUserPharmacyOrders']);
-
     });
- 
 
     //labTest
     Route::get('/LabTestDetails', [LabtestController::class, 'labTestDetails']);
 
-
-    
     Route::get('/productListByCategory/{categoryName}', [OtcController::class, 'productListByCategory']);
     Route::get('/productListByBrand/{brandName}', [PopularBrandController::class, 'productListByBrand']);
 
@@ -122,12 +114,7 @@ Route::middleware('check.api.key')->group(function () {
     Route::post('/brand/filter', [PopularBrandController::class, 'getFilters']);
     Route::post('/category/filter', [OtcController::class, 'getFilters']);
 
+    //    Laboratory
 
-
-
-//    Laboratory
-
-  Route::post('/getAllLaboratory', [LaboratoriesController::class, 'getAllLaboratory']);
-
-
+    Route::post('/getAllLaboratory', [LaboratoriesController::class, 'getAllLaboratory']);
 });

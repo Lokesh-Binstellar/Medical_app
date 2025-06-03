@@ -1,6 +1,7 @@
 <?php
 
 use App\Events\MyEvent;
+use App\Http\Controllers\CustomerDetailsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaboratoriesController;
 use App\Http\Controllers\LabtestController;
@@ -256,6 +257,12 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/fetch-cart-by-customer', [MedicineSearchController::class, 'fetchCartByCustomer']);
         Route::get('/fetch-prescription-files', [MedicineSearchController::class, 'fetchPrescriptionFiles'])->name('search.prescription');
     });
+ Route::get('customer-list', [CustomerDetailsController::class, 'index'])->name('customer.list');
+ Route::get('/customers/{id}', [CustomerDetailsController::class, 'show'])->name('customer.show');
+
+
+
+
 
     // Route::post('/add-medicine/store', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
 
