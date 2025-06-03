@@ -37,6 +37,7 @@ Route::post('/login', [AuthTokenController::class, 'login']);
 //fetch apis
 Route::middleware('check.api.key')->group(function () {
     Route::post('/getAllPharmacy', [PharmaciesController::class, 'getPharmacy'])->name('pharmacy.getPharmacy');
+    Route::post('/popularpharmacydetails/{id}', [PharmaciesController::class, 'popularpharmacydetails'])->name('pharmacy.popularpharmacydetails');
     Route::get('/filterbyorgan', [LabPackageAndTestDetailsController::class, 'getpackageandtestbyorgan'])->name('filterbyorgan');
     Route::post('/getPacakgesAndTestByOrgan/{id}', [LabPackageAndTestDetailsController::class, 'getPacakgesAndTestByOrgan']);
     

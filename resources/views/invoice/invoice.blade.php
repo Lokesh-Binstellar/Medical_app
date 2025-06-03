@@ -73,6 +73,18 @@
         </table>
     @endif
 
+    @if ($order->patient)
+        <div style="margin-top: 20px;border: 1px solid #000; padding: 10px; border-radius: 5px;">
+            <strong>Patient Details:</strong><br>
+            Name: {{ preg_replace('/\s+/', ' ', trim($order->patient->name)) }}<br>
+            Birth Date: {{ \Carbon\Carbon::createFromFormat('d/m/Y', $order->patient->birth_date)->format('d-m-Y') }}<br>
+            Gender: {{ ucfirst($order->patient->gender) }}
+        </div>
+    @endif
+
+
+
+
     <table style="width: 100%; margin-top: 20px;" class="table-borderless">
         <tr>
             <!-- Invoice To (Left) -->

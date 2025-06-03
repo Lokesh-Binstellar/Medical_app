@@ -307,4 +307,45 @@ class PharmaciesController extends Controller
         }
     }
 
+    public function popularpharmacydetails(Request $request, $id)
+    {
+        $pharmacy = Pharmacies::find($id);
+         // Fetch rating info
+        $ratingData = Rating::where('rateable_type', 'Pharmacy')
+            ->where('rateable_id', $pharmacy->user_id)
+            ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as rating_count')
+            ->first();
+
+        $formattedRating = $ratingData->rating_count > 0
+            ? round($ratingData->avg_rating, 1) . ' (' . $ratingData->rating_count . ')'
+            : null;
+
+        if ($pharmacy) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $pharmacy->id,
+                    'name' => $pharmacy->pharmacy_name,
+                    'owner_name' => $pharmacy->owner_name,
+                    'address' => $pharmacy->address,
+                    'city' => $pharmacy->city,
+                    'state' => $pharmacy->state,
+                    'phone' => $pharmacy->phone,
+                    'email' => $pharmacy->email,
+                    'license' => $pharmacy->license,
+                    'image' => $pharmacy->image
+                            ? [url('assets/image/' . basename($pharmacy->image))]
+                            : [],
+                    'rating' => $formattedRating,
+                    // Add any other fields as needed
+                ]
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pharmacy not found.'
+            ], 404);
+        }
+    }
+
 }

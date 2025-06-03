@@ -33,7 +33,7 @@
                                     @if ($packageCategory->package_image)
                                         <div class="mb-2">
                                             <img id="logo"
-                                                src={{ asset('assets/package_image/' . $packageCategory->package_image) }}
+                                                src="{{ asset('assets/package_image/' . rawurlencode($packageCategory->package_image)) }}"
                                                 alt="category Image" class="img-thumbnail" style="max-height: 150px;">
                                         </div>
                                     @endif

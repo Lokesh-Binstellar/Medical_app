@@ -168,7 +168,7 @@
         @endif
 
         {{-- Laboratory Management --}}
-        @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
+        @if ($isSuperAdmin == 1)
             <li
                 class="menu-item {{ in_array(Route::current()->getName(), ['popular_lab_test.index', 'packageCategory.index']) ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -183,13 +183,13 @@
                                 <div data-i18n="Popular Lab Test">Popular Lab Test</div>
                             </a>
                         </li>
-                    @endif
 
                     <li class="menu-item {{ Route::current()->getName() == 'packageCategory.index' ? 'active' : '' }}">
                         <a href="{{ route('packageCategory.index') }}" class="menu-link">
                             <div data-i18n="Filter By Organs">Filter By Organs</div>
                         </a>
                     </li>
+                    @endif
                 </ul>
             </li>
         @endif
@@ -348,7 +348,7 @@
             </li>
         @endif
 
-        @if (in_array('Pharmacies', $permissions) || $isSuperAdmin == 1 || in_array('Orders', $permissions))
+        @if (in_array('Pharmacies', $permissions) || $isSuperAdmin == 1 || in_array('Orders', $permissions) || in_array('Laboratories', $permissions) )
             <li class="menu-item {{ in_array(Route::current()->getName(), ['orderdetails']) ? 'active' : '' }}">
                 <a href="{{ route('orderdetails') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-view-list"></i>

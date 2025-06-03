@@ -11,6 +11,7 @@ use App\Models\Customers;
 use App\Models\Medicine;
 use App\Models\Order;
 use App\Models\Otcmedicine;
+use App\Models\Patient;
 use App\Models\Pharmacies;
 use App\Models\Phrmacymedicine;
 use App\Models\Prescription;
@@ -144,7 +145,6 @@ class MedicineSearchController extends Controller
     }
 
     public function allPharmacyRequests(Request $request)
-    
     {
         // echo "okk";die;
         $currentCustomer = $request->get('user_id');  // e.g. 2
@@ -559,10 +559,19 @@ class MedicineSearchController extends Controller
 
     public function showMedicines($id)
     {
+        // Load order and customer
         $order = Order::with('customer')->findOrFail($id);
+
+        // Decode medicines from product_details JSON
         $medicines = json_decode($order->product_details, true);
 
-        return view('pharmacist.medicine_details', compact('order', 'medicines'));
+        // Load patient details if ID is available
+        $patient = null;
+        if ($order->add_patient) {
+            $patient = Patient::find($order->add_patient);
+        }
+
+        return view('pharmacist.medicine_details', compact('order', 'medicines', 'patient'));
     }
 
     public function assignDeliveryPerson(Request $request, Order $order)
