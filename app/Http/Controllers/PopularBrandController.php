@@ -163,12 +163,14 @@ class PopularBrandController extends Controller
     public function productListByBrand(Request $request, $brandName)
     {
 
-
         $page = $request->query('page', 1);
         $perPage = $request->query('per_page', 20);
 
         $packageFilter = $request->query('package');
         $productFormFilter = $request->query('product_form');
+
+        $packageArray = $packageFilter ? array_map('trim', explode(',', $packageFilter)) : null;
+        $productFormArray = $productFormFilter ? array_map('trim', explode(',', $productFormFilter)) : null;
 
         if (!$brandName) {
             return response()->json([
@@ -180,10 +182,16 @@ class PopularBrandController extends Controller
         $baseUrl = url('medicines');
         $defaultImage = "{$baseUrl}/placeholder.png";
 
+
+
         // --- Fetch and transform Medicines ---
         $medicines = Medicine::where('marketer', $brandName)
-            ->when($packageFilter, fn($q) => $q->where('package', $packageFilter))
-            ->when($productFormFilter, fn($q) => $q->where('product_form', $productFormFilter))
+            ->when($productFormArray, function ($q) use ($productFormArray) {
+                return $q->whereIn('product_form', $productFormArray);
+            })
+            ->when($packageArray, function ($q) use ($packageArray) {
+                return $q->whereIn('package', $packageArray);
+            })
             ->select('product_id', 'product_name', 'salt_composition', 'package', 'image_url', 'marketer', 'product_form')
             ->get()
             ->map(function ($item) use ($baseUrl, $defaultImage) {
@@ -201,10 +209,11 @@ class PopularBrandController extends Controller
                 ];
             });
 
+
         // --- Fetch and transform OTC Medicines ---
         $otc = Otcmedicine::where('manufacturers', $brandName)
-            ->when($packageFilter, fn($q) => $q->where('package', $packageFilter))
-            ->when($productFormFilter, fn($q) => $q->where('product_form', $productFormFilter))
+            ->when($packageArray, fn($q) => $q->whereIn('package', $packageArray))
+            ->when($productFormArray, fn($q) => $q->whereIn('product_form', $productFormArray))
             ->select('otc_id', 'name', 'package', 'image_url', 'manufacturers', 'product_form')
             ->get()
             ->map(function ($item) use ($baseUrl, $defaultImage) {
@@ -221,6 +230,7 @@ class PopularBrandController extends Controller
                     'brand' => $item->manufacturers ?? '',
                 ];
             });
+
 
         // --- Merge the collections ---
         $merged = $medicines->concat($otc)->values(); // ensures fresh indexes
