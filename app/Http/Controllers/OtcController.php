@@ -102,15 +102,19 @@ class OtcController extends Controller
         $packageFilter = $request->query('package'); // Now using 'package'
         $productFormFilter = $request->query('product_form'); // e.g., 'Oil'
 
+        $packageArray = $packageFilter ? array_map('trim', explode(',', $packageFilter)) : null;
+        $productFormArray = $productFormFilter ? array_map('trim', explode(',', $productFormFilter)) : null;
+
         // Filter products in category
         $products = Otcmedicine::where('category', $categoryName)
-            ->when($packageFilter, function ($query, $packageFilter) {
-                $query->where('package', $packageFilter);
+            ->when($packageArray, function ($query) use ($packageArray) {
+                $query->whereIn('package', $packageArray);
             })
-            ->when($productFormFilter, function ($query, $productFormFilter) {
-                $query->where('product_form', $productFormFilter);
+            ->when($productFormArray, function ($query) use ($productFormArray) {
+                $query->whereIn('product_form', $productFormArray);
             })
             ->get();
+
 
         if ($products->isEmpty()) {
             return response()->json([
