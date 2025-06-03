@@ -62,6 +62,8 @@ class OrderController extends Controller
 
             $orderId = 'P' . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
 
+            
+
             $order = Order::create([
                 'order_id' => $orderId,
                 'user_id' => $userId,

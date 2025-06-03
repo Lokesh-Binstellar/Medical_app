@@ -4,6 +4,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Laboratories;
 use Illuminate\Http\Request;
 use App\Models\LabTest;
 use App\Models\PopularLabTest;
@@ -52,6 +53,7 @@ class PopularLabTestController extends Controller
         }
 
         PopularLabTest::create([
+            'test_id' => $labTest->id,
             'name' => $labTest->name,
             'contains' => $labTest->contains,
         ]);
@@ -84,7 +86,7 @@ class PopularLabTestController extends Controller
     public function getAll()
     {
         try {
-            $data = PopularLabTest::select('id', 'name', 'contains')->get();
+            $data = PopularLabTest::select('id', 'name', 'contains', 'test_id')->get();
             return response()->json([
                 'status' => true,
                 // 'message' => 'Popular lab tests fetched successfully.',
@@ -97,5 +99,98 @@ class PopularLabTestController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function listLabTest(Request $request, $test_id)
+    {
+        $city = $this->getCityofTenKm($request);
+        $labTest = LabTest::find($test_id);
+
+        if (!$labTest) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Lab test not found.',
+                'data' => null
+            ], 404);
+        }
+
+        // Hide unwanted columns
+        $labTest->makeHidden(['created_at', 'updated_at', 'reports_in']);
+
+        // Fetch labs offering this test
+        $labs = Laboratories::where('city', $city)->get();
+
+        $matchingLabs = [];
+
+        foreach ($labs as $lab) {
+            // Manually decode in case test is stored as JSON string
+            $tests = is_string($lab->test) ? json_decode($lab->test, true) : $lab->test;
+
+            // Ensure it's a valid array before proceeding
+            if (is_array($tests)) {
+                foreach ($tests as $testEntry) {
+                    if ((string) $testEntry['test'] === (string) $test_id) {
+                        $matchingLabs[] = array_merge($testEntry, [
+                            'lab_id' => $lab->id,
+                            'lab_name' => $lab->lab_name,
+                        ]);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // echo "<pre>";
+        // print_r($matchingLabs);
+        // die;
+
+        // 👇 Hide the columns you don’t want to expose
+        $labTest->makeHidden(['created_at', 'updated_at', 'reports_in']);   // add any column names here
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'test' => $labTest,
+                'labs' => $matchingLabs
+            ]
+        ]);
+    }
+
+    public function getCityofTenKm(Request $request)
+    {
+        $latlong = $request->latlong;
+        if (!$latlong) {
+            return response()->json(['status' => false, 'message' => 'latlong is required'], 200);
+        }
+
+        [$userLat, $userLon] = explode(',', $latlong);
+        $userLat = trim($userLat);
+        $userLon = trim($userLon);
+
+        $apiKey = env('GOOGLE_MAPS_API_KEY');
+
+        // 1. Get city from coordinates using Geocoding API
+        $geoUrl = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$userLat,$userLon&key=$apiKey";
+        $geoResponse = file_get_contents($geoUrl);
+        $geoData = json_decode($geoResponse, true);
+
+        if (!$geoData || $geoData['status'] !== 'OK') {
+            return response()->json(['status' => false, 'message' => 'Could not determine city from location'], 400);
+        }
+
+        $city = null;
+        foreach ($geoData['results'][0]['address_components'] as $component) {
+            if (in_array('locality', $component['types'])) {
+                $city = $component['long_name'];
+                break;
+            }
+        }
+
+        if (!$city) {
+            return response()->json(['status' => false, 'message' => 'City not found in address data'], 400);
+        }
+
+        return $city;
+
     }
 }

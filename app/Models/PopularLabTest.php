@@ -8,6 +8,6 @@ class PopularLabTest extends Model
 {
     // app/Models/PopularLabTest.php
 
-protected $fillable = ['name', 'contains'];
+protected $fillable = ['name', 'contains','test_id'];
 
 }

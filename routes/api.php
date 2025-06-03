@@ -49,6 +49,7 @@ Route::middleware('check.api.key')->group(function () {
 
     Route::get('/medicine-by-salt', [MedicineController::class, 'medicineBySaltComposition']);
     Route::get('/popular-lab-tests', [PopularLabTestController::class, 'getAll']);
+    Route::post('/listlabtest/{test_id}', [PopularLabTestController::class, 'listLabTest']);
 
     
     Route::post('/send-otp', [AuthController::class, 'sendOtp']);

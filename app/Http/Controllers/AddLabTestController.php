@@ -17,9 +17,8 @@ class AddLabTestController extends Controller
     }
 
     public function store(Request $request)
-    {
+    { 
         $validated = $request->validate([
-            'prescription_id' => 'required',
             'labtest.*.id' => 'required',
             'labtest.*.contains' => 'required',
         ]);
@@ -85,6 +84,8 @@ class AddLabTestController extends Controller
                     'lab_id' => $incomingLabId,
                 ];
             }
+
+            
 
             LabCart::create([
                 'customer_id' => $customerId,
