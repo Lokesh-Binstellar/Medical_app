@@ -48,8 +48,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/get-dashboard-graph-data', [DashboardController::class, 'getAllGraphData'])->name('dashboard.graph.data');
     Route::get('/orders-data', [DashboardController::class, 'getOrdersData'])->name('dashboard.orders.data');
-    Route::get('/pending-quotes-data', [DashboardController::class, 'pendingQuotesData'])->name('pending.quotes.data');
+    Route::get('/pending-quotes-data', [DashboardController::class, 'pendingQuotesData'])->name('pending.quotes');
 Route::get('/fetch-ratings', [DashboardController::class, 'fetchRatings']);
+Route::get('/top-pharmacies', [DashboardController::class, 'getTopPharmaciesData']);
 
 });
 

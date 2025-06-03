@@ -470,189 +470,122 @@ class DashboardController extends Controller
             ->make(true);
     }
 
-    
-public function pendingQuotesData(Request $request)
-{
-    $quotes = RequestQuote::where('pharmacy_address_status', 0);
+    // Pending Quotes
+    public function pendingQuotesData(Request $request)
+    {
+        $quotes = RequestQuote::where('pharmacy_address_status', 0);
 
-    return DataTables::of($quotes)
-        ->addColumn('quote_id', function ($quote) {
-            return $quote->id;
-        })
-        ->addColumn('customer_details', function ($quote) {
-            $customer = Customers::find($quote->customer_id);
-            if ($customer) {
-                return $customer->firstName . ' ' . $customer->lastName;
-            }
-            return 'N/A';
-        })
-        ->addColumn('status', function ($quote) {
-            return match ($quote->pharmacy_address_status) {
-                0 => '<span class="badge bg-warning">Pending</span>',
-                1 => '<span class="badge bg-success">Completed</span>',
-                default => '<span class="badge bg-secondary">Unknown</span>',
-            };
-        })
-        ->addColumn('created_at', function ($quote) {
-            return $quote->created_at->format('d-m-Y h:i A');
-        })
-        ->rawColumns(['status'])
-        ->make(true);
-}
-
-public function fetchRatings(Request $request)
-{
-    $type = $request->get('type');
-
-    if ($type === 'Pharmacy') {
-        $data = Pharmacies::with('user')->get()->map(function ($item) {
-            $avg = Rating::where('rateable_type', 'Pharmacy')
-                        ->where('rateable_id', $item->user_id)
-                        ->avg('rating');
-
-            $count = Rating::where('rateable_type', 'Pharmacy')
-                        ->where('rateable_id', $item->user_id)
-                        ->count();
-
-            return [
-                'name' => $item->pharmacy_name ?? 'Unknown',
-                'rating' => $avg ? number_format($avg, 1) : 'N/A',
-                'total_ratings' => $count
-            ];
-        });
-
-    } elseif ($type === 'Laboratory') {
-        $data = Laboratories::with('user')->get()->map(function ($item) {
-            $avg = Rating::where('rateable_type', 'Laboratory')
-                        ->where('rateable_id', $item->user_id)
-                        ->avg('rating');
-
-            $count = Rating::where('rateable_type', 'Laboratory')
-                        ->where('rateable_id', $item->user_id)
-                        ->count();
-
-            return [
-                'name' => $item->lab_name ?? 'Unknown',
-                'rating' => $avg ? number_format($avg, 1) : 'N/A',
-                'total_ratings' => $count
-            ];
-        });
-
-    } else {
-        return datatables()->of(collect([]))->make(true); // return empty for invalid type
+        return DataTables::of($quotes)
+            ->addIndexColumn()
+            ->addColumn('quote_id', function ($quote) {
+                return $quote->id;
+            })
+            ->addColumn('customer_details', function ($quote) {
+                $customer = Customers::find($quote->customer_id);
+                if ($customer) {
+                    return $customer->firstName . ' ' . $customer->lastName;
+                }
+                return 'N/A';
+            })
+            ->addColumn('status', function ($quote) {
+                return match ($quote->pharmacy_address_status) {
+                    0 => '<span class="badge bg-warning">Pending</span>',
+                    1 => '<span class="badge bg-success">Completed</span>',
+                    default => '<span class="badge bg-secondary">Unknown</span>',
+                };
+            })
+            ->addColumn('created_at', function ($quote) {
+                return $quote->created_at->format('d-m-Y h:i A');
+            })
+            ->rawColumns(['status'])
+            ->make(true);
     }
 
-    return DataTables::of($data)
-        ->addIndexColumn()
-        ->make(true);
-}
+
+    // Average Pharmacy/Laboratory Rating
+    public function fetchRatings(Request $request)
+    {
+        $type = $request->get('type');
+
+        if ($type === 'Pharmacy') {
+            $data = Pharmacies::with('user')->get()->map(function ($item) {
+                $avg = Rating::where('rateable_type', 'Pharmacy')
+                    ->where('rateable_id', $item->user_id)
+                    ->avg('rating');
+
+                $count = Rating::where('rateable_type', 'Pharmacy')
+                    ->where('rateable_id', $item->user_id)
+                    ->count();
+
+                return [
+                    'name' => $item->pharmacy_name ?? 'Unknown',
+                    'rating' => $avg ? number_format($avg, 1) : 'N/A',
+                    'total_ratings' => $count,
+                    'avg_rating' => $avg ?? 0 // sorting ke liye numeric value rakhte hain
+                ];
+            });
+
+            // Sort descending by avg_rating (jo numeric hai)
+            $data = $data->sortByDesc('avg_rating')->values()->all();
+        } elseif ($type === 'Laboratory') {
+            $data = Laboratories::with('user')->get()->map(function ($item) {
+                $avg = Rating::where('rateable_type', 'Laboratory')
+                    ->where('rateable_id', $item->user_id)
+                    ->avg('rating');
+
+                $count = Rating::where('rateable_type', 'Laboratory')
+                    ->where('rateable_id', $item->user_id)
+                    ->count();
+
+                return [
+                    'name' => $item->lab_name ?? 'Unknown',
+                    'rating' => $avg ? number_format($avg, 1) : 'N/A',
+                    'total_ratings' => $count,
+                    'avg_rating' => $avg ?? 0
+                ];
+            });
+
+            $data = $data->sortByDesc('avg_rating')->values()->all();
+        } else {
+            return datatables()->of(collect([]))->make(true);
+        }
+
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->make(true);
+    }
+
+    // Top Pharmacies
+    public function getTopPharmaciesData()
+    {
+        $topRated = Rating::where('rateable_type', 'Pharmacy')
+            ->selectRaw('rateable_id, AVG(rating) as avg_rating')
+            ->groupBy('rateable_id')
+            ->orderByDesc('avg_rating')
+            ->get()
+            ->filter(function ($rating) {
+                return Pharmacies::where('user_id', $rating->rateable_id)->exists();
+            })
+            ->take(3);
+
+        $data = $topRated->map(function ($rating, $index) {
+            $pharmacy = Pharmacies::where('user_id', $rating->rateable_id)->first();
+
+            $accepted = Order::where('pharmacy_id', $pharmacy->user_id)->where('status', 0)->count();
+            $completed = Order::where('pharmacy_id', $pharmacy->user_id)->where('status', 1)->count();
 
 
+            return [
 
-    // public function salesGraphData($startDate, $endDate)
-    // {
-    //     $totalSales = 0;
-    //     $pharmacyId = Auth::id();
+                'id' => $index + 1,
+                'pharmacy_name' => $pharmacy->pharmacy_name ?? 'Unknown',
+                'total_accepted' => $accepted,
+                'total_completed' => $completed
+            ];
+        })->values();
 
-    //     $pharmacyExists = Pharmacies::where('user_id', $pharmacyId)->exists();
-
-    //     if ($pharmacyExists && $startDate && $endDate) {
-    //         $totalSales = Order::where('pharmacy_id', $pharmacyId)
-    //             ->whereRaw('DATE(created_at) BETWEEN ? AND ?', [$startDate, $endDate])
-    //             ->sum('items_price');
-    //     }
-
-    //     return $totalSales;
-    // }
-
-
-
-    // public function dasindex(Request $request)
-    // {
-    //     if ($request->ajax()) {
-    //         $data = User::with('role')->latest()->get();
-
-    //         return DataTables::of($data)
-    //             ->addIndexColumn()
-
-    //             // Name column with random avatar and name only
-    //             ->addColumn('name', function ($row) {
-    //                 // Random avatar from 1.png to 5.png (you can adjust range)
-    //                 $randomAvatar = asset('assets/img/dasuseravtar/' . rand(1, 7) . '.png');
-
-    //                 return '
-    //                 <div class="d-flex align-items-center">
-    //                     <div class="avatar avatar-sm me-3">
-    //                         <img src="' . $randomAvatar . '" class="rounded-circle" alt="Avatar" width="36" height="36">
-    //                     </div>
-    //                     <div>
-    //                         <h6 class="mb-0 text-truncate">' . e($row->name) . '</h6>
-    //                     </div>
-    //                 </div>';
-    //             })
-
-    //             // Role column with icon
-    //             ->addColumn('role', function ($row) {
-    //                 $roleName = strtolower($row->role->name ?? '');
-
-    //                 switch ($roleName) {
-    //                     case 'admin':
-    //                         $icon = '<i class="menu-icon tf-icons mdi mdi-crown-outline text-primary icon-22px me-2"></i>';
-    //                         break;
-    //                     case 'pharmacy':
-    //                         $icon = '<i class="menu-icon tf-icons mdi mdi-pill text-success icon-22px me-2"></i>';
-    //                         break;
-    //                     case 'laboratory':
-    //                         $icon = '<i class="menu-icon tf-icons mdi mdi-microscope text-info icon-22px me-2"></i>';
-    //                         break;
-    //                     case 'delivery boy':
-    //                         $icon = '<i class="menu-icon tf-icons mdi mdi-truck-delivery-outline text-warning icon-22px me-2"></i>';
-    //                         break;
-    //                     default:
-    //                         $icon = '<i class="menu-icon tf-icons mdi mdi-account-outline text-muted icon-22px me-2"></i>';
-    //                         break;
-    //                 }
-
-
-    //                 return '<div class="d-flex align-items-center">' . $icon . '<span>' . ucfirst($roleName) . '</span></div>';
-    //             })
-
-    //             ->rawColumns(['name', 'role']) // Important for rendering HTML
-    //             ->make(true);
-    //     }
-
-    //     return view('dashboard.dasindex');
-    // }
-
-
-    // public function getSalesOverview()
-    // {
-    //     $pharmacyId = Pharmacies::where('user_id', Auth::user()->id)->first();
-    //     dd($pharmacyId);
-    //     // $pharmacyId = auth()->user()->id;
-    //     $salesData = Order::where('pharmacy_id', $pharmacyId)
-    //         ->selectRaw('SUM(items_price) as total_sales')
-    //         ->selectRaw('COUNT(DISTINCT user_id) as total_customers')
-    //         ->first();
-
-    //     return view('getSalesOverview.', [
-    //         'totalSales' => $salesData->total_sales ?? 0,
-    //         'totalCustomers' => $salesData->total_customers ?? 0
-    //     ]);
-    // }
-    // public function pharmacyDashboard()
-    // {
-    //     $pharmacyId = Auth::user()->id;
-    //     dd($pharmacyId);
-
-    //     $salesData = Order::where('pharmacy_id', $pharmacyId)
-    //         ->selectRaw('SUM(items_price) as total_sales')
-    //         ->selectRaw('COUNT(DISTINCT user_id) as total_customers')
-    //         ->first();
-
-    //     return view('pharmacy.dashboard', [
-    //         'totalSales' => $salesData->total_sales ?? 0,
-    //         'totalCustomers' => $salesData->total_customers ?? 0
-    //     ]);
-    // }
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->make(true);
+    }
 }

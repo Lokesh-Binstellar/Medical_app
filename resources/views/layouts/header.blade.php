@@ -95,7 +95,7 @@
                         @if ($notificationCount > 0)
                             <span id="notification-dot"
                                 class="position-absolute top-0 start-50 translate-middle-y badge rounded-pill bg-danger mt-2 border"
-                                style="font-size: 10px; padding: 4px 6px;transform: translateY(-30%) !important;">
+                                style="font-size: 10px; padding: 5px 5px; transform: translateY(-30%) !important;">
                                 {{ $notificationCount }}
                             </span>
                         @endif

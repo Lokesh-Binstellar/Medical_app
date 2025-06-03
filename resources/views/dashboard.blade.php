@@ -52,20 +52,17 @@
 
 
         @if (auth()->user()->role_id == 1)
-            <div class="row dassbord">
+            <div class="row ">
                 <div class="col-lg-9">
                     <div class="card h-100">
-                        <div class="card-header-das">
-                            <div class="d-flex justify-content-between">
-                                <h4 class="mb-2">Users Overview</h4>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <h5 class="me-2">Total {{ $totalUsers }} Users</h5>
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">Users Overview</h4>
 
-                            </div>
+                            <h5 class="m-0">Total {{ $totalUsers }} Users</h5>
+
                         </div>
 
-                        <div class="card-body d-flex justify-content-between flex-wrap gap-3">
+                        <div class="card-body d-flex justify-content-between flex-wrap gap-3 dassbord">
                             <div class="d-flex gap-3">
                                 <div class="avatar">
                                     <div class="avatar-initial bg-label-info rounded">
@@ -131,7 +128,7 @@
 
                 <div class="col-lg-3 col-sm-6">
                     <div class="card h-100">
-                        <div class="row">
+                        <div class="row dassbord">
                             <div class="col-6">
                                 <div class="card-body">
                                     <div class="card-info mb-3 py-2 mb-lg-1 mb-xl-3">
@@ -155,10 +152,10 @@
 
                 <div class="col-xl-6 col-md-6">
                     <div class="card overflow-hidden">
-                        <div class="card-header-das">
-                            <h4>User Data</h4>
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">User Data</h4>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body dassbord">
                             <div class="table-responsive">
                                 <table class="display table table-striped table-hover " id="usersTable">
                                     <thead>
@@ -179,20 +176,23 @@
 
                 <div class="col-xl-6 col-md-6">
                     <div class="card overflow-hidden">
-                        <div class="card-header-das">
-                            <h4>Average Pharmacy/Laboratory Rating</h4>
+
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">Average Pharmacy/Laboratory Rating</h4>
                         </div>
                         <div class="card-body">
 
                             <!-- Dropdown to select Pharmacy or Laboratory -->
-                            <div class="mb-3">
-                                <label for="typeSelect" class="form-label">Select Type</label>
-                                <select class="form-control" id="typeSelect">
-                                    <option value="">-- Select Type --</option>
-                                    <option value="Pharmacy">Pharmacy</option>
-                                    <option value="Laboratory">Laboratory</option>
-                                </select>
-                            </div>
+                            <ul class="nav nav-tabs mb-3" id="ratingTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="pharmacy-tab" data-type="Pharmacy" type="button"
+                                        role="tab">Pharmacy</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="laboratory-tab" data-type="Laboratory" type="button"
+                                        role="tab">Laboratory</button>
+                                </li>
+                            </ul>
 
                             <!-- Ratings Table -->
                             <div class="table-responsive">
@@ -214,17 +214,40 @@
                     </div>
                 </div>
 
-
+                <div class="col-lg-6">
+                    <div class="card overflow-hidden">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">Top Pharmacies</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="display table table-striped table-hover "id="topPharmaciesTable">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>ID</th>
+                                            <th>Pharmacies Name</th>
+                                            <th>total orders accepted</th>
+                                            <th>total orders completed</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         @endif
 
         @if (auth()->user()->role_id == 2)
-            <div class="row g-6 mb-6 dassbord">
+            <div class="row g-6 mb-6 ">
 
                 <div class="col-lg-3 col-sm-6">
                     <div class="card ">
-                        <div class="card-header-das">
+
+                        <div class="card-header">
                             <div class="d-flex justify-content-between">
                                 <h4 class="mb-1">Sales Overview</h4>
 
@@ -232,13 +255,10 @@
                             <div class="d-flex align-items-center card-subtitl-das">
                                 <small class="me-2">Total ₹{{ number_format($salesData->total_sales, 2 ?? 0.0) }}
                                     Sales</small>
-                                {{-- <div class="d-flex align-items-center text-success">
-                                    <p class="mb-0 fw-medium">+18%</p>
-                                    <i class="icon-base ri ri-arrow-up-s-line"></i>
-                                </div> --}}
+
                             </div>
                         </div>
-                        <div class="card-body d-flex justify-content-between flex-wrap gap-4">
+                        <div class="card-body d-flex justify-content-between flex-wrap gap-4 dassbord">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="avatar">
                                     <div class="avatar-initial bg-label-primary rounded">
@@ -259,7 +279,7 @@
                     <div class="card ">
                         <div class="row">
                             <div class="col-6">
-                                <div class="card-body">
+                                <div class="card-body dassbord">
                                     <div class="card-info mb-3 py-2 mb-lg-1 mb-xl-3">
                                         <h4 class="mb-3 mb-lg-2 mb-xl-3 text-nowrap">Pharmacy Rating</h4>
                                         <div class="badge bg-label-primary rounded-pill lh-xs">
@@ -285,14 +305,12 @@
 
                 <div class="col-lg-6">
                     <div class="card overflow-hidden">
-                        <div class="card-header-das">
-                            <div class="d-flex justify-content-between">
-                                <h4 class="mb-1">Recent Orders (Today's orders)</h4>
-
+                   
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4 class="card-title mb-0">Recent Orders (Today's orders)</h4>
                             </div>
 
-                        </div>
-                        <div class="card-body">
+                        <div class="card-body dassbord">
                             <div class="table-responsive">
                                 <table class="display table table-striped table-hover " id="customerDetailsTable">
                                     <thead>
@@ -316,7 +334,7 @@
 
                 <div class="col-lg-6 col-md-12 col-12 mb-4 mb-lg-0">
                     <div class="card">
-                        <div class="card-header-das d-flex align-items-center justify-content-between py-2 pe-2">
+                        <div class="card-header d-flex align-items-center justify-content-between py-2 pe-2">
                             <h5 class="card-title m-0 me-2 text-secondary">Commission This Month</h5>
 
                             <div id="commissionFilterDateRange" class="form-floating form-floating-outline"
@@ -349,7 +367,7 @@
 
                 <div class="col-lg-6 col-md-12 col-12 mb-4 mb-lg-0">
                     <div class="card ">
-                        <div class="card-header-das d-flex align-items-center justify-content-between py-2 pe-2">
+                        <div class="card-header d-flex align-items-center justify-content-between py-2 pe-2">
                             <h5 class="card-title m-0 me-2 text-secondary">Sales This Month</h5>
 
                             <div id="salesFilterDateRange" class="form-floating form-floating-outline"
@@ -377,8 +395,9 @@
 
                 <div class="col-lg-6">
                     <div class="card overflow-hidden">
-                        <div class="card-header-das">
-                            <h4>Pending Quotes ( <span id="quoteCount">0</span> )</h4>
+                        
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">Pending Quotes ( <span id="quoteCount">0</span> )</h4>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -412,24 +431,12 @@
             var table = $('#usersTable').DataTable({
                 processing: true,
                 serverSide: true,
-                responsive: {
-                    details: {
-                        type: 'column',
-                        target: 0 // Set the control to column 0
-                    }
-                },
-                columnDefs: [{
-                    targets: 0,
-                    className: 'control', // Enables the plus icon in this column
-                    orderable: false
-                }],
                 ajax: "{{ route('dashboard') }}",
                 columns: [{
-                        data: 'id',
-                        name: 'id'
+                        data: 'id'
                     }, {
                         data: 'DT_RowIndex',
-                        name: 'DT_RowIndex'
+                        name: 'id'
                     },
                     {
                         data: 'name',
@@ -446,83 +453,239 @@
                         orderable: false
                     },
 
-                ]
+                ],
+                columnDefs: [{
+                    // For Responsive
+                    className: 'control',
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 1,
+                    targets: 0,
+                    render: function(data, type, full, meta) {
+                        return '';
+                    }
+                }],
+                responsive: {
+                    details: {
+                        display: $.fn.dataTable.Responsive.display.modal({
+                            header: function(row) {
+                                var data = row.data();
+                                return 'Details of ' + data['name'];
+                            }
+                        }),
+                        type: 'column',
+                        renderer: function(api, rowIdx, columns) {
+                            var data = $.map(columns, function(col, i) {
+                                return col.title !==
+                                    '' // ? Do not show row in modal popup if title is blank (for check box)
+                                    ?
+                                    '<tr data-dt-row="' +
+                                    col.rowIndex +
+                                    '" data-dt-column="' +
+                                    col.columnIndex +
+                                    '">' +
+                                    '<td>' +
+                                    col.title +
+                                    ':' +
+                                    '</td> ' +
+                                    '<td>' +
+                                    col.data +
+                                    '</td>' +
+                                    '</tr>' :
+                                    '';
+                            }).join('');
+
+                            return data ? $('<table class="table"/><tbody />').append(data) : false;
+                        }
+                    }
+                }
+
             });
 
+        });
+
+
+        // topPharmaciesTable
+        $(document).ready(function() {
+            var table = $('#topPharmaciesTable').DataTable({
+                processing: true,
+                serverSide: false,
+                ajax: "/top-pharmacies", // adjust route if needed
+                columns: [{
+                        data: 'id'
+                    },
+                    {
+                        data: 'DT_RowIndex',
+                        name: 'id'
+                    },
+                    {
+                        data: 'pharmacy_name',
+                        name: 'pharmacy_name',
+                        orderable: false
+                    },
+                    {
+                        data: 'total_accepted',
+                        name: 'total_accepted'
+                    },
+                    {
+                        data: 'total_completed',
+                        name: 'total_completed'
+                    }
+                ],
+                columnDefs: [{
+                    // For Responsive (optional first col blank)
+                    className: 'control',
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 1,
+                    targets: 0,
+                    render: function(data, type, full, meta) {
+                        return '';
+                    }
+                }],
+                responsive: {
+                    details: {
+                        display: $.fn.dataTable.Responsive.display.modal({
+                            header: function(row) {
+                                var data = row.data();
+                                return 'Details of ' + data['pharmacy_name'];
+                            }
+                        }),
+                        type: 'column',
+                        renderer: function(api, rowIdx, columns) {
+                            var data = $.map(columns, function(col, i) {
+                                return col.title !== '' ?
+                                    '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' +
+                                    col.columnIndex + '">' +
+                                    '<td>' + col.title + ':</td>' +
+                                    '<td>' + col.data + '</td>' +
+                                    '</tr>' :
+                                    '';
+                            }).join('');
+
+                            return data ? $('<table class="table"/><tbody />').append(data) : false;
+                        }
+                    }
+                }
+            });
         });
 
 
         // Average Pharmacy/Laboratory Rating
         let ratingTable;
 
-$(document).ready(function() {
-    ratingTable = $('#ratingTable').DataTable({
-        processing: true,
-        serverSide: true,
-        responsive: {
-            details: {
-                type: 'column',
-                target: 0
-            }
-        },
-        columnDefs: [{
-            targets: 0,
-            className: 'control',
-            orderable: false,
-            searchable: false
-        }],
-        ajax: {
-            url: '/fetch-ratings',
-            data: function(d) {
-                d.type = $('#typeSelect').val();
-            }
-        },
-        columns: [
-            { data: null, defaultContent: '', orderable: false, searchable: false },
-            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'name', name: 'name' },
-            {
-                data: 'rating',
-                name: 'rating',
-                render: function(data, type, row) {
-                    if (data === null || data === undefined) return 'N/A';
-                    return renderStars(parseFloat(data));
+        $(document).ready(function() {
+            let selectedType = 'Pharmacy'; // default tab
+
+            // Initialize DataTable
+            ratingTable = $('#ratingTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '/fetch-ratings',
+                    data: function(d) {
+                        d.type = selectedType;
+                    }
+                },
+                columns: [{
+                        data: null,
+                        defaultContent: '',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'rating',
+                        name: 'rating',
+                        render: function(data, type, row) {
+                            if (data === null || data === undefined) return 'N/A';
+                            return renderStars(parseFloat(data));
+                        }
+                    },
+                    {
+                        data: 'total_ratings',
+                        name: 'total_ratings'
+                    }
+                ],
+                columnDefs: [{
+                    className: 'control',
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 1,
+                    targets: 0,
+                    render: function(data, type, full, meta) {
+                        return '';
+                    }
+                }],
+                responsive: {
+                    details: {
+                        display: $.fn.dataTable.Responsive.display.modal({
+                            header: function(row) {
+                                var data = row.data();
+                                return 'Details of ' + data['name'];
+                            }
+                        }),
+                        type: 'column',
+                        renderer: function(api, rowIdx, columns) {
+                            var data = $.map(columns, function(col, i) {
+                                return col.title !== '' ?
+                                    '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' +
+                                    col.columnIndex + '">' +
+                                    '<td>' + col.title + ':</td><td>' + col.data +
+                                    '</td></tr>' :
+                                    '';
+                            }).join('');
+                            return data ? $('<table class="table"/><tbody />').append(data) : false;
+                        }
+                    }
                 }
-            },
-            { data: 'total_ratings', name: 'total_ratings' }
-        ]
-    });
+            });
 
-    $('#typeSelect').on('change', function() {
-        ratingTable.ajax.reload();
-    });
-});
+            // Handle tab switching
+            $('#ratingTabs button').on('click', function() {
+                $('#ratingTabs button').removeClass('active');
+                $(this).addClass('active');
 
-function renderStars(rating) {
-    let displayRating = rating ? parseFloat(rating).toFixed(1) : "0.0";
+                selectedType = $(this).data('type');
+                ratingTable.ajax.reload(); // Reload DataTable with new type
+            });
+        });
 
-    if (!rating || rating <= 0) {
-        return '<i class="far fa-star" style="color:gold;"></i> '.repeat(5) + ` (${displayRating})`;
-    }
 
-    let fullStars = Math.floor(rating);
-    let halfStar = (rating - fullStars) >= 0.5 ? 1 : 0;
-    let emptyStars = 5 - fullStars - halfStar;
+        function renderStars(rating) {
+            let displayRating = rating ? parseFloat(rating).toFixed(1) : "0.0";
 
-    let starsHtml = '';
+            if (!rating || rating <= 0) {
+                return '<i class="far fa-star" style="color:gold;"></i> '.repeat(5) + ` (${displayRating})`;
+            }
 
-    for (let i = 0; i < fullStars; i++) {
-        starsHtml += '<i class="fas fa-star" style="color:gold;"></i> ';
-    }
-    if (halfStar) {
-        starsHtml += '<i class="fas fa-star-half-alt" style="color:gold;"></i> ';
-    }
-    for (let i = 0; i < emptyStars; i++) {
-        starsHtml += '<i class="far fa-star" style="color:gold;"></i> ';
-    }
+            let fullStars = Math.floor(rating);
+            let halfStar = (rating - fullStars) >= 0.5 ? 1 : 0;
+            let emptyStars = 5 - fullStars - halfStar;
 
-    return starsHtml + ` (${displayRating})`;
-}
+            let starsHtml = '';
+
+            for (let i = 0; i < fullStars; i++) {
+                starsHtml += '<i class="fas fa-star" style="color:gold;"></i> ';
+            }
+            if (halfStar) {
+                starsHtml += '<i class="fas fa-star-half-alt" style="color:gold;"></i> ';
+            }
+            for (let i = 0; i < emptyStars; i++) {
+                starsHtml += '<i class="far fa-star" style="color:gold;"></i> ';
+            }
+
+            return starsHtml + ` (${displayRating})`;
+        }
 
 
 
@@ -579,10 +742,12 @@ function renderStars(rating) {
             var table = $('#pendingQuotesTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('pending.quotes.data') }}",
+                ajax: "{{ route('pending.quotes') }}",
                 columns: [{
-                        data: 'quote_id',
-                        name: 'quote_id'
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'customer_details',
