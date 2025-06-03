@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Validator;
 
 class CustomerAddressController extends Controller
 {
-   
     /**
      * Store a newly created resource in storage.
      */
@@ -20,7 +19,6 @@ class CustomerAddressController extends Controller
 
             $latlng = $request->latlng;
             $apiKey = env('GOOGLE_MAPS_API_KEY');
-
 
             $url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$latlng&key=$apiKey";
 
@@ -36,11 +34,9 @@ class CustomerAddressController extends Controller
             } else {
                 $data = json_decode($response, true);
                 if (empty($data['results'])) {
-
                     return response([
-                        "status" => false,
-                        "message" => "latlong not found"
-
+                        'status' => false,
+                        'message' => 'latlong not found',
                     ]);
                 }
                 // Initialize values
@@ -69,27 +65,27 @@ class CustomerAddressController extends Controller
                         }
                     }
 
+                    if ($request->filled('postal_code')) {
+                        $postalCode = $request->postal_code;
+                    }
+
                     $formatted_address = $data['results'][0]['formatted_address'];
-                    
+
                     $lat = $data['results'][0]['geometry']['location']['lat'];
                     $lng = $data['results'][0]['geometry']['location']['lng'];
-                    
                 }
-                
+
                 if (empty($city) || empty($state) || empty($formatted_address)) {
-
                     return response([
-                        "status" => false,
-                        "message" => " not found"
-
+                        'status' => false,
+                        'message' => ' not found',
                     ]);
                 }
                 //echo '<pre>'; print_r(   $request->latlng); die;
                 $this->saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address, $lat, $lng);
             }
             curl_close($ch);
-        } else {
-
+        } elseif($request->filled('address_line')) {
             $address_line = urlencode($request->address_line);
             $apiKey = env('GOOGLE_MAPS_API_KEY');
 
@@ -106,14 +102,11 @@ class CustomerAddressController extends Controller
             if (curl_errno($ch)) {
                 echo 'Curl error: ' . curl_error($ch);
             } else {
-
                 $data = json_decode($response, true);
                 if (empty($data['results'])) {
-
                     return response([
-                        "status" => false,
-                        "message" => "address not found"
-
+                        'status' => false,
+                        'message' => 'address not found',
                     ]);
                 }
 
@@ -138,28 +131,98 @@ class CustomerAddressController extends Controller
                             $postalCode = $component['long_name'];
                         }
                     }
+
+                    if ($request->filled('postal_code')) {
+                        $postalCode = $request->postal_code;
+                    }
+
                     $formatted_address = $data['results'][0]['formatted_address'];
                     $lat = $data['results'][0]['geometry']['location']['lat'];
                     $lng = $data['results'][0]['geometry']['location']['lng'];
                     // echo $lat;die;
                 }
                 if (empty($city) || empty($state) || empty($formatted_address)) {
-
                     return response([
-                        "status" => false,
-                        "message" => " not found"
-
+                        'status' => false,
+                        'message' => ' not found',
                     ]);
-
                 }
 
                 $this->saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address, $lat, $lng);
             }
         }
+     elseif ($request->filled('postal_code')) {
+    $postalCode = $request->postal_code;
+    $apiKey = env('GOOGLE_MAPS_API_KEY');
+
+    $url = "https://maps.googleapis.com/maps/api/geocode/json?address=" . urlencode($postalCode) . "&key=$apiKey";
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $response = curl_exec($ch);
+
+    if (curl_errno($ch)) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Curl error: ' . curl_error($ch),
+        ], 500);
+    }
+
+    $data = json_decode($response, true);
+
+    if (empty($data['results'])) {
+        return response()->json([
+            'status' => false,
+            'message' => 'No results found for postal code',
+        ], 404);
+    }
+
+    $city = null;
+    $state = null;
+    $formatted_address = $data['results'][0]['formatted_address'];
+    $lat = $data['results'][0]['geometry']['location']['lat'];
+    $lng = $data['results'][0]['geometry']['location']['lng'];
+
+  foreach ($data['results'][0]['address_components'] as $component) {
+    if (in_array('locality', $component['types'])) {
+        $city = $component['long_name'];
+    }
+    // Fallback agar locality na mile to 'administrative_area_level_3' bhi check kar sakte ho
+    elseif (in_array('administrative_area_level_3', $component['types'])) {
+        $city = $component['long_name'];
+    }
+
+    if (in_array('administrative_area_level_1', $component['types'])) {
+        $state = $component['long_name'];
+    }
+
+    if (in_array('postal_code', $component['types'])) {
+        $postalCode = $component['long_name'];
+    }
+}
+
+   if (empty($city) || empty($state) || empty($formatted_address)) {
+    return response()->json([
+        'status' => false,
+        'message' => 'Incomplete location data from postal code',
+    ], 422);
+}
+
+    // Postal code bhi save hoga kyunki hum yahan pass kar rahe hain
+    return $this->saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address, $lat, $lng);
+}
+    else {
+        return response()->json([
+            'status' => false,
+            'message' => 'No valid location data provided',
+        ], 400);
+    }
 
         return response()->json([
             'status' => true,
-            'message' => 'Address saved successfully'
+            'message' => 'Address saved successfully',
         ]);
     }
 
@@ -182,9 +245,7 @@ class CustomerAddressController extends Controller
         // }
 
         // Check if user already has this address_type
-        $existing = CustomerAddress::where('customer_id', $userId)
-            ->where('address_type', $request->address_type)
-            ->first();
+        $existing = CustomerAddress::where('customer_id', $userId)->where('address_type', $request->address_type)->first();
 
         if ($existing) {
             // Update existing address
@@ -203,7 +264,7 @@ class CustomerAddressController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Address updated successfully',
-                'data' => $existing
+                'data' => $existing,
             ]);
         } else {
             // Create new address
@@ -224,7 +285,7 @@ class CustomerAddressController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Address saved successfully',
-                'data' => $address
+                'data' => $address,
             ]);
         }
     }
@@ -233,23 +294,44 @@ class CustomerAddressController extends Controller
     {
         $userId = $request->get('user_id');
         if (!$userId) {
-            return response()->json([
-                'status' => false,
-                'message' => 'User ID is required.'
-            ], 400);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'User ID is required.',
+                ],
+                400,
+            );
         }
         $addresses = CustomerAddress::where('customer_id', $userId)->get();
 
         if ($addresses->isEmpty()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'No address found for this user.'
-            ], 404);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'No address found for this user.',
+                ],
+                404,
+            );
         }
+        $filteredAddresses = $addresses->map(function ($addresses) {
+            return [
+                'customer_id' => $addresses->customer_id,
+                'name' => $addresses->name,
+                'mobile_no' => $addresses->mobile_no,
+                'address_type' => $addresses->address_type,
+                'house_number' => $addresses->house_number,
+                'address_line' => $addresses->address_line,
+                'lat' => $addresses->lat,
+                'lng' => $addresses->lng,
+                'city' => $addresses->city,
+                'state' => $addresses->state,
+                'postal_code' => $addresses->postal_code,
+            ];
+        });
+
         return response()->json([
             'status' => true,
-            'data' => $addresses
+            'data' => $filteredAddresses,
         ]);
     }
-
 }

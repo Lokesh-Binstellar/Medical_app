@@ -105,7 +105,7 @@ class FileUploadController extends Controller
                 'prescription_file' => $originalFileName,
                 'prescription_status' => $prescription_status,
             ]);
-            event(new MyEvent('admin', 'New Prescription Received'));
+            event(new MyEvent('admin',null, 'New Prescription Received'));
 
             return response()->json([
                 'status' => true,

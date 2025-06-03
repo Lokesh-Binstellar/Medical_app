@@ -3,7 +3,22 @@
 
 @section('styles')
     <style>
-        #paymentFilterDateRange {
+        #commissionFilterDateRange {
+            background: #ffffff;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px solid #d8d8dd;
+            height: 42px;
+            padding: 0 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 30px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        #salesFilterDateRange {
             background: #ffffff;
             border-radius: 10px;
             cursor: pointer;
@@ -18,7 +33,6 @@
             font-weight: 500;
         }
     </style>
- 
 @endsection
 @section('content')
     <div class="page-inner">
@@ -38,20 +52,17 @@
 
 
         @if (auth()->user()->role_id == 1)
-            <div class="row dassbord">
+            <div class="row ">
                 <div class="col-lg-9">
                     <div class="card h-100">
-                        <div class="card-header-das">
-                            <div class="d-flex justify-content-between">
-                                <h4 class="mb-2">Users Overview</h4>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <h5 class="me-2">Total {{ $totalUsers }} Users</h5>
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">Users Overview</h4>
 
-                            </div>
+                            <h5 class="m-0">Total {{ $totalUsers }} Users</h5>
+
                         </div>
 
-                        <div class="card-body d-flex justify-content-between flex-wrap gap-3">
+                        <div class="card-body d-flex justify-content-between flex-wrap gap-3 dassbord">
                             <div class="d-flex gap-3">
                                 <div class="avatar">
                                     <div class="avatar-initial bg-label-info rounded">
@@ -117,7 +128,7 @@
 
                 <div class="col-lg-3 col-sm-6">
                     <div class="card h-100">
-                        <div class="row">
+                        <div class="row dassbord">
                             <div class="col-6">
                                 <div class="card-body">
                                     <div class="card-info mb-3 py-2 mb-lg-1 mb-xl-3">
@@ -139,9 +150,12 @@
                     </div>
                 </div>
 
-                <div class="col-xl-8 col-md-6">
+                <div class="col-xl-6 col-md-6">
                     <div class="card overflow-hidden">
-                        <div class="card-body">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">User Data</h4>
+                        </div>
+                        <div class="card-body dassbord">
                             <div class="table-responsive">
                                 <table class="display table table-striped table-hover " id="usersTable">
                                     <thead>
@@ -160,15 +174,80 @@
                     </div>
                 </div>
 
+                <div class="col-xl-6 col-md-6">
+                    <div class="card overflow-hidden">
+
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">Average Pharmacy/Laboratory Rating</h4>
+                        </div>
+                        <div class="card-body">
+
+                            <!-- Dropdown to select Pharmacy or Laboratory -->
+                            <ul class="nav nav-tabs mb-3" id="ratingTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="pharmacy-tab" data-type="Pharmacy" type="button"
+                                        role="tab">Pharmacy</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="laboratory-tab" data-type="Laboratory" type="button"
+                                        role="tab">Laboratory</button>
+                                </li>
+                            </ul>
+
+                            <!-- Ratings Table -->
+                            <div class="table-responsive">
+                                <table class="display table table-striped table-hover" id="ratingTable">
+                                    <thead>
+                                        <tr>
+                                            <th></th> <!-- For responsive control icon -->
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Average Rating</th>
+                                            <th>Total User Ratings</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card overflow-hidden">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">Top Pharmacies</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="display table table-striped table-hover "id="topPharmaciesTable">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>ID</th>
+                                            <th>Pharmacies Name</th>
+                                            <th>total orders accepted</th>
+                                            <th>total orders completed</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         @endif
 
         @if (auth()->user()->role_id == 2)
-            <div class="row g-6 mb-6 dassbord">
+            <div class="row g-6 mb-6 ">
 
-                <div class="col-lg-3">
-                    <div class="card h-100">
-                        <div class="card-header-das">
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card ">
+
+                        <div class="card-header">
                             <div class="d-flex justify-content-between">
                                 <h4 class="mb-1">Sales Overview</h4>
 
@@ -176,13 +255,10 @@
                             <div class="d-flex align-items-center card-subtitl-das">
                                 <small class="me-2">Total ₹{{ number_format($salesData->total_sales, 2 ?? 0.0) }}
                                     Sales</small>
-                                {{-- <div class="d-flex align-items-center text-success">
-                                    <p class="mb-0 fw-medium">+18%</p>
-                                    <i class="icon-base ri ri-arrow-up-s-line"></i>
-                                </div> --}}
+
                             </div>
                         </div>
-                        <div class="card-body d-flex justify-content-between flex-wrap gap-4">
+                        <div class="card-body d-flex justify-content-between flex-wrap gap-4 dassbord">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="avatar">
                                     <div class="avatar-initial bg-label-primary rounded">
@@ -200,10 +276,10 @@
                 </div>
 
                 <div class="col-lg-3 col-sm-6">
-                    <div class="card h-100">
+                    <div class="card ">
                         <div class="row">
                             <div class="col-6">
-                                <div class="card-body">
+                                <div class="card-body dassbord">
                                     <div class="card-info mb-3 py-2 mb-lg-1 mb-xl-3">
                                         <h4 class="mb-3 mb-lg-2 mb-xl-3 text-nowrap">Pharmacy Rating</h4>
                                         <div class="badge bg-label-primary rounded-pill lh-xs">
@@ -227,28 +303,60 @@
                     </div>
                 </div>
 
+                <div class="col-lg-6">
+                    <div class="card overflow-hidden">
+                   
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4 class="card-title mb-0">Recent Orders (Today's orders)</h4>
+                            </div>
 
-                <div class="col-lg-5 col-md-12 col-12 mb-4 mb-lg-0">
-                    <div class="card h-100">
-                        <div class="card-header-das d-flex align-items-center justify-content-between py-2 pe-2">
+                        <div class="card-body dassbord">
+                            <div class="table-responsive">
+                                <table class="display table table-striped table-hover " id="customerDetailsTable">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Order id</th>
+                                            <th>Customer Details</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="col-lg-6 col-md-12 col-12 mb-4 mb-lg-0">
+                    <div class="card">
+                        <div class="card-header d-flex align-items-center justify-content-between py-2 pe-2">
                             <h5 class="card-title m-0 me-2 text-secondary">Commission This Month</h5>
 
-                            <div id="paymentFilterDateRange" class="form-floating form-floating-outline"
+                            <div id="commissionFilterDateRange" class="form-floating form-floating-outline"
                                 style="cursor:pointer;">
                                 <span class="text-primary"></span>
                                 <i class="mdi mdi-calendar text-primary"></i>
                             </div>
 
-                            <input type="hidden" name="payment_start_date" value="" id="payment_start_date"
+                            <input type="hidden" name="commission_start_date" value="" id="commission_start_date"
                                 readonly>
-                            <input type="hidden" name="payment_end_date" value="" id="payment_end_date" readonly>
+                            <input type="hidden" name="commission_end_date" value="" id="commission_end_date"
+                                readonly>
                         </div>
 
 
                         <div class="card-body">
-                            <div class="card-info">
+                            <div class="card-info py-3">
                                 <p class="mb-0">Total Commission This Month</p>
                                 <h5 id="commissionText" class="mb-0">₹0.00</h5>
+                            </div>
+                            <div class="">
+                                <canvas id="commissionChart" height="130"></canvas>
                             </div>
                         </div>
 
@@ -257,7 +365,57 @@
 
 
 
+                <div class="col-lg-6 col-md-12 col-12 mb-4 mb-lg-0">
+                    <div class="card ">
+                        <div class="card-header d-flex align-items-center justify-content-between py-2 pe-2">
+                            <h5 class="card-title m-0 me-2 text-secondary">Sales This Month</h5>
 
+                            <div id="salesFilterDateRange" class="form-floating form-floating-outline"
+                                style="cursor:pointer;">
+                                <span class="text-primary"></span>
+                                <i class="mdi mdi-calendar text-primary"></i>
+                            </div>
+
+                            <input type="hidden" name="sales_start_date" id="sales_start_date" readonly>
+                            <input type="hidden" name="sales_end_date" id="sales_end_date" readonly>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="card-info py-3">
+                                <p class="mb-0">Total Sales This Month</p>
+                                <h5 id="salesText" class="mb-0">₹0.00</h5>
+                            </div>
+                            <div>
+                                <canvas id="salesChart" height="130"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-lg-6">
+                    <div class="card overflow-hidden">
+                        
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">Pending Quotes ( <span id="quoteCount">0</span> )</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="display table table-striped table-hover "id="pendingQuotesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Customer Details</th>
+                                            <th>Status</th>
+                                            <th>Requested Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
 
             </div>
@@ -267,33 +425,18 @@
 
 
 @section('scripts')
-    <!-- DataTables Scripts -->
-
-
-
     <script>
+        // admin User data 
         $(document).ready(function() {
             var table = $('#usersTable').DataTable({
                 processing: true,
                 serverSide: true,
-                responsive: {
-                    details: {
-                        type: 'column',
-                        target: 0 // Set the control to column 0
-                    }
-                },
-                columnDefs: [{
-                    targets: 0,
-                    className: 'control', // Enables the plus icon in this column
-                    orderable: false
-                }],
                 ajax: "{{ route('dashboard') }}",
                 columns: [{
-                        data: 'id',
-                        name: 'id'
+                        data: 'id'
                     }, {
                         data: 'DT_RowIndex',
-                        name: 'DT_RowIndex'
+                        name: 'id'
                     },
                     {
                         data: 'name',
@@ -310,30 +453,419 @@
                         orderable: false
                     },
 
-                ]
+                ],
+                columnDefs: [{
+                    // For Responsive
+                    className: 'control',
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 1,
+                    targets: 0,
+                    render: function(data, type, full, meta) {
+                        return '';
+                    }
+                }],
+                responsive: {
+                    details: {
+                        display: $.fn.dataTable.Responsive.display.modal({
+                            header: function(row) {
+                                var data = row.data();
+                                return 'Details of ' + data['name'];
+                            }
+                        }),
+                        type: 'column',
+                        renderer: function(api, rowIdx, columns) {
+                            var data = $.map(columns, function(col, i) {
+                                return col.title !==
+                                    '' // ? Do not show row in modal popup if title is blank (for check box)
+                                    ?
+                                    '<tr data-dt-row="' +
+                                    col.rowIndex +
+                                    '" data-dt-column="' +
+                                    col.columnIndex +
+                                    '">' +
+                                    '<td>' +
+                                    col.title +
+                                    ':' +
+                                    '</td> ' +
+                                    '<td>' +
+                                    col.data +
+                                    '</td>' +
+                                    '</tr>' :
+                                    '';
+                            }).join('');
+
+                            return data ? $('<table class="table"/><tbody />').append(data) : false;
+                        }
+                    }
+                }
+
             });
 
         });
 
 
+        // topPharmaciesTable
+        $(document).ready(function() {
+            var table = $('#topPharmaciesTable').DataTable({
+                processing: true,
+                serverSide: false,
+                ajax: "/top-pharmacies", // adjust route if needed
+                columns: [{
+                        data: 'id'
+                    },
+                    {
+                        data: 'DT_RowIndex',
+                        name: 'id'
+                    },
+                    {
+                        data: 'pharmacy_name',
+                        name: 'pharmacy_name',
+                        orderable: false
+                    },
+                    {
+                        data: 'total_accepted',
+                        name: 'total_accepted'
+                    },
+                    {
+                        data: 'total_completed',
+                        name: 'total_completed'
+                    }
+                ],
+                columnDefs: [{
+                    // For Responsive (optional first col blank)
+                    className: 'control',
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 1,
+                    targets: 0,
+                    render: function(data, type, full, meta) {
+                        return '';
+                    }
+                }],
+                responsive: {
+                    details: {
+                        display: $.fn.dataTable.Responsive.display.modal({
+                            header: function(row) {
+                                var data = row.data();
+                                return 'Details of ' + data['pharmacy_name'];
+                            }
+                        }),
+                        type: 'column',
+                        renderer: function(api, rowIdx, columns) {
+                            var data = $.map(columns, function(col, i) {
+                                return col.title !== '' ?
+                                    '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' +
+                                    col.columnIndex + '">' +
+                                    '<td>' + col.title + ':</td>' +
+                                    '<td>' + col.data + '</td>' +
+                                    '</tr>' :
+                                    '';
+                            }).join('');
 
+                            return data ? $('<table class="table"/><tbody />').append(data) : false;
+                        }
+                    }
+                }
+            });
+        });
+
+
+        // Average Pharmacy/Laboratory Rating
+        let ratingTable;
+
+        $(document).ready(function() {
+            let selectedType = 'Pharmacy'; // default tab
+
+            // Initialize DataTable
+            ratingTable = $('#ratingTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '/fetch-ratings',
+                    data: function(d) {
+                        d.type = selectedType;
+                    }
+                },
+                columns: [{
+                        data: null,
+                        defaultContent: '',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'rating',
+                        name: 'rating',
+                        render: function(data, type, row) {
+                            if (data === null || data === undefined) return 'N/A';
+                            return renderStars(parseFloat(data));
+                        }
+                    },
+                    {
+                        data: 'total_ratings',
+                        name: 'total_ratings'
+                    }
+                ],
+                columnDefs: [{
+                    className: 'control',
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 1,
+                    targets: 0,
+                    render: function(data, type, full, meta) {
+                        return '';
+                    }
+                }],
+                responsive: {
+                    details: {
+                        display: $.fn.dataTable.Responsive.display.modal({
+                            header: function(row) {
+                                var data = row.data();
+                                return 'Details of ' + data['name'];
+                            }
+                        }),
+                        type: 'column',
+                        renderer: function(api, rowIdx, columns) {
+                            var data = $.map(columns, function(col, i) {
+                                return col.title !== '' ?
+                                    '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' +
+                                    col.columnIndex + '">' +
+                                    '<td>' + col.title + ':</td><td>' + col.data +
+                                    '</td></tr>' :
+                                    '';
+                            }).join('');
+                            return data ? $('<table class="table"/><tbody />').append(data) : false;
+                        }
+                    }
+                }
+            });
+
+            // Handle tab switching
+            $('#ratingTabs button').on('click', function() {
+                $('#ratingTabs button').removeClass('active');
+                $(this).addClass('active');
+
+                selectedType = $(this).data('type');
+                ratingTable.ajax.reload(); // Reload DataTable with new type
+            });
+        });
+
+
+        function renderStars(rating) {
+            let displayRating = rating ? parseFloat(rating).toFixed(1) : "0.0";
+
+            if (!rating || rating <= 0) {
+                return '<i class="far fa-star" style="color:gold;"></i> '.repeat(5) + ` (${displayRating})`;
+            }
+
+            let fullStars = Math.floor(rating);
+            let halfStar = (rating - fullStars) >= 0.5 ? 1 : 0;
+            let emptyStars = 5 - fullStars - halfStar;
+
+            let starsHtml = '';
+
+            for (let i = 0; i < fullStars; i++) {
+                starsHtml += '<i class="fas fa-star" style="color:gold;"></i> ';
+            }
+            if (halfStar) {
+                starsHtml += '<i class="fas fa-star-half-alt" style="color:gold;"></i> ';
+            }
+            for (let i = 0; i < emptyStars; i++) {
+                starsHtml += '<i class="far fa-star" style="color:gold;"></i> ';
+            }
+
+            return starsHtml + ` (${displayRating})`;
+        }
+
+
+
+
+
+
+        // customer orders data 
+        $(document).ready(function() {
+            $('#customerDetailsTable').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: {
+                    details: {
+                        type: 'column',
+                        target: 0
+                    }
+                },
+                columnDefs: [{
+                    targets: 0,
+                    className: 'control',
+                    orderable: false
+                }],
+                ajax: "{{ route('dashboard.orders.data') }}",
+                columns: [{
+                        data: null,
+                        defaultContent: '',
+                        orderable: false
+                    }, // control column
+                    {
+                        data: 'order_id',
+                        name: 'order_id'
+                    },
+                    {
+                        data: 'name',
+                        name: 'name',
+                        orderable: false
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        orderable: false
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    },
+                ]
+            });
+        });
+
+        $(document).ready(function() {
+            var table = $('#pendingQuotesTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('pending.quotes') }}",
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'customer_details',
+                        name: 'customer_details',
+                        orderable: false
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'created_at'
+                    }
+                ],
+                drawCallback: function(settings) {
+                    $('#quoteCount').text(settings._iRecordsTotal); // Sets total pending quotes count
+                }
+            });
+        });
+
+
+
+        // Commission This Month 
+        let commissionChart; // chart instance
+
+        function renderCommissionChart(data) {
+            const ctx = document.getElementById('commissionChart').getContext('2d');
+
+            const labels = data.map(item => item.label);
+            const values = data.map(item => item.value);
+
+            // Get index of highest value to highlight
+            const maxIndex = values.indexOf(Math.max(...values));
+
+            // Generate background colors (highlight max bar)
+            const backgroundColors = values.map((_, index) =>
+                index === maxIndex ? '#033a62' : 'rgba(115, 103, 240, 0.2)'
+            );
+
+            if (commissionChart) {
+                commissionChart.destroy();
+            }
+
+            commissionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '', // remove label to match clean look
+                        data: values,
+                        backgroundColor: backgroundColors,
+                        borderRadius: 10, // rounded bars
+                        barThickness: 30
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#6E6B7B',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        y: {
+                            display: true, // ✅ show y-axis
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 10,
+                                color: '#6E6B7B',
+                                font: {
+                                    size: 14
+                                },
+                                callback: value => `₹${value}` // Optional: add ₹ symbol
+                            },
+                            grid: {
+                                drawBorder: false
+                            }
+                        }
+
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `${ctx.raw.toLocaleString()} ₹  Commission`
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
         $(document).ready(function() {
             var start = moment().startOf('month');
             var end = moment().endOf('month');
-            paymentDate(start,end);
-            function paymentDate(start, end) {
-                var formattedRange = start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY');
-                $('#paymentFilterDateRange span').text(formattedRange);
-                $('#payment_start_date').val(start.format('YYYY-MM-DD'));
-                $('#payment_end_date').val(end.format('YYYY-MM-DD'));
+            commissionDate(start, end);
 
-                fetchPaymentData(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
+            function commissionDate(start, end) {
+                var formattedRange = start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY');
+                $('#commissionFilterDateRange span').text(formattedRange);
+                $('#commission_start_date').val(start.format('YYYY-MM-DD'));
+                $('#commission_end_date').val(end.format('YYYY-MM-DD'));
+
+                fetchcommissionData(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
             }
 
-            $('#paymentFilterDateRange').daterangepicker({
+            $('#commissionFilterDateRange').daterangepicker({
 
-                
+
                 startDate: start.format('DD/MM/YYYY'),
                 endDate: end.format('DD/MM/YYYY'),
                 locale: {
@@ -348,28 +880,163 @@
                     'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1,
                         'month').endOf('month')]
                 }
-            }, paymentDate);
+            }, commissionDate);
 
             // Initialize with current month range
-            fetchPaymentData(startDate, endDate);
-            
+            fetchcommissionData(startDate, endDate);
+
 
         });
 
-        function fetchPaymentData(startDate, endDate) {
-            // Optional: Show loader if you have one
+        function fetchcommissionData(startDate, endDate) {
             $('.spinner-border').show();
 
             $.get("get-dashboard-graph-data", {
-                payment_start_date: startDate,
-                payment_end_date: endDate
+                commission_start_date: startDate,
+                commission_end_date: endDate
             }, function(data) {
                 $('.spinner-border').hide();
 
-                // Safely parse commission number
-                var commission = parseFloat(data.paymentGraphData) || 0;
+                let commission = parseFloat(data.commissionGraphData.totalCommission) || 0;
                 $('#commissionText').text('₹' + commission.toFixed(2));
+
+                if (data.commissionGraphData.chartData.length > 0) {
+                    renderCommissionChart(data.commissionGraphData.chartData);
+                }
+            });
+        }
+
+
+
+
+        // Sales This Month 
+        let salesChart;
+
+        function renderSalesChart(data) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+
+            const labels = data.map(item => item.label);
+            const values = data.map(item => item.value);
+
+            const maxIndex = values.indexOf(Math.max(...values));
+
+            const backgroundColors = values.map((_, index) =>
+                index === maxIndex ? '#033a62' : 'rgba(115, 103, 240, 0.2)'
+            );
+
+            if (salesChart) {
+                salesChart.destroy();
+            }
+
+            salesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '',
+                        data: values,
+                        backgroundColor: backgroundColors,
+                        borderRadius: 10,
+                        barThickness: 30
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#6E6B7B',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        y: {
+                            display: true,
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 10,
+                                color: '#6E6B7B',
+                                font: {
+                                    size: 14
+                                },
+                                callback: value => `₹${value}`
+                            },
+                            grid: {
+                                drawBorder: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `${ctx.raw.toLocaleString()} ₹ Sales`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            var start = moment().startOf('month');
+            var end = moment().endOf('month');
+            salesDate(start, end);
+
+            function salesDate(start, end) {
+                var formattedRange = start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY');
+                $('#salesFilterDateRange span').text(formattedRange);
+                $('#sales_start_date').val(start.format('YYYY-MM-DD'));
+                $('#sales_end_date').val(end.format('YYYY-MM-DD'));
+
+                fetchsalesData(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
+            }
+
+            $('#salesFilterDateRange').daterangepicker({
+                startDate: start.format('DD/MM/YYYY'),
+                endDate: end.format('DD/MM/YYYY'),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1,
+                        'month').endOf('month')]
+                }
+            }, salesDate);
+
+            // Initialize with current month range
+            fetchsalesData(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
+        });
+
+        function fetchsalesData(startDate, endDate) {
+            $('.spinner-border').show();
+
+            $.get("get-dashboard-graph-data", {
+                sales_start_date: startDate,
+                sales_end_date: endDate
+            }, function(data) {
+                $('.spinner-border').hide();
+
+                // Safely parse total sales number and chart data
+                var salesTotal = parseFloat(data.salesGraphData.totalSales) || 0;
+                $('#salesText').text('₹' + salesTotal.toFixed(2));
+
+                if (data.salesGraphData.chartData.length > 0) {
+                    renderSalesChart(data.salesGraphData.chartData);
+                }
             });
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @endsection

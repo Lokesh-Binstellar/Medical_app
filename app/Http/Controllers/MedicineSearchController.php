@@ -144,7 +144,9 @@ class MedicineSearchController extends Controller
     }
 
     public function allPharmacyRequests(Request $request)
+    
     {
+        // echo "okk";die;
         $currentCustomer = $request->get('user_id');  // e.g. 2
 
         $getMedicine = Phrmacymedicine::with('pharmacy')

@@ -190,6 +190,7 @@ class LaboratoriesController extends Controller
 
         $params['test'] = json_encode($testData);
         $params['package_details'] = json_encode($packageData);
+        $params['password'] = Hash::make($request->password);
 
         unset($params['price'], $params['homeprice'], $params['report'], $params['offer_visiting_price'], $params['offer_home_price'], $params['package_name'], $params['package_description'], $params['package_visiting_price'], $params['package_home_price'], $params['package_report'], $params['package_offer_visiting_price'], $params['package_offer_home_price'], $params['package_category']);
 
@@ -283,7 +284,9 @@ class LaboratoriesController extends Controller
         $validated = $request->validate([
             'lab_name' => 'required|string',
             'owner_name' => 'required|string',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:users,email,' . $laboratorie->user_id,
+            
+            'password' => 'nullable|string|min:6',
             'phone' => 'required|min:11|numeric',
             'city' => 'required|string',
             'state' => 'required|string',
@@ -291,7 +294,7 @@ class LaboratoriesController extends Controller
             'address' => 'required|string',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
-            // 'username' => 'required|string',
+            'username' => 'required|string',
             'license' => 'required|string',
             'pickup' => 'required|string',
             'gstno' => 'nullable|string',
@@ -382,6 +385,17 @@ class LaboratoriesController extends Controller
                     'package_category' => $package_categories[$key] ?? null,
                 ];
             }
+        }
+
+        // Update linked user account
+        $user = User::find($laboratorie->user_id);
+        if ($user) {
+            $user->name = $request->username ?? $user->name;
+            $user->email = $request->email ?? $user->email;
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
+            $user->save();
         }
 
         $data['package_details'] = json_encode($packageData);

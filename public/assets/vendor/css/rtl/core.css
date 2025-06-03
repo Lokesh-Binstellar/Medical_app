@@ -800,7 +800,7 @@ progress {
 
 .row {
     --bs-gutter-x: 1.5rem;
-    --bs-gutter-y: 0;
+    --bs-gutter-y: 1.5rem;
     display: flex;
     flex-wrap: wrap;
     margin-top: calc(-1 * var(--bs-gutter-y));
@@ -9767,7 +9767,7 @@ label.btn {
 .btn-icon {
     --bs-btn-active-border-color: transparent;
     padding: 0;
-    width: calc(2.278125rem + calc(1px * 2));
+    width: calc(3rem + calc(1px * 2));
     height: calc(2.278125rem + calc(1px * 2));
     display: inline-flex;
     flex-shrink: 0;

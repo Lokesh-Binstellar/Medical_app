@@ -69,7 +69,7 @@ class RequestQuoteController extends Controller
             return response()->json(
                 [
                     'status' => false,
-                    'message' => 'Work address not found.',
+                    'message' => 'address not found.',
                 ],
                 404,
             );
@@ -88,6 +88,7 @@ class RequestQuoteController extends Controller
         $nearby = [];
 
         $pharmacies = Pharmacies::all();
+      
 
         foreach ($pharmacies as $pharmacy) {
             if ($pharmacy->latitude && $pharmacy->longitude) {
@@ -116,7 +117,7 @@ class RequestQuoteController extends Controller
             $pharmacyUser->notify(new QuoteRequested($customer));
 
             //Event call for refresh the page
-            event(new MyEvent('pharmacy', 'You have received a new quote.'));
+       event(new MyEvent('pharmacy', $pharmacyUser->id,'You have received a new quote.' ));
             if (!$exists) {
                 RequestQuote::create([
                     'customer_id' => $userId,

@@ -19,7 +19,8 @@ class PatientController extends Controller
                 'id' => $patient->id,
                 'customer_id' => $patient->customer_id,
                 'name' => $patient->name,
-                'birth_date' => $patient->birth_date, // Accessor formats it already
+                // 'birth_date' => $patient->birth_date, // Accessor formats it already
+                'age' => Carbon::createFromFormat('d/m/Y', $patient->birth_date)->age,
                 'gender' => $patient->gender,
             ];
         });
