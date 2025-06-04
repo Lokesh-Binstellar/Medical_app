@@ -12,10 +12,71 @@
         html {
             scroll-behavior: smooth;
         }
+
+         .switch {
+        position: relative;
+        display: inline-block;
+        width: 70px;
+        height: 38px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0;
+        right: 0; bottom: 0;
+        background-color: #dc3545; /* Red (OFF) */
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 30px;
+        width: 30px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #28a745; /* Green (ON) */
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(32px);
+    }
+
+    .slider.round {
+        border-radius: 34px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+    .toggle-text {
+        font-size: 1.2rem;
+        color: #28a745;
+    }
+
+    .toggle-text.off {
+        color: #dc3545;
+    }
     </style>
 @endsection
 
-<nav class="layout-navbar navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme " id="layout-navbar">
+<nav class="layout-navbar navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme "
+    id="layout-navbar">
     <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
         <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
             <i class="mdi mdi-menu mdi-24px"></i>
@@ -25,16 +86,21 @@
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         {{-- @if (Route::current()->getName() == 'dashboard') --}}
         <!-- Welcome Text -->
-        <div class="navbar-nav align-items-center">
-            <div class="nav-item navbar-search-wrapper mb-0 ">
+        <div class="navbar-nav align-items-center d-flex justify-content-between w-100">
+
+            {{-- Left Side: Welcome + Address --}}
+            <div class="nav-item navbar-search-wrapper mb-0">
                 @auth
-                    <h3 class="fw-bold text-primary mb-0">Welcome @if (Auth::user()->laboratories)
+                    <h3 class="fw-bold text-primary mb-0">
+                        Welcome
+                        @if (Auth::user()->laboratories)
                             {{ Auth::user()->laboratories->lab_name }}
                         @elseif(Auth::user()->pharmacies)
                             {{ Auth::user()->pharmacies->pharmacy_name }}
                         @else
                             {{ auth()->user()->name }}
-                        @endif !</h3>
+                        @endif!
+                    </h3>
                 @else
                     <span class="fw-bold text-primary">
                         Welcome, Guest!
@@ -42,22 +108,32 @@
                 @endauth
 
                 @auth
-                <span class="fw-bold text-primary">
-                     
-                    @if (Auth::user()->pharmacies)
-                            Address :
-                            {{ Auth::user()->pharmacies->address }}
+                    <span class="fw-bold text-primary d-block mt-1">
+                        @if (Auth::user()->pharmacies)
+                            Address: {{ Auth::user()->pharmacies->address }}
                         @elseif (Auth::user()->laboratories)
-                            Address :
-                            {{ Auth::user()->laboratories->lab_name }}
+                            Address: {{ Auth::user()->laboratories->lab_name }}
                         @endif
                     </span>
                 @endauth
-
             </div>
+
+            {{-- Right Side: ON/OFF Switch for Pharmacy --}}
+            @if(Auth::check() && Auth::user()->role->name === 'pharmacy')
+    <div class="me-3 pharmacy-toggle-wrapper">
+        <label class="switch">
+            <input type="checkbox" id="pharmacyStatusToggle" checked>
+            <span class="slider round"></span>
+        </label>
+        <span class="toggle-text ms-2 fw-semibold">Status: On</span>
+    </div>
+@endif
+
+
 
 
         </div>
+
         <!-- /Welcome Text -->
         {{-- @endif --}}
 
@@ -187,7 +263,7 @@
                 <div class="avatar">
                     <img src="{{ asset('assets/img/profile.jpg') }}" alt class="w-px-40 h-px-40 rounded-circle" />
                     {{-- <img src="{{ asset('assets/img/branding/main-logo.png') }}"
-                            class="w-px-40 h-auto rounded-circle"> --}}
+                        class="w-px-40 h-auto rounded-circle"> --}}
 
                 </div>
             </a>
@@ -267,16 +343,16 @@
         const csrfToken = csrfTokenMeta.getAttribute('content');
 
         document.querySelectorAll('.mark-read-btn').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const id = this.dataset.id;
 
                 fetch(`/notifications/read/${id}`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': csrfToken,
-                            'Content-Type': 'application/json',
-                        }
-                    })
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json',
+                    }
+                })
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
@@ -290,7 +366,7 @@
 
 
     // Initialize Pusher
-   Pusher.logToConsole = true;
+    Pusher.logToConsole = true;
 
     var pusher = new Pusher('7ba4a23b60749764133c', {
         cluster: 'ap1'
@@ -302,33 +378,57 @@
     console.log('User ID:', userId);
 
     var channel = pusher.subscribe('my-channel.' + userRole + '.user.' + userId);
-    channel.bind('my-event', function(data) {
+    channel.bind('my-event', function (data) {
         localStorage.setItem('pusher_message', data.message || 'You have received a new quote.');
         location.reload(true);
     });
 
     var adminChannel = pusher.subscribe('admin-channel');
-    adminChannel.bind('my-event', function() {
+    adminChannel.bind('my-event', function () {
         var messageDiv = document.getElementById('pusher-message');
         messageDiv.textContent = 'Admin has triggered an update.';
         messageDiv.style.display = 'block';
 
-        setTimeout(function() {
+        setTimeout(function () {
             messageDiv.style.display = 'none';
         }, 20000);
     });
 
-    window.onload = function() {
+    window.onload = function () {
         var message = localStorage.getItem('pusher_message');
         if (message) {
             var messageDiv = document.getElementById('pusher-message');
             messageDiv.textContent = message;
             messageDiv.style.display = 'block';
 
-            setTimeout(function() {
+            setTimeout(function () {
                 messageDiv.style.display = 'none';
                 localStorage.removeItem('pusher_message');
             }, 20000);
         }
     };
+    
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggle = document.getElementById('pharmacyStatusToggle');
+        const text = document.querySelector('.toggle-text');
+
+        function updateStatus() {
+            if (toggle.checked) {
+                text.textContent = 'Status: On';
+                text.classList.remove('off');
+                text.classList.add('on');
+                text.style.color = '#28a745';
+            } else {
+                text.textContent = 'Status: Off';
+                text.classList.remove('on');
+                text.classList.add('off');
+                text.style.color = '#dc3545';
+            }
+        }
+
+        toggle.addEventListener('change', updateStatus);
+        updateStatus(); // initialize on load
+    });
 </script>

@@ -441,6 +441,8 @@ Route::prefix('notifications')->group(function () {
 Route::get('/additionalcharges', [AdditionalchargesController::class, 'showForm'])->name('additionalcharges');
 Route::post('/platform-fee', [AdditionalchargesController::class, 'storeOrUpdate'])->name('platform-fee.store');
 // Route::get('/platform-fee/{id?}', [AdditionalchargesController::class, 'showForm'])->name('platform-fee.form');
+Route::post('/pharmacist/toggle-status', [PharmaciesController::class, 'toggleStatus'])->name('pharmacist.toggleStatus');
+
 
 
 
