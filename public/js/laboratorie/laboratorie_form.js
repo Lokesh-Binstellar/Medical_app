@@ -185,6 +185,14 @@ document.addEventListener("DOMContentLoaded", function () {
                         },
                     },
                 },
+                terms: {
+                    validators: {
+                        notEmpty: {
+                            message: "You must agree to the terms and conditions",
+                        },
+                    },
+                },
+ 
             },
 
             plugins: {

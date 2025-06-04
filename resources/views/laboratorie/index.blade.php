@@ -8,38 +8,36 @@
     </style>
 @endsection
 @section('content')
-
-                    <div class="card">
-                        <div class="card-header rounded-top">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <h4 class="card-title mb-0  text-white">Laboratory </h4>
-                                <a href="{{ route('laboratorie.create') }}" class="btn btn-primary text-white  addButton ">+
-                                    Add
-                                    Laboratory</a>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-datatable table-responsive pt-0">
-                                <table class="datatables-basic table table-striped data-table">
-                                    <div id="overlay"></div>
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Id</th>
-                                            <th style="width: 10%">Action</th>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Address</th>
-                                            <th>Phone</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                
+    <div class="card">
+        <div class="card-header rounded-top">
+            <div class="d-flex align-items-center justify-content-between">
+                <h4 class="card-title mb-0  text-white">Laboratory </h4>
+                <a href="{{ route('laboratorie.create') }}" class="btn btn-primary text-white  addButton ">+
+                    Add
+                    Laboratory</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-datatable table-responsive pt-0">
+                <table class="datatables-basic table table-striped data-table">
+                    <div id="overlay"></div>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Id</th>
+                            <th style="width: 10%">Action</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Address</th>
+                            <th>Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('scripts')
     <script>

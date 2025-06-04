@@ -5,12 +5,12 @@
 
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h4 class="mb-0">Edit Privacy Policy</h4>
+        <h4 class="mb-0">View Privacy Policy</h4>
     </div>
     <div class="card-body">
      
             <div class="mb-3">
-                <label class="form-label fw-semibold">Description</label>
+                {{-- <label class="form-label fw-semibold">Description</label> --}}
                 <div class="border p-3">{!! $privacyPolicy->description !!}</div>
             </div>
 

@@ -370,13 +370,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-check">
-    <input class="form-check-input" type="checkbox" id="termsCheckbox" name="terms" required>
-    <label class="form-check-label" for="termsCheckbox">
-        I agree to the <a href="/terms-and-conditions" target="_blank">Terms and Conditions</a>.
-    </label>
-</div>
-
+                <div class="col-md-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="termsCheckbox" name="terms" required>
+                        <label class="form-check-label" for="termsCheckbox">
+                            I agree to the <a href="/cms/terms/1" target="_blank">Terms and Conditions</a>.
+                        </label>
+                    </div>
+                </div>
 
                 {{-- Buttons --}}
                 <div class="card-action">

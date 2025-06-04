@@ -5,7 +5,7 @@
 
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h4 class="mb-0">Edit FAQs</h4>
+        <h4 class="mb-0">View FAQs</h4>
     </div>
     <div class="card-body">
      

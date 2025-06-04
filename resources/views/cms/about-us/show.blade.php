@@ -10,7 +10,7 @@
     <div class="card-body">
      
             <div class="mb-3">
-                <label class="form-label fw-semibold">Description</label>
+                {{-- <label class="form-label fw-semibold">Description</label> --}}
                 <div class="border p-3">{!! $aboutUs->description !!}</div>
             </div>
 
