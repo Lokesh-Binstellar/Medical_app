@@ -374,7 +374,7 @@ class CmsController extends Controller
                 ->addColumn('action', function ($row) {
                     $editUrl = route('cms.terms-and-conditions.edit', $row->id);
                     $showUrl = route('cms.terms-and-conditions.show', $row->id);
-                    $deleteUrl = route('cms.terms-and-conditions.destroy', $row->id);
+                    // $deleteUrl = route('cms.terms-and-conditions.destroy', $row->id);
 
                     return '
     <div class="dropdown">
@@ -384,9 +384,9 @@ class CmsController extends Controller
         <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="' . $showUrl . '">View</a></li>
             <li><a class="dropdown-item" href="' . $editUrl . '">Edit</a></li>
-            <li><button class="dropdown-item btn-delete" data-id="' . $row->id . '" data-url="' . $deleteUrl . '">Delete</button></li>
-        </ul>
-    </div>';
+            </ul>
+            </div>';
+            // <li><button class="dropdown-item btn-delete" data-id="' . $row->id . '" data-url="' . $deleteUrl . '">Delete</button></li>
                 })
                 ->rawColumns(['action'])
                 ->make(true);

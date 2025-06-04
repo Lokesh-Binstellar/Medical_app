@@ -448,6 +448,12 @@ Route::post('/platform-fee', [AdditionalchargesController::class, 'storeOrUpdate
 
 
 
+Route::view('/webpage/home', 'webpage.home');
+Route::view('/webpage/about', 'webpage.about');
+Route::view('/webpage/contact', 'webpage.contact');
+Route::view('/webpage/privacy-policy', 'webpage.privacy-policy');
+Route::view('/webpage/terms', 'webpage.terms');
+
 
 
 

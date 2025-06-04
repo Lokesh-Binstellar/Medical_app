@@ -154,7 +154,14 @@ document.addEventListener('DOMContentLoaded', function () {
                             message: 'Address must be at least 10 characters'
                         }
                     }
-                }
+                },
+                 terms: {
+                    validators: {
+                        notEmpty: {
+                            message: "You must agree to the terms and conditions",
+                        },
+                    },
+                },
             },
             
             plugins: {
