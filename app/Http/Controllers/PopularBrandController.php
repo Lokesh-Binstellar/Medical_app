@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-
 class PopularBrandController extends Controller
 {
     public function index(Request $request)
@@ -40,7 +39,7 @@ class PopularBrandController extends Controller
                 ->rawColumns(['action', 'logo'])
                 ->make(true);
         }
-
+        
         $medicineMarketers = Medicine::select('marketer')
             ->whereNotNull('marketer')
             ->distinct()
@@ -231,7 +230,6 @@ class PopularBrandController extends Controller
                 ];
             });
 
-
         // --- Merge the collections ---
         $merged = $medicines->concat($otc)->values(); // ensures fresh indexes
 
@@ -258,8 +256,6 @@ class PopularBrandController extends Controller
                 'last_page' => $paginator->lastPage(),
             ]
         ]);
-
-
     }
 
     public function destroy($id)

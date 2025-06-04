@@ -80,48 +80,49 @@
 
 
         {{-- User Management --}}
-         @if (in_array('Users', $permissions) || $isSuperAdmin == 1)
-        <li
-            class="menu-item {{ in_array(Route::current()->getName(), ['user.index', 'pharmacist.index', 'laboratorie.index', 'delivery_person.index']) ? 'active open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons mdi mdi-account-multiple-outline"></i>
-                <div data-i18n="User Management">User Management</div>
-            </a>
-            <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
-                @if (in_array('Users', $permissions) || $isSuperAdmin == 1)
-                    <li class="menu-item {{ Route::current()->getName() == 'user.index' ? 'active' : '' }}">
-                        <a href="{{ route('user.index') }}" class="menu-link">
-                            <div data-i18n="User">User</div>
-                        </a>
-                    </li>
-                @endif
+        @if (in_array('Users', $permissions) || $isSuperAdmin == 1)
+            <li
+                class="menu-item {{ in_array(Route::current()->getName(), ['user.index', 'pharmacist.index', 'laboratorie.index', 'delivery_person.index']) ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons mdi mdi-account-multiple-outline"></i>
+                    <div data-i18n="User Management">User Management</div>
+                </a>
+                <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
+                    @if (in_array('Users', $permissions) || $isSuperAdmin == 1)
+                        <li class="menu-item {{ Route::current()->getName() == 'user.index' ? 'active' : '' }}">
+                            <a href="{{ route('user.index') }}" class="menu-link">
+                                <div data-i18n="User">User</div>
+                            </a>
+                        </li>
+                    @endif
 
-                @if ($isSuperAdmin == 1)
-                    <li class="menu-item {{ Route::current()->getName() == 'pharmacist.index' ? 'active' : '' }}">
-                        <a href="{{ route('pharmacist.index') }}" class="menu-link">
-                            <div data-i18n="Pharmacies">Pharmacies</div>
-                        </a>
-                    </li>
-                @endif
+                    @if ($isSuperAdmin == 1)
+                        <li class="menu-item {{ Route::current()->getName() == 'pharmacist.index' ? 'active' : '' }}">
+                            <a href="{{ route('pharmacist.index') }}" class="menu-link">
+                                <div data-i18n="Pharmacies">Pharmacies</div>
+                            </a>
+                        </li>
+                    @endif
 
-                @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
-                    <li class="menu-item {{ Route::current()->getName() == 'laboratorie.index' ? 'active' : '' }}">
-                        <a href="{{ route('laboratorie.index') }}" class="menu-link">
-                            <div data-i18n="Laboratories">Laboratories</div>
-                        </a>
-                    </li>
-                @endif
+                    @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
+                        <li class="menu-item {{ Route::current()->getName() == 'laboratorie.index' ? 'active' : '' }}">
+                            <a href="{{ route('laboratorie.index') }}" class="menu-link">
+                                <div data-i18n="Laboratories">Laboratories</div>
+                            </a>
+                        </li>
+                    @endif
 
-                @if (in_array('DeliveryPerson', $permissions) || $isSuperAdmin == 1)
-                    <li class="menu-item {{ Route::current()->getName() == 'delivery_person.index' ? 'active' : '' }}">
-                        <a href="{{ route('delivery_person.index') }}" class="menu-link">
-                            <div data-i18n="Delivery Person">Delivery Person</div>
-                        </a>
-                    </li>
-                @endif
-            </ul>
-        </li>
-        @endif  
+                    @if (in_array('DeliveryPerson', $permissions) || $isSuperAdmin == 1)
+                        <li
+                            class="menu-item {{ Route::current()->getName() == 'delivery_person.index' ? 'active' : '' }}">
+                            <a href="{{ route('delivery_person.index') }}" class="menu-link">
+                                <div data-i18n="Delivery Person">Delivery Person</div>
+                            </a>
+                        </li>
+                    @endif
+                </ul>
+            </li>
+        @endif
 
 
 
@@ -360,7 +361,68 @@
                 </ul>
             </li>
         @endif
+        @if (in_array('About', $permissions) || $isSuperAdmin == 1)
+            @php
+                $cmsRoutes = [
+                    'cms.about-us.index',
+                    'cms.contact-us.index',
+                    'cms.faqs.index',
+                    'cms.terms-and-conditions.index',
+                    'cms.return-policies.index',
+                    'cms.privacy-policies.index',
+                    // 'cms.shipping-policies.index',
+                ];
+            @endphp
 
+            <li class="menu-item {{ in_array(Route::currentRouteName(), $cmsRoutes) ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons mdi mdi-information-outline"></i>
+                    <div data-i18n="About Gomeds 24/7">About Gomeds 24/7</div>
+                </a>
+                <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
+                    <li class="menu-item {{ Route::currentRouteName() == 'cms.about-us.index' ? 'active' : '' }}">
+                        <a href="{{ route('cms.about-us.index') }}" class="menu-link">
+                            <div data-i18n="About Us">About Us</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-item {{ Route::currentRouteName() == 'cms.contact-us.index' ? 'active' : '' }}">
+                        <a href="{{ route('cms.contact-us.index') }}" class="menu-link">
+                            <div data-i18n="Contact Us">Contact Us</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-item {{ Route::currentRouteName() == 'cms.faqs.index' ? 'active' : '' }}">
+                        <a href="{{ route('cms.faqs.index') }}" class="menu-link">
+                            <div data-i18n="FAQs">FAQ's</div>
+                        </a>
+                    </li>
+
+                    <li
+                        class="menu-item {{ Route::currentRouteName() == 'cms.terms-and-conditions.index' ? 'active' : '' }}">
+                        <a href="{{ route('cms.terms-and-conditions.index') }}" class="menu-link">
+                            <div data-i18n="Terms and Conditions">Terms and Conditions</div>
+                        </a>
+                    </li>
+
+                    <li
+                        class="menu-item {{ Route::currentRouteName() == 'cms.return-policies.index' ? 'active' : '' }}">
+                        <a href="{{ route('cms.return-policies.index') }}" class="menu-link">
+                            <div data-i18n="Return Policy">Return Policy</div>
+                        </a>
+                    </li>
+
+                    <li
+                        class="menu-item {{ Route::currentRouteName() == 'cms.privacy-policies.index' ? 'active' : '' }}">
+                        <a href="{{ route('cms.privacy-policies.index') }}" class="menu-link">
+                            <div data-i18n="Privacy Policy">Privacy Policy</div>
+                        </a>
+                    </li>
+
+
+                </ul>
+            </li>
+        @endif
 
 
 

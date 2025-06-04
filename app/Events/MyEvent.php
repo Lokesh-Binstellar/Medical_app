@@ -35,10 +35,15 @@ class MyEvent implements ShouldBroadcastNow
         // return new Channel('my-channel.' . $this->role);
 
 
-         if ($this->userId) {
+   if ($this->role === 'admin') {
+        return new Channel('admin-channel');
+    }
+
+    if ($this->userId) {
         return new Channel('my-channel.' . $this->role . '.user.' . $this->userId);
     }
-        return new Channel('my-channel.' . $this->role);
+
+    return new Channel('my-channel.' . $this->role);
     }
 
     /**
