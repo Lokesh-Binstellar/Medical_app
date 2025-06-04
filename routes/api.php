@@ -40,6 +40,7 @@ Route::middleware('check.api.key')->group(function () {
     Route::post('/popularpharmacydetails/{id}', [PharmaciesController::class, 'popularpharmacydetails'])->name('pharmacy.popularpharmacydetails');
     Route::get('/filterbyorgan', [LabPackageAndTestDetailsController::class, 'getpackageandtestbyorgan'])->name('filterbyorgan');
     Route::post('/getPacakgesAndTestByOrgan/{id}', [LabPackageAndTestDetailsController::class, 'getPacakgesAndTestByOrgan']);
+    Route::post('/invoice/{id}', [MedicineSearchController::class, 'saveInvoice']);
     
     
     Route::get('/medicines/search', [MedicineController::class, 'search']);

@@ -21,6 +21,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class MedicineSearchController extends Controller
 {
@@ -599,8 +600,36 @@ class MedicineSearchController extends Controller
         ])->loadView('invoice.invoice', compact('order'));
 
         return $pdf->download("invoice-{$order->order_number}.pdf");
+    }
 
+    public function saveInvoice($orderId)
+    {
+        $order = Order::where('order_id', $orderId)
+            ->with(['customer', 'pharmacy'])
+            ->firstOrFail();
 
+        $pdf = Pdf::setOptions([
+            'defaultFont' => 'DejaVu Sans',
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+        ])->loadView('invoice.invoice', compact('order'));
+
+        $fileName = "invoice-{$order->order_id}.pdf";
+        $publicPath = public_path('invoices');
+
+        // Create directory if it doesn't exist
+        if (!File::exists($publicPath)) {
+            File::makeDirectory($publicPath, 0755, true);
+        }
+
+        $filePath = "{$publicPath}/{$fileName}";
+        file_put_contents($filePath, $pdf->output());
+
+        return [
+            'file_name' => $fileName,
+            'file_path' => $filePath,
+            'url' => asset("invoices/{$fileName}")
+        ];
     }
 
 
