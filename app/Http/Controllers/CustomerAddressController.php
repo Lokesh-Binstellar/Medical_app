@@ -334,4 +334,42 @@ class CustomerAddressController extends Controller
             'data' => $filteredAddresses,
         ]);
     }
+
+
+
+    public function deleteAddress(Request $request)
+{
+
+    $userId = $request->get('user_id');
+    // echo   $userId;die;
+    $addressType = $request->get('address_type');
+
+    if (!$userId || !$addressType) {
+        return response()->json([
+            'status' => false,
+            'message' => 'User ID and address type are required',
+        ], 400);
+    }
+
+    $address = CustomerAddress::where('customer_id', $userId)
+                ->where('address_type', $addressType)
+                ->first();
+
+    if (!$address) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Address not found',
+        ], 404);
+    }
+
+    $address->delete();
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Address deleted successfully',
+    ]);
+}
+
+
+
 }

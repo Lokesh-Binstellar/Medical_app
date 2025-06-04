@@ -124,6 +124,31 @@
         @endif  
 
 
+
+        
+        {{-- customer --}}
+        @if ($isSuperAdmin == 1)
+            <li
+                class="menu-item {{ in_array(Route::currentRouteName(), ['customer.list']) ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons mdi mdi-account-outline"></i>
+                    <div data-i18n="Customer Details">Customer Details</div>
+                </a>
+                <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
+                    <li class="menu-item {{ Route::currentRouteName() == 'labtest.index' ? 'active' : '' }}">
+                        <a href="{{ route('customer.list') }}" class="menu-link">
+                            <div data-i18n="Customers">Customers</div>
+                        </a>
+                    </li>
+                    {{-- <li class="menu-item {{ Route::currentRouteName() == 'addLabTest.index' ? 'active' : '' }}">
+                        <a href="{{ route('addLabTest.index') }}" class="menu-link">
+                            <div data-i18n="Add Lab Test">Add Lab Test</div>
+                        </a>
+                    </li> --}}
+                </ul>
+            </li>
+        @endif
+
         {{-- Pharmacy Management --}}
         @if (in_array('Medicines', $permissions) || in_array('Otcmedicines', $permissions) || $isSuperAdmin == 1)
             <li

@@ -149,7 +149,7 @@ class PopularBrandController extends Controller
             return [
                 'id' => $brand->id,
                 'name' => $brand->name,
-                'logo' => $brand->logo ? url('storage/brands/' . basename($brand->logo)) : [],
+                'logo' => $brand->logo ? url('popular/brands/' . basename($brand->logo)) : [],
 
             ];
         });
