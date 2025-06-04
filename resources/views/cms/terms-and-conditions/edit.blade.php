@@ -53,7 +53,8 @@
                         [{ header: [1, 2, false] }],
                         ['bold', 'italic', 'underline'],
                         ['link', 'blockquote', 'code-block', 'image'],
-                        [{ list: 'ordered' }, { list: 'bullet' }]
+                        [{ list: 'ordered' }, { list: 'bullet' }],
+                         [{ align: [] }],
                     ]
                 }
             });

@@ -26,6 +26,7 @@ use App\Http\Controllers\MedicineBannerController;
 use App\Http\Controllers\PhlebotomistController;
 use App\Http\Controllers\PopularLabTestController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PusherController;
 use App\Http\Controllers\RequestQuoteController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -440,3 +441,19 @@ Route::prefix('notifications')->group(function () {
 Route::get('/additionalcharges', [AdditionalchargesController::class, 'showForm'])->name('additionalcharges');
 Route::post('/platform-fee', [AdditionalchargesController::class, 'storeOrUpdate'])->name('platform-fee.store');
 // Route::get('/platform-fee/{id?}', [AdditionalchargesController::class, 'showForm'])->name('platform-fee.form');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Route::get('/trigger-event', [PusherController::class, 'trigger']);

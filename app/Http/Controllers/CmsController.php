@@ -9,6 +9,7 @@ use App\Models\Faq;
 use App\Models\TermsAndCondition;
 use App\Models\ReturnPolicy;
 use App\Models\PrivacyPolicy;
+use Illuminate\Support\Facades\Response;
 use Yajra\DataTables\Facades\DataTables;
 
 class CmsController extends Controller
@@ -543,7 +544,7 @@ class CmsController extends Controller
     {
         $about = AboutUs::latest()->first();
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $about,
         ]);
     }
@@ -552,7 +553,7 @@ class CmsController extends Controller
     {
         $contact = ContactUs::latest()->first();
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $contact,
         ]);
     }
@@ -561,35 +562,59 @@ class CmsController extends Controller
     {
         $faqs = Faq::orderBy('id', 'desc')->get();
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $faqs,
         ]);
     }
 
-    public function terms()
-    {
-        $terms = TermsAndCondition::latest()->first();
-        return response()->json([
-            'success' => true,
-            'data' => $terms,
-        ]);
-    }
+public function terms()
+{
+    $terms = TermsAndCondition::latest()->first();
 
-    public function returnPolicy()
-    {
-        $returnPolicy = ReturnPolicy::latest()->first();
-        return response()->json([
-            'success' => true,
-            'data' => $returnPolicy,
-        ]);
-    }
+    $description = '<div style="text-align:justify;">' . $terms->description . '</div>';
 
-    public function privacyPolicy()
-    {
-        $privacyPolicy = PrivacyPolicy::latest()->first();
-        return response()->json([
-            'success' => true,
-            'data' => $privacyPolicy,
-        ]);
-    }
+    return response()->json([
+        'status' => true,
+        'data' => [
+            'id' => $terms->id,
+            'description' => $description,
+            'created_at' => $terms->created_at,
+            'updated_at' => $terms->updated_at,
+        ]
+    ], 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
+
+public function returnPolicy()
+{
+    $returnPolicy = ReturnPolicy::latest()->first();
+
+    return response()->json([
+        'status' => true,
+        'data' => [
+            'id' => $returnPolicy->id,
+            'description' => '<div style="text-align:justify;">' . $returnPolicy->description . '</div>',
+            'created_at' => $returnPolicy->created_at,
+            'updated_at' => $returnPolicy->updated_at,
+        ],
+    ]);
+}
+
+
+
+   public function privacyPolicy()
+{
+    $privacyPolicy = PrivacyPolicy::latest()->first();
+
+    return response()->json([
+        'status' => true,
+        'data' => [
+            'id' => $privacyPolicy->id,
+            'description' => '<div style="text-align:justify;">' . $privacyPolicy->description . '</div>',
+            'created_at' => $privacyPolicy->created_at,
+            'updated_at' => $privacyPolicy->updated_at,
+        ],
+    ]);
+}
+
 }

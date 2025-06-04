@@ -42,9 +42,12 @@
                     <h4 class="card-title mb-0  text-white">Prescriptions</h4>
                     {{-- <a href="{{ route('laboratorie.create') }}" class="btn btn-primary text-white  addButton ">+ Add
                                     Laboratory</a> --}}
+
+                                
                 </div>
             </div>
             <div class="card-body">
+                    <button onclick="triggerEvent()">event calll</button>
                 <div class="table-responsive">
                     <table id="add-row" class="display table table-striped table-hover data-table">
                         <thead>
@@ -209,5 +212,38 @@
                     });
             }
         }
+
+
+
+
+
+
+
+
+function triggerEvent() {
+    fetch('/trigger-event')
+        .then(response => {
+            // Inspect content-type
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                return response.json();
+            } else {
+                return response.text(); // fallback
+            }
+        })
+        .then(data => {
+            if (typeof data === 'object') {
+                alert(data.status);
+            } else {
+                console.warn("Not JSON:", data);
+            }
+        })
+        .catch(error => console.error('Fetch error:', error));
+}
+
+
+
+
+    
     </script>
 @endsection

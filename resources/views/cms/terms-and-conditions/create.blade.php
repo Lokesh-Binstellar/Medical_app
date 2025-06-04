@@ -58,7 +58,8 @@
                             list: 'ordered'
                         }, {
                             list: 'bullet'
-                        }]
+                        }],
+                         [{ align: [] }],
                     ]
                 }
             });

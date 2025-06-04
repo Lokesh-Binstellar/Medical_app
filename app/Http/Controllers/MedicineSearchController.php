@@ -593,7 +593,7 @@ class MedicineSearchController extends Controller
             ->with(['customer', 'pharmacy'])
             ->firstOrFail();
 
-        $pdf = Pdf::setOptions([
+        $pdf =Pdf::setOptions([
             'defaultFont' => 'DejaVu Sans',
             'isHtml5ParserEnabled' => true,
             'isRemoteEnabled' => true,

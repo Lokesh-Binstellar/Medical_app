@@ -308,7 +308,7 @@
     });
 
     var adminChannel = pusher.subscribe('admin-channel');
-    adminChannel.bind('admin-event', function() {
+    adminChannel.bind('my-event', function() {
         var messageDiv = document.getElementById('pusher-message');
         messageDiv.textContent = 'Admin has triggered an update.';
         messageDiv.style.display = 'block';

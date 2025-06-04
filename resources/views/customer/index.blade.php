@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('content')
     <!-- Customers List Table -->
     <div class="card">
@@ -23,9 +22,9 @@
                     @foreach ($customer as $index => $cust)
                         <tr>
                             <td>{{ $index + 1 }}</td>
-                            <td>
+                            <td class="text-capitalize">
                                 <a href="{{ route('customer.show', $cust->id) }}">
-                                    {{ $cust->firstName ?? '' }}
+                                    {{ $cust->firstName ?? 'NA' }}
                                 </a>
                             </td>
                             <td>{{ $cust->lastName ?? 'NA' }}</td>
@@ -35,7 +34,6 @@
                     @endforeach
                 </tbody>
             </table>
-
         </div>
     </div>
 @endsection
