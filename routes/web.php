@@ -11,6 +11,7 @@ use App\Http\Controllers\MedicineSearchController;
 use App\Http\Controllers\AddMedicineController;
 use App\Http\Controllers\AdditionalchargesController;
 use App\Http\Controllers\AppRatingController;
+use App\Http\Controllers\CmsController;
 use App\Http\Controllers\DeliveryPersonController;
 use App\Http\Controllers\OtcController;
 use App\Http\Controllers\packageCategoryController;
@@ -50,10 +51,79 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/get-dashboard-graph-data', [DashboardController::class, 'getAllGraphData'])->name('dashboard.graph.data');
     Route::get('/orders-data', [DashboardController::class, 'getOrdersData'])->name('dashboard.orders.data');
     Route::get('/pending-quotes-data', [DashboardController::class, 'pendingQuotesData'])->name('pending.quotes');
-Route::get('/fetch-ratings', [DashboardController::class, 'fetchRatings']);
-Route::get('/top-pharmacies', [DashboardController::class, 'getTopPharmaciesData']);
-
+    Route::get('/fetch-ratings', [DashboardController::class, 'fetchRatings']);
+    Route::get('/top-pharmacies', [DashboardController::class, 'getTopPharmaciesData']);
 });
+
+
+
+// About Us Routes
+Route::prefix('cms/about-us')->name('cms.about-us.')->group(function () {
+    Route::get('/', [CmsController::class, 'aboutIndex'])->name('index');
+    Route::get('/create', [CmsController::class, 'aboutCreate'])->name('create');
+    Route::post('/store', [CmsController::class, 'aboutStore'])->name('store');
+    Route::get('/{aboutUs}', [CmsController::class, 'aboutShow'])->name('show');
+    Route::get('/{aboutUs}/edit', [CmsController::class, 'aboutEdit'])->name('edit');
+    Route::put('/{aboutUs}', [CmsController::class, 'aboutUpdate'])->name('update');
+    Route::delete('/{aboutUs}', [CmsController::class, 'aboutDestroy'])->name('destroy');
+});
+
+// Contact Us Routes
+Route::prefix('cms/contact-us')->name('cms.contact-us.')->group(function () {
+    Route::get('/', [CmsController::class, 'contactIndex'])->name('index');
+    Route::get('/create', [CmsController::class, 'contactCreate'])->name('create');
+    Route::post('/store', [CmsController::class, 'contactStore'])->name('store');
+    Route::get('/{contactUs}', [CmsController::class, 'contactShow'])->name('show');
+    Route::get('/{contactUs}/edit', [CmsController::class, 'contactEdit'])->name('edit');
+    Route::put('/{contactUs}', [CmsController::class, 'contactUpdate'])->name('update');
+    Route::delete('/{contactUs}', [CmsController::class, 'contactDestroy'])->name('destroy');
+});
+
+
+// FAQs Routes
+Route::prefix('cms/faqs')->name('cms.faqs.')->group(function () {
+    Route::get('/', [CmsController::class, 'faqsIndex'])->name('index');
+    Route::get('/create', [CmsController::class, 'faqsCreate'])->name('create');
+    Route::post('/store', [CmsController::class, 'faqsStore'])->name('store');
+    Route::get('/{faq}', [CmsController::class, 'faqsShow'])->name('show');
+    Route::get('/{faq}/edit', [CmsController::class, 'faqsEdit'])->name('edit');
+    Route::put('/{faq}', [CmsController::class, 'faqsUpdate'])->name('update');
+    Route::delete('/{faq}', [CmsController::class, 'faqsDestroy'])->name('destroy');
+});
+
+// Return Policies Routes
+Route::prefix('cms/return-policies')->name('cms.return-policies.')->group(function () {
+    Route::get('/', [CmsController::class, 'returnPoliciesIndex'])->name('index');
+    Route::get('/create', [CmsController::class, 'returnPoliciesCreate'])->name('create');
+    Route::post('/store', [CmsController::class, 'returnPoliciesStore'])->name('store');
+    Route::get('/{returnPolicy}', [CmsController::class, 'returnPoliciesShow'])->name('show');
+    Route::get('/{returnPolicy}/edit', [CmsController::class, 'returnPoliciesEdit'])->name('edit');
+    Route::put('/{returnPolicy}', [CmsController::class, 'returnPoliciesUpdate'])->name('update');
+    Route::delete('/{returnPolicy}', [CmsController::class, 'returnPoliciesDestroy'])->name('destroy');
+});
+
+// Privacy Policies Routes
+Route::prefix('cms/privacy-policies')->name('cms.privacy-policies.')->group(function () {
+    Route::get('/', [CmsController::class, 'privacyPoliciesIndex'])->name('index');
+    Route::get('/create', [CmsController::class, 'privacyPoliciesCreate'])->name('create');
+    Route::post('/store', [CmsController::class, 'privacyPoliciesStore'])->name('store');
+    Route::get('/{privacyPolicy}', [CmsController::class, 'privacyPoliciesShow'])->name('show');
+    Route::get('/{privacyPolicy}/edit', [CmsController::class, 'privacyPoliciesEdit'])->name('edit');
+    Route::put('/{privacyPolicy}', [CmsController::class, 'privacyPoliciesUpdate'])->name('update');
+    Route::delete('/{privacyPolicy}', [CmsController::class, 'privacyPoliciesDestroy'])->name('destroy');
+});
+
+// Terms & Conditions Routes
+Route::prefix('cms/terms')->name('cms.terms-and-conditions.')->group(function () {
+    Route::get('/', [CmsController::class, 'termsIndex'])->name('index');
+    Route::get('/create', [CmsController::class, 'termsCreate'])->name('create');
+    Route::post('/store', [CmsController::class, 'termsStore'])->name('store');
+    Route::get('/{termsAndCondition}', [CmsController::class, 'termsShow'])->name('show');
+    Route::get('/{termsAndCondition}/edit', [CmsController::class, 'termsEdit'])->name('edit');
+    Route::put('/{termsAndCondition}', [CmsController::class, 'termsUpdate'])->name('update');
+    Route::delete('/{termsAndCondition}', [CmsController::class, 'termsDestroy'])->name('destroy');
+});
+
 
 
 Auth::routes();

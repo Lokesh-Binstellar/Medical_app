@@ -177,6 +177,12 @@ h1,
     line-height: 1.1;
     color: var(--bs-heading-color);
 }
+.ql-editor :is(h1, h2, h3, h4, h5, h6),
+#aboutTable :is(h1, h2, h3, h4, h5, h6) ,
+.border.p-3 :is(h1, h2, h3, h4, h5, h6) {
+    color: #828393;
+}
+
 
 h1,
 .h1 {

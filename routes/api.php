@@ -18,6 +18,7 @@ use App\Http\Controllers\PharmaciesController;
 use App\Http\Controllers\PopularBrandController;
 use App\Http\Controllers\PopularCategoryController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CmsController;
 use App\Http\Controllers\HomeBannerController;
 use App\Http\Controllers\JoinUsController;
 use App\Http\Controllers\MedicineBannerController;
@@ -99,6 +100,15 @@ Route::middleware('check.api.key')->group(function () {
 
         // MyOrders
         Route::get('/pharmacyMyOrders', [MyOrderController::class, 'getUserPharmacyOrders']);
+
+
+
+         Route::get('/about-us', [CmsController::class, 'aboutUs']);
+    Route::get('/contact-us', [CmsController::class, 'contactUs']);
+    Route::get('/faqs', [CmsController::class, 'faqs']);
+    Route::get('/terms', [CmsController::class, 'terms']);
+    Route::get('/return-policy', [CmsController::class, 'returnPolicy']);
+    Route::get('/privacy-policy', [CmsController::class, 'privacyPolicy']);
     });
 
     //labTest
