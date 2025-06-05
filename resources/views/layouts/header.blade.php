@@ -1,78 +1,4 @@
 @section('styles')
-    <style>
-        .filter {
-            justify-content: space-evenly;
-            margin-bottom: 8px;
-        }
-
-        .filter button {
-            font-size: x-small;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-         .switch {
-        position: relative;
-        display: inline-block;
-        width: 70px;
-        height: 38px;
-    }
-
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0; left: 0;
-        right: 0; bottom: 0;
-        background-color: #dc3545; /* Red (OFF) */
-        transition: .4s;
-        border-radius: 34px;
-    }
-
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 30px;
-        width: 30px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
-    }
-
-    input:checked + .slider {
-        background-color: #28a745; /* Green (ON) */
-    }
-
-    input:checked + .slider:before {
-        transform: translateX(32px);
-    }
-
-    .slider.round {
-        border-radius: 34px;
-    }
-
-    .slider.round:before {
-        border-radius: 50%;
-    }
-
-    .toggle-text {
-        font-size: 1.2rem;
-        color: #28a745;
-    }
-
-    .toggle-text.off {
-        color: #dc3545;
-    }
-    </style>
 @endsection
 
 <nav class="layout-navbar navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme "
@@ -120,14 +46,18 @@
 
             {{-- Right Side: ON/OFF Switch for Pharmacy --}}
             @if(Auth::check() && Auth::user()->role->name === 'pharmacy')
-    <div class="me-3 pharmacy-toggle-wrapper">
-        <label class="switch">
-            <input type="checkbox" id="pharmacyStatusToggle" checked>
-            <span class="slider round"></span>
-        </label>
-        <span class="toggle-text ms-2 fw-semibold">Status: On</span>
-    </div>
-@endif
+                <div class="me-3 d-flex align-items-center">
+                    <label class="form-switch-custom mb-0">
+                        <input type="checkbox" id="pharmacyStatusToggle" {{ Auth::user()->pharmacies->status ? 'checked' : '' }}>
+                        <span class="slider-custom"></span>
+                    </label>
+                    <span id="pharmacyStatusText"
+                        class="toggle-text ms-2 fw-semibold {{ Auth::user()->pharmacies->status ? 'text-success' : 'text-danger' }}">
+                        Status: {{ Auth::user()->pharmacies->status ? 'On' : 'Off' }}
+                    </span>
+
+                </div>
+            @endif
 
 
 
@@ -407,28 +337,47 @@
             }, 20000);
         }
     };
-    
+
 </script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const toggle = document.getElementById('pharmacyStatusToggle');
-        const text = document.querySelector('.toggle-text');
+    const toggle = document.getElementById('pharmacyStatusToggle');
+const statusText = document.getElementById('pharmacyStatusText');
 
-        function updateStatus() {
-            if (toggle.checked) {
-                text.textContent = 'Status: On';
-                text.classList.remove('off');
-                text.classList.add('on');
-                text.style.color = '#28a745';
+toggle?.addEventListener('change', function () {
+    fetch("{{ route('pharmacy.toggleStatus') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status) {
+            const newStatus = data.new_status;
+
+            statusText.textContent = 'Status: ' + newStatus;
+
+            // Remove both possible classes first
+            statusText.classList.remove('text-success', 'text-danger');
+
+            // Add appropriate class
+            if (newStatus === 'On') {
+                statusText.classList.add('text-success');
             } else {
-                text.textContent = 'Status: Off';
-                text.classList.remove('on');
-                text.classList.add('off');
-                text.style.color = '#dc3545';
+                statusText.classList.add('text-danger');
             }
+        } else {
+            alert('Failed to update status');
+            toggle.checked = !toggle.checked; // revert toggle
         }
-
-        toggle.addEventListener('change', updateStatus);
-        updateStatus(); // initialize on load
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Error updating status.");
+        toggle.checked = !toggle.checked; // revert toggle
     });
+});
+
 </script>

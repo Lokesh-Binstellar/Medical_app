@@ -9,6 +9,7 @@ use App\Models\Rating;
 use App\Models\User;
 use File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -310,7 +311,7 @@ class PharmaciesController extends Controller
     public function popularpharmacydetails(Request $request, $id)
     {
         $pharmacy = Pharmacies::find($id);
-         // Fetch rating info
+        // Fetch rating info
         $ratingData = Rating::where('rateable_type', 'Pharmacy')
             ->where('rateable_id', $pharmacy->user_id)
             ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as rating_count')
@@ -334,8 +335,8 @@ class PharmaciesController extends Controller
                     'email' => $pharmacy->email,
                     'license' => $pharmacy->license,
                     'image' => $pharmacy->image
-                            ? [url('assets/image/' . basename($pharmacy->image))]
-                            : [],
+                        ? [url('assets/image/' . basename($pharmacy->image))]
+                        : [],
                     'rating' => $formattedRating,
                     // Add any other fields as needed
                 ]
@@ -347,5 +348,23 @@ class PharmaciesController extends Controller
             ], 404);
         }
     }
+
+    public function toggleStatus(Request $request)
+    {
+        $user = Auth::user();
+        if ($user && $user->pharmacies) {
+            $pharmacy = $user->pharmacies;
+            $pharmacy->status = !$pharmacy->status;
+            $pharmacy->save();
+
+            return response()->json([
+                'status' => true,
+                'new_status' => $pharmacy->status ? 'On' : 'Off'
+            ]);
+        }
+
+        return response()->json(['status' => false, 'message' => 'Unauthorized'], 403);
+    }
+
 
 }

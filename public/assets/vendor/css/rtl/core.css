@@ -33218,4 +33218,68 @@ a.bg-vimeo:focus {
         color: #fff;
         border-radius: 5px;
     }
+    
+}
+        .filter {
+            justify-content: space-evenly;
+            margin-bottom: 8px;
+        }
+
+        .filter button {
+            font-size: x-small;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+   .form-switch-custom {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.form-switch-custom input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider-custom {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    background-color: #dc3545; /* OFF = red */
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider-custom:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider-custom {
+    background-color: #28a745; /* ON = green */
+}
+
+input:checked + .slider-custom:before {
+    transform: translateX(26px);
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
 }

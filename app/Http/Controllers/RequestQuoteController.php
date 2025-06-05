@@ -87,8 +87,8 @@ class RequestQuoteController extends Controller
 
         $nearby = [];
 
-        $pharmacies = Pharmacies::all();
-      
+        $pharmacies = Pharmacies::where('status', 1)->get();
+
 
         foreach ($pharmacies as $pharmacy) {
             if ($pharmacy->latitude && $pharmacy->longitude) {

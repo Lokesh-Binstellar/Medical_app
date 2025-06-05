@@ -37,6 +37,7 @@
                 <table class="table table-bordered text-align-center " style="border: 1px solid black;">
                     <thead>
                         <tr style="background-color: rgb(245, 245, 247);" class="align-middle">
+                            <th class="fw-bold fs-6">Date</th>
                             <th class="fw-bold fs-6">Order ID</th>
                             <th class="fw-bold fs-6">Customer Details</th>
                             <th class="fw-bold fs-6">Total Price</th>
@@ -55,6 +56,13 @@
                     <tbody>
                         @forelse ($orders as $order)
                             <tr>
+                                <td class="fw-bold text-black">
+                                    {{ \Carbon\Carbon::parse($order->created_at)->format('jS F Y') }}<br>
+                                    <small
+                                        class="text-dark">{{ \Carbon\Carbon::parse($order->created_at)->format('h:i A') }}</small>
+                                </td>
+
+
                                 <td class="fw-bold text-black">{{ $order->order_id }}</td>
                                 <td class="fw-bold text-black">
                                     @if($order->customer)
@@ -94,6 +102,7 @@
                                                             </option>
                                                         @endforeach
                                                     </select>
+
                                                     <button type="submit" class="btn btn-sm btn-primary">Assign</button>
                                                 </div>
                                             </form>
@@ -122,7 +131,8 @@
                                             @csrf
                                             @method('PUT')
                                             <select name="status"
-                                                class="form-select form-select-sm me-2 fw-bold text-black border border-dark status-select" data-role="{{ Auth::user()->role->name }}">
+                                                class="form-select form-select-sm me-2 fw-bold text-black border border-dark status-select"
+                                                data-role="{{ Auth::user()->role->name }}">
                                                 <option value="">-- Update Status --</option>
 
                                                 @if (Auth::user()->role->name === 'delivery_person')
@@ -151,69 +161,72 @@
                                     </a>
                                 </td>
                                 <td class="text-center align-middle">
-                                    <a href="{{ route('invoice.download', $order->order_id) }}" class="btn btn-success" title="Download Invoice">
+                                    <a href="{{ route('invoice.download', $order->order_id) }}" class="btn btn-success"
+                                        title="Download Invoice">
                                         <i class="tf-icons mdi mdi-download"></i>
                                     </a>
 
                                 </td>
                             </tr>
-                           @if ($order->delivery_person_id)
-                            @php
-                                $assignedPerson = $deliveryPersons->firstWhere('id', $order->delivery_person_id);
-                                $pickupAddress = $order->selected_pharmacy_address ?? 'N/A';
-                                $deliveryAddress = $order->delivery_address ?? 'N/A';
-                            @endphp
+                            @if ($order->delivery_person_id)
+                                @php
+                                    $assignedPerson = $deliveryPersons->firstWhere('id', $order->delivery_person_id);
+                                    $pickupAddress = $order->selected_pharmacy_address ?? 'N/A';
+                                    $deliveryAddress = $order->delivery_address ?? 'N/A';
+                                @endphp
 
-                            @if ($assignedPerson)
-                                <tr>
-                                    <td colspan="10">
-                                        <button class="btn btn-outline-dark btn-sm mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#deliveryInfo{{ $order->id }}">
-                                            <i class="mdi mdi-truck-fast me-1"></i> View Delivery Info
-                                        </button>
+                                @if ($assignedPerson)
+                                    <tr>
+                                        <td colspan="10">
+                                            <button class="btn btn-outline-dark btn-sm mb-2" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#deliveryInfo{{ $order->id }}">
+                                                <i class="mdi mdi-truck-fast me-1"></i> View Delivery Info
+                                            </button>
 
-                                        <div class="collapse" id="deliveryInfo{{ $order->id }}">
-                                            <div class="border rounded p-3 bg-white shadow-sm">
-                                                <h6 class="text-danger mb-3">
-                                                    <i class="mdi mdi-truck-fast me-1"></i>
-                                                    Delivery Information
-                                                </h6>
+                                            <div class="collapse" id="deliveryInfo{{ $order->id }}">
+                                                <div class="border rounded p-3 bg-white shadow-sm">
+                                                    <h6 class="text-danger mb-3">
+                                                        <i class="mdi mdi-truck-fast me-1"></i>
+                                                        Delivery Information
+                                                    </h6>
 
-                                                <div class="mb-3">
-                                                    <strong><i class="mdi mdi-account-badge-outline me-1 text-primary"></i>Assigned To:</strong>
-                                                    <span class="text-dark">
-                                                        {{ $assignedPerson->name }}
-                                                        @if ($assignedPerson->deliveryProfile && $assignedPerson->deliveryProfile->phone)
-                                                            ({{ $assignedPerson->deliveryProfile->phone }})
-                                                        @endif
-                                                    </span><br>
-                                                    <small class="text-dark d-block mb-1">Order ID: #{{ $order->order_id }}</small>
-                                                </div>
+                                                    <div class="mb-3">
+                                                        <strong><i class="mdi mdi-account-badge-outline me-1 text-primary"></i>Assigned
+                                                            To:</strong>
+                                                        <span class="text-dark">
+                                                            {{ $assignedPerson->name }}
+                                                            @if ($assignedPerson->deliveryProfile && $assignedPerson->deliveryProfile->phone)
+                                                                ({{ $assignedPerson->deliveryProfile->phone }})
+                                                            @endif
+                                                        </span><br>
+                                                        <small class="text-dark d-block mb-1">Order ID: #{{ $order->order_id }}</small>
+                                                    </div>
 
-                                                <div class="mb-3">
-                                                    <strong><i class="mdi mdi-flask me-1 text-success"></i>Pickup Location (Pharmacy):</strong><br>
-                                                    <span class="text-dark d-block mb-1">{{ $pickupAddress }}</span>
-                                                    <a href="https://www.google.com/maps/dir/?api=1&destination={{ urlencode($pickupAddress) }}"
-                                                    target="_blank"
-                                                    class="badge bg-success text-white text-decoration-none">
-                                                        <i class="mdi mdi-directions"></i> Direction
-                                                    </a>
-                                                </div>
+                                                    <div class="mb-3">
+                                                        <strong><i class="mdi mdi-flask me-1 text-success"></i>Pickup Location
+                                                            (Pharmacy):</strong><br>
+                                                        <span class="text-dark d-block mb-1">{{ $pickupAddress }}</span>
+                                                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ urlencode($pickupAddress) }}"
+                                                            target="_blank" class="badge bg-success text-white text-decoration-none">
+                                                            <i class="mdi mdi-directions"></i> Direction
+                                                        </a>
+                                                    </div>
 
-                                                <div>
-                                                    <strong><i class="mdi mdi-home-map-marker me-1 text-danger"></i>Delivery Location (Customer):</strong><br>
-                                                    <span class="text-dark d-block mb-1">{{ $deliveryAddress }}</span>
-                                                    <a href="https://www.google.com/maps/dir/?api=1&destination={{ urlencode($deliveryAddress) }}"
-                                                    target="_blank"
-                                                    class="badge bg-primary text-white text-decoration-none">
-                                                        <i class="mdi mdi-directions"></i> Direction
-                                                    </a>
+                                                    <div>
+                                                        <strong><i class="mdi mdi-home-map-marker me-1 text-danger"></i>Delivery
+                                                            Location (Customer):</strong><br>
+                                                        <span class="text-dark d-block mb-1">{{ $deliveryAddress }}</span>
+                                                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ urlencode($deliveryAddress) }}"
+                                                            target="_blank" class="badge bg-primary text-white text-decoration-none">
+                                                            <i class="mdi mdi-directions"></i> Direction
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                    </tr>
+                                @endif
                             @endif
-                        @endif
                         @empty
                             <div class="alert alert-info">No orders found.</div>
                         @endforelse
@@ -228,82 +241,82 @@
 @section('scripts')
     <!-- Add custom JS if needed -->
     <!-- SweetAlert Script -->
-   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.status-select').forEach(select => {
-            select.addEventListener('change', function () {
-                const form = this.closest('form');
-                const selectedValue = this.value;
-                const userRole = this.dataset.role;
-                console.log(userRole);
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.status-select').forEach(select => {
+                select.addEventListener('change', function () {
+                    const form = this.closest('form');
+                    const selectedValue = this.value;
+                    const userRole = this.dataset.role;
+                    console.log(userRole);
 
-                if (selectedValue === "1") {
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "You are about to mark this order as completed.",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonText: 'Yes, mark as complete!',
-                        cancelButtonText: 'Cancel',
-                        customClass: {
-                            confirmButton: 'btn btn-success me-2',
-                            cancelButton: 'btn btn-secondary'
-                        },
-                        buttonsStyling: false
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Additional check for pharmacy users
-                            if (userRole === 'pharmacy') {
-                                Swal.fire({
-                                    title: 'Prescription Verified?',
-                                    text: "Have you checked a valid prescription for this order?",
-                                    icon: 'question',
-                                    showCancelButton: true,
-                                    confirmButtonText: 'Yes, Verified',
-                                    cancelButtonText: 'No',
-                                    customClass: {
-                                        confirmButton: 'btn btn-primary me-2',
-                                        cancelButton: 'btn btn-secondary'
-                                    },
-                                    buttonsStyling: false
-                                }).then((prescriptionConfirm) => {
-                                    if (prescriptionConfirm.isConfirmed) {
-                                        form.submit();
-                                    } else {
-                                        select.value = '';
-                                    }
-                                });
+                    if (selectedValue === "1") {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You are about to mark this order as completed.",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, mark as complete!',
+                            cancelButtonText: 'Cancel',
+                            customClass: {
+                                confirmButton: 'btn btn-success me-2',
+                                cancelButton: 'btn btn-secondary'
+                            },
+                            buttonsStyling: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Additional check for pharmacy users
+                                if (userRole === 'pharmacy') {
+                                    Swal.fire({
+                                        title: 'Prescription Verified?',
+                                        text: "Have you checked a valid prescription for this order?",
+                                        icon: 'question',
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Yes, Verified',
+                                        cancelButtonText: 'No',
+                                        customClass: {
+                                            confirmButton: 'btn btn-primary me-2',
+                                            cancelButton: 'btn btn-secondary'
+                                        },
+                                        buttonsStyling: false
+                                    }).then((prescriptionConfirm) => {
+                                        if (prescriptionConfirm.isConfirmed) {
+                                            form.submit();
+                                        } else {
+                                            select.value = '';
+                                        }
+                                    });
+                                } else {
+                                    form.submit(); // For delivery person or others
+                                }
                             } else {
-                                form.submit(); // For delivery person or others
+                                select.value = '';
                             }
-                        } else {
-                            select.value = '';
-                        }
-                    });
-                } else if (selectedValue === "2") {
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "You are about to cancel this order.",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonText: 'Yes, cancel it!',
-                        cancelButtonText: 'No',
-                        customClass: {
-                            confirmButton: 'btn btn-danger me-2',
-                            cancelButton: 'btn btn-secondary'
-                        },
-                        buttonsStyling: false
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        } else {
-                            select.value = '';
-                        }
-                    });
-                }
+                        });
+                    } else if (selectedValue === "2") {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You are about to cancel this order.",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, cancel it!',
+                            cancelButtonText: 'No',
+                            customClass: {
+                                confirmButton: 'btn btn-danger me-2',
+                                cancelButton: 'btn btn-secondary'
+                            },
+                            buttonsStyling: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();
+                            } else {
+                                select.value = '';
+                            }
+                        });
+                    }
+                });
             });
         });
-    });
-</script>
+    </script>
 
 @endsection
