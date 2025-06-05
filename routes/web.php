@@ -450,12 +450,18 @@ Route::post('/pharmacy/toggle-status', [PharmaciesController::class, 'toggleStat
 
 
 
-
-Route::view('/webpage/home', 'webpage.home');
-Route::view('/webpage/about', 'webpage.about');
-Route::view('/webpage/contact', 'webpage.contact');
-Route::view('/webpage/privacy-policy', 'webpage.privacy-policy');
-Route::view('/webpage/terms', 'webpage.terms');
+Route::prefix('/webpage')->group(function () {
+Route::view('/home', 'webpage.home');
+// Route::view('/about', 'webpage.about');
+// Route::view('/contact', 'webpage.contact');
+// Route::get('/home', [CmsController::class, 'homeweb'])->name('webpage.home');
+Route::get('/about', [CmsController::class, 'aboutweb'])->name('webpage.about');
+Route::get('/contact', [CmsController::class, 'contactweb'])->name('webpage.contact');
+// Route::view('/webpage/privacy-policy', 'webpage.privacy-policy');
+// Route::view('/webpage/terms', 'webpage.terms');
+Route::get('/terms', [CmsController::class, 'termsweb'])->name('webpage.terms');
+Route::get('/privacy-policy', [CmsController::class, 'privacyPolicyweb'])->name('webpage.privacy-policy');
+});
 
 
 

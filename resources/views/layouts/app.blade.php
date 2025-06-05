@@ -270,8 +270,8 @@
     <script src="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/hammer/hammer.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/i18n/i18n.js') }}"></script>
+    
     <script src="{{ asset('assets/vendor/libs/typeahead-js/typeahead.js') }}"></script>
-
     <script src="{{ asset('assets/vendor/js/menu.js') }}"></script>
 
     <!-- endbuild -->
@@ -289,7 +289,7 @@
     {{-- <script src="{{ asset('assets/js/app-ecommerce-customer-detail.js') }}"></script>
     <script src="{{ asset('assets/js/app-ecommerce-customer-detail-overview.js') }}"></script> --}}
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
     <script src="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.js') }}"></script>
 
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>

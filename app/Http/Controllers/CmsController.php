@@ -416,12 +416,14 @@ class CmsController extends Controller
     public function termsShow(TermsAndCondition $termsAndCondition)
     {
         return view('cms.terms-and-conditions.show', compact('termsAndCondition'));
+        return view('webpage.terms', compact('termsAndCondition'));
     }
 
     public function termsEdit(TermsAndCondition $termsAndCondition)
     {
         return view('cms.terms-and-conditions.edit', compact('termsAndCondition'));
     }
+    
 
     public function termsUpdate(Request $request, TermsAndCondition $termsAndCondition)
     {
@@ -617,4 +619,45 @@ public function returnPolicy()
     ]);
 }
 
+
+
+
+
+
+
+
+
+public function termsweb()
+{
+    $termsAndCondition = TermsAndCondition::latest()->first(); // or where('status', 1)->first()
+
+    return view('webpage.terms', compact('termsAndCondition'));
+}
+
+
+public function privacyPolicyweb()
+{
+    $privacyPolicy = PrivacyPolicy::latest()->first(); // or where('status', 1)->first()
+
+    return view('webpage.privacy-policy', compact('privacyPolicy'));
+}
+
+public function contactweb()
+{
+    $contactUs = ContactUs::latest()->first(); // or where('status', 1)->first()
+
+    return view('webpage.contact', compact('contactUs'));
+}
+public function aboutweb()
+{
+    $aboutUs = AboutUs::latest()->first(); // or where('status', 1)->first()
+
+    return view('webpage.about', compact('aboutUs'));
+}
+// public function homeweb()
+// {
+//     $home = AboutUs::latest()->first(); // or where('status', 1)->first()
+
+//     return view('webpage.home', compact('home'));
+// }
 }
