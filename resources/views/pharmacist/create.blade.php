@@ -141,7 +141,7 @@
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="termsCheckbox" name="terms" required>
                         <label class="form-check-label" for="termsCheckbox">
-                            I agree to the <a href="/cms/terms/1" target="_blank">Terms and Conditions</a>.
+                            I agree to the <a href="{{ Route('webpage.terms') }}" target="_blank">Terms and Conditions</a>.
                         </label>
                     </div>
                 </div>
