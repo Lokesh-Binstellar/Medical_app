@@ -97,7 +97,7 @@
                                                             class="h6 mb-0 text-capitalize text-black fw-bold">{{ ucfirst($address->address_type) }}</span>
                                                     </span>
                                                     <span
-                                                        class="mb-0 text-body fw-normal">{{ $address->address_line }}</span>
+                                                        class="mb-0 text-body fw-normal text-wrap">{{ $address->address_line }}</span>
                                                 </span>
                                             </a>
 

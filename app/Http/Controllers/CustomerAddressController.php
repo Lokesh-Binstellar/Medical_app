@@ -70,6 +70,9 @@ class CustomerAddressController extends Controller
                     }
 
                     $formatted_address = $data['results'][0]['formatted_address'];
+                    if ($request->filled('house_number')) {
+                        $formatted_address = trim($request->house_number) . ', ' . $formatted_address;
+                    }
 
                     $lat = $data['results'][0]['geometry']['location']['lat'];
                     $lng = $data['results'][0]['geometry']['location']['lng'];
@@ -85,7 +88,7 @@ class CustomerAddressController extends Controller
                 $this->saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address, $lat, $lng);
             }
             curl_close($ch);
-        } elseif($request->filled('address_line')) {
+        } elseif ($request->filled('address_line')) {
             $address_line = urlencode($request->address_line);
             $apiKey = env('GOOGLE_MAPS_API_KEY');
 
@@ -137,6 +140,9 @@ class CustomerAddressController extends Controller
                     }
 
                     $formatted_address = $data['results'][0]['formatted_address'];
+                    if ($request->filled('house_number')) {
+                        $formatted_address = trim($request->house_number) . ', ' . $formatted_address;
+                    }
                     $lat = $data['results'][0]['geometry']['location']['lat'];
                     $lng = $data['results'][0]['geometry']['location']['lng'];
                     // echo $lat;die;
@@ -150,12 +156,12 @@ class CustomerAddressController extends Controller
 
                 $this->saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address, $lat, $lng);
             }
-        }
-     elseif ($request->filled('postal_code')) {
+        } 
+        elseif ($request->filled('postal_code')) {
     $postalCode = $request->postal_code;
     $apiKey = env('GOOGLE_MAPS_API_KEY');
 
-    $url = "https://maps.googleapis.com/maps/api/geocode/json?address=" . urlencode($postalCode) . "&key=$apiKey";
+    $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($postalCode) . "&key=$apiKey";
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
@@ -164,11 +170,14 @@ class CustomerAddressController extends Controller
     $response = curl_exec($ch);
 
     if (curl_errno($ch)) {
+        curl_close($ch);
         return response()->json([
             'status' => false,
             'message' => 'Curl error: ' . curl_error($ch),
         ], 500);
     }
+
+    curl_close($ch); // ✅ Close after error check
 
     $data = json_decode($response, true);
 
@@ -179,50 +188,77 @@ class CustomerAddressController extends Controller
         ], 404);
     }
 
-    $city = null;
-    $state = null;
+    $addressComponents = $data['results'][0]['address_components'];
     $formatted_address = $data['results'][0]['formatted_address'];
+
+    // ✅ Add house number if provided
+    if ($request->filled('house_number')) {
+        $formatted_address = trim($request->house_number) . ', ' . $formatted_address;
+    }
+
+    // ✅ Ensure postal code is included in formatted address
+    if (!str_contains($formatted_address, $postalCode)) {
+        $formatted_address .= ', ' . $postalCode;
+    }
+
     $lat = $data['results'][0]['geometry']['location']['lat'];
     $lng = $data['results'][0]['geometry']['location']['lng'];
 
-  foreach ($data['results'][0]['address_components'] as $component) {
-    if (in_array('locality', $component['types'])) {
-        $city = $component['long_name'];
-    }
-    // Fallback agar locality na mile to 'administrative_area_level_3' bhi check kar sakte ho
-    elseif (in_array('administrative_area_level_3', $component['types'])) {
-        $city = $component['long_name'];
+    $city = $state = null;
+
+    // ✅ Extract city/state from components
+    foreach ($addressComponents as $component) {
+        if (in_array('locality', $component['types']) && !$city) {
+            $city = $component['long_name'];
+        } elseif (in_array('administrative_area_level_2', $component['types']) && !$city) {
+            $city = $component['long_name'];
+        } elseif (in_array('administrative_area_level_3', $component['types']) && !$city) {
+            $city = $component['long_name'];
+        } elseif (in_array('sublocality', $component['types']) && !$city) {
+            $city = $component['long_name'];
+        } elseif (in_array('neighborhood', $component['types']) && !$city) {
+            $city = $component['long_name'];
+        }
+
+        if (in_array('administrative_area_level_1', $component['types'])) {
+            $state = $component['long_name'];
+        }
+
+        if (in_array('postal_code', $component['types'])) {
+            $postalCode = $component['long_name'];
+        }
     }
 
-    if (in_array('administrative_area_level_1', $component['types'])) {
-        $state = $component['long_name'];
-    }
-
-    if (in_array('postal_code', $component['types'])) {
-        $postalCode = $component['long_name'];
-    }
-}
-
-   if (empty($city) || empty($state) || empty($formatted_address)) {
-    return response()->json([
-        'status' => false,
-        'message' => 'Incomplete location data from postal code',
-    ], 422);
-}
-
-    // Postal code bhi save hoga kyunki hum yahan pass kar rahe hain
-    return $this->saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address, $lat, $lng);
-}
-    else {
+    if (empty($city) || empty($state) || empty($formatted_address)) {
         return response()->json([
             'status' => false,
-            'message' => 'No valid location data provided',
-        ], 400);
+            'message' => 'Incomplete location data from postal code',
+        ], 422);
     }
+
+    return $this->saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address, $lat, $lng);
+}
+
+        else {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'No valid location data provided',
+                ],
+                400,
+            );
+        }
 
         return response()->json([
             'status' => true,
-            'message' => 'Address saved successfully',
+            'data' => [
+                'city' => $city,
+                'state' => $state,
+                'postal_code' => $postalCode,
+                'formatted_address' => $formatted_address,
+                'lat' => $lat,
+                'lng' => $lng,
+            ],
         ]);
     }
 
@@ -335,41 +371,39 @@ class CustomerAddressController extends Controller
         ]);
     }
 
-
-
     public function deleteAddress(Request $request)
-{
+    {
+        $userId = $request->get('user_id');
+        // echo   $userId;die;
+        $addressType = $request->get('address_type');
 
-    $userId = $request->get('user_id');
-    // echo   $userId;die;
-    $addressType = $request->get('address_type');
+        if (!$userId || !$addressType) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'User ID and address type are required',
+                ],
+                400,
+            );
+        }
 
-    if (!$userId || !$addressType) {
+        $address = CustomerAddress::where('customer_id', $userId)->where('address_type', $addressType)->first();
+
+        if (!$address) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Address not found',
+                ],
+                404,
+            );
+        }
+
+        $address->delete();
+
         return response()->json([
-            'status' => false,
-            'message' => 'User ID and address type are required',
-        ], 400);
+            'status' => true,
+            'message' => 'Address deleted successfully',
+        ]);
     }
-
-    $address = CustomerAddress::where('customer_id', $userId)
-                ->where('address_type', $addressType)
-                ->first();
-
-    if (!$address) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Address not found',
-        ], 404);
-    }
-
-    $address->delete();
-
-    return response()->json([
-        'status' => true,
-        'message' => 'Address deleted successfully',
-    ]);
-}
-
-
-
 }

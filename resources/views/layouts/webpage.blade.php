@@ -640,9 +640,9 @@
                     <li><a href="{{ url('/webpage/home') }}"><i class="fas fa-home"></i> Home</a></li>
                     <li><a href="{{ url('/webpage/about') }}"><i class="fas fa-info-circle"></i> About Us</a></li>
                     <li><a href="{{ url('/webpage/contact') }}"><i class="fas fa-phone"></i> Contact Us</a></li>
-                    <li><a href="{{ Route('webpage.privacy-policy') }}"><i class="fas fa-shield-alt"></i> Privacy</a>
+                    <li><a href="{{ Route('webpage.privacy-policy') }}"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
                     </li>
-                    <li><a href="{{ Route('webpage.terms') }}"><i class="fas fa-file-contract"></i> Terms</a></li>
+                    <li><a href="{{ Route('webpage.terms') }}"><i class="fas fa-file-contract"></i> Terms & Conditions </a></li>
                 </ul>
 
                 <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
@@ -655,8 +655,8 @@
                         <li><a href="{{ url('/webpage/about') }}"><i class="fas fa-info-circle"></i> About Us</a></li>
                         <li><a href="{{ url('/webpage/contact') }}"><i class="fas fa-phone"></i> Contact Us</a></li>
                         <li><a href="{{ Route('webpage.privacy-policy') }}"><i class="fas fa-shield-alt"></i>
-                                Privacy</a></li>
-                        <li><a href="{{ Route('webpage.terms') }}"><i class="fas fa-file-contract"></i> Terms </a></li>
+                                Privacy Policy</a></li>
+                        <li><a href="{{ Route('webpage.terms') }}"><i class="fas fa-file-contract"></i> Terms & Conditions </a></li>
                     </ul>
                 </div>
             </nav>
@@ -673,8 +673,8 @@
                 <a href="{{ url('/webpage/home') }}">Home</a>
                 <a href="{{ url('/webpage/about') }}">About Us</a>
                 <a href="{{ url('/webpage/contact') }}">Contact Us</a>
-                <a href="{{ Route('webpage.privacy-policy') }}">Privacy</a>
-                <a href="{{ Route('webpage.terms') }}">Terms</a>
+                <a href="{{ Route('webpage.privacy-policy') }}">Privacy Policy</a>
+                <a href="{{ Route('webpage.terms') }}">Terms & Conditions</a>
             </div>
             <p>&copy; {{ date('Y') }} Gomeds - Digital Healthcare Platform. All rights reserved.</p>
             <p><i class="fas fa-heartbeat"></i> Connecting You to Better Health</p>

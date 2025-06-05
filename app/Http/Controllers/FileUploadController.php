@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SendMessageEvent;
 use App\Models\Customers;
 use App\Events\AdminEvent;
 use App\Events\MyEvent;
@@ -123,28 +124,48 @@ class FileUploadController extends Controller
         }
     }
 
-    public function updateStatus(Request $request, $id)
-    {
-        $request->validate([
-            'prescription_status' => 'required|in:0,1',
-            'reason' => 'required_if:prescription_status,1|string|nullable',
-        ]);
-        $prescription = Prescription::findOrFail($id);
-        $prescription->prescription_status = $request->prescription_status;
-        if ($request->prescription_status == 1) {
-            $prescription->status = -1;
-            $prescription->reason = $request->reason ?? null;
-        } else {
-            $prescription->status = 1;
-            $prescription->reason = null;
-        }
-        $prescription->save();
+   public function updateStatus(Request $request, $id)
+{
+    $request->validate([
+        'prescription_status' => 'required|in:0,1',
+        'reason' => 'required_if:prescription_status,1|string|nullable',
+    ]);
 
-        return response()->json([
+    $prescription = Prescription::findOrFail($id);
+    $prescription->prescription_status = $request->prescription_status;
+
+    if ($request->prescription_status == 1) {
+        $prescription->status = -1;
+        $prescription->reason = $request->reason ?? null;
+
+        // ✅ Prepare message
+        $message = [
             'status' => true,
-            'message' => 'Status updated successfully.',
-        ]);
+            'prescription_id' => $prescription->id,
+            'prescription_status' => 'No',
+            'reason' => $prescription->reason,
+            'message' => 'Prescription marked as No by user',
+        ];
+
+        // ✅ Use actual user_id who created the prescription
+        $receiverId = $prescription->user_id;
+
+        if ($receiverId) {
+            event(new SendMessageEvent($message, $receiverId));
+        }
+
+    } else {
+        $prescription->status = 1;
+        $prescription->reason = null;
     }
+
+    $prescription->save();
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Status updated successfully.',
+    ]);
+}
 
     public function uploadprescription()
     {
