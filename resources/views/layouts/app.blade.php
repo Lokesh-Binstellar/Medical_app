@@ -70,13 +70,10 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
     <link rel="stylesheet"
         href="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css') }}">
-<<<<<<< Updated upstream
   
-=======
             <link rel="stylesheet" href="{{ asset('assets/css/daterangepicker.css') }}">
     {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/parsleyjs/src/parsley.css"> --}}
     {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css"> --}}
->>>>>>> Stashed changes
     <style>
         /* ::-webkit-scrollbar-track {
             -webkit-box-shadow: inset 0 0 6px #033a62;

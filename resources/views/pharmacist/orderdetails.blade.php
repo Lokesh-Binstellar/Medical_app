@@ -1,59 +1,77 @@
 @extends('layouts.app')
 @section('styles')
     <style>
-        /* Ensure black text color for all cells */
-        table#ordersTable th,
-        table#ordersTable td {
-            color: #000 !important;
-            background-color: #fff !important;
-            /* Force white background for cells */
-            text-align: center !important;
-            vertical-align: middle !important;
-        }
+/* Ensure black text color for all cells */
+table#ordersTable th,
+table#ordersTable td {
+    color: #000 !important;
+    background-color: #fff !important;
+    text-align: center !important; /* Default center alignment */
+    vertical-align: middle !important;
+}
 
-        /* Style only the table header */
-        table#ordersTable thead th {
-            background-color: #f0f0f0 !important;
-            /* Light grey */
-            font-weight: bold !important;
-            color: #000 !important;
-            /* Ensure header text is black too */
-        }
 
-        #ordersTable,
-        #ordersTable th,
-        #ordersTable td {
-            border: 1px solid black !important;
-        }
+/* Style only the table header */
+table#ordersTable thead th {
+    background-color: #f0f0f0 !important;
+    /* Light grey */
+    font-weight: bold !important;
+    color: #000 !important;
+    /* Ensure header text is black too */
+}
 
-        table.dataTable.dtr-inline.collapsed>tbody>tr>td.child {
-            padding: 0.75rem 1rem;
-            background-color: #f9f9f9;
-        }
+#ordersTable,
+#ordersTable th,
+#ordersTable td {
+    border: 1px solid black !important;
+}
 
-        table.dataTable.dtr-inline.collapsed>tbody>tr>td.child table {
-            width: 100%;
-        }
+/* Updated Child row styles for responsive */
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.child {
+    padding: 1rem !important;
+    background-color: #f9f9f9 !important;
+    border-top: 1px solid #ddd !important;
+    font-size: 14px;
+}
 
-        table.dataTable.dtr-inline.collapsed>tbody>tr>td.child td {
-            padding: 0.5rem;
-            vertical-align: top;
-        }
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.child table {
+    width: 100% !important;
+    table-layout: fixed;
+}
 
-        /* Target the specific table cell for Customer column */
-        #ordersTable td.customer-name {
-            white-space: normal !important;
-            word-wrap: break-word;
-            max-width: 150px;
-            /* adjust as needed */
-        }
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.child td {
+    padding: 0.5rem !important;
+    word-wrap: break-word;
+    border: none !important;
+    vertical-align: top !important;
+}
 
-        .btn-primary:hover {
-            background-color: #033a62 !important;
-            color: #ffffff !important;
-            border-color: #ffffff !important;
-            /* optional: to make the border visible */
-        }
+/* Target the specific table cell for Customer column */
+#ordersTable td.customer-name {
+    white-space: normal !important;
+    word-wrap: break-word;
+    max-width: 150px;
+    /* adjust as needed */
+}
+
+.btn-primary:hover {
+    background-color: #033a62 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+    /* optional: to make the border visible */
+}
+
+      /* For small screens, align text left */
+@media (max-width: 1600px) {
+    table#ordersTable th,
+    table#ordersTable td {
+          /* display: table-cell !important; */
+    vertical-align: middle !important;
+        text-align: left !important;
+        /* vertical-align: middle !important; */
+    }
+}
+  
         
     </style>
 @endsection

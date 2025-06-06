@@ -13,17 +13,17 @@ class SendMessageEvent implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $message;
-    public $receiverId;
+     public $token;
 
-    public function __construct($message, $receiverId)
+    public function __construct($message,  $token)
     {
         $this->message = $message;
-        $this->receiverId = $receiverId;
+        $this->token =$token;
     }
 
     public function broadcastOn()
     {
-        return new PrivateChannel('user.' . $this->receiverId); // 👈 private channel per user
+        return new PrivateChannel('user.' . $this->token); // 👈 private channel per user
     }
 
     public function broadcastAs()
@@ -34,7 +34,8 @@ class SendMessageEvent implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'message' => $this->message
+            'message' => $this->message,
+             'token' => $this->token,
         ];
     }
 }

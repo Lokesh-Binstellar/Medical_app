@@ -475,4 +475,4 @@ Route::get('/privacy-policy', [CmsController::class, 'privacyPolicyweb'])->name(
 
 
 
-Route::post('/trigger-event', [PusherController::class, 'trigger']);
+Route::get('/trigger-event', [PusherController::class, 'trigger']);

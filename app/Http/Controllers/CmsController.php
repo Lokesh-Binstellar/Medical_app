@@ -527,21 +527,6 @@ class CmsController extends Controller
             return response()->json(['status' => false, 'message' => 'Failed to delete.']);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public function aboutUs()
     {
         $about = AboutUs::latest()->first();

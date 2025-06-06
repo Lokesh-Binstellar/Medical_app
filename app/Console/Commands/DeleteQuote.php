@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Events\SendMessageEvent;
 use Illuminate\Console\Command;
 use App\Models\RequestQuote;
+use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 
 class DeleteQuote extends Command
 {
@@ -28,6 +30,8 @@ class DeleteQuote extends Command
 
 		    // Delete all quotes older than 25 minutes
 		    RequestQuote::where('created_at', '<', now()->subMinutes(25))->delete();
+
+               event(new SendMessageEvent('hgvh',null));
 
 		    \Log::info('-- Delete Quote CRON completed --');
         

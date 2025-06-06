@@ -25,6 +25,7 @@ use App\Http\Controllers\MedicineBannerController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PopularLabTestController;
 use App\Http\Controllers\LabtestController;
+use App\Http\Controllers\PusherController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\RequestQuoteController;
 use App\Http\Controllers\LabRequestQuoteController;
@@ -99,6 +100,12 @@ Route::middleware('check.api.key')->group(function () {
 
         // MyOrders
         Route::get('/pharmacyMyOrders', [MyOrderController::class, 'getUserPharmacyOrders']);
+
+        // Route::post('/broadcasting/auth', function (Request $request) {
+        //     return Broadcast::auth($request);
+        // });
+        Route::post('/broadcasting/auth', [PusherController::class, 'authenticate']);
+        Route::get('/trigger-call', [PusherController::class, 'triggerCall']);
     });
     Route::get('/about-us', [CmsController::class, 'aboutUs']);
     Route::get('/contact-us', [CmsController::class, 'contactUs']);

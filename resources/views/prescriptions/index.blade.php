@@ -219,20 +219,22 @@
 
 
 
-// function triggerEvent() {
-//  fetch('/trigger-event', {
-//     method: 'POST',
-//     headers: {
-//         'Content-Type': 'application/json',
-//         'Accept': 'application/json',
-//         // token bhejna ho to Authorization header bhi add karo
-//         'Authorization': 'Bearer ' + localStorage.getItem('token')
-//     },
-//     body: JSON.stringify({
-//         receiver_id: 5, // 👈 jisko message bhejna hai uska ID
-//     })
-// })
-// }
+function triggerEvent() {
+    const receiverId = 5;
+    fetch(`/trigger-event?receiver_id=${receiverId}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.status);
+    })
+    .catch(error => console.error('Fetch error:', error));
+}
+
 
 
 
