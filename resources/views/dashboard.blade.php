@@ -33,6 +33,7 @@
             font-weight: 500;
         }
     </style>
+
 @endsection
 @section('content')
     <div class="page-inner">
@@ -151,7 +152,7 @@
                 </div>
 
                 <div class="col-xl-6 col-md-6">
-                    <div class="card overflow-hidden">
+                    <div class="card overflow-hidden h-100">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title mb-0">User Data</h4>
                         </div>
@@ -175,7 +176,7 @@
                 </div>
 
                 <div class="col-xl-6 col-md-6">
-                    <div class="card overflow-hidden">
+                    <div class="card overflow-hidden h-100">
 
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title mb-0">Average Pharmacy/Laboratory Rating</h4>
@@ -215,7 +216,7 @@
                 </div>
 
                 <div class="col-lg-6">
-                    <div class="card overflow-hidden">
+                    <div class="card overflow-hidden h-100">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title mb-0">Top Pharmacies</h4>
                         </div>
@@ -244,7 +245,7 @@
         @if (auth()->user()->role_id == 2)
             <div class="row g-6 mb-6 ">
 
-                <div class="col-lg-3 col-sm-6">
+                {{-- <div class="col-lg-3 col-sm-6">
                     <div class="card ">
 
                         <div class="card-header">
@@ -258,6 +259,7 @@
 
                             </div>
                         </div>
+
                         <div class="card-body d-flex justify-content-between flex-wrap gap-4 dassbord">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="avatar">
@@ -273,10 +275,75 @@
 
                         </div>
                     </div>
+                </div> --}}
+
+
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="mb-1">Sales Overview</h5>
+                            </div>
+                        </div>
+                        <div class="card-body d-flex justify-content-between flex-wrap gap-4 dassbord">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar">
+                                    <div class="avatar-initial bg-label-primary rounded">
+                                        <i class="mdi mdi-account-star-outline icon-24px"></i>
+
+                                    </div>
+                                </div>
+                                <div class="card-info">
+                                    <h5 class="mb-0">{{ $salesData->total_customers ?? 0 }}</h5>
+                                    <p class="mb-0">New Customers</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar">
+                                    <div class="avatar-initial bg-label-warning rounded">
+                                        <i class="mdi mdi-chart-pie-outline icon-24px"></i>
+                                    </div>
+                                </div>
+                                <div class="card-info">
+                                    <h5 class="mb-0"> ₹{{ number_format($salesData->total_sales, 2 ?? 0.0) }}</h5>
+                                    <p class="mb-0">Total Sales</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar">
+                                    <div class="avatar-initial bg-label-info rounded">
+                                        <i class="mdi mdi-swap-horizontal icon-24px"></i>
+                                    </div>
+                                </div>
+                                <div class="card-info">
+                                    <h5 class="mb-0">₹{{ number_format($commissionData->total_commission, 2 ?? 0.0) }}
+                                    </h5>
+                                    <p class="mb-0">Total Commission </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
+                <div class="col-lg-6 col-sm-6 col-xl-3">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0">Sales This Month</h5>
+                        </div>
+                        <div class="card-body dassbord">
+                            <div class="card-info mb-4">
+                                <p class="mb-0">Total Sales This Month</p>
+                                <h5 class="mb-0">₹{{ number_format($totalSalesForMonth, 2) }}
+                                </h5>
+                            </div>
+                            {{-- <div id="saleThisMonth" style="min-height: 100px;"></div> --}}
+                        </div>
+                    </div>
+                </div>
+
+
                 <div class="col-lg-3 col-sm-6">
-                    <div class="card ">
+                    <div class="card h-100">
                         <div class="row">
                             <div class="col-6">
                                 <div class="card-body dassbord">
@@ -303,37 +370,9 @@
                     </div>
                 </div>
 
-                <div class="col-lg-6">
-                    <div class="card overflow-hidden">
-                   
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="card-title mb-0">Recent Orders (Today's orders)</h4>
-                            </div>
-
-                        <div class="card-body dassbord">
-                            <div class="table-responsive">
-                                <table class="display table table-striped table-hover " id="customerDetailsTable">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Order id</th>
-                                            <th>Customer Details</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-
 
                 <div class="col-lg-6 col-md-12 col-12 mb-4 mb-lg-0">
-                    <div class="card">
+                    <div class="card h-100">
                         <div class="card-header d-flex align-items-center justify-content-between py-2 pe-2">
                             <h5 class="card-title m-0 me-2 text-secondary">Commission This Month</h5>
 
@@ -362,7 +401,6 @@
 
                     </div>
                 </div>
-
 
 
                 <div class="col-lg-6 col-md-12 col-12 mb-4 mb-lg-0">
@@ -394,8 +432,35 @@
 
 
                 <div class="col-lg-6">
+                    <div class="card overflow-hidden h-100">
+
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="card-title mb-0">Recent Orders (Today's orders)</h4>
+                        </div>
+
+                        <div class="card-body dassbord">
+                            <div class="table-responsive">
+                                <table class="display table table-striped table-hover " id="customerDetailsTable">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Order id</th>
+                                            <th>Customer Details</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-lg-6">
                     <div class="card overflow-hidden">
-                        
+
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="card-title mb-0">Pending Quotes ( <span id="quoteCount">0</span> )</h4>
                         </div>
@@ -849,39 +914,40 @@
             });
         }
 
-   $(document).ready(function () {
-    var start = moment().startOf('month');
-    var end = moment().endOf('month');
-    commissionDate(start, end); // this already calls fetchcommissionData()
+        $(document).ready(function() {
+            var start = moment().startOf('month');
+            var end = moment().endOf('month');
+            commissionDate(start, end); // this already calls fetchcommissionData()
 
-    function commissionDate(start, end) {
-        var formattedRange = start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY');
-        $('#commissionFilterDateRange span').text(formattedRange);
-        $('#commission_start_date').val(start.format('YYYY-MM-DD'));
-        $('#commission_end_date').val(end.format('YYYY-MM-DD'));
+            function commissionDate(start, end) {
+                var formattedRange = start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY');
+                $('#commissionFilterDateRange span').text(formattedRange);
+                $('#commission_start_date').val(start.format('YYYY-MM-DD'));
+                $('#commission_end_date').val(end.format('YYYY-MM-DD'));
 
-        fetchcommissionData(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
-    }
+                fetchcommissionData(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
+            }
 
-    $('#commissionFilterDateRange').daterangepicker({
-        startDate: start.format('DD/MM/YYYY'),
-        endDate: end.format('DD/MM/YYYY'),
-        locale: {
-            format: 'DD/MM/YYYY'
-        },
-        ranges: {
-            'Today': [moment(), moment()],
-            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        }
-    }, commissionDate);
+            $('#commissionFilterDateRange').daterangepicker({
+                startDate: start.format('DD/MM/YYYY'),
+                endDate: end.format('DD/MM/YYYY'),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1,
+                        'month').endOf('month')]
+                }
+            }, commissionDate);
 
-    // ❌ Remove this line: it's redundant and has error
-    // fetchcommissionData(startDate, endDate);
-});
+            // ❌ Remove this line: it's redundant and has error
+            // fetchcommissionData(startDate, endDate);
+        });
 
 
         function fetchcommissionData(startDate, endDate) {
@@ -1033,6 +1099,51 @@
                 }
             });
         }
+
+
+
+        // document.addEventListener("DOMContentLoaded", function() {
+        //     var salesData = {!! json_encode($dailySalesData) !!};
+
+        //     var options = {
+        //         chart: {
+        //             type: 'line',
+        //             height: 100,
+        //             sparkline: {
+        //                 enabled: true // hides axes
+        //             }
+        //         },
+        //         stroke: {
+        //             curve: 'smooth',
+        //             width: 3,
+        //             colors: ['#4f46e5']
+        //         },
+        //         series: [{
+        //             name: "Daily Sales",
+        //             data: salesData
+        //         }],
+        //         tooltip: {
+        //             enabled: true,
+        //             // custom tooltip to show day number + sales value
+        //             custom: function({
+        //                 series,
+        //                 seriesIndex,
+        //                 dataPointIndex,
+        //                 w
+        //             }) {
+        //                 var day = dataPointIndex + 1;
+        //                 var sales = series[seriesIndex][dataPointIndex];
+        //                 return `<div style="padding:5px;">
+        //                     <strong>Day ${day}</strong><br/>
+        //                     Sales: ₹${sales.toFixed(2)}
+        //                 </div>`;
+        //             }
+        //         }
+        //     };
+
+        //     var chart = new ApexCharts(document.querySelector("#saleThisMonth"), options);
+        //     chart.render();
+        // });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
 @endsection
