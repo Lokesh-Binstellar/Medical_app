@@ -70,8 +70,13 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
     <link rel="stylesheet"
         href="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css') }}">
+<<<<<<< Updated upstream
+  
+=======
+            <link rel="stylesheet" href="{{ asset('assets/css/daterangepicker.css') }}">
     {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/parsleyjs/src/parsley.css"> --}}
     {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css"> --}}
+>>>>>>> Stashed changes
     <style>
         /* ::-webkit-scrollbar-track {
             -webkit-box-shadow: inset 0 0 6px #033a62;
@@ -308,6 +313,13 @@
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
+ 
+
+
+    {{-- chaet script  --}}
+    <script src="{{ asset('assets/js/moment.min.js') }}"></script>
+    <script src="{{ asset('assets/js/daterangepicker.min.js') }}"></script>
+    <script src="{{ asset('assets/js/chart.min.js') }}"></script>
     {{-- <script src="https://cdn.jsdelivr.net/npm/parsleyjs"></script>/ --}}
     {{-- <script src="https://code.highcharts.com/highcharts.js"></script> --}}
     {{-- <script
