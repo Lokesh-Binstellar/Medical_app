@@ -10,6 +10,8 @@ class RequestQuote extends Model
         'customer_id',
         'pharmacy_id',
         'customer_address',
-        'pharmacy_address_status'
+        'pharmacy_address_status',
+        'prescription_id',
+        'products_details',
     ];
 }

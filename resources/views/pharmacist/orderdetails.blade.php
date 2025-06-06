@@ -197,8 +197,6 @@
                     orderable: false,
                     searchable: false
                 }
-
-
             ];
 
             @if (Auth::user()->role->name === 'admin')

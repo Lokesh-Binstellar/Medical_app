@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\MyEvent;
+use App\Models\Carts;
 use App\Models\CustomerAddress;
 use App\Models\Customers;
 use App\Models\Pharmacies;
@@ -117,7 +118,26 @@ class RequestQuoteController extends Controller
             $pharmacyUser->notify(new QuoteRequested($customer));
 
             //Event call for refresh the page
-       event(new MyEvent('pharmacy', $pharmacyUser->id,'You have received a new quote.' ));
+            event(new MyEvent('pharmacy', $pharmacyUser->id,'You have received a new quote.' ));
+
+            // Get the user's latest cart
+            $cart = Carts::where('customer_id', $userId)->latest()->first();
+            
+            // Extract prescription_id (removing array brackets if needed)
+            $prescriptionId = null;
+            if ($cart && !empty($cart->prescription_id)) {
+                // Handle cases where prescription_id is stored as ["63"]
+                $prescriptionArray = json_decode($cart->prescription_id, true);
+                $prescriptionId = is_array($prescriptionArray) ? $prescriptionArray[0] : $cart->prescription_id;
+            }
+
+            // Prepare products details (exactly as stored in cart)
+            $productsDetails = [];
+            if ($cart && !empty($cart->products_details)) {
+                $productsDetails = json_decode($cart->products_details, true);
+            }
+            //echo "sdfs"; print_r($prescriptionId);die;
+
             if (!$exists) {
                 RequestQuote::create([
                     'customer_id' => $userId,
@@ -127,6 +147,8 @@ class RequestQuoteController extends Controller
                         'lat' => $address->lat,
                         'lng' => $address->lng,
                     ]),
+                    'prescription_id' => json_encode($prescriptionId),
+                    'products_details' => json_encode($productsDetails), // Already formatted correctly
                 ]);
                 $pharmacyUser = User::where('id', $pharmacy->user_id)->first();
                 $requestingUser = User::find($userId);
