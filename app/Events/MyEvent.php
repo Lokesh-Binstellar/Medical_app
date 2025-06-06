@@ -29,22 +29,22 @@ class MyEvent implements ShouldBroadcastNow
      *
      * @return Channel
      */
-    public function broadcastOn()
-    {
-        // Role-based dynamic channel
-        // return new Channel('my-channel.' . $this->role);
-
-
-   if ($this->role === 'admin') {
+ public function broadcastOn()
+{
+    if ($this->role === 'admin') {
+        // Only admin-channel for admin role
         return new Channel('admin-channel');
     }
 
+    // For non-admin users, send to specific user channel
     if ($this->userId) {
         return new Channel('my-channel.' . $this->role . '.user.' . $this->userId);
     }
 
+    // Fallback: role-based general channel
     return new Channel('my-channel.' . $this->role);
-    }
+}
+
 
     /**
      * The event's broadcast name.

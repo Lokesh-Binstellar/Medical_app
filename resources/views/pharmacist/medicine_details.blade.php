@@ -14,6 +14,7 @@
                     </div>
 
                     <div class="card-body p-3">
+                        <div class="table-responsive text-wrap" style="overflow-x:auto;">
                         @if (!empty($medicines))
                             <div style="overflow-x: auto; width: 100%;">
                                 <table class="table table-bordered border-dark mb-0" style="min-width: 900px;">
@@ -57,6 +58,8 @@
                         @else
                             <p class="text-muted">No medicine details found for this order.</p>
                         @endif
+                        </div>
+
                     </div>
                 </div>
 

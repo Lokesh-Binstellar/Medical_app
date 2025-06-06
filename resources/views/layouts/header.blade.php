@@ -298,31 +298,53 @@
     // Initialize Pusher
     Pusher.logToConsole = true;
 
-    var pusher = new Pusher('7ba4a23b60749764133c', {
-        cluster: 'ap1'
+var pusher = new Pusher('7ba4a23b60749764133c', {
+    cluster: 'ap1'
+});
+
+var userRole = @json(auth()->user()->role->name ?? 'guest');
+var userId = @json(auth()->user()->id ?? 0);
+console.log('User Role:', userRole);
+console.log('User ID:', userId);
+
+// 🔒 Subscribe to user-specific channel
+if (userRole === 'admin') {
+    var adminChannel = pusher.subscribe('admin-channel');
+    adminChannel.bind('my-event', function(data) {
+        console.log('Admin event:', data);
+        showPusherMessage(data.message);
     });
-
-    var userRole = @json(auth()->user()->role->name ?? 'guest');
-    var userId = @json(auth()->user()->id ?? 0);
-    console.log('User Role:', userRole);
-    console.log('User ID:', userId);
-
+} else {
     var channel = pusher.subscribe('my-channel.' + userRole + '.user.' + userId);
     channel.bind('my-event', function (data) {
         localStorage.setItem('pusher_message', data.message || 'You have received a new quote.');
         location.reload(true);
     });
+}
 
-    var adminChannel = pusher.subscribe('admin-channel');
-    adminChannel.bind('my-event', function () {
+function showPusherMessage(msg) {
+    var messageDiv = document.getElementById('pusher-message');
+    messageDiv.textContent = msg || 'Notification received!';
+    messageDiv.style.display = 'block';
+    setTimeout(() => {
+        messageDiv.style.display = 'none';
+    }, 20000);
+}
+
+
+window.onload = function () {
+    var message = localStorage.getItem('pusher_message');
+    if (message) {
         var messageDiv = document.getElementById('pusher-message');
-        messageDiv.textContent = 'Admin has triggered an update.';
+        messageDiv.textContent = message;
         messageDiv.style.display = 'block';
 
         setTimeout(function () {
             messageDiv.style.display = 'none';
+            localStorage.removeItem('pusher_message');
         }, 20000);
-    });
+    }
+};
 
     window.onload = function () {
         var message = localStorage.getItem('pusher_message');

@@ -6,13 +6,18 @@ use App\Events\SendMessageEvent; // ✅ Import your new event
 
 class PusherController extends Controller
 {
-    public function trigger()
+    public function trigger(Request $request)
     {
-        $message = ' Event triggered by lokesh using SendMessageEvent!';
+        // ✅ Assume receiver_id is coming from request
+         $user = auth()->user(); 
+        $receiverId = $request->input('receiver_id'); // e.g., 5
+        $message = 'Private event triggered by Lokesh using SendMessageEvent!';
 
-        // ✅ Fire the new event to global-channel
-        event(new SendMessageEvent($message));
+        // ✅ Fire event to specific user
+        event(new SendMessageEvent($message, $user->id));
 
-        return response()->json(['status' => 'SendMessageEvent sent']);
+        return response()->json([
+            'status' => 'SendMessageEvent sent to user.' . $user->id
+        ]);
     }
 }

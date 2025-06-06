@@ -849,44 +849,40 @@
             });
         }
 
-        $(document).ready(function() {
-            var start = moment().startOf('month');
-            var end = moment().endOf('month');
-            commissionDate(start, end);
+   $(document).ready(function () {
+    var start = moment().startOf('month');
+    var end = moment().endOf('month');
+    commissionDate(start, end); // this already calls fetchcommissionData()
 
-            function commissionDate(start, end) {
-                var formattedRange = start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY');
-                $('#commissionFilterDateRange span').text(formattedRange);
-                $('#commission_start_date').val(start.format('YYYY-MM-DD'));
-                $('#commission_end_date').val(end.format('YYYY-MM-DD'));
+    function commissionDate(start, end) {
+        var formattedRange = start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY');
+        $('#commissionFilterDateRange span').text(formattedRange);
+        $('#commission_start_date').val(start.format('YYYY-MM-DD'));
+        $('#commission_end_date').val(end.format('YYYY-MM-DD'));
 
-                fetchcommissionData(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
-            }
+        fetchcommissionData(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
+    }
 
-            $('#commissionFilterDateRange').daterangepicker({
+    $('#commissionFilterDateRange').daterangepicker({
+        startDate: start.format('DD/MM/YYYY'),
+        endDate: end.format('DD/MM/YYYY'),
+        locale: {
+            format: 'DD/MM/YYYY'
+        },
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, commissionDate);
 
+    // ❌ Remove this line: it's redundant and has error
+    // fetchcommissionData(startDate, endDate);
+});
 
-                startDate: start.format('DD/MM/YYYY'),
-                endDate: end.format('DD/MM/YYYY'),
-                locale: {
-                    format: 'DD/MM/YYYY'
-                },
-                ranges: {
-                    'Today': [moment(), moment()],
-                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1,
-                        'month').endOf('month')]
-                }
-            }, commissionDate);
-
-            // Initialize with current month range
-            fetchcommissionData(startDate, endDate);
-
-
-        });
 
         function fetchcommissionData(startDate, endDate) {
             $('.spinner-border').show();
