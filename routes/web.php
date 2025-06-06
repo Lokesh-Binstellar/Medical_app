@@ -316,7 +316,11 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/pharmacist/order-details', [MedicineSearchController::class, 'orderdetails'])->name('orderdetails');
         Route::put('/pharmacy/orders/{id}/status', [MedicineSearchController::class, 'updateOrderStatus'])->name('pharmacy.updateOrderStatus');
         Route::get('/orders/{id}/medicines', [MedicineSearchController::class, 'showMedicines'])->name('orders.medicines');
-        Route::post('/orders/{order}/assign-delivery', [MedicineSearchController::class, 'assignDeliveryPerson'])->name('orders.assignDeliveryPerson');
+        //Route::post('/orders/{order}/assign-delivery', [MedicineSearchController::class, 'assignDeliveryPerson'])->name('orders.assignDeliveryPerson');
+        Route::post('/orders/assign-delivery-person', [MedicineSearchController::class, 'assignDeliveryPerson'])->name('orders.assignDeliveryPerson');
+        
+
+
         Route::get('/search-medicine/invoice/download/{id}', [MedicineSearchController::class, 'downloadInvoice'])->name('invoice.download');
 
 
@@ -442,6 +446,7 @@ Route::get('/additionalcharges', [AdditionalchargesController::class, 'showForm'
 Route::post('/platform-fee', [AdditionalchargesController::class, 'storeOrUpdate'])->name('platform-fee.store');
 // Route::get('/platform-fee/{id?}', [AdditionalchargesController::class, 'showForm'])->name('platform-fee.form');
 Route::post('/pharmacy/toggle-status', [PharmaciesController::class, 'toggleStatus'])->name('pharmacy.toggleStatus');
+Route::get('/delivery-info/{id}/{orderId}', [MedicineSearchController::class, 'showDeliveryInfo'])->name('delivery.showDeliveryInfo');
 
 
 

@@ -1,237 +1,141 @@
 @extends('layouts.app')
-
 @section('styles')
-    {{--
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" /> --}}
     <style>
-        .btn.btn-primary:hover .mdi {
-            color: #fff;
+        /* Ensure black text color for all cells */
+        table#ordersTable th,
+        table#ordersTable td {
+            color: #000 !important;
+            background-color: #fff !important;
+            /* Force white background for cells */
+            text-align: center !important;
+            vertical-align: middle !important;
         }
+
+        /* Style only the table header */
+        table#ordersTable thead th {
+            background-color: #f0f0f0 !important;
+            /* Light grey */
+            font-weight: bold !important;
+            color: #000 !important;
+            /* Ensure header text is black too */
+        }
+
+        #ordersTable,
+        #ordersTable th,
+        #ordersTable td {
+            border: 1px solid black !important;
+        }
+
+        table.dataTable.dtr-inline.collapsed>tbody>tr>td.child {
+            padding: 0.75rem 1rem;
+            background-color: #f9f9f9;
+        }
+
+        table.dataTable.dtr-inline.collapsed>tbody>tr>td.child table {
+            width: 100%;
+        }
+
+        table.dataTable.dtr-inline.collapsed>tbody>tr>td.child td {
+            padding: 0.5rem;
+            vertical-align: top;
+        }
+
+        /* Target the specific table cell for Customer column */
+        #ordersTable td.customer-name {
+            white-space: normal !important;
+            word-wrap: break-word;
+            max-width: 150px;
+            /* adjust as needed */
+        }
+
+        .btn-primary:hover {
+            background-color: #033a62 !important;
+            color: #ffffff !important;
+            border-color: #ffffff !important;
+            /* optional: to make the border visible */
+        }
+        
     </style>
 @endsection
+
 
 @section('content')
     <div class="card">
         <h5 class="card-header fw-bold">Order Details</h5><br>
         @if (Auth::user()->role->name === 'pharmacy')
-            <div class="alert alert-warning text-black" role="alert">
-                <strong>Note:</strong> Once an order is <strong>Accepted</strong>, its details will be visible here.<br>
-                Please ensure to update the order status to <strong>Completed</strong> after the customer has picked up the
-                medicines, or to <strong>Cancelled</strong> if the pickup does not occur within 24 hours.
+            <div class="border border-warning rounded-3 p-3 mb-4 shadow-sm" style="background-color: #fffbe6;">
+                <div class="d-flex align-items-start">
+                    <i class="mdi mdi-alert-circle-outline text-warning fs-3 me-3"></i>
+                    <div>
+                        <h6 class="mb-1 fw-bold text-dark">Important Notice</h6>
+                        <p class="mb-0 text-dark">
+                            Once an order is <span class="fw-bold text-primary">Accepted</span>, its details will be shown
+                            below.<br>
+                            Please <span class="fw-bold text-danger">mark the order as Completed</span> after the customer picks
+                            up the medicines,
+                            or <span class="fw-bold text-danger">Cancelled</span> if the pickup doesn’t occur within <strong>24
+                                hours</strong>.
+                        </p>
+                    </div>
+                </div>
             </div>
         @elseif (Auth::user()->role->name === 'admin')
-            <div class="alert alert-warning text-black" role="alert">
-                <strong>Note:</strong> Once an order is <strong>Accepted</strong>, its details will be visible here.<br>
-                Please ensure to update the order status to <strong>Completed</strong> after the delivery boy has delivered the
-                medicines, or to <strong>Cancelled</strong>.
+            <div class="border border-warning rounded-3 p-3 mb-4 shadow-sm" style="background-color: #fffbe6;">
+                <div class="d-flex align-items-start">
+                    <i class="mdi mdi-alert-circle-outline text-warning fs-3 me-3"></i>
+                    <div>
+                        <h6 class="mb-1 fw-bold text-dark">Important Notice</h6>
+                        <p class="mb-0 text-dark">
+                            Once an order is <span class="fw-bold text-primary">Accepted</span>, its details will be shown
+                            below.<br>
+                            Please <span class="fw-bold text-danger">mark the order as Completed</span> after the delivery is
+                            done,
+                            or <span class="fw-bold text-danger">Cancelled</span> if the delivery cannot be fulfilled.
+                        </p>
+                    </div>
+                </div>
             </div>
         @elseif (Auth::user()->role->name === 'delivery_person')
-            <div class="alert alert-warning text-black" role="alert">
-                <strong>Note:</strong> Once an order is <strong>assigned</strong>, its details will be visible here.<br>
-                Please ensure to update the order status to <strong>Completed</strong> after the delivery.
+            <div class="border border-warning rounded-3 p-3 mb-4 shadow-sm" style="background-color: #fffbe6;">
+                <div class="d-flex align-items-start">
+                    <i class="mdi mdi-alert-circle-outline text-warning fs-3 me-3"></i>
+                    <div>
+                        <h6 class="mb-1 fw-bold text-dark">Important Notice</h6>
+                        <p class="mb-0 text-dark">
+                            Once an order is <span class="fw-bold text-primary">assigned</span>, its details will be shown
+                            below.<br>
+                            Please remember to <span class="fw-bold text-danger">mark the order as Completed</span> once
+                            delivery is done.
+                        </p>
+                    </div>
+                </div>
             </div>
         @endif
+
+
         <div class="card-body">
             <div class="table-responsive text-nowrap" style="overflow-x: auto;">
-                <table class="table table-bordered text-align-center " style="border: 1px solid black;">
-                    <thead>
-                        <tr style="background-color: rgb(245, 245, 247);" class="align-middle">
-                            <th class="fw-bold fs-6">Date</th>
-                            <th class="fw-bold fs-6">Order ID</th>
-                            <th class="fw-bold fs-6">Customer Details</th>
-                            <th class="fw-bold fs-6">Total Price</th>
-                            <th class="fw-bold fs-6 text-center">Status</th>
-                            <th class="fw-bold fs-6 text-center">Delivery</th>
+                <table class="table table-bordered text-align-center" style="border: 1px solid black; color: black;"
+                    id="ordersTable">
+
+                    <thead class="bg-light fw-bold">
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
                             @if (Auth::user()->role->name === 'admin')
                                 <th class="fw-bold fs-6 ">Assign Delivery Person</th>
                             @endif
-
-                            <th class="fw-bold fs-6 text-center">Payment</th>
-                            <th class="fw-bold fs-6">Update Status</th>
-                            <th class="fw-bold fs-6 text-center">View</th>
-                            <th class="fw-bold fs-6">Invoice</th>
+                            <th>Order Details</th> {{-- new combined column --}}
+                            <th>Order Status</th>
+                            <th>Status</th>
+                            <th>Medicine Details</th>
+                            <th>Invoice</th>
+                            <th>Delivery Information</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @forelse ($orders as $order)
-                            <tr>
-                                <td class="fw-bold text-black">
-                                    {{ \Carbon\Carbon::parse($order->created_at)->format('jS F Y') }}<br>
-                                    <small
-                                        class="text-dark">{{ \Carbon\Carbon::parse($order->created_at)->format('h:i A') }}</small>
-                                </td>
 
-
-                                <td class="fw-bold text-black">{{ $order->order_id }}</td>
-                                <td class="fw-bold text-black">
-                                    @if($order->customer)
-                                        {{ $order->customer->firstName }} {{ $order->customer->lastName }}<br>
-                                        <small>{{ $order->customer->mobile_no }}</small>
-                                    @else
-                                        <em>Not found</em>
-                                    @endif
-                                </td>
-                                <td class="fw-bold text-black">
-                                    ₹{{ number_format($order->total_price, 2) }}
-                                </td>
-                                <td class="text-center">@if ($order->status == 0)
-                                    <span class="badge bg-warning">Request Accepted</span>
-                                @elseif ($order->status == 1)
-                                        <span class="badge bg-success">Completed</span>
-                                    @elseif ($order->status == 2)
-                                        <span class="badge bg-danger">Cancelled</span>
-                                    @endif
-                                </td>
-                                <td class="fw-bold text-black">
-                                    {{ ucfirst(str_replace('_', ' ', $order->delivery_options)) }}
-                                </td>
-                                @if (Auth::user()->role->name === 'admin')
-                                    @if($order->delivery_options === 'home_delivery' && $order->status == 0)
-                                        <td>
-                                            <form action="{{ route('orders.assignDeliveryPerson', $order->id) }}" method="POST">
-                                                @csrf
-                                                <div class="d-flex align-items-center">
-                                                    <select name="delivery_person_id"
-                                                        class="form-select form-select-sm me-2 fw-bold text-black border border-dark"
-                                                        required>
-                                                        <option value=""> - Select Delivery Person - </option>
-                                                        @foreach($deliveryPersons as $person)
-                                                            <option value="{{ $person->id }}" {{ $order->delivery_person_id == $person->id ? 'selected' : '' }}>
-                                                                {{ $person->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-
-                                                    <button type="submit" class="btn btn-sm btn-primary">Assign</button>
-                                                </div>
-                                            </form>
-                                        </td>
-                                    @else
-                                        <td class="fw-bold text-black text-center">
-                                            @if($order->status == 1)
-                                                <span class="badge bg-success">Order is Delivered</span>
-                                            @elseif($order->status == 2)
-                                                <span class="badge bg-danger">Order is Cancelled</span>
-                                            @else
-                                                {{ ucfirst(str_replace('_', ' ', $order->delivery_options)) }}
-                                            @endif
-                                        </td>
-                                    @endif
-                                @endif
-
-
-                                <td class="fw-bold text-black">
-                                    {{ ucfirst(str_replace('_', ' ', $order->payment_option)) }}
-                                </td>
-                                <td class="text-center">
-                                    @if ($order->status == 0)
-                                        <form action="{{ route('pharmacy.updateOrderStatus', $order->id) }}" method="POST"
-                                            class="d-inline-block status-form">
-                                            @csrf
-                                            @method('PUT')
-                                            <select name="status"
-                                                class="form-select form-select-sm me-2 fw-bold text-black border border-dark status-select"
-                                                data-role="{{ Auth::user()->role->name }}">
-                                                <option value="">-- Update Status --</option>
-
-                                                @if (Auth::user()->role->name === 'delivery_person')
-                                                    <option value="1">Complete</option>
-                                                @else
-                                                    <option value="1">Complete</option>
-                                                    <option value="2">Cancel</option>
-                                                @endif
-
-                                            </select>
-                                        </form>
-                                    @else
-                                        @if ($order->status == 1)
-                                            <span class="badge bg-success">Delivered to Customer</span>
-                                        @elseif ($order->status == 2)
-                                            <span class="badge bg-danger">Order Cancelled</span>
-                                        @endif
-                                    @endif
-                                </td>
-
-                                <td>
-                                    <a href="{{ route('orders.medicines', $order->id) }}"
-                                        class="btn btn-primary waves-effect waves-light" data-bs-toggle="tooltip"
-                                        data-bs-placement="top" title="View Medicine Details">
-                                        <i class="tf-icons mdi mdi-eye"></i>
-                                    </a>
-                                </td>
-                                <td class="text-center align-middle">
-                                    <a href="{{ route('invoice.download', $order->order_id) }}" class="btn btn-success"
-                                        title="Download Invoice">
-                                        <i class="tf-icons mdi mdi-download"></i>
-                                    </a>
-
-                                </td>
-                            </tr>
-                            @if ($order->delivery_person_id)
-                                @php
-                                    $assignedPerson = $deliveryPersons->firstWhere('id', $order->delivery_person_id);
-                                    $pickupAddress = $order->selected_pharmacy_address ?? 'N/A';
-                                    $deliveryAddress = $order->delivery_address ?? 'N/A';
-                                @endphp
-
-                                @if ($assignedPerson)
-                                    <tr>
-                                        <td colspan="10">
-                                            <button class="btn btn-outline-dark btn-sm mb-2" type="button" data-bs-toggle="collapse"
-                                                data-bs-target="#deliveryInfo{{ $order->id }}">
-                                                <i class="mdi mdi-truck-fast me-1"></i> View Delivery Info
-                                            </button>
-
-                                            <div class="collapse" id="deliveryInfo{{ $order->id }}">
-                                                <div class="border rounded p-3 bg-white shadow-sm">
-                                                    <h6 class="text-danger mb-3">
-                                                        <i class="mdi mdi-truck-fast me-1"></i>
-                                                        Delivery Information
-                                                    </h6>
-
-                                                    <div class="mb-3">
-                                                        <strong><i class="mdi mdi-account-badge-outline me-1 text-primary"></i>Assigned
-                                                            To:</strong>
-                                                        <span class="text-dark">
-                                                            {{ $assignedPerson->name }}
-                                                            @if ($assignedPerson->deliveryProfile && $assignedPerson->deliveryProfile->phone)
-                                                                ({{ $assignedPerson->deliveryProfile->phone }})
-                                                            @endif
-                                                        </span><br>
-                                                        <small class="text-dark d-block mb-1">Order ID: #{{ $order->order_id }}</small>
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <strong><i class="mdi mdi-flask me-1 text-success"></i>Pickup Location
-                                                            (Pharmacy):</strong><br>
-                                                        <span class="text-dark d-block mb-1">{{ $pickupAddress }}</span>
-                                                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ urlencode($pickupAddress) }}"
-                                                            target="_blank" class="badge bg-success text-white text-decoration-none">
-                                                            <i class="mdi mdi-directions"></i> Direction
-                                                        </a>
-                                                    </div>
-
-                                                    <div>
-                                                        <strong><i class="mdi mdi-home-map-marker me-1 text-danger"></i>Delivery
-                                                            Location (Customer):</strong><br>
-                                                        <span class="text-dark d-block mb-1">{{ $deliveryAddress }}</span>
-                                                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ urlencode($deliveryAddress) }}"
-                                                            target="_blank" class="badge bg-primary text-white text-decoration-none">
-                                                            <i class="mdi mdi-directions"></i> Direction
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endif
-                            @endif
-                        @empty
-                            <div class="alert alert-info">No orders found.</div>
-                        @endforelse
-                    </tbody>
                 </table>
+
             </div>
         </div>
     </div>
@@ -239,84 +143,227 @@
 @endsection
 
 @section('scripts')
-    <!-- Add custom JS if needed -->
-    <!-- SweetAlert Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.status-select').forEach(select => {
-                select.addEventListener('change', function () {
-                    const form = this.closest('form');
-                    const selectedValue = this.value;
-                    const userRole = this.dataset.role;
-                    console.log(userRole);
+        $(function () {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
 
-                    if (selectedValue === "1") {
-                        Swal.fire({
-                            title: 'Are you sure?',
-                            text: "You are about to mark this order as completed.",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonText: 'Yes, mark as complete!',
-                            cancelButtonText: 'Cancel',
-                            customClass: {
-                                confirmButton: 'btn btn-success me-2',
-                                cancelButton: 'btn btn-secondary'
-                            },
-                            buttonsStyling: false
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                // Additional check for pharmacy users
-                                if (userRole === 'pharmacy') {
-                                    Swal.fire({
-                                        title: 'Prescription Verified?',
-                                        text: "Have you checked a valid prescription for this order?",
-                                        icon: 'question',
-                                        showCancelButton: true,
-                                        confirmButtonText: 'Yes, Verified',
-                                        cancelButtonText: 'No',
-                                        customClass: {
-                                            confirmButton: 'btn btn-primary me-2',
-                                            cancelButton: 'btn btn-secondary'
-                                        },
-                                        buttonsStyling: false
-                                    }).then((prescriptionConfirm) => {
-                                        if (prescriptionConfirm.isConfirmed) {
-                                            form.submit();
-                                        } else {
-                                            select.value = '';
-                                        }
-                                    });
-                                } else {
-                                    form.submit(); // For delivery person or others
+            let columns = [
+                { data: 'order_id', name: 'order_id' },
+                {
+                    data: 'customer_name',
+                    name: 'customer_name',
+                    className: 'customer-name'
+                },
+                // assign_delivery will be added conditionally below
+                {
+                    data: null,
+                    name: 'order_details',
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return `<div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                            <a href="#" class="order-details-link btn btn-sm btn-primary control me-2" data-details='${JSON.stringify({
+                            date: row.date_raw,
+                            payment_mode: row.payment_mode,
+                            delivery_method: row.delivery_method,
+                            total_price: row.total_price
+                        })}'>
+                                <i class="mdi mdi-eye"></i>View
+                            </a>
+                        </div>`;
+                    }
+                },
+                { data: 'status', name: 'status' },
+                {
+                    data: 'status_control',
+                    name: 'status_control',
+                    orderable: false,
+                    searchable: false
+                },
+                { data: 'action', name: 'action', orderable: false, searchable: false },
+                {
+                    data: 'invoice',
+                    name: 'invoice',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'delivery_info',
+                    name: 'delivery_info',
+                    orderable: false,
+                    searchable: false
+                }
+
+
+            ];
+
+            @if (Auth::user()->role->name === 'admin')
+                // Add assign_delivery column ONLY for admin
+                columns.splice(2, 0, { data: 'assign_delivery', name: 'assign_delivery', orderable: false, searchable: false });
+                // Splice at index 2 to insert after customer_name and before order_details
+            @endif
+
+            let table = $('#ordersTable').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: {
+                    details: {
+                        renderer: function (api, rowIdx, columns) {
+                            let data = $.map(columns, function (col) {
+                                if (col.hidden) {
+                                    let label = $('<strong>').text(col.title + ': ').prop('outerHTML');
+                                    return '<tr><td colspan="2" style="padding: 5px 10px;">' + label + col.data + '</td></tr>';
                                 }
-                            } else {
-                                select.value = '';
-                            }
-                        });
-                    } else if (selectedValue === "2") {
-                        Swal.fire({
-                            title: 'Are you sure?',
-                            text: "You are about to cancel this order.",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonText: 'Yes, cancel it!',
-                            cancelButtonText: 'No',
-                            customClass: {
-                                confirmButton: 'btn btn-danger me-2',
-                                cancelButton: 'btn btn-secondary'
-                            },
-                            buttonsStyling: false
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                form.submit();
-                            } else {
-                                select.value = '';
-                            }
-                        });
+                                return '';
+                            }).join('');
+                            return data ? $('<table/>').append(data).prop('outerHTML') : false;
+                        }
+                    }
+                },
+                ajax: '{{ route('orderdetails') }}',
+                columns: columns,
+            });
+
+            // Handle delivery person assignment
+            $('#ordersTable').on('change', '.assign-delivery', function () {
+                const orderId = $(this).data('id');
+                const deliveryPersonId = $(this).val();
+
+                $.ajax({
+                    url: '{{ route("orders.assignDeliveryPerson") }}',
+                    type: 'POST',
+                    data: {
+                        order_id: orderId,
+                        delivery_person_id: deliveryPersonId
+                    },
+                    success: function (response) {
+                        alert(response.message);
+                        table.ajax.reload(null, false);
+                    },
+                    error: function (xhr) {
+                        alert('Failed to assign delivery person.');
                     }
                 });
             });
         });
-    </script>
+        // Create modal markup once on page
+        if (!$('#orderDetailsModal').length) {
+            $('body').append(`
+                    <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="orderDetailsLabel">Order Details</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body"></div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>`);
+        }
 
+        // Handle click on "View Details"
+        $('#ordersTable').on('click', '.order-details-link', function (e) {
+            e.preventDefault();
+            let details = $(this).data('details');
+
+            // Format date nicely (you can customize)
+            let formattedDate = new Date(details.date).toLocaleString(); // now details.date is ISO string
+
+
+            let html = `
+                        <p><strong>Date:</strong> ${formattedDate}</p>
+                        <p><strong>Payment Mode:</strong> ${details.payment_mode}</p>
+                        <p><strong>Delivery Method:</strong> ${details.delivery_method}</p>
+                        <p><strong>Total Price:</strong> ₹${details.total_price}</p>
+                    `;
+
+            $('#orderDetailsModal .modal-body').html(html);
+            let modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+            modal.show();
+        });
+
+    </script>
+    <script>
+        document.addEventListener('change', function (e) {
+            if (e.target && e.target.classList.contains('status-select')) {
+                const select = e.target;
+                const form = select.closest('form');
+                const selectedValue = select.value;
+                const userRole = select.dataset.role;
+
+                if (selectedValue === "1") {
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You are about to mark this order as completed.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, mark as complete!',
+                        cancelButtonText: 'Cancel',
+                        customClass: {
+                            confirmButton: 'btn btn-success me-2',
+                            cancelButton: 'btn btn-secondary'
+                        },
+                        buttonsStyling: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if (userRole === 'pharmacy') {
+                                Swal.fire({
+                                    title: 'Prescription Verified?',
+                                    text: "Have you checked a valid prescription for this order?",
+                                    icon: 'question',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Yes, Verified',
+                                    cancelButtonText: 'No',
+                                    customClass: {
+                                        confirmButton: 'btn btn-primary me-2',
+                                        cancelButton: 'btn btn-secondary'
+                                    },
+                                    buttonsStyling: false
+                                }).then((prescriptionConfirm) => {
+                                    if (prescriptionConfirm.isConfirmed) {
+                                        form.submit();
+                                    } else {
+                                        select.value = '';
+                                    }
+                                });
+                            } else {
+                                form.submit();
+                            }
+                        } else {
+                            select.value = '';
+                        }
+                    });
+                } else if (selectedValue === "2") {
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You are about to cancel this order.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, cancel it!',
+                        cancelButtonText: 'No',
+                        customClass: {
+                            confirmButton: 'btn btn-danger me-2',
+                            cancelButton: 'btn btn-secondary'
+                        },
+                        buttonsStyling: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        } else {
+                            select.value = '';
+                        }
+                    });
+                }
+            }
+        });
+
+    </script>
 @endsection

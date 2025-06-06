@@ -33283,3 +33283,9 @@ input:checked + .slider-custom:before {
 .text-danger {
     color: #dc3545 !important;
 }
+.control {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+

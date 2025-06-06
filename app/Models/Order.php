@@ -28,4 +28,10 @@ class Order extends Model
         return $this->belongsTo(Patient::class, 'add_patient','id');
     }
 
+    public function deliveryPerson()
+    {
+        return $this->belongsTo(User::class, 'delivery_person_id');
+    }
+
+
 }

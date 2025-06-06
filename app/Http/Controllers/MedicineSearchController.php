@@ -8,6 +8,7 @@ use App\Models\Carts;
 use App\Models\Additionalcharges;
 use App\Models\CustomerAddress;
 use App\Models\Customers;
+use App\Models\DeliveryPerson;
 use App\Models\Medicine;
 use App\Models\Order;
 use App\Models\Otcmedicine;
@@ -22,6 +23,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Yajra\DataTables\DataTables;
 
 class MedicineSearchController extends Controller
 {
@@ -497,52 +499,236 @@ class MedicineSearchController extends Controller
 
     public function orderdetails(Request $request)
     {
-        $pharmacy = Pharmacies::where('user_id', Auth::user()->id)->first();
+        // $pharmacy = Pharmacies::where('user_id', Auth::user()->id)->first();
 
-        $medicines = Phrmacymedicine::where('phrmacy_id', Auth::user()->id)->get();
+        // $medicines = Phrmacymedicine::where('phrmacy_id', Auth::user()->id)->get();
 
-        // Fetch orders where pharmacy_id matches current pharmacy
-        //$orders = Order::where('pharmacy_id', Auth::user()->id)->get();
+        // // Fetch orders where pharmacy_id matches current pharmacy
+        // //$orders = Order::where('pharmacy_id', Auth::user()->id)->get();
 
-        $orders = Order::with('customer')->where('pharmacy_id', Auth::user()->id)->get();
-        $roleName = Auth::user()->role->name;
-
-
-        if ($roleName === 'admin') {
-            // Admin: Get all orders
-            $orders = Order::with('customer')->get();
-        } elseif ($roleName === 'pharmacy') {
-            // Pharmacy: Get orders for that pharmacy
-            $orders = Order::with('customer')
-                ->where('pharmacy_id', Auth::id())
-                ->get();
-        } elseif ($roleName === 'laboratory') {
-            // Laboratory: Get orders for that lab
-            $orders = Order::with('customer')
-                ->where('lab_id', Auth::id())
-                ->get();
-        } elseif ($roleName === 'delivery_person') {
-            // Delivery Person: Get only assigned orders
-            $orders = Order::with('customer')
-                ->where('delivery_person_id', Auth::id())
-                ->get();
-        } else {
-            // Unknown or unauthorized role: return empty
-            $orders = collect();
-        }
+        // $orders = Order::with('customer')->where('pharmacy_id', Auth::user()->id)->get();
+        // $roleName = Auth::user()->role->name;
 
 
-        // $deliveryPersons = User::whereHas('role', function ($q) {
+        // if ($roleName === 'admin') {
+        //     // Admin: Get all orders
+        //     $orders = Order::with('customer')->get();
+        // } elseif ($roleName === 'pharmacy') {
+        //     // Pharmacy: Get orders for that pharmacy
+        //     $orders = Order::with('customer')
+        //         ->where('pharmacy_id', Auth::id())
+        //         ->get();
+        // } elseif ($roleName === 'laboratory') {
+        //     // Laboratory: Get orders for that lab
+        //     $orders = Order::with('customer')
+        //         ->where('lab_id', Auth::id())
+        //         ->get();
+        // } elseif ($roleName === 'delivery_person') {
+        //     // Delivery Person: Get only assigned orders
+        //     $orders = Order::with('customer')
+        //         ->where('delivery_person_id', Auth::id())
+        //         ->get();
+        // } else {
+        //     // Unknown or unauthorized role: return empty
+        //     $orders = collect();
+        // }
+
+
+        // // $deliveryPersons = User::whereHas('role', function ($q) {
+        // //     $q->where('name', 'delivery_person');
+        // // })->get();
+
+        // $deliveryPersons = User::with('deliveryProfile')->whereHas('role', function ($q) {
         //     $q->where('name', 'delivery_person');
         // })->get();
 
-        $deliveryPersons = User::with('deliveryProfile')->whereHas('role', function ($q) {
-            $q->where('name', 'delivery_person');
-        })->get();
 
 
+        // return view('pharmacist.orderdetails', compact('medicines', 'pharmacy', 'orders', 'deliveryPersons'));
 
-        return view('pharmacist.orderdetails', compact('medicines', 'pharmacy', 'orders', 'deliveryPersons'));
+        if ($request->ajax()) {
+            $roleName = Auth::user()->role->name;
+            $query = Order::with(['customer', 'pharmacy', 'deliveryPerson']);
+
+            if ($roleName === 'admin') {
+                $orders = $query->get();
+            } elseif ($roleName === 'pharmacy') {
+                $orders = $query->where('pharmacy_id', Auth::id())->get();
+            } elseif ($roleName === 'laboratory') {
+                $orders = $query->where('lab_id', Auth::id())->get();
+            } elseif ($roleName === 'delivery_person') {
+                $orders = $query->where('delivery_person_id', Auth::id())->get();
+            } else {
+                $orders = collect();
+            }
+
+            $deliveryPersons = User::whereHas('role', function ($q) {
+                $q->where('name', 'delivery_person');
+            })->with('deliveryProfile')->get();
+
+            return DataTables::of($orders)
+                ->addColumn('date_formatted', function ($order) {
+                    if (!$order->created_at)
+                        return 'N/A';
+
+                    return $order->created_at->format('d M Y h:i A');
+                })
+                ->addColumn('date_raw', function ($order) {
+                    if (!$order->created_at)
+                        return null;
+
+                    return $order->created_at->toDateTimeString(); // e.g. "2025-06-05 15:45:00"
+                })
+
+
+                ->addColumn('customer_name', function ($order) {
+                    if (!$order->customer) {
+                        return 'N/A';
+                    }
+
+                    $fullName = $order->customer->firstName . ' ' . $order->customer->lastName;
+                    $phone = $order->customer->mobile_no;
+
+                    return '<div style="white-space: normal; word-wrap: break-word; max-width: 150px;">'
+                        . e($fullName) . ' (' . e($phone) . ')'
+                        . '</div>';
+                })
+                ->rawColumns(['customer_name']) // <-- important to render the HTML
+
+
+                // ->addColumn('total_price', function ($order) {
+                //     return '₹' . number_format($order->total_price, 2);
+                // })
+
+                ->addColumn(
+                    'payment_mode',
+                    fn($order) =>
+                    $order->payment_option
+                    ? ucwords(str_replace('_', ' ', $order->payment_option))
+                    : 'N/A'
+                )
+                ->addColumn(
+                    'delivery_method',
+                    fn($order) =>
+                    $order->delivery_options
+                    ? ucwords(str_replace('_', ' ', $order->delivery_options))
+                    : 'N/A'
+                )
+
+                // ->addColumn('delivery_person', function ($order) {
+                //     return $order->deliveryPerson?->name ?? 'Unassigned';
+                // })
+                ->addColumn('status', function ($order) {
+                    switch ($order->status) {
+                        case 0:
+                            return '<span class="badge bg-warning">Request Accepted</span>';
+                        case 1:
+                            return '<span class="badge bg-success">Completed</span>';
+                        case 2:
+                            return '<span class="badge bg-danger">Cancelled</span>';
+                        default:
+                            return '<span class="badge bg-secondary">Unknown</span>';
+                    }
+                })
+
+
+                ->addColumn('action', function ($order) {
+                    return '
+        <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+            <a href="' . route('orders.medicines', $order->id) . '" 
+               class="btn btn-sm btn-primary control me-2">
+                <i class="mdi mdi-eye"></i> View
+            </a>
+        </div>';
+                })
+                ->addColumn('assign_delivery', function ($order) use ($deliveryPersons) {
+                    if (Auth::user()->role->name === 'admin') {
+                        if ($order->delivery_options === 'home_delivery' && $order->status == 0) {
+                            $html = '<form action="' . route('orders.assignDeliveryPerson') . '" method="POST">';
+                            $html .= '<input type="hidden" name="order_id" value="' . $order->id . '">';
+                            $html .= csrf_field();
+                            $html .= '<div class="d-flex align-items-center">';
+                            $html .= '<select name="delivery_person_id" class="form-select form-select-sm me-2 fw-bold text-black border border-dark" required>';
+                            $html .= '<option value=""> - Select Delivery Person - </option>';
+
+                            foreach ($deliveryPersons as $person) {
+                                $selected = $order->delivery_person_id == $person->id ? 'selected' : '';
+                                $html .= '<option value="' . $person->id . '" ' . $selected . '>' . $person->name . '</option>';
+                            }
+
+                            $html .= '</select>';
+                            $html .= '<button type="submit" class="btn btn-sm btn-primary">Assign</button>';
+                            $html .= '</div></form>';
+
+                            return $html;
+                        } else {
+                            if ($order->status == 1) {
+                                return '<span class="badge bg-success">Completed</span>';
+                            } elseif ($order->status == 2) {
+                                return '<span class="badge bg-danger">Order is Cancelled</span>';
+                            } else {
+                                return ucfirst(str_replace('_', ' ', $order->delivery_options));
+                            }
+                        }
+                    }
+                    return ''; // or 'N/A' for other roles
+                })
+                ->addColumn('status_control', function ($order) {
+                    $html = '<div class="text-center">';
+
+                    if ($order->status == 0) {
+                        $html .= '<form action="' . route('pharmacy.updateOrderStatus', $order->id) . '" method="POST" class="d-inline-block status-form">';
+                        $html .= csrf_field();
+                        $html .= method_field('PUT');
+
+                        $html .= '<select name="status" class="form-select form-select-sm me-2 fw-bold text-black border border-dark status-select" data-role="' . auth()->user()->role->name . '">';
+                        $html .= '<option value="">-- Update Status --</option>';
+
+                        if (auth()->user()->role->name === 'delivery_person') {
+                            $html .= '<option value="1">Complete</option>';
+                        } else {
+                            $html .= '<option value="1">Complete</option>';
+                            $html .= '<option value="2">Cancel</option>';
+                        }
+
+                        $html .= '</select></form>';
+                    } else {
+                        if ($order->status == 1) {
+                            $html .= '<span class="badge bg-success">Delivered to Customer</span>';
+                        } elseif ($order->status == 2) {
+                            $html .= '<span class="badge bg-danger">Order Cancelled</span>';
+                        }
+                    }
+
+                    $html .= '</div>';
+                    return $html;
+                })
+                ->addColumn('invoice', function ($order) {
+                    $url = route('invoice.download', $order->order_id);
+
+                    return '<div class="text-center align-middle">
+                    <a href="' . $url . '" class="btn btn-success" title="Download Invoice">
+                    <i class="tf-icons mdi mdi-download"></i>
+                    </a>
+                    </div>';
+                })
+                ->addColumn('delivery_info', function ($order) {
+                    if (!$order->delivery_person_id)
+                        return '';
+
+                    return '<a href="' . route('delivery.showDeliveryInfo', [$order->delivery_person_id, $order->order_id]) . '" 
+                            class="btn btn-sm btn-primary" 
+                            title="View Delivery Info">
+                            <i class="mdi mdi-truck-fast me-1"></i> View Delivery Info
+                        </a>';
+
+                })
+
+                ->rawColumns(['delivery_person', 'action', 'status', 'date', 'assign_delivery', 'customer_name', 'status_control', 'invoice', 'delivery_info'])
+                ->make(true);
+        }
+
+        return view('pharmacist.orderdetails');
     }
 
     public function updateOrderStatus(Request $request, $id)
@@ -577,10 +763,21 @@ class MedicineSearchController extends Controller
 
     public function assignDeliveryPerson(Request $request, Order $order)
     {
+        // $request->validate([
+        //     'delivery_person_id' => 'required|exists:users,id',
+        // ]);
+
+        // $order->delivery_person_id = $request->delivery_person_id;
+        // $order->save();
+
+        // return back()->with('success', 'Delivery person assigned successfully.');
+
         $request->validate([
-            'delivery_person_id' => 'required|exists:users,id',
+            'order_id' => 'required|exists:orders,id',
+            'delivery_person_id' => 'nullable|exists:users,id'
         ]);
 
+        $order = Order::find($request->order_id);
         $order->delivery_person_id = $request->delivery_person_id;
         $order->save();
 
@@ -593,7 +790,7 @@ class MedicineSearchController extends Controller
             ->with(['customer', 'pharmacy'])
             ->firstOrFail();
 
-        $pdf =Pdf::setOptions([
+        $pdf = Pdf::setOptions([
             'defaultFont' => 'DejaVu Sans',
             'isHtml5ParserEnabled' => true,
             'isRemoteEnabled' => true,
@@ -631,6 +828,19 @@ class MedicineSearchController extends Controller
             'url' => asset("invoices/{$fileName}")
         ];
     }
+
+    public function showDeliveryInfo($id, $orderId)
+    {
+        // Get delivery person using user_id
+        $deliveryPersons = DeliveryPerson::with('user')->where('user_id', $id)->firstOrFail();
+
+        // Get the latest or specific order for this delivery person (optional: customize based on your logic)
+        $order = Order::where('order_id', $orderId)->firstOrFail();
+
+        return view('delivery.info', compact('deliveryPersons', 'order'));
+    }
+
+
 
 
 
