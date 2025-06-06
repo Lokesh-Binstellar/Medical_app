@@ -44,34 +44,43 @@ class MedicineSearchController extends Controller
         // Get pharmacy info
         $pharmacy = Pharmacies::where('user_id', $user->id)->first();
 
-        // ✅ Calculate total quantity from all medicine entries
         $totalQuantity = 0;
+        $substituteMedicines = [];
+
         if (isset($data['medicine']) && is_array($data['medicine'])) {
-            foreach ($data['medicine'] as $medicine) {
-                $totalQuantity += intval($medicine['quantity'] ?? 0);
+            foreach ($data['medicine'] as $medicineItem) {
+                $totalQuantity += intval($medicineItem['quantity'] ?? 0);
+
+                // Convert substitute to object with medicine_name
+                if (!empty($medicineItem['substitute_medicine']) && is_string($medicineItem['substitute_medicine'])) {
+                    $substituteMedicines[] = [
+                        'medicine_name' => $medicineItem['substitute_medicine']
+                    ];
+                }
             }
         }
 
-        // Save medicine
+
         $medicine = new Phrmacymedicine();
         $medicine->medicine = json_encode($data['medicine']);
-        //$medicine->quantity = $totalQuantity; // ✅ Use calculated total quantity
-        // $medicine->quantity = $totalQuantity; 
-        $medicine->total_amount = $data['total_amount'] ?? 0; // ✅ Add fallback
-        $medicine->mrp_amount = $data['mrp_amount'] ?? 0; // ✅ Add fallback
-        $medicine->commission_amount = $data['commission_amount'] ?? 0; // ✅ Add fallback
+        $medicine->quantity = $totalQuantity;
+        $medicine->substitute_medicines = json_encode($substituteMedicines);
+
+        $medicine->total_amount = $data['total_amount'] ?? 0;
+        $medicine->mrp_amount = $data['mrp_amount'] ?? 0;
+        $medicine->commission_amount = $data['commission_amount'] ?? 0;
         $medicine->phrmacy_id = $pharmacy->user_id;
-        $medicine->customer_id = $data['customer'][0]['customer_id'];
+        $medicine->customer_id = $data['customer'][0]['customer_id'] ?? null;
         $medicine->save();
 
-        // ✅ Update request_quotes only if both customer_id and pharmacy_id match
         DB::table('request_quotes')
-            ->where('customer_id', $data['customer'][0]['customer_id'])
+            ->where('customer_id', $data['customer'][0]['customer_id'] ?? 0)
             ->where('pharmacy_id', $pharmacy->user_id)
             ->update(['pharmacy_address_status' => 1]);
 
         return redirect()->back()->with('success', 'Medicine added successfully!');
     }
+
 
     public function search(Request $request)
     {
@@ -144,7 +153,6 @@ class MedicineSearchController extends Controller
             'results' => $results,
             'product' => $product
         ]);
-
     }
 
     public function allPharmacyRequests(Request $request)
@@ -260,7 +268,6 @@ class MedicineSearchController extends Controller
                                 'price' => isset($med['price']) ? (float) $med['price'] : null,
                                 'discount_percent' => isset($med['discount_percent']) ? (float) $med['discount_percent'] : null,
                             ];
-
                         });
                     } catch (\Exception $e) {
                         return [['error' => 'Invalid JSON']];
@@ -366,9 +373,12 @@ class MedicineSearchController extends Controller
     public function fetchCartByCustomer(Request $request)
     {
         $customerId = $request->input('customer_id');
+        $current_pharmacy_id = $request->input('current_pharmacy_id');
+       $cart = RequestQuote::where('customer_id', $customerId)
+    ->where('pharmacy_id', $current_pharmacy_id)
+    ->first();
 
-        $cart = Carts::where('customer_id', $customerId)->first();
-
+// dd( $cart);
         if (!$cart || !$cart->products_details) {
             return response()->json(['status' => 'error', 'message' => 'Cart not found']);
         }
@@ -604,15 +614,15 @@ class MedicineSearchController extends Controller
                     'payment_mode',
                     fn($order) =>
                     $order->payment_option
-                    ? ucwords(str_replace('_', ' ', $order->payment_option))
-                    : 'N/A'
+                        ? ucwords(str_replace('_', ' ', $order->payment_option))
+                        : 'N/A'
                 )
                 ->addColumn(
                     'delivery_method',
                     fn($order) =>
                     $order->delivery_options
-                    ? ucwords(str_replace('_', ' ', $order->delivery_options))
-                    : 'N/A'
+                        ? ucwords(str_replace('_', ' ', $order->delivery_options))
+                        : 'N/A'
                 )
 
                 // ->addColumn('delivery_person', function ($order) {
@@ -721,7 +731,6 @@ class MedicineSearchController extends Controller
                             title="View Delivery Info">
                             <i class="mdi mdi-truck-fast me-1"></i> View Delivery Info
                         </a>';
-
                 })
 
                 ->rawColumns(['delivery_person', 'action', 'status', 'date', 'assign_delivery', 'customer_name', 'status_control', 'invoice', 'delivery_info'])
@@ -843,5 +852,77 @@ class MedicineSearchController extends Controller
 
 
 
+    public function fetchSubstituteBySalt(Request $request)
+    {
+        $input = $request->query('salt');
 
+        if (!$input) {
+            return response()->json(['results' => []]);
+        }
+
+        // Extract salt after '+', if present
+        $salt = $input;
+        if (strpos($input, '+') !== false) {
+            $parts = explode('+', $input);
+            $salt = trim($parts[1]);
+        }
+
+        $currentProductId = $request->query('selectedMedicineId');
+        //dd($request);
+        $results = [];
+        // Query medicines with salt_composition LIKE $salt
+        $medicines = Medicine::where('salt_composition', 'LIKE', '%' . $salt . '%')->get();
+
+        foreach ($medicines as $m) {
+            // Skip the current product
+            if ($m->product_id === $currentProductId) {
+                continue;
+            }
+
+            $results[] = [
+                'id' =>  $m->product_name . ' + ' . $m->salt_composition,
+                'text' => $m->product_name . ' + ' . $m->salt_composition,
+            ];
+        }
+
+        // For OTC medicines, no salt filtering (or just skip)
+        // You can either skip or fetch all OTCs if you want:
+        /*
+    $otcs = Otcmedicine::all();
+    foreach ($otcs as $o) {
+        $results[] = [
+            'id' => 'otc_' . $o->otc_id,
+            'text' => $o->name,
+        ];
+    }
+    */
+
+        return response()->json(['results' => $results]);
+    }
+
+
+
+    public function getSalt(Request $request)
+    {
+        $medicineId = $request->query('medicine_id');
+
+        \Log::info('getSalt called', ['medicine_id' => $medicineId]);
+
+        $medicine = Medicine::where('product_id', $medicineId)->first();
+        if ($medicine) {
+            \Log::info('Medicine found', ['salt_composition' => $medicine->salt_composition]);
+            return response()->json(['salt' => $medicine->salt_composition]);
+        }
+
+        $otc = Otcmedicine::where('otc_id', $medicineId)->first();
+        if ($otc) {
+            \Log::info('OTC medicine found, but no salt_composition field available');
+            // Assuming OTC medicine does not have salt_composition
+            return response()->json(['salt' => null]);
+        }
+
+        \Log::warning('Medicine or OTC not found for ID', ['medicine_id' => $medicineId]);
+
+        return response()->json(['salt' => null]);
+    }
 }

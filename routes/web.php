@@ -318,7 +318,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/orders/{id}/medicines', [MedicineSearchController::class, 'showMedicines'])->name('orders.medicines');
         //Route::post('/orders/{order}/assign-delivery', [MedicineSearchController::class, 'assignDeliveryPerson'])->name('orders.assignDeliveryPerson');
         Route::post('/orders/assign-delivery-person', [MedicineSearchController::class, 'assignDeliveryPerson'])->name('orders.assignDeliveryPerson');
-        
+
 
 
         Route::get('/search-medicine/invoice/download/{id}', [MedicineSearchController::class, 'downloadInvoice'])->name('invoice.download');
@@ -328,12 +328,22 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/add-medicine', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
         Route::post('/medicines/store', [MedicineSearchController::class, 'store'])->name('medicines.store');
         Route::get('/customers/select', [MedicineSearchController::class, 'customerSelect'])->name('customers.select');
+// Only one route definition for get-substitute-medicines, no duplicates
+Route::get('/get-substitute-medicines', [MedicineSearchController::class, 'fetchSubstituteBySalt'])->name('get-substitute-medicines');
+
+Route::get('/get-medicine-salt', [MedicineSearchController::class, 'getSalt'])->name('get-medicine-salt');
+
+
+
+
+
+
 
         Route::get('/fetch-cart-by-customer', [MedicineSearchController::class, 'fetchCartByCustomer']);
         Route::get('/fetch-prescription-files', [MedicineSearchController::class, 'fetchPrescriptionFiles'])->name('search.prescription');
     });
- Route::get('customer-list', [CustomerDetailsController::class, 'index'])->name('customer.list');
- Route::get('/customers/{id}', [CustomerDetailsController::class, 'show'])->name('customer.show');
+    Route::get('customer-list', [CustomerDetailsController::class, 'index'])->name('customer.list');
+    Route::get('/customers/{id}', [CustomerDetailsController::class, 'show'])->name('customer.show');
 
 
 
@@ -456,16 +466,16 @@ Route::get('/delivery-info/{id}/{orderId}', [MedicineSearchController::class, 's
 
 
 Route::prefix('/webpage')->group(function () {
-Route::view('/home', 'webpage.home');
-// Route::view('/about', 'webpage.about');
-// Route::view('/contact', 'webpage.contact');
-// Route::get('/home', [CmsController::class, 'homeweb'])->name('webpage.home');
-Route::get('/about', [CmsController::class, 'aboutweb'])->name('webpage.about');
-Route::get('/contact', [CmsController::class, 'contactweb'])->name('webpage.contact');
-// Route::view('/webpage/privacy-policy', 'webpage.privacy-policy');
-// Route::view('/webpage/terms', 'webpage.terms');
-Route::get('/terms', [CmsController::class, 'termsweb'])->name('webpage.terms');
-Route::get('/privacy-policy', [CmsController::class, 'privacyPolicyweb'])->name('webpage.privacy-policy');
+    Route::view('/home', 'webpage.home');
+    // Route::view('/about', 'webpage.about');
+    // Route::view('/contact', 'webpage.contact');
+    // Route::get('/home', [CmsController::class, 'homeweb'])->name('webpage.home');
+    Route::get('/about', [CmsController::class, 'aboutweb'])->name('webpage.about');
+    Route::get('/contact', [CmsController::class, 'contactweb'])->name('webpage.contact');
+    // Route::view('/webpage/privacy-policy', 'webpage.privacy-policy');
+    // Route::view('/webpage/terms', 'webpage.terms');
+    Route::get('/terms', [CmsController::class, 'termsweb'])->name('webpage.terms');
+    Route::get('/privacy-policy', [CmsController::class, 'privacyPolicyweb'])->name('webpage.privacy-policy');
 });
 
 

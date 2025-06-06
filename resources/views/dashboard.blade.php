@@ -33,7 +33,6 @@
             font-weight: 500;
         }
     </style>
-
 @endsection
 @section('content')
     <div class="page-inner">
@@ -469,6 +468,7 @@
                                 <table class="display table table-striped table-hover "id="pendingQuotesTable">
                                     <thead>
                                         <tr>
+                                            <th></th>
                                             <th>ID</th>
                                             <th>Customer Details</th>
                                             <th>Status</th>
@@ -759,49 +759,74 @@
 
         // customer orders data 
         $(document).ready(function() {
-            $('#customerDetailsTable').DataTable({
-                processing: true,
-                serverSide: true,
-                responsive: {
-                    details: {
-                        type: 'column',
-                        target: 0
+    $('#customerDetailsTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('dashboard.orders.data') }}",
+        columns: [
+            {
+                data: null,
+                defaultContent: '',
+                orderable: false
+            }, // control column for responsive toggle
+            {
+                data: 'order_id',
+                name: 'order_id'
+            },
+            {
+                data: 'name',
+                name: 'name',
+                orderable: false
+            },
+            {
+                data: 'status',
+                name: 'status',
+                orderable: false
+            },
+            {
+                data: 'action',
+                name: 'action',
+                orderable: false,
+                searchable: false
+            }
+        ],
+        columnDefs: [{
+            // For Responsive (first col is blank control)
+            targets: 0,
+            className: 'control',
+            orderable: false,
+            searchable: false,
+            responsivePriority: 1,
+            render: function(data, type, full, meta) {
+                return '';
+            }
+        }],
+        responsive: {
+            details: {
+                display: $.fn.dataTable.Responsive.display.modal({
+                    header: function(row) {
+                        var data = row.data();
+                        return 'Details of ' + (data.pharmacy_name || data.name || 'Customer');
                     }
-                },
-                columnDefs: [{
-                    targets: 0,
-                    className: 'control',
-                    orderable: false
-                }],
-                ajax: "{{ route('dashboard.orders.data') }}",
-                columns: [{
-                        data: null,
-                        defaultContent: '',
-                        orderable: false
-                    }, // control column
-                    {
-                        data: 'order_id',
-                        name: 'order_id'
-                    },
-                    {
-                        data: 'name',
-                        name: 'name',
-                        orderable: false
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
-                        orderable: false
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },
-                ]
-            });
-        });
+                }),
+                type: 'column',
+                renderer: function(api, rowIdx, columns) {
+                    var data = $.map(columns, function(col, i) {
+                        return col.title !== '' ?
+                            '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' +
+                            col.columnIndex + '">' +
+                            '<td>' + col.title + ':</td>' +
+                            '<td>' + col.data + '</td>' +
+                            '</tr>' : '';
+                    }).join('');
+
+                    return data ? $('<table class="table"/><tbody />').append(data) : false;
+                }
+            }
+        }
+    });
+});
+
 
         $(document).ready(function() {
             var table = $('#pendingQuotesTable').DataTable({
@@ -809,6 +834,13 @@
                 serverSide: true,
                 ajax: "{{ route('pending.quotes') }}",
                 columns: [{
+                        data: null,
+                        defaultContent: '',
+                        className: 'control',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                         orderable: false,
@@ -828,11 +860,45 @@
                         name: 'created_at'
                     }
                 ],
+                columnDefs: [{
+                    className: 'control',
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 1,
+                    targets: 0,
+                    render: function(data, type, full, meta) {
+                        return '';
+                    }
+                }],
+                responsive: {
+                    details: {
+                        display: $.fn.dataTable.Responsive.display.modal({
+                            header: function(row) {
+                                var data = row.data();
+                                return 'Details of ' + (data.customer_details || 'N/A');
+                            }
+                        }),
+                        type: 'column',
+                        renderer: function(api, rowIdx, columns) {
+                            var data = $.map(columns, function(col, i) {
+                                return col.title !== '' ?
+                                    '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' +
+                                    col.columnIndex + '">' +
+                                    '<td>' + col.title + ':</td>' +
+                                    '<td>' + col.data + '</td>' +
+                                    '</tr>' : '';
+                            }).join('');
+
+                            return data ? $('<table class="table"/><tbody />').append(data) : false;
+                        }
+                    }
+                },
                 drawCallback: function(settings) {
-                    $('#quoteCount').text(settings._iRecordsTotal); // Sets total pending quotes count
+                    $('#quoteCount').text(settings._iRecordsTotal); // Set total pending quotes count
                 }
             });
         });
+
 
 
 
@@ -1134,9 +1200,9 @@
         //                 var day = dataPointIndex + 1;
         //                 var sales = series[seriesIndex][dataPointIndex];
         //                 return `<div style="padding:5px;">
-        //                     <strong>Day ${day}</strong><br/>
-        //                     Sales: ₹${sales.toFixed(2)}
-        //                 </div>`;
+    //                     <strong>Day ${day}</strong><br/>
+    //                     Sales: ₹${sales.toFixed(2)}
+    //                 </div>`;
         //             }
         //         }
         //     };
@@ -1145,5 +1211,4 @@
         //     chart.render();
         // });
     </script>
-  
 @endsection

@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('customer_id');
             $table->unsignedBigInteger('phrmacy_id');
-            $table->json('medicine');           
-            $table->decimal('quantity', 10, 2);
+            $table->json('medicine');       
+            $table->json('substitute_medicines')->nullable();    
+            $table->decimal('quantity', 10, 2)->nullable();
             $table->decimal('mrp_amount', 10, 2);
             $table->decimal('total_amount', 10, 2);
             $table->decimal('commission_amount', 10, 2);

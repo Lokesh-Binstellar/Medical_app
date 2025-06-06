@@ -321,7 +321,7 @@ button.list-group-item-primary.active {
     border-color: #fefefe !important;
 }
 .btn-primary:hover {
-    color: #fefefe ;
+    color: #fefefe !important;
     background-color: #033a62 ;
     /* border-color: #fefefe !important; */
 }

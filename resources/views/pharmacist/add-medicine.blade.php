@@ -126,276 +126,286 @@
 @endsection
 @section('content')
 
-    
-        <div class="card shadow-xl rounded-3">
-            <!-- Blue Header Title -->
-            <div class="card-header text-white fw-bold fs-5">
-                Add Medicine
-            </div>
-            <input type="hidden" name="current_pharmacy_id" id="current_pharmacy_id" value="{{ Auth::id() }}">
 
-            <div class="card-body">
-                <form method="POST" action="{{ route('medicines.store') }}" id="medicineCreateForm"
-                    class="d-flex flex-column gap-4">
-                    @csrf
-                    <div class="d-flex selectCustomer align-items-center gap-5">
-                        <label class="font-bold">Please Select Customer :</label>
-                        <select class="form-control customer-search customerDropdown" name="customer[0][customer_id]"
-                            id="prescription-select">
-                            <option value="">Search customer...</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <div class="header">Prescriptions Preview</div>
-
-                        <div class="pdf-wrapper" id="prescription-preview"></div>
-
-                        <div class="footer" id="download-links"></div>
-                    </div>
-
-                    <div class="card" style="display:none;" id="cart-details">
-                        <h5 class="card-header">Customer Cart Details</h5>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Product ID</th>
-                                            <th>Product Name</th>
-                                            <th>Packaging Detail</th>
-                                            <th>Quantity</th>
-                                            <th>Is Substitute</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="cart-product-body">
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="table-responsive mb-3">
-                        <table class="display table table-striped table-hover data-table" id="medicine-table">
-                            <thead>
-                                <div
-                                    style="border-left: 5px solid #f44336; background-color: #ffe6e6; padding: 10px 15px; margin-bottom: 10px; border-radius: 6px; font-family: Arial, sans-serif;">
-                                    <strong style="color: #d32f2f;">Note :</strong> <br><strong>Please make sure to enter
-                                        the
-                                        total price manually, not the per unit price based on the quantity
-                                        requested by the customer.</strong>
-                                    <br>
-                                    <strong>
-                                        If requested quantity is not available,
-                                        kindly mark the medicine as not available</strong>.
-                                </div>
-
-                                <tr>
-                                    <th>Search Medicine</th>
-                                    <th>MRP</th>
-                                    <th>Final Amount</th>
-                                    <th>Discount %</th>
-                                    <th>Quantity</th>
-                                    <th>Available</th>
-                                    <th>Substitute</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="medicine-body" class="cart-medicine-body">
-                                <tr class="medicine-row">
-                                    <td>
-                                        <select class="form-select medicine_search medicineDropdown"
-                                            name="medicine[0][medicine_id]"></select>
-                                        <input type="hidden" class="medicine_name" name="medicine[0][medicine_name]">
-                                    </td>
-                                    <td>
-                                        <input type="number" name="medicine[0][mrp]" class="form-control mrp"
-                                            step="0.01" placeholder="MRP">
-                                    </td>
-                                    <td>
-                                        <input type="number" name="medicine[0][discount]" class="form-control discount"
-                                            step="0.01" placeholder="Final Amount">
-                                    </td>
-                                    <td>
-                                        <input type="number" name="medicine[0][discount_percent]"
-                                            class="form-control discount_percent" step="0.01" placeholder="%">
-                                    </td>
-                                    <td>
-                                        <input type="number" name="medicine[0][quantity]" class="form-control quantity"
-                                            step="0" placeholder="Quantity" readonly style="background-color: #eef0f3;">
-                                    </td>
-                                    <td>
-                                        <select name="medicine[0][available]" class="form-select">
-                                            <option value="yes">Yes</option>
-                                            <option value="no">No</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select name="medicine[0][is_substitute]" class="form-select">
-                                            <option value="yes">Yes</option>
-                                            <option value="no" selected>No</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-outline-danger remove-row">−</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="d-flex justify-content-between flex-wrap gap-3">
-                        <div class="d-flex gap-2 justify-center align-items-center">
-                            {{-- <button type="button" id="add-row" class="btn btn-primary">+</button> --}}
-                            <button type="submit" class="btn btn-primary">Save</button>
-                        </div>
-
-                        <div class="d-flex flex-column text-end">
-                            <div>
-                                <input type="hidden" id="mrp_amount" name="mrp_amount">
-                                <strong>Total MRP:</strong>
-                                <span class="text-primary fw-bold mrp-amount">0.00</span>
-                            </div>
-                            <div>
-                                <input type="hidden" id="total_amount" name="total_amount">
-                                <strong>Total Final Amount:</strong>
-                                <span class="text-success fw-bold total-amount">0.00</span>
-                            </div>
-                            <div>
-                                <input type="hidden" id="commission_amount" name="commission_amount">
-                                <strong>Total Commission :</strong>
-                                <span class="text-danger fw-bold commission-amount">0.00</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </form>
-            </div>
+    <div class="card shadow-xl rounded-3">
+        <!-- Blue Header Title -->
+        <div class="card-header text-white fw-bold fs-5">
+            Add Medicine
         </div>
-   
+        <input type="hidden" name="current_pharmacy_id" id="current_pharmacy_id" value="{{ Auth::id() }}">
 
-    
-        <div class="card shadow-xl my-5">
-            <div class="card-header text-white">
-                <h5 class="mb-0">Medicine Data</h5>
-            </div>
+        <div class="card-body">
+            <form method="POST" action="{{ route('medicines.store') }}" id="medicineCreateForm"
+                class="d-flex flex-column gap-4">
+                @csrf
+                <div class="d-flex selectCustomer align-items-center gap-5">
+                    <label class="font-bold">Please Select Customer :</label>
+                    <select class="form-control customer-search customerDropdown" name="customer[0][customer_id]"
+                        id="prescription-select">
+                        <option value="">Search customer...</option>
+                    </select>
+                </div>
 
-            <div class="card-body px-0">
-                @if ($medicines->count() > 0)
-                    <div class="accordion" id="medicineAccordion">
-                        @foreach ($medicines as $entry)
-                            @php
-                                $accordionId = $entry->id;
-                                $pharmacyId = $entry->phrmacy_id;
-                                $medData = json_decode($entry->medicine, true);
-                                $customer = $entry->customer;
-                                $statusText = '';
-                                if ($entry->status == 0) {
-                                    $statusText =
-                                        '<span class="badge rounded-pill bg-label-warning me-1">Request Sent</span>';
-                                } elseif ($entry->status == 1) {
-                                    $statusText =
-                                        '<span class="badge rounded-pill bg-label-success me-1">Request Accepted</span>';
-                                } elseif ($entry->status == 2) {
-                                    $statusText =
-                                        '<span class="badge rounded-pill bg-label-danger me-1">Request Cancelled</span>';
-                                }
-                            @endphp
+                <div>
+                    <div class="header">Prescriptions Preview</div>
 
-                            <div class="accordion-item border-0 shadow-sm mb-3">
-                                <h2 class="accordion-header" id="heading{{ $accordionId }}">
-                                    <button
-                                        class="accordion-button collapsed d-flex justify-content-between align-items-center w-100"
-                                        type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapse{{ $accordionId }}" aria-expanded="false"
-                                        aria-controls="collapse{{ $accordionId }}">
+                    <div class="pdf-wrapper" id="prescription-preview"></div>
 
-                                        <table class="table table-bordered table-sm w-auto"
-                                            style="border: 1px solid black;">
+                    <div class="footer" id="download-links"></div>
+                </div>
+
+                <div class="card" style="display:none;" id="cart-details">
+                    <h5 class="card-header">Customer Cart Details</h5>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Product ID</th>
+                                        <th>Product Name</th>
+                                        <th>Packaging Detail</th>
+                                        <th>Quantity</th>
+                                        <th>Is Substitute</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cart-product-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive mb-3">
+                    <table class="display table table-striped table-hover data-table" id="medicine-table">
+                        <thead>
+                            <div
+                                style="border-left: 5px solid #f44336; background-color: #ffe6e6; padding: 10px 15px; margin-bottom: 10px; border-radius: 6px; font-family: Arial, sans-serif;">
+                                <strong style="color: #d32f2f;">Note :</strong> <br><strong>Please make sure to enter
+                                    the
+                                    total price manually, not the per unit price based on the quantity
+                                    requested by the customer.</strong>
+                                <br>
+                                <strong>
+                                    If requested quantity is not available,
+                                    kindly mark the medicine as not available</strong>.
+                            </div>
+
+                            <tr>
+                                <th>Search Medicine</th>
+                                <th>Substitute Medicine</th>
+                                <th>MRP</th>
+                                <th>Final Amount</th>
+                                <th>Discount %</th>
+                                <th>Quantity</th>
+                                <th>Available</th>
+                                <th>Substitute</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="medicine-body" class="cart-medicine-body">
+                            <tr class="medicine-row">
+                                <td>
+                                    <select class="form-select medicine_search medicineDropdown" disabled
+                                        name="medicine[0][medicine_id]"></select>
+                                    <input type="hidden" class="medicine_name" name="medicine[0][medicine_name]">
+                                </td>
+                                <td>
+                                    <select name="medicine[0][substitute_medicine]"
+                                        class="form-select substitute_medicine_dropdown substitute_search" disabled>
+                                        <option value="">N/A</option>
+                                    </select>
+                                </td>
+
+
+                                <td>
+                                    <input type="number" name="medicine[0][mrp]" class="form-control mrp" step="0.01"
+                                        placeholder="MRP">
+                                </td>
+                                <td>
+                                    <input type="number" name="medicine[0][discount]" class="form-control discount"
+                                        step="0.01" placeholder="Final Amount">
+                                </td>
+                                <td>
+                                    <input type="number" name="medicine[0][discount_percent]"
+                                        class="form-control discount_percent" step="0.01" placeholder="%">
+                                </td>
+                                <td>
+                                    <input type="number" name="medicine[0][quantity]" class="form-control quantity"
+                                        step="0" placeholder="Quantity" readonly style="background-color: #eef0f3;">
+                                </td>
+                                <td>
+                                    <select name="medicine[0][available]" class="form-select">
+                                        <option value="yes">Yes</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="medicine[0][is_substitute]" class="form-select is_saltsubstitute">
+                                        <option value="yes">Yes</option>
+                                        <option value="no" selected>No</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-row">−</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between flex-wrap gap-3">
+                    <div class="d-flex gap-2 justify-center align-items-center">
+                        {{-- <button type="button" id="add-row" class="btn btn-primary">+</button> --}}
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+
+                    <div class="d-flex flex-column text-end">
+                        <div>
+                            <input type="hidden" id="mrp_amount" name="mrp_amount">
+                            <strong>Total MRP:</strong>
+                            <span class="text-primary fw-bold mrp-amount">0.00</span>
+                        </div>
+                        <div>
+                            <input type="hidden" id="total_amount" name="total_amount">
+                            <strong>Total Final Amount:</strong>
+                            <span class="text-success fw-bold total-amount">0.00</span>
+                        </div>
+                        <div>
+                            <input type="hidden" id="commission_amount" name="commission_amount">
+                            <strong>Total Commission :</strong>
+                            <span class="text-danger fw-bold commission-amount">0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
+
+    <div class="card shadow-xl my-5">
+        <div class="card-header text-white">
+            <h5 class="mb-0">Medicine Data</h5>
+        </div>
+
+        <div class="card-body px-0">
+            @if ($medicines->count() > 0)
+                <div class="accordion" id="medicineAccordion">
+                    @foreach ($medicines as $entry)
+                        @php
+                            $accordionId = $entry->id;
+                            $pharmacyId = $entry->phrmacy_id;
+                            $medData = json_decode($entry->medicine, true);
+                            $customer = $entry->customer;
+                            $statusText = '';
+                            if ($entry->status == 0) {
+                                $statusText =
+                                    '<span class="badge rounded-pill bg-label-warning me-1">Request Sent</span>';
+                            } elseif ($entry->status == 1) {
+                                $statusText =
+                                    '<span class="badge rounded-pill bg-label-success me-1">Request Accepted</span>';
+                            } elseif ($entry->status == 2) {
+                                $statusText =
+                                    '<span class="badge rounded-pill bg-label-danger me-1">Request Cancelled</span>';
+                            }
+                        @endphp
+
+                        <div class="accordion-item border-0 shadow-sm mb-3">
+                            <h2 class="accordion-header" id="heading{{ $accordionId }}">
+                                <button
+                                    class="accordion-button collapsed d-flex justify-content-between align-items-center w-100"
+                                    type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapse{{ $accordionId }}" aria-expanded="false"
+                                    aria-controls="collapse{{ $accordionId }}">
+
+                                    <table class="table table-bordered table-sm w-auto" style="border: 1px solid black;">
+                                        <tbody>
+                                            <tr>
+                                                <th><strong>Record #</strong></th>
+                                                <td><strong>{{ $accordionId }}</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <th><strong>Customer Details</strong></th>
+                                                <td><strong>Name: {{ $customer->firstName ?? 'N/A' }} | Phone:
+                                                        {{ $customer->mobile_no ?? 'N/A' }}</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <th><strong>Status</strong></th>
+                                                <td><strong>{!! $statusText !!}</strong></td>
+                                            </tr>
+                                            @if ($entry->status == 1)
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <span class="text-danger">
+                                                            <strong>Note:</strong> Accepted order details will be
+                                                            displayed under
+                                                            <strong>Orders</strong>.
+                                                            You need to update the order status to
+                                                            <strong>Completed</strong> or
+                                                            <strong>Cancelled</strong> from there.
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
+
+                                    <a type="button" class="btn btn-primary Show-Medicine">Show Medicine<i
+                                            class="fa-solid fa-arrow-down pl-1"></i></a>
+                                </button>
+                            </h2>
+
+                            <div id="collapse{{ $accordionId }}" class="accordion-collapse collapse"
+                                aria-labelledby="heading{{ $accordionId }}" data-bs-parent="#medicineAccordion">
+                                <div class="accordion-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Medicine Name</th>
+                                                    <th>Substitute Medicine Name</th>
+                                                    <th>MRP</th>
+                                                    <th>Final Price</th>
+                                                    <th>Discount %</th>
+                                                    <th>Quantity</th>
+                                                    <th>Available</th>
+                                                    <th>Substitute</th>
+                                                </tr>
+                                            </thead>
                                             <tbody>
-                                                <tr>
-                                                    <th><strong>Record #</strong></th>
-                                                    <td><strong>{{ $accordionId }}</strong></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><strong>Customer Details</strong></th>
-                                                    <td><strong>Name: {{ $customer->firstName ?? 'N/A' }} | Phone:
-                                                            {{ $customer->mobile_no ?? 'N/A' }}</strong></td>
-                                                </tr>
-                                                <tr>
-                                                    <th><strong>Status</strong></th>
-                                                    <td><strong>{!! $statusText !!}</strong></td>
-                                                </tr>
-                                                @if ($entry->status == 1)
+                                                @php $counter = 1; @endphp
+                                                @foreach ($medData as $med)
                                                     <tr>
-                                                        <td colspan="2">
-                                                            <span class="text-danger">
-                                                                <strong>Note:</strong> Accepted order details will be
-                                                                displayed under
-                                                                <strong>Orders</strong>.
-                                                                You need to update the order status to
-                                                                <strong>Completed</strong> or
-                                                                <strong>Cancelled</strong> from there.
-                                                            </span>
-                                                        </td>
+                                                        <td>{{ $counter++ }}</td>
+                                                        <td>{{ $med['medicine_name'] ?? '-' }}</td>
+                                                        <td>{{ $med['substitute_medicine'] ?? '-' }}</td>
+                                                        <td>₹{{ $med['mrp'] ?? '0.00' }}</td>
+                                                        <td>₹{{ $med['discount'] ?? '0.00' }}</td>
+                                                        <td>{{ $med['discount_percent'] ?? '0' }}%</td>
+                                                        <td>{{ $med['quantity'] ?? '0' }}</td>
+                                                        <td>{{ ucfirst($med['available'] ?? '-') }}</td>
+                                                        <td>{{ ucfirst($med['is_substitute'] ?? '-') }}</td>
                                                     </tr>
-                                                @endif
+                                                @endforeach
                                             </tbody>
                                         </table>
-
-                                        <a type="button" class="btn btn-primary Show-Medicine">Show Medicine<i
-                                                class="fa-solid fa-arrow-down pl-1"></i></a>
-                                    </button>
-                                </h2>
-
-                                <div id="collapse{{ $accordionId }}" class="accordion-collapse collapse"
-                                    aria-labelledby="heading{{ $accordionId }}" data-bs-parent="#medicineAccordion">
-                                    <div class="accordion-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th>#</th>
-                                                        <th>Medicine Name</th>
-                                                        <th>MRP</th>
-                                                        <th>Final Price</th>
-                                                        <th>Discount %</th>
-                                                        <th>Quantity</th>
-                                                        <th>Available</th>
-                                                        <th>Substitute</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @php $counter = 1; @endphp
-                                                    @foreach ($medData as $med)
-                                                        <tr>
-                                                            <td>{{ $counter++ }}</td>
-                                                            <td>{{ $med['medicine_name'] ?? '-' }}</td>
-                                                            <td>₹{{ $med['mrp'] ?? '0.00' }}</td>
-                                                            <td>₹{{ $med['discount'] ?? '0.00' }}</td>
-                                                            <td>{{ $med['discount_percent'] ?? '0' }}%</td>
-                                                            <td>{{ $med['quantity'] ?? '0' }}</td>
-                                                            <td>{{ ucfirst($med['available'] ?? '-') }}</td>
-                                                            <td>{{ ucfirst($med['is_substitute'] ?? '-') }}</td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div class="mt-2">
-                                            <div><strong>Total MRP:</strong> ₹{{ $entry->mrp_amount }}</div>
-                                            <div><strong>Total Final Amount:</strong> ₹{{ $entry->total_amount }}</div>
-                                            <div><strong>Commission Amount:</strong> ₹{{ $entry->commission_amount }}</div>
-                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <div><strong>Total MRP:</strong> ₹{{ $entry->mrp_amount }}</div>
+                                        <div><strong>Total Final Amount:</strong> ₹{{ $entry->total_amount }}</div>
+                                        <div><strong>Commission Amount:</strong> ₹{{ $entry->commission_amount }}</div>
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
-  
+    </div>
+
 
 @endsection
 
@@ -434,6 +444,42 @@
                 }
             });
         }
+
+        function initSubstituteSelect2($el) {
+            $el.select2({
+                placeholder: 'Select substitute medicine',
+                allowClear: true,
+                minimumInputLength: 0,
+                width: '100%'
+            }).on('select2:select', function(e) {
+                // Optional: If you want to store selected substitute name in a hidden input, you can add logic here
+            });
+
+            // Optional: Set fixed width like medicine dropdown (350px)
+            $el.each(function() {
+                const container = $(this).data('select2')?.$container;
+                if (container) {
+                    container.css('width', '350px');
+                }
+            });
+        }
+
+        // function initSubstituteSelect2($el) {
+        //     $el.select2({
+        //         placeholder: 'Select substitute medicine',
+        //         allowClear: true,
+        //         width: 'resolve' // makes it adapt to container
+        //     });
+
+        //     // Force correct width styling for new rows (optional fix)
+        //     $el.each(function() {
+        //         let $container = $(this).data('select2')?.$container;
+        //         if ($container) {
+        //             $container.css('width', '350px');
+        //         }
+        //     });
+        // }
+
 
         function calculateTotal() {
             let total = 0;
@@ -492,6 +538,10 @@
                 $newRow.find('.medicine_search').replaceWith($newSelect);
                 initSelect2($newSelect);
 
+                $newRow.find('.substitute_medicine_dropdown')
+                    .html('<option value="">Select Substitute</option>')
+                    .prop('disabled', true);
+
                 $('#medicine-body').append($newRow);
                 index++;
                 calculateTotal();
@@ -526,8 +576,86 @@
                 calculateTotal();
             });
 
-            $(document).on('input', '.discount', calculateTotal); // final amount changes
+            $(document).on('input', '.discount', calculateTotal);
 
+            $(document).on('change', '.form-select[name$="[is_substitute]"]', function() {
+                const row = $(this).closest('.medicine-row');
+                const isSubstitute = $(this).val();
+                const substituteDropdown = row.find('.substitute_medicine_dropdown');
+                const selectedMedicineId = row.find('.medicineDropdown').val();
+
+
+
+                if (isSubstitute === 'no') {
+                    substituteDropdown.select2('destroy');
+                    substituteDropdown.html('<option>N/A</option>');
+                    substituteDropdown.prop('disabled', true);
+                    substituteDropdown.css('border', '');
+                    substituteDropdown.closest('td').find('.substitute-medicine-error').remove();
+                } else {
+                    substituteDropdown.prop('disabled', false);
+                    substituteDropdown.html('<option>Loading...</option>');
+
+                    $.ajax({
+                        url: "{{ route('get-medicine-salt') }}",
+                        type: 'GET',
+                        data: {
+                            medicine_id: selectedMedicineId
+
+                        },
+                        success: function(response) {
+                            const salt = response.salt;
+                            if (!salt) {
+                                substituteDropdown.html(
+                                    '<option>No substitutes found</option>');
+                                return;
+                            }
+
+                            $.ajax({
+                                url: "{{ route('get-substitute-medicines') }}",
+                                type: 'GET',
+                                data: {
+                                    salt: salt,
+                                    selectedMedicineId: selectedMedicineId
+                                },
+                                success: function(res) {
+                                    let options =
+                                        '<option value="">Select Substitute</option>';
+                                    if (res.results.length > 0) {
+                                        res.results.forEach(item => {
+                                            options +=
+                                                `<option value="${item.id}">${item.text}</option>`;
+                                        });
+                                    } else {
+                                        options =
+                                            '<option>No substitutes found</option>';
+                                    }
+
+                                    substituteDropdown.html(options).prop(
+                                        'disabled', false);
+
+                                    // ⛔️ Avoid destroy unless previously applied
+                                    if ($.fn.select2 && substituteDropdown.hasClass(
+                                            "select2-hidden-accessible")) {
+                                        substituteDropdown.select2('destroy');
+                                    }
+
+                                    initSubstituteSelect2(substituteDropdown);
+
+                                },
+                                error: function() {
+                                    substituteDropdown.html(
+                                        '<option>Error loading substitutes</option>'
+                                    );
+                                }
+                            });
+                        },
+                        error: function() {
+                            substituteDropdown.html('<option>Error fetching salt</option>');
+                        }
+                    });
+                }
+            });
 
             function initCustomerSelect2($el) {
                 $el.select2({
@@ -539,8 +667,7 @@
                         data: function(params) {
                             return {
                                 query: params.term,
-                                current_pharmacy_id: $('#current_pharmacy_id')
-                                    .val() // static value added here
+                                current_pharmacy_id: $('#current_pharmacy_id').val()
                             };
                         },
                         processResults: function(data) {
@@ -555,16 +682,13 @@
 
             initCustomerSelect2($('.customer-search'));
 
-
             $('form').on('submit', function(e) {
                 let isValid = true;
 
-
-                $('.medicine-error, .mrp-error, .discount-error, .discount-percent-error, .quantity-error,.available-error, .substitute-error, .customer-error')
+                $('.medicine-error, .mrp-error, .discount-error, .discount-percent-error, .quantity-error, .available-error, .substitute-error, .substitute-medicine-error, .customer-error')
                     .remove();
                 $('.form-control, .form-select').css('border', '');
                 $('.medicine_search').next('.select2-container').css('border', '');
-
 
                 $('#medicine-body .medicine-row').each(function(index) {
                     const $row = $(this);
@@ -574,8 +698,29 @@
                     if (!medicineVal) {
                         isValid = false;
                         $medicineSelect.next('.select2-container').css('border', '1px solid red');
-                        $row.find('td:first').append(
+                        $row.find('td:nth-child(1)').append(
                             '<div class="text-danger small medicine-error mt-1">Please select a medicine.</div>'
+                        );
+                    }
+
+                    const $substituteMedicineSelect = $row.find(
+                        `select[name="medicine[${index}][substitute_medicine]"]`);
+                    const $substituteSelect = $row.find(
+                        `select[name="medicine[${index}][is_substitute]"]`);
+
+                    if (!$substituteSelect.val()) {
+                        isValid = false;
+                        $substituteSelect.css('border', '1px solid red');
+                        $row.find('td:nth-child(8)').append(
+                            '<div class="text-danger small substitute-error mt-1">Please select if it is a substitute.</div>'
+                        );
+                    }
+
+                    if ($substituteSelect.val() === 'yes' && !$substituteMedicineSelect.val()) {
+                        isValid = false;
+                        $substituteMedicineSelect.css('border', '1px solid red');
+                        $row.find('td:nth-child(2)').append(
+                            '<div class="text-danger small substitute-medicine-error mt-1">Please select a substitute medicine.</div>'
                         );
                     }
 
@@ -583,17 +728,8 @@
                     if (!$mrp.val() || parseFloat($mrp.val()) <= 0) {
                         isValid = false;
                         $mrp.css('border', '1px solid red');
-                        $row.find('td:nth-child(2)').append(
-                            '<div class="text-danger small mrp-error mt-1">Please enter a valid MRP.</div>'
-                        );
-                    }
-
-                    const $discount = $row.find(`input[name="medicine[${index}][discount]"]`);
-                    if (!$discount.val() || parseFloat($discount.val()) < 0) {
-                        isValid = false;
-                        $discount.css('border', '1px solid red');
                         $row.find('td:nth-child(3)').append(
-                            '<div class="text-danger small discount-error mt-1">Please enter a valid discount amount.</div>'
+                            '<div class="text-danger small mrp-error mt-1">Please enter a valid MRP.</div>'
                         );
                     }
 
@@ -603,17 +739,25 @@
                     if (!$discountPercent.val() || dpVal < 0 || dpVal > 100) {
                         isValid = false;
                         $discountPercent.css('border', '1px solid red');
-                        $row.find('td:nth-child(4)').append(
+                        $row.find('td:nth-child(5)').append(
                             '<div class="text-danger small discount-percent-error mt-1">Please enter a valid discount percentage (0–100).</div>'
                         );
                     }
 
-                    // ✅ Fixed: quantity is an INPUT field, not a SELECT
+                    const $discount = $row.find(`input[name="medicine[${index}][discount]"]`);
+                    if (!$discount.val() || parseFloat($discount.val()) < 0) {
+                        isValid = false;
+                        $discount.css('border', '1px solid red');
+                        $row.find('td:nth-child(4)').append(
+                            '<div class="text-danger small discount-error mt-1">Please enter a valid discount amount.</div>'
+                        );
+                    }
+
                     const $quantity = $row.find(`input[name="medicine[${index}][quantity]"]`);
                     if (!$quantity.val() || parseFloat($quantity.val()) <= 0) {
                         isValid = false;
                         $quantity.css('border', '1px solid red');
-                        $row.find('td:nth-child(5)').append(
+                        $row.find('td:nth-child(6)').append(
                             '<div class="text-danger small quantity-error mt-1">Please enter a valid quantity.</div>'
                         );
                     }
@@ -622,23 +766,11 @@
                     if (!$available.val()) {
                         isValid = false;
                         $available.css('border', '1px solid red');
-                        $row.find('td:nth-child(6)').append(
+                        $row.find('td:nth-child(7)').append(
                             '<div class="text-danger small available-error mt-1">Please select availability.</div>'
                         );
                     }
-
-                    const $substitute = $row.find(
-                        `select[name="medicine[${index}][is_substitute]"]`);
-                    if (!$substitute.val()) {
-                        isValid = false;
-                        $substitute.css('border', '1px solid red');
-                        $row.find('td:nth-child(7)').append(
-                            '<div class="text-danger small substitute-error mt-1">Please select if it is a substitute.</div>'
-                        );
-                    }
-
                 });
-
 
                 const $customerSelect = $('select[name="customer[0][customer_id]"]');
                 if (!$customerSelect.val()) {
@@ -654,7 +786,8 @@
                 if (!isValid) e.preventDefault();
             });
 
-            $(document).on('change input', '.medicine_search', function() {
+
+            $(document).on('change', '.medicine_search', function() {
                 if ($(this).val()) {
                     $(this).next('.select2-container').css('border', '');
                     $(this).closest('td').find('.medicine-error').remove();
@@ -683,7 +816,6 @@
                 }
             });
 
-            // ✅ Fixed: quantity is an INPUT field, not a SELECT
             $(document).on('input', 'input[name*="[quantity]"]', function() {
                 if ($(this).val() && parseFloat($(this).val()) > 0) {
                     $(this).css('border', '');
@@ -705,6 +837,13 @@
                 }
             });
 
+            $(document).on('change', 'select[name*="[substitute_medicine]"]', function() {
+                if ($(this).val()) {
+                    $(this).css('border', '');
+                    $(this).closest('td').find('.substitute-medicine-error').remove();
+                }
+            });
+
             $(document).on('change', 'select.customer-search', function() {
                 if ($(this).val()) {
                     $(this).css('border', '');
@@ -712,8 +851,8 @@
                 }
             });
 
-
         });
+
 
         // Enhanced customer selection handler - Auto-populate medicine table from cart
         $(document).ready(function() {
@@ -725,79 +864,90 @@
                     url: '/search-medicine/fetch-cart-by-customer',
                     method: 'GET',
                     data: {
-                        customer_id: customerId
+                        customer_id: customerId,
+                        current_pharmacy_id : $('#current_pharmacy_id').val()
                     },
                     success: function(response) {
                         if (response.status === 'success') {
                             const products = response.data;
-                            
+
                             // Clear existing medicine rows except the first one
                             $('#medicine-body .medicine-row:not(:first)').remove();
-                            
+
                             // Clear the first row
                             const $firstRow = $('#medicine-body .medicine-row:first');
                             $firstRow.find('input').val('');
-                            $firstRow.find('select').not('.medicine_search').prop('selectedIndex', 0);
+                            $firstRow.find('select').not('.medicine_search').prop(
+                                'selectedIndex', 0);
                             $firstRow.find('.medicine_search').val(null).trigger('change');
-                            
+
                             // Populate rows based on cart products
                             products.forEach((product, productIndex) => {
                                 let $targetRow;
-                                
+
                                 if (productIndex === 0) {
                                     // Use the first existing row
                                     $targetRow = $firstRow;
                                 } else {
                                     // Clone the first row for additional products
                                     $targetRow = $firstRow.clone();
-                                    
+
                                     // Update name attributes for the new row
                                     $targetRow.find('select, input').each(function() {
                                         const name = $(this).attr('name');
                                         if (name) {
-                                            const newName = name.replace(/\[\d+\]/, `[${productIndex}]`);
+                                            const newName = name.replace(
+                                                /\[\d+\]/,
+                                                `[${productIndex}]`);
                                             $(this).attr('name', newName);
                                         }
                                     });
-                                    
+
                                     // Remove existing Select2 container and reinitialize
                                     $targetRow.find('.select2-container').remove();
-                                    const $newSelect = $targetRow.find('.medicine_search').clone().val('');
-                                    $targetRow.find('.medicine_search').replaceWith($newSelect);
-                                    
+                                    const $newSelect = $targetRow.find(
+                                        '.medicine_search').clone().val('');
+                                    $targetRow.find('.medicine_search').replaceWith(
+                                        $newSelect);
+
                                     // Append to table body
                                     $('#medicine-body').append($targetRow);
-                                    
+
                                     // Initialize Select2 for the new dropdown
                                     initSelect2($newSelect);
                                 }
-                                
+
                                 // Set the medicine dropdown value and trigger change
-                                const $medicineSelect = $targetRow.find('.medicine_search');
-                                
+                                const $medicineSelect = $targetRow.find(
+                                    '.medicine_search');
+
                                 // Create option and add to select
-                                const option = new Option(product.name, product.product_id, true, true);
+                                const option = new Option(product.name, product
+                                    .product_id, true, true);
                                 $medicineSelect.append(option).trigger('change');
-                                
+
                                 // Set the hidden medicine name field
                                 $targetRow.find('.medicine_name').val(product.name);
-                                
+
                                 // Set quantity
                                 $targetRow.find('.quantity').val(product.quantity);
-                                
+
                                 // Set substitute status if available
                                 if (product.is_substitute !== undefined) {
-                                    const substituteValue = product.is_substitute == 1 ? 'yes' : 'no';
-                                    $targetRow.find('select[name*="[is_substitute]"]').val(substituteValue);
+                                    const substituteValue = product.is_substitute == 1 ?
+                                        'yes' : 'no';
+                                    $targetRow.find('select[name*="[is_substitute]"]')
+                                        .val(substituteValue);
                                 }
-                                
+
                                 // Set availability to 'yes' by default
-                                $targetRow.find('select[name*="[available]"]').val('yes');
+                                $targetRow.find('select[name*="[available]"]').val(
+                                    'yes');
                             });
-                            
+
                             // Update index for future manual additions
                             index = products.length;
-                            
+
                             // Show cart details table
                             let cartHtml = '';
                             products.forEach(product => {
@@ -809,21 +959,22 @@
                                     <td>${product.is_substitute}</td>
                                 </tr>`;
                             });
-                            
+
                             $('#cart-product-body').html(cartHtml);
                             $('#cart-details').show();
-                            
+
                             // Recalculate totals
                             calculateTotal();
-                            
+
                         } else {
                             // Clear medicine table if no cart data
                             $('#medicine-body .medicine-row:not(:first)').remove();
                             const $firstRow = $('#medicine-body .medicine-row:first');
                             $firstRow.find('input').val('');
-                            $firstRow.find('select').not('.medicine_search').prop('selectedIndex', 0);
+                            $firstRow.find('select').not('.medicine_search').prop(
+                                'selectedIndex', 0);
                             $firstRow.find('.medicine_search').val(null).trigger('change');
-                            
+
                             $('#cart-product-body').html('');
                             $('#cart-details').hide();
                         }
@@ -871,6 +1022,70 @@
                 });
             });
         });
+
+
+
+
+        // $(document).on('change', '.form-select[name$="[is_substitute]"]', function() {
+        //     const row = $(this).closest('.medicine-row');
+        //     const isSubstitute = $(this).val();
+        //     const substituteDropdown = row.find('.substitute_medicine_dropdown');
+        //     const selectedMedicineId = row.find('.medicineDropdown').val();
+
+        //     if (isSubstitute === 'no') {
+        //         substituteDropdown.select2('destroy');
+        //         substituteDropdown.html('<option>N/A</option>');
+        //         substituteDropdown.prop('disabled', true);
+        //     } else {
+        //         substituteDropdown.prop('disabled', false);
+        //         substituteDropdown.html('<option>Loading...</option>');
+
+        //         $.ajax({
+        //             url: "{{ route('get-medicine-salt') }}",
+        //             type: 'GET',
+        //             data: {
+        //                 medicine_id: selectedMedicineId
+        //             },
+        //             success: function(response) {
+        //                 const salt = response.salt;
+        //                 if (!salt) {
+        //                     substituteDropdown.html('<option>No substitutes found</option>');
+        //                     return;
+        //                 }
+
+        //                 $.ajax({
+        //                     url: "{{ route('get-substitute-medicines') }}",
+        //                     type: 'GET',
+        //                     data: {
+        //                         salt: salt
+        //                     },
+        //                     success: function(res) {
+        //                         let options = '<option value="">Select Substitute</option>';
+        //                         if (res.results.length > 0) {
+        //                             res.results.forEach(item => {
+        //                                 options +=
+        //                                     `<option value="${item.id}">${item.text}</option>`;
+        //                             });
+        //                         } else {
+        //                             options = '<option>No substitutes found</option>';
+        //                         }
+
+        //                         substituteDropdown.html(options).prop('disabled', false);
+        //                         substituteDropdown.select2('destroy');
+        //                         initSubstituteSelect2(substituteDropdown);
+        //                     },
+        //                     error: function() {
+        //                         substituteDropdown.html(
+        //                             '<option>Error loading substitutes</option>');
+        //                     }
+        //                 });
+        //             },
+        //             error: function() {
+        //                 substituteDropdown.html('<option>Error fetching salt</option>');
+        //             }
+        //         });
+        //     }
+        // });
     </script>
     {{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script> --}}
 @endsection

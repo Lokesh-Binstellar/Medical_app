@@ -20,28 +20,32 @@ class RequestQuoteController extends Controller
 {
     //view all Notification
 
-    public function index()
-    {
-        $user = auth()->user();
+   public function index()
+{
+    $user = auth()->user();
 
-        // User ki notifications le rahe hain
-        $notifications = $user->notifications;
+    $unread = $user->unreadNotifications;
+    $read = $user->readNotifications;
 
-        $formattedNotifications = $notifications->map(function ($not) {
-            $data = $not->data;
+    $formattedUnread = $unread->map(function ($not) {
+        return [
+            'title' => $not->data['title'] ?? 'Notification',
+            'message' => $not->data['message'] ?? '',
+            'datetime' => \Carbon\Carbon::parse($not->created_at)->format('d M Y, h:i A'),
+        ];
+    });
 
-            return [
-                'title' => $data['title'] ?? 'Notification',
-                'message' => $data['message'] ?? '',
-                'datetime' => Carbon::parse($not->created_at)->format('d M Y, h:i A'),
-                'role' => $data['role'] ?? null,
-                'pharmacy_id' => $data['pharmacy_id'] ?? null,
-                'laboratory_id' => $data['laboratory_id'] ?? null,
-            ];
-        });
+    $formattedRead = $read->map(function ($not) {
+        return [
+            'title' => $not->data['title'] ?? 'Notification',
+            'message' => $not->data['message'] ?? '',
+            'datetime' => \Carbon\Carbon::parse($not->created_at)->format('d M Y, h:i A'),
+        ];
+    });
 
-        return view('view_notifications.index', compact('formattedNotifications', 'user'));
-    }
+    return view('view_notifications.index', compact('formattedUnread', 'formattedRead', 'user'));
+}
+
 
     public function getRoadDistance($lat1, $lon1, $lat2, $lon2, $apiKey)
     {

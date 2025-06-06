@@ -1,8 +1,7 @@
 @section('styles')
 @endsection
 
-<nav class="layout-navbar navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme "
-    id="layout-navbar">
+<nav class="layout-navbar navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme " id="layout-navbar">
     <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
         <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
             <i class="mdi mdi-menu mdi-24px"></i>
@@ -45,10 +44,11 @@
             </div>
 
             {{-- Right Side: ON/OFF Switch for Pharmacy --}}
-            @if(Auth::check() && Auth::user()->role->name === 'pharmacy')
+            @if (Auth::check() && Auth::user()->role->name === 'pharmacy')
                 <div class="me-3 d-flex align-items-center">
                     <label class="form-switch-custom mb-0">
-                        <input type="checkbox" id="pharmacyStatusToggle" {{ Auth::user()->pharmacies->status ? 'checked' : '' }}>
+                        <input type="checkbox" id="pharmacyStatusToggle"
+                            {{ Auth::user()->pharmacies->status ? 'checked' : '' }}>
                         <span class="slider-custom"></span>
                     </label>
                     <span id="pharmacyStatusText"
@@ -273,133 +273,148 @@
         const csrfToken = csrfTokenMeta.getAttribute('content');
 
         document.querySelectorAll('.mark-read-btn').forEach(button => {
-            button.addEventListener('click', function () {
+            button.addEventListener('click', function() {
                 const id = this.dataset.id;
 
                 fetch(`/notifications/read/${id}`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Content-Type': 'application/json',
-                    }
-                })
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Content-Type': 'application/json',
+                        }
+                    })
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-                            this.closest('.notification-item').remove();
+                            // Remove notification
+                            this.closest('.dropdown-notifications-item').remove();
 
+                            // Update count
+                            const badge = document.getElementById('notification-dot');
+                            let count = parseInt(badge?.innerText || 0);
+
+                            if (!isNaN(count)) {
+                                count--;
+                                if (count > 0) {
+                                    badge.innerText = count;
+                                    document.querySelector('.dropdown-header .badge').innerText =
+                                        `${count} New`;
+                                } else {
+                                    badge.remove();
+                                    document.querySelector('.dropdown-header .badge').remove();
+                                }
+                            }
                         }
                     });
             });
         });
+
     }
 
 
     // Initialize Pusher
     Pusher.logToConsole = true;
 
-var pusher = new Pusher('7ba4a23b60749764133c', {
-    cluster: 'ap1'
-});
-
-var userRole = @json(auth()->user()->role->name ?? 'guest');
-var userId = @json(auth()->user()->id ?? 0);
-console.log('User Role:', userRole);
-console.log('User ID:', userId);
-
-// 🔒 Subscribe to user-specific channel
-if (userRole === 'admin') {
-    var adminChannel = pusher.subscribe('admin-channel');
-    adminChannel.bind('my-event', function(data) {
-        console.log('Admin event:', data);
-        showPusherMessage(data.message);
+    var pusher = new Pusher('7ba4a23b60749764133c', {
+        cluster: 'ap1'
     });
-} else {
-    var channel = pusher.subscribe('my-channel.' + userRole + '.user.' + userId);
-    channel.bind('my-event', function (data) {
-        localStorage.setItem('pusher_message', data.message || 'You have received a new quote.');
-        location.reload(true);
-    });
-}
 
-function showPusherMessage(msg) {
-    var messageDiv = document.getElementById('pusher-message');
-    messageDiv.textContent = msg || 'Notification received!';
-    messageDiv.style.display = 'block';
-    setTimeout(() => {
-        messageDiv.style.display = 'none';
-    }, 20000);
-}
+    var userRole = @json(auth()->user()->role->name ?? 'guest');
+    var userId = @json(auth()->user()->id ?? 0);
+    console.log('User Role:', userRole);
+    console.log('User ID:', userId);
 
+    // 🔒 Subscribe to user-specific channel
+    if (userRole === 'admin') {
+        var adminChannel = pusher.subscribe('admin-channel');
+        adminChannel.bind('my-event', function(data) {
+            console.log('Admin event:', data);
+            showPusherMessage(data.message);
+        });
+    } else {
+        var channel = pusher.subscribe('my-channel.' + userRole + '.user.' + userId);
+        channel.bind('my-event', function(data) {
+            localStorage.setItem('pusher_message', data.message || 'You have received a new quote.');
+            location.reload(true);
+        });
+    }
 
-window.onload = function () {
-    var message = localStorage.getItem('pusher_message');
-    if (message) {
+    function showPusherMessage(msg) {
         var messageDiv = document.getElementById('pusher-message');
-        messageDiv.textContent = message;
+        messageDiv.textContent = msg || 'Notification received!';
         messageDiv.style.display = 'block';
-
-        setTimeout(function () {
+        setTimeout(() => {
             messageDiv.style.display = 'none';
-            localStorage.removeItem('pusher_message');
         }, 20000);
     }
-};
 
-    window.onload = function () {
+
+    window.onload = function() {
         var message = localStorage.getItem('pusher_message');
         if (message) {
             var messageDiv = document.getElementById('pusher-message');
             messageDiv.textContent = message;
             messageDiv.style.display = 'block';
 
-            setTimeout(function () {
+            setTimeout(function() {
                 messageDiv.style.display = 'none';
                 localStorage.removeItem('pusher_message');
             }, 20000);
         }
     };
 
+    window.onload = function() {
+        var message = localStorage.getItem('pusher_message');
+        if (message) {
+            var messageDiv = document.getElementById('pusher-message');
+            messageDiv.textContent = message;
+            messageDiv.style.display = 'block';
+
+            setTimeout(function() {
+                messageDiv.style.display = 'none';
+                localStorage.removeItem('pusher_message');
+            }, 20000);
+        }
+    };
 </script>
 <script>
     const toggle = document.getElementById('pharmacyStatusToggle');
-const statusText = document.getElementById('pharmacyStatusText');
+    const statusText = document.getElementById('pharmacyStatusText');
 
-toggle?.addEventListener('change', function () {
-    fetch("{{ route('pharmacy.toggleStatus') }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        },
-        body: JSON.stringify({})
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status) {
-            const newStatus = data.new_status;
+    toggle?.addEventListener('change', function() {
+        fetch("{{ route('pharmacy.toggleStatus') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status) {
+                    const newStatus = data.new_status;
 
-            statusText.textContent = 'Status: ' + newStatus;
+                    statusText.textContent = 'Status: ' + newStatus;
 
-            // Remove both possible classes first
-            statusText.classList.remove('text-success', 'text-danger');
+                    // Remove both possible classes first
+                    statusText.classList.remove('text-success', 'text-danger');
 
-            // Add appropriate class
-            if (newStatus === 'On') {
-                statusText.classList.add('text-success');
-            } else {
-                statusText.classList.add('text-danger');
-            }
-        } else {
-            alert('Failed to update status');
-            toggle.checked = !toggle.checked; // revert toggle
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("Error updating status.");
-        toggle.checked = !toggle.checked; // revert toggle
+                    // Add appropriate class
+                    if (newStatus === 'On') {
+                        statusText.classList.add('text-success');
+                    } else {
+                        statusText.classList.add('text-danger');
+                    }
+                } else {
+                    alert('Failed to update status');
+                    toggle.checked = !toggle.checked; // revert toggle
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Error updating status.");
+                toggle.checked = !toggle.checked; // revert toggle
+            });
     });
-});
-
 </script>
