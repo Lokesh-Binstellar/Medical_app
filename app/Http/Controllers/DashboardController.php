@@ -32,6 +32,13 @@ class DashboardController extends Controller
         $averageRating = round($averageRating, 2);
         $salesData = null;
         $ratingPharma = null;
+        $commissionData = null;
+        $salesPerMonthData = null;
+        $dailySalesData = null;
+        $totalSalesForMonth = null;
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        $daysInMonth = Carbon::now()->daysInMonth;
         // $totalCommission = null;
 
         $pharmacyexists = Pharmacies::where('user_id', Auth::user()->id)->exists();
@@ -47,6 +54,27 @@ class DashboardController extends Controller
                 ->selectRaw('avg(rating) as total_rating')
                 ->selectRaw('COUNT( customer_id) as total_viewers')
                 ->first();
+
+            $commissionData = Phrmacymedicine::where('phrmacy_id', $pharmacyId)
+                ->selectRaw('SUM(commission_amount) as total_commission')
+                ->first();
+
+           $salesPerMonthData = Order::where('pharmacy_id', $pharmacyId)
+    ->whereMonth('created_at', $currentMonth)
+    ->whereYear('created_at', $currentYear)
+    ->selectRaw('DAY(created_at) as day, SUM(items_price) as total_sales')
+    ->groupBy('day')
+    ->orderBy('day')
+    ->pluck('total_sales', 'day')
+    ->toArray();
+
+$dailySalesData = [];
+for ($i = 1; $i <= $daysInMonth; $i++) {
+    $dailySalesData[] = $salesPerMonthData[$i] ?? 0;
+}
+
+// Calculate total sales of the month
+$totalSalesForMonth = array_sum($salesPerMonthData);
         }
 
 
@@ -114,6 +142,10 @@ class DashboardController extends Controller
             'averageRating',
             'salesData',
             'ratingPharma',
+            'commissionData',
+            'salesPerMonthData',
+            'dailySalesData',
+            'totalSalesForMonth',
             // 'totalCommission'
         ));
     }

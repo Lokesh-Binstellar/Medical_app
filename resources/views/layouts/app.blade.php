@@ -70,7 +70,8 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
     <link rel="stylesheet"
         href="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css') }}">
-  
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/parsleyjs/src/parsley.css"> --}}
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css"> --}}
     <style>
         /* ::-webkit-scrollbar-track {
             -webkit-box-shadow: inset 0 0 6px #033a62;
@@ -269,7 +270,7 @@
     <script src="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/hammer/hammer.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/i18n/i18n.js') }}"></script>
-    
+
     <script src="{{ asset('assets/vendor/libs/typeahead-js/typeahead.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.3.1/typeahead.bundle.min.js"></script>
 
@@ -307,14 +308,19 @@
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
- 
+    {{-- <script src="https://cdn.jsdelivr.net/npm/parsleyjs"></script>/ --}}
+    {{-- <script src="https://code.highcharts.com/highcharts.js"></script> --}}
+    {{-- <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1mG52tiHM3duCJupl0CtEB3xpzUGiohQ&callback=initAutocomplete&libraries=places&v=weekly"
+    defer
+  ></script> --}}
 
 
 
 
     @yield('scripts')
     @livewireScripts
-    <script>
+    {{-- <script>
         $(document).ready(function() {
 
             $(".close-menu").click(function() {
@@ -332,7 +338,7 @@
 
 
         });
-    </script>
+    </script> --}}
 
     {{-- <script>
         function markAllAsRead() {
