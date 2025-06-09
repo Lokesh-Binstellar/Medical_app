@@ -2,39 +2,32 @@
 
 namespace App\Console\Commands;
 
-use App\Events\SendMessageEvent;
+use App\Events\RoleMessageEvent;
 use Illuminate\Console\Command;
 use App\Models\RequestQuote;
-use Symfony\Component\Mailer\Messenger\SendEmailMessage;
+use App\Events\SendMessageEvent;
+use Illuminate\Support\Facades\Log;
 
 class DeleteQuote extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * You can run it with: php artisan your:command
-     */
     protected $signature = 'delete:quote';
+    protected $description = 'Delete RequestQuotes older than 25 minutes and broadcast via Pusher';
 
-    /**
-     * The console command description.
-     */
-    protected $description = 'Delete Quote CRON';
-
-    /**
-     * Execute the console command.
-     */	
     public function handle()
     {
-            \Log::info('-- Delete Quote CRON started --');
+        Log::info('-- Delete Quote CRON started --');
 
-		    // Delete all quotes older than 25 minutes
-		    RequestQuote::where('created_at', '<', now()->subMinutes(25))->delete();
+        // Delete and get the count
+        $deletedCount = RequestQuote::where('created_at', '<', now()->subMinutes(1))->delete();
 
-               event(new SendMessageEvent('hgvh',null));
+        Log::info("Quotes deleted: {$deletedCount}");
 
-		    \Log::info('-- Delete Quote CRON completed --');
-        
-        
+        if ($deletedCount > 0) {
+            // Fire Pusher event with message
+            event(new RoleMessageEvent('Enable request quote'));
+            Log::info('-- Pusher event fired after quote deletion --');
+        }
+
+        Log::info('-- Delete Quote CRON completed --');
     }
 }

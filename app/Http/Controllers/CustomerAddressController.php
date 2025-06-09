@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CustomerAddress;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 
 class CustomerAddressController extends Controller
@@ -156,90 +157,96 @@ class CustomerAddressController extends Controller
 
                 $this->saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address, $lat, $lng);
             }
-        } 
-        elseif ($request->filled('postal_code')) {
-    $postalCode = $request->postal_code;
-    $apiKey = env('GOOGLE_MAPS_API_KEY');
+        } elseif ($request->filled('postal_code')) {
+            $postalCode = $request->postal_code;
+            $apiKey = env('GOOGLE_MAPS_API_KEY');
 
-    $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($postalCode) . "&key=$apiKey";
+            $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($postalCode) . "&key=$apiKey";
 
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-    $response = curl_exec($ch);
+            $response = curl_exec($ch);
 
-    if (curl_errno($ch)) {
-        curl_close($ch);
-        return response()->json([
-            'status' => false,
-            'message' => 'Curl error: ' . curl_error($ch),
-        ], 500);
-    }
+            if (curl_errno($ch)) {
+                curl_close($ch);
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => 'Curl error: ' . curl_error($ch),
+                    ],
+                    500,
+                );
+            }
 
-    curl_close($ch); // ✅ Close after error check
+            curl_close($ch); // ✅ Close after error check
 
-    $data = json_decode($response, true);
+            $data = json_decode($response, true);
 
-    if (empty($data['results'])) {
-        return response()->json([
-            'status' => false,
-            'message' => 'No results found for postal code',
-        ], 404);
-    }
+            if (empty($data['results'])) {
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => 'No results found for postal code',
+                    ],
+                    404,
+                );
+            }
 
-    $addressComponents = $data['results'][0]['address_components'];
-    $formatted_address = $data['results'][0]['formatted_address'];
+            $addressComponents = $data['results'][0]['address_components'];
+            $formatted_address = $data['results'][0]['formatted_address'];
 
-    // ✅ Add house number if provided
-    if ($request->filled('house_number')) {
-        $formatted_address = trim($request->house_number) . ', ' . $formatted_address;
-    }
+            // ✅ Add house number if provided
+            if ($request->filled('house_number')) {
+                $formatted_address = trim($request->house_number) . ', ' . $formatted_address;
+            }
 
-    // ✅ Ensure postal code is included in formatted address
-    if (!str_contains($formatted_address, $postalCode)) {
-        $formatted_address .= ', ' . $postalCode;
-    }
+            // ✅ Ensure postal code is included in formatted address
+            if (!str_contains($formatted_address, $postalCode)) {
+                $formatted_address .= ', ' . $postalCode;
+            }
 
-    $lat = $data['results'][0]['geometry']['location']['lat'];
-    $lng = $data['results'][0]['geometry']['location']['lng'];
+            $lat = $data['results'][0]['geometry']['location']['lat'];
+            $lng = $data['results'][0]['geometry']['location']['lng'];
 
-    $city = $state = null;
+            $city = $state = null;
 
-    // ✅ Extract city/state from components
-    foreach ($addressComponents as $component) {
-        if (in_array('locality', $component['types']) && !$city) {
-            $city = $component['long_name'];
-        } elseif (in_array('administrative_area_level_2', $component['types']) && !$city) {
-            $city = $component['long_name'];
-        } elseif (in_array('administrative_area_level_3', $component['types']) && !$city) {
-            $city = $component['long_name'];
-        } elseif (in_array('sublocality', $component['types']) && !$city) {
-            $city = $component['long_name'];
-        } elseif (in_array('neighborhood', $component['types']) && !$city) {
-            $city = $component['long_name'];
-        }
+            // ✅ Extract city/state from components
+            foreach ($addressComponents as $component) {
+                if (in_array('locality', $component['types']) && !$city) {
+                    $city = $component['long_name'];
+                } elseif (in_array('administrative_area_level_2', $component['types']) && !$city) {
+                    $city = $component['long_name'];
+                } elseif (in_array('administrative_area_level_3', $component['types']) && !$city) {
+                    $city = $component['long_name'];
+                } elseif (in_array('sublocality', $component['types']) && !$city) {
+                    $city = $component['long_name'];
+                } elseif (in_array('neighborhood', $component['types']) && !$city) {
+                    $city = $component['long_name'];
+                }
 
-        if (in_array('administrative_area_level_1', $component['types'])) {
-            $state = $component['long_name'];
-        }
+                if (in_array('administrative_area_level_1', $component['types'])) {
+                    $state = $component['long_name'];
+                }
 
-        if (in_array('postal_code', $component['types'])) {
-            $postalCode = $component['long_name'];
-        }
-    }
+                if (in_array('postal_code', $component['types'])) {
+                    $postalCode = $component['long_name'];
+                }
+            }
 
-    if (empty($city) || empty($state) || empty($formatted_address)) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Incomplete location data from postal code',
-        ], 422);
-    }
+            if (empty($city) || empty($state) || empty($formatted_address)) {
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => 'Incomplete location data from postal code',
+                    ],
+                    422,
+                );
+            }
 
-    return $this->saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address, $lat, $lng);
-}
-
-        else {
+            return $this->saveAddress($city, $postalCode, $userId, $request, $state, $formatted_address, $lat, $lng);
+        } else {
             return response()->json(
                 [
                     'status' => false,
@@ -404,6 +411,135 @@ class CustomerAddressController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Address deleted successfully',
+        ]);
+    }
+
+    public function getAddressFromLatLng(Request $request)
+    {
+        if (!$request->filled('latlng')) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'latlng is required',
+                ],
+                400,
+            );
+        }
+
+        $latlng = $request->latlng;
+        $apiKey = env('GOOGLE_MAPS_API_KEY');
+        $url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$latlng&key=$apiKey";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            curl_close($ch);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Curl error: ' . curl_error($ch),
+                ],
+                500,
+            );
+        }
+
+        curl_close($ch);
+
+        $data = json_decode($response, true);
+
+        if (empty($data['results'])) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'No results found for latlng',
+                ],
+                404,
+            );
+        }
+
+        // Extract data
+        $components = $data['results'][0]['address_components'];
+        $formatted_address = $data['results'][0]['formatted_address'];
+        $lat = $data['results'][0]['geometry']['location']['lat'];
+        $lng = $data['results'][0]['geometry']['location']['lng'];
+
+        $city = $state = $postalCode = null;
+
+        foreach ($components as $component) {
+            if (in_array('administrative_area_level_3', $component['types']) && !$city) {
+                $city = $component['long_name'];
+            } elseif (in_array('locality', $component['types']) && !$city) {
+                $city = $component['long_name'];
+            } elseif (in_array('administrative_area_level_2', $component['types']) && !$city) {
+                $city = $component['long_name'];
+            }
+
+            if (in_array('administrative_area_level_1', $component['types'])) {
+                $state = $component['long_name'];
+            }
+
+            if (in_array('postal_code', $component['types'])) {
+                $postalCode = $component['long_name'];
+            }
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'city' => $city,
+                'state' => $state,
+                'postal_code' => $postalCode,
+                'formatted_address' => $formatted_address,
+                'lat' => $lat,
+                'lng' => $lng,
+            ],
+        ]);
+    }
+
+    //seggetion api
+    public function placeAutocomplete(Request $request)
+    {
+        $input = $request->query('input');
+
+        if (empty($input)) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Input parameter is required.',
+                ],
+                400,
+            );
+        }
+
+        $apiKey = env('GOOGLE_MAPS_API_KEY');
+
+        $url = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+
+        $response = Http::get($url, [
+            'input' => $input,
+            'components' => 'country:in',
+            'key' => $apiKey,
+        ]);
+
+        if ($response->failed()) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Google API request failed.',
+                ],
+                500,
+            );
+        }
+
+        $data = $response->json();
+
+        // Return predictions only
+        return response()->json([
+            'status' => true,
+            'suggestions' => $data['predictions'] ?? [],
         ]);
     }
 }

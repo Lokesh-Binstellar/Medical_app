@@ -23,7 +23,7 @@ class MyOrderController extends Controller
             // Get orders joined with pharmacy info
             $orders = Order::join('pharmacies', 'orders.pharmacy_id', '=', 'pharmacies.user_id')
                 ->where('orders.user_id', $userId)
-                ->select('orders.order_id', 'orders.status', 'orders.product_details', 'orders.total_price', 
+                ->select('orders.order_id', 'orders.status', 'orders.product_details', 'orders.total_price', 'orders.pharmacy_id',
                 'orders.items_price', 'orders.delivery_charges', 'orders.platform_fees', 'orders.delivery_address', 'orders.created_at', 'pharmacies.pharmacy_name', 
                 'pharmacies.image as pharmacy_image')
                 ->get()
@@ -68,6 +68,7 @@ class MyOrderController extends Controller
 
                     return [
                         'order_id' => $order->order_id,
+                        'id' => $order->pharmacy_id ?? 'N/A',
                         'pharmacy_name' => $order->pharmacy_name ?? 'N/A',
                         'pharmacy_image' => $order->pharmacy_image ? "{$pharmacyImageBaseUrl}/{$order->pharmacy_image}" : $defaultImage,
                         'product_details' => $products,

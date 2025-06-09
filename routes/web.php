@@ -31,6 +31,7 @@ use App\Http\Controllers\RequestQuoteController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ZipCodeViceDeliveryController;
+use App\Http\Middleware\CheckSession;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Broadcast;
 use App\Models\HomeBanner;
@@ -42,12 +43,15 @@ use Illuminate\Support\Facades\Route;
 // });
 Route::get('/', function () {
     return view('auth.login');
-});
+})->name('login');;
 
 // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified', 'permission:pharmacies,create']);
 
 // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified']);
-Route::middleware(['auth', 'verified'])->group(function () {
+
+Route::middleware(['auth', 'verified', \App\Http\Middleware\CheckSession::class])->group(function () {
+Route::middleware(['auth', 'verified','checkSession.auth'])->group(function () {
+
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/get-dashboard-graph-data', [DashboardController::class, 'getAllGraphData'])->name('dashboard.graph.data');
     Route::get('/orders-data', [DashboardController::class, 'getOrdersData'])->name('dashboard.orders.data');
@@ -129,10 +133,6 @@ Route::prefix('cms/terms')->name('cms.terms-and-conditions.')->group(function ()
 
 Auth::routes();
 Route::group(['middleware' => ['auth']], function () {
-
-
-
-
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -364,7 +364,7 @@ Route::get('/get-medicine-salt', [MedicineSearchController::class, 'getSalt'])->
     Route::get('/addLabTestSearch', [AddLabTestController::class, 'search'])->name('addLabTest.search');
     Route::get('/get-contains', [AddLabTestController::class, 'getContains'])->name('addLabTest.contains');
 });
-
+});
 require __DIR__ . '/auth.php';
 
 // phlebotomist routes group with resource controller style

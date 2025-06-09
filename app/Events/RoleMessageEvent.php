@@ -1,5 +1,8 @@
 <?php
-use Illuminate\Broadcasting\PrivateChannel;
+
+namespace App\Events;
+
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -9,26 +12,26 @@ class RoleMessageEvent implements ShouldBroadcastNow
     use Dispatchable, SerializesModels;
 
     public $message;
-    public $role;
 
-    public function __construct($message, $role)
+    public function __construct($message)
     {
         $this->message = $message;
-        $this->role = $role;
     }
 
     public function broadcastOn()
     {
-        return new Channel('role.' . $this->role);
+        return new Channel('test-channel');
     }
 
     public function broadcastAs()
     {
-        return 'role-message';
+        return 'test-message';
     }
 
     public function broadcastWith()
     {
-        return ['message' => $this->message];
+        return [
+            'message' => $this->message
+        ];
     }
 }
