@@ -16,7 +16,7 @@ class RatingController extends Controller
         // dd( $userId);
         if (!$userId) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => 'Unauthorized'
             ], 401);
         }
@@ -36,7 +36,7 @@ class RatingController extends Controller
             $type = 'Pharmacy';
         } else {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => 'Invalid rateable ID'
             ], 404);
         }
@@ -51,7 +51,7 @@ class RatingController extends Controller
         ]);
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'message' => 'Rating submitted successfully',
         ], 201);
     }
@@ -75,7 +75,7 @@ class RatingController extends Controller
 
         return response()->json([
             'message' => 'Popular pharmacies fetched successfully',
-            'success' => true,
+            'status' => true,
             'data'    => $popularPharmacies
         ]);
     }
@@ -99,7 +99,7 @@ class RatingController extends Controller
 
         return response()->json([
             'message' => 'Popular laboratories fetched successfully',
-            'success' => true,
+            'status' => true,
             'data'    => $popularLabs
         ]);
     }
