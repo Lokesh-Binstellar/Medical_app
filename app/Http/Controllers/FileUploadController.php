@@ -93,6 +93,20 @@ class FileUploadController extends Controller
     }
     public function upload(Request $request)
     {
+        // Set timezone if needed (optional)
+        date_default_timezone_set('Asia/Kolkata'); // Replace with your timezone
+
+        // Get current time (24-hour format) as integer hour (0-23)
+        $currentHour = (int) date('H');
+
+        // Allowed time: from 9 AM (9) to 9 PM (21)
+        if ($currentHour < 9 || $currentHour > 21) {
+            return response()->json([
+                'status' => false,
+                'message' => 'You can only upload prescriptions between 9 AM and 9 PM.',
+            ], 403); 
+        }
+
         $userId = $request->get('user_id');
 
         if ($request->hasFile('file')) {
@@ -106,7 +120,8 @@ class FileUploadController extends Controller
                 'prescription_file' => $originalFileName,
                 'prescription_status' => $prescription_status,
             ]);
-            event(new MyEvent('admin', null ,'New Prescription Received'));
+
+            event(new MyEvent('admin', null, 'New Prescription Received'));
 
             return response()->json([
                 'status' => true,
@@ -114,58 +129,55 @@ class FileUploadController extends Controller
                 'file_name' => $originalFileName,
             ]);
         } else {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => 'No file found in request',
-                ],
-                400,
-            );
+            return response()->json([
+                'status' => false,
+                'message' => 'No file found in request',
+            ], 400);
         }
     }
 
-   public function updateStatus(Request $request, $id)
-{
-    $request->validate([
-        'prescription_status' => 'required|in:0,1',
-        'reason' => 'required_if:prescription_status,1|string|nullable',
-    ]);
 
-    $prescription = Prescription::findOrFail($id);
-    $prescription->prescription_status = $request->prescription_status;
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'prescription_status' => 'required|in:0,1',
+            'reason' => 'required_if:prescription_status,1|string|nullable',
+        ]);
 
-    if ($request->prescription_status == 1) {
-        $prescription->status = -1;
-        $prescription->reason = $request->reason ?? null;
+        $prescription = Prescription::findOrFail($id);
+        $prescription->prescription_status = $request->prescription_status;
 
-        // ✅ Prepare message
-        $message = [
+        if ($request->prescription_status == 1) {
+            $prescription->status = -1;
+            $prescription->reason = $request->reason ?? null;
+
+            // ✅ Prepare message
+            $message = [
+                'status' => true,
+                'prescription_id' => $prescription->id,
+                'prescription_status' => 'No',
+                'reason' => $prescription->reason,
+                'message' => 'Prescription marked as No by user',
+            ];
+
+            // ✅ Use actual user_id who created the prescription
+            $receiverId = $prescription->user_id;
+
+            if ($receiverId) {
+                event(new SendMessageEvent($message, $receiverId));
+            }
+        } else {
+            $prescription->status = 1;
+            $prescription->reason = null;
+        }
+
+        $prescription->save();
+
+        return response()->json([
             'status' => true,
-            'prescription_id' => $prescription->id,
-            'prescription_status' => 'No',
-            'reason' => $prescription->reason,
-            'message' => 'Prescription marked as No by user',
-        ];
-
-        // ✅ Use actual user_id who created the prescription
-        $receiverId = $prescription->user_id;
-
-        if ($receiverId) {
-            event(new SendMessageEvent($message, $receiverId));
-        }
-
-    } else {
-        $prescription->status = 1;
-        $prescription->reason = null;
+            'message' => 'Status updated successfully.',
+        ]);
     }
-
-    $prescription->save();
-
-    return response()->json([
-        'status' => true,
-        'message' => 'Status updated successfully.',
-    ]);
-}
 
     public function uploadprescription()
     {

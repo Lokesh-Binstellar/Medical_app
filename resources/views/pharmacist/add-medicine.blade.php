@@ -175,22 +175,20 @@
                     </div>
                 </div>
 
+                <!-- ✅ Responsive Note ABOVE the Table -->
                 <div class="table-responsive mb-3">
-                    <table class="display table table-striped table-hover data-table" id="medicine-table">
-                        <thead>
-                            <div
-                                style="border-left: 5px solid #f44336; background-color: #ffe6e6; padding: 10px 15px; margin-bottom: 10px; border-radius: 6px; font-family: Arial, sans-serif;">
-                                <strong style="color: #d32f2f;">Note :</strong> <br><strong>Please make sure to enter
-                                    the
-                                    total price manually, not the per unit price based on the quantity
-                                    requested by the customer.</strong>
-                                <br>
-                                <strong>
-                                    If requested quantity is not available,
-                                    kindly mark the medicine as not available</strong>.
-                            </div>
+                    <div
+                        style="border-left: 5px solid #f44336; background-color: #ffe6e6; padding: 10px 15px; margin-bottom: 10px; border-radius: 6px; font-family: Arial, sans-serif;">
+                        <strong style="color: #d32f2f;">Note :</strong><br>
+                        <strong>Please make sure to enter the total price manually, not the per unit price based on the
+                            quantity requested by the customer.</strong><br>
+                        <strong>If requested quantity is not available, kindly mark the medicine as not available.</strong>
+                    </div>
 
+                    <table class="display table table-striped table-hover data-table nowrap" id="medicine-table">
+                        <thead>
                             <tr>
+                                {{-- <th></th> --}}
                                 <th>Search Medicine</th>
                                 <th>Substitute Medicine</th>
                                 <th>MRP</th>
@@ -204,6 +202,7 @@
                         </thead>
                         <tbody id="medicine-body" class="cart-medicine-body">
                             <tr class="medicine-row">
+                                {{-- <td></td>  --}}
                                 <td>
                                     <select class="form-select medicine_search medicineDropdown" disabled
                                         name="medicine[0][medicine_id]"></select>
@@ -215,8 +214,6 @@
                                         <option value="">N/A</option>
                                     </select>
                                 </td>
-
-
                                 <td>
                                     <input type="number" name="medicine[0][mrp]" class="form-control mrp" step="0.01"
                                         placeholder="MRP">
@@ -252,6 +249,7 @@
                         </tbody>
                     </table>
                 </div>
+
 
                 <div class="d-flex justify-content-between flex-wrap gap-3">
                     <div class="d-flex gap-2 justify-center align-items-center">
@@ -853,6 +851,45 @@
 
         });
 
+        // $(document).ready(function() {
+        //     $('#medicine-table').DataTable({
+        //         responsive: {
+        //             details: {
+        //                 display: $.fn.dataTable.Responsive.display.modal({
+        //                     header: function(row) {
+        //                         return 'Medicine Row Details';
+        //                     }
+        //                 }),
+        //                 renderer: function(api, rowIdx, columns) {
+        //                     var data = $.map(columns, function(col) {
+        //                         return col.title ?
+        //                             `<tr data-dt-row="${col.rowIndex}" data-dt-column="${col.columnIndex}">
+        //                             <td><strong>${col.title}</strong></td>
+        //                             <td>${col.data}</td>
+        //                        </tr>` :
+        //                             '';
+        //                     }).join('');
+
+        //                     return $('<table class="table table-striped mb-0"><tbody>' + data +
+        //                         '</tbody></table>');
+        //                 }
+        //             }
+        //         },
+        //         columnDefs: [{
+        //                 className: 'control',
+        //                 orderable: false,
+        //                 searchable: false,
+        //                 responsivePriority: 1,
+        //                 targets: 0
+        //             },
+        //             {
+        //                 targets: -1, // Action column
+        //                 orderable: false,
+        //                 searchable: false
+        //             }
+        //         ]
+        //     });
+        // });
 
         // Enhanced customer selection handler - Auto-populate medicine table from cart
         $(document).ready(function() {
@@ -865,9 +902,43 @@
                     method: 'GET',
                     data: {
                         customer_id: customerId,
-                        current_pharmacy_id : $('#current_pharmacy_id').val()
+                        current_pharmacy_id: $('#current_pharmacy_id').val()
                     },
                     success: function(response) {
+                        if (response.status === 'error') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Quote Timeout',
+                                text: 'Request quote exceeded 15 minutes',
+                                showCancelButton: true,
+                                confirmButtonText: 'OK',
+                                cancelButtonText: 'Cancel',
+                                showDenyButton: true, // keep true if DOM me lana zaruri ho
+                                denyButtonText: 'NO'
+                            }).then(() => {
+                                // Disable fields
+                                $('#medicine-body .medicine-row').find('input, select')
+                                    .prop('disabled', true);
+                                $('#add-medicine-button').prop('disabled', true);
+                                $('#save-quote-button').hide();
+
+                                // ✅ Disable customer dropdown also
+                                // $('#prescription-select').prop('disabled', true);
+                            });
+
+                            // Immediately after fire, hide deny button forcefully
+                            setTimeout(() => {
+                                document.querySelector('.swal2-deny')?.style
+                                    .setProperty('display', 'none', 'important');
+                            }, 10);
+
+
+
+                            return;
+                        }
+
+
+
                         if (response.status === 'success') {
                             const products = response.data;
 

@@ -374,14 +374,24 @@ class MedicineSearchController extends Controller
     {
         $customerId = $request->input('customer_id');
         $current_pharmacy_id = $request->input('current_pharmacy_id');
-       $cart = RequestQuote::where('customer_id', $customerId)
-    ->where('pharmacy_id', $current_pharmacy_id)
-    ->first();
+        $cart = RequestQuote::where('customer_id', $customerId)
+            ->where('pharmacy_id', $current_pharmacy_id)
+            ->first();
 
-// dd( $cart);
-        if (!$cart || !$cart->products_details) {
-            return response()->json(['status' => 'error', 'message' => 'Cart not found']);
+        if ($cart) {
+            $quoteTime = \Carbon\Carbon::parse($cart->created_at);
+            $now = \Carbon\Carbon::now();
+
+            // Show message if more than 15 minutes old
+            if ($now->diffInMinutes($quoteTime) > 15) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Request quote exceeded 15 minutes'
+                ]);
+            }
         }
+
+
 
         $products = json_decode($cart->products_details, true);
         $result = [];

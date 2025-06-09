@@ -114,6 +114,8 @@ class RequestQuoteController extends Controller
                 404,
             );
         }
+
+        
         foreach ($nearby as $pharmacy) {
             $exists = RequestQuote::where('customer_id', $userId)->where('pharmacy_id', $pharmacy->user_id)->exists();
 

@@ -13,17 +13,19 @@ class RatingController extends Controller
     public function store(Request $request)
     {
         $userId = $request->get('user_id');
+        // dd( $userId);
+        if (!$userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
 
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'rateable_id' => 'required|integer',
+            'comment' => 'nullable|string|max:1000',
         ]);
-
-
-
-        if (!$userId) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
 
         // Determine the type: Laboratory or Pharmacy
         $type = null;
@@ -33,22 +35,27 @@ class RatingController extends Controller
         } elseif (Pharmacies::where('user_id', $request->rateable_id)->exists()) {
             $type = 'Pharmacy';
         } else {
-            return response()->json(['error' => 'Invalid rateable ID'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid rateable ID'
+            ], 404);
         }
 
         // Store the rating
         $rating = Rating::create([
             'customer_id'    => $userId,
             'rating'         => $request->rating,
+            'comment'        => $request->comment,
             'rateable_id'    => $request->rateable_id,
             'rateable_type'  => $type,
         ]);
 
         return response()->json([
+            'success' => true,
             'message' => 'Rating submitted successfully',
-            'data'    => $rating
         ], 201);
     }
+
     public function popularPharmacies()
     {
         $popularPharmacies = Rating::select('rateable_id')

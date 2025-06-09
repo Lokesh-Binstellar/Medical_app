@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('customer_id');
             $table->unsignedInteger('rating');
+            $table->text('comment')->nullable();
             $table->unsignedBigInteger('rateable_id');
             $table->string('rateable_type');
             $table->timestamps();
