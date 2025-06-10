@@ -79,7 +79,8 @@ class OrderController extends Controller
                 'payment_option' => $request->payment_option,
                 'status' => 0,
                 'selected_pharmacy_address' => $selected_pharmacy_address,
-                'selected_pharmacy_latlong' => $selected_pharmacy_latlong
+                'selected_pharmacy_latlong' => $selected_pharmacy_latlong,
+                'commission' => $productData->commission_amount
             ]);
 
 

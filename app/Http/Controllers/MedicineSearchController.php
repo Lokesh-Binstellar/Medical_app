@@ -519,56 +519,16 @@ class MedicineSearchController extends Controller
 
     public function orderdetails(Request $request)
     {
-        // $pharmacy = Pharmacies::where('user_id', Auth::user()->id)->first();
-
-        // $medicines = Phrmacymedicine::where('phrmacy_id', Auth::user()->id)->get();
-
-        // // Fetch orders where pharmacy_id matches current pharmacy
-        // //$orders = Order::where('pharmacy_id', Auth::user()->id)->get();
-
-        // $orders = Order::with('customer')->where('pharmacy_id', Auth::user()->id)->get();
-        // $roleName = Auth::user()->role->name;
 
 
-        // if ($roleName === 'admin') {
-        //     // Admin: Get all orders
-        //     $orders = Order::with('customer')->get();
-        // } elseif ($roleName === 'pharmacy') {
-        //     // Pharmacy: Get orders for that pharmacy
-        //     $orders = Order::with('customer')
-        //         ->where('pharmacy_id', Auth::id())
-        //         ->get();
-        // } elseif ($roleName === 'laboratory') {
-        //     // Laboratory: Get orders for that lab
-        //     $orders = Order::with('customer')
-        //         ->where('lab_id', Auth::id())
-        //         ->get();
-        // } elseif ($roleName === 'delivery_person') {
-        //     // Delivery Person: Get only assigned orders
-        //     $orders = Order::with('customer')
-        //         ->where('delivery_person_id', Auth::id())
-        //         ->get();
-        // } else {
-        //     // Unknown or unauthorized role: return empty
-        //     $orders = collect();
-        // }
-
-
-        // // $deliveryPersons = User::whereHas('role', function ($q) {
-        // //     $q->where('name', 'delivery_person');
-        // // })->get();
-
-        // $deliveryPersons = User::with('deliveryProfile')->whereHas('role', function ($q) {
-        //     $q->where('name', 'delivery_person');
-        // })->get();
-
-
-
-        // return view('pharmacist.orderdetails', compact('medicines', 'pharmacy', 'orders', 'deliveryPersons'));
 
         if ($request->ajax()) {
             $roleName = Auth::user()->role->name;
             $query = Order::with(['customer', 'pharmacy', 'deliveryPerson']);
+
+            if ($request->filled('order_date')) {
+                $query->whereDate('created_at', $request->order_date);
+            }
 
             if ($roleName === 'admin') {
                 $orders = $query->get();
@@ -624,15 +584,15 @@ class MedicineSearchController extends Controller
                     'payment_mode',
                     fn($order) =>
                     $order->payment_option
-                        ? ucwords(str_replace('_', ' ', $order->payment_option))
-                        : 'N/A'
+                    ? ucwords(str_replace('_', ' ', $order->payment_option))
+                    : 'N/A'
                 )
                 ->addColumn(
                     'delivery_method',
                     fn($order) =>
                     $order->delivery_options
-                        ? ucwords(str_replace('_', ' ', $order->delivery_options))
-                        : 'N/A'
+                    ? ucwords(str_replace('_', ' ', $order->delivery_options))
+                    : 'N/A'
                 )
 
                 // ->addColumn('delivery_person', function ($order) {
@@ -645,21 +605,23 @@ class MedicineSearchController extends Controller
                         case 1:
                             return '<span class="badge bg-success">Completed</span>';
                         case 2:
-                            return '<span class="badge bg-danger">Cancelled</span>';
+                            $reason = $order->cancel_by ? '<br><small class="text-danger">Cancelled By: ' . e($order->cancel_by) . '</small>' : '';
+                            return '<span class="badge bg-danger">Cancelled</span>' . $reason;
                         default:
                             return '<span class="badge bg-secondary">Unknown</span>';
                     }
                 })
 
 
+
                 ->addColumn('action', function ($order) {
                     return '
-        <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
-            <a href="' . route('orders.medicines', $order->id) . '" 
-               class="btn btn-sm btn-primary control me-2">
-                <i class="mdi mdi-eye"></i> View
-            </a>
-        </div>';
+                <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                <a href="' . route('orders.medicines', $order->id) . '" 
+                class="btn btn-sm btn-primary control me-2">
+                    <i class="mdi mdi-eye"></i> View
+                </a>
+                </div>';
                 })
                 ->addColumn('assign_delivery', function ($order) use ($deliveryPersons) {
                     if (Auth::user()->role->name === 'admin') {
@@ -711,7 +673,9 @@ class MedicineSearchController extends Controller
                             $html .= '<option value="2">Cancel</option>';
                         }
 
-                        $html .= '</select></form>';
+                        $html .= '</select>';
+                        $html .= '<input type="hidden" name="cancel_by" class="cancel-by-input" value="">';
+                        $html .= '</form>';
                     } else {
                         if ($order->status == 1) {
                             $html .= '<span class="badge bg-success">Delivered to Customer</span>';
@@ -723,6 +687,7 @@ class MedicineSearchController extends Controller
                     $html .= '</div>';
                     return $html;
                 })
+
                 ->addColumn('invoice', function ($order) {
                     $url = route('invoice.download', $order->order_id);
 
@@ -743,6 +708,8 @@ class MedicineSearchController extends Controller
                         </a>';
                 })
 
+
+
                 ->rawColumns(['delivery_person', 'action', 'status', 'date', 'assign_delivery', 'customer_name', 'status_control', 'invoice', 'delivery_info'])
                 ->make(true);
         }
@@ -758,10 +725,23 @@ class MedicineSearchController extends Controller
 
         $order = Order::findOrFail($id);
         $order->status = $request->status;
+
+        // If order is being cancelled (status = 2)
+        if ($request->status == 2) {
+            // Determine who is cancelling
+            $userRole = auth()->user()->role->name ?? 'admin';
+
+            // Set cancel_by based on role
+            $order->cancel_by = in_array($userRole, ['admin', 'pharmacy'])
+                ? $userRole
+                : 'customer';
+        }
+
         $order->save();
 
         return back()->with('success', 'Order status updated successfully.');
     }
+
 
     public function showMedicines($id)
     {
@@ -890,7 +870,7 @@ class MedicineSearchController extends Controller
             }
 
             $results[] = [
-                'id' =>  $m->product_name . ' + ' . $m->salt_composition,
+                'id' => $m->product_name . ' + ' . $m->salt_composition,
                 'text' => $m->product_name . ' + ' . $m->salt_composition,
             ];
         }

@@ -1,78 +1,78 @@
 @extends('layouts.app')
 @section('styles')
     <style>
-/* Ensure black text color for all cells */
-table#ordersTable th,
-table#ordersTable td {
-    color: #000 !important;
-    background-color: #fff !important;
-    text-align: center !important; /* Default center alignment */
-    vertical-align: middle !important;
-}
+        /* Ensure black text color for all cells */
+        table#ordersTable th,
+        table#ordersTable td {
+            color: #000 !important;
+            background-color: #fff !important;
+            text-align: center !important;
+            /* Default center alignment */
+            vertical-align: middle !important;
+        }
 
 
-/* Style only the table header */
-table#ordersTable thead th {
-    background-color: #f0f0f0 !important;
-    /* Light grey */
-    font-weight: bold !important;
-    color: #000 !important;
-    /* Ensure header text is black too */
-}
+        /* Style only the table header */
+        table#ordersTable thead th {
+            background-color: #f0f0f0 !important;
+            /* Light grey */
+            font-weight: bold !important;
+            color: #000 !important;
+            /* Ensure header text is black too */
+        }
 
-#ordersTable,
-#ordersTable th,
-#ordersTable td {
-    border: 1px solid black !important;
-}
+        #ordersTable,
+        #ordersTable th,
+        #ordersTable td {
+            border: 1px solid black !important;
+        }
 
-/* Updated Child row styles for responsive */
-table.dataTable.dtr-inline.collapsed > tbody > tr > td.child {
-    padding: 1rem !important;
-    background-color: #f9f9f9 !important;
-    border-top: 1px solid #ddd !important;
-    font-size: 14px;
-}
+        /* Updated Child row styles for responsive */
+        table.dataTable.dtr-inline.collapsed>tbody>tr>td.child {
+            padding: 1rem !important;
+            background-color: #f9f9f9 !important;
+            border-top: 1px solid #ddd !important;
+            font-size: 14px;
+        }
 
-table.dataTable.dtr-inline.collapsed > tbody > tr > td.child table {
-    width: 100% !important;
-    table-layout: fixed;
-}
+        table.dataTable.dtr-inline.collapsed>tbody>tr>td.child table {
+            width: 100% !important;
+            table-layout: fixed;
+        }
 
-table.dataTable.dtr-inline.collapsed > tbody > tr > td.child td {
-    padding: 0.5rem !important;
-    word-wrap: break-word;
-    border: none !important;
-    vertical-align: top !important;
-}
+        table.dataTable.dtr-inline.collapsed>tbody>tr>td.child td {
+            padding: 0.5rem !important;
+            word-wrap: break-word;
+            border: none !important;
+            vertical-align: top !important;
+        }
 
-/* Target the specific table cell for Customer column */
-#ordersTable td.customer-name {
-    white-space: normal !important;
-    word-wrap: break-word;
-    max-width: 150px;
-    /* adjust as needed */
-}
+        /* Target the specific table cell for Customer column */
+        #ordersTable td.customer-name {
+            white-space: normal !important;
+            word-wrap: break-word;
+            max-width: 150px;
+            /* adjust as needed */
+        }
 
-.btn-primary:hover {
-    background-color: #033a62 !important;
-    color: #ffffff !important;
-    border-color: #ffffff !important;
-    /* optional: to make the border visible */
-}
+        .btn-primary:hover {
+            background-color: #033a62 !important;
+            color: #ffffff !important;
+            border-color: #ffffff !important;
+            /* optional: to make the border visible */
+        }
 
-      /* For small screens, align text left */
-@media (max-width: 1600px) {
-    table#ordersTable th,
-    table#ordersTable td {
-          /* display: table-cell !important; */
-    vertical-align: middle !important;
-        text-align: left !important;
-        /* vertical-align: middle !important; */
-    }
-}
-  
-        
+        /* For small screens, align text left */
+        @media (max-width: 1600px) {
+
+            table#ordersTable th,
+            table#ordersTable td {
+                /* display: table-cell !important; */
+                vertical-align: middle !important;
+                text-align: left !important;
+                /* vertical-align: middle !important; */
+            }
+        }
     </style>
 @endsection
 
@@ -135,20 +135,27 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td.child td {
             <div class="table-responsive text-nowrap" style="overflow-x: auto;">
                 <table class="table table-bordered text-align-center" style="border: 1px solid black; color: black;"
                     id="ordersTable">
+                    <div class="mb-3">
+                        <label for="orderDate" class="form-label fw-bold">Filter by Order Date:</label>
+                        <input type="date" id="orderDate" class="form-control" style="width: 250px;">
+                    </div>
 
                     <thead class="bg-light fw-bold">
                         <tr>
                             <th>Order ID</th>
                             <th>Customer</th>
                             @if (Auth::user()->role->name === 'admin')
-                                <th class="fw-bold fs-6 ">Assign Delivery Person</th>
+                                <th class="fw-bold fs-6 ">Assign Delivery Boy</th>
                             @endif
                             <th>Order Details</th> {{-- new combined column --}}
                             <th>Order Status</th>
-                            <th>Status</th>
+                            <th>Update Status</th>
                             <th>Medicine Details</th>
                             <th>Invoice</th>
-                            <th>Delivery Information</th>
+                            @if (Auth::user()->role->name === 'admin')
+                                <th>Delivery Information</th>
+                            @endif
+
                         </tr>
                     </thead>
 
@@ -169,59 +176,87 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td.child td {
                 }
             });
 
+            // Base columns that everyone sees
             let columns = [
-                { data: 'order_id', name: 'order_id' },
+                {
+                    data: 'order_id',
+                    name: 'order_id'
+                },
                 {
                     data: 'customer_name',
                     name: 'customer_name',
                     className: 'customer-name'
-                },
-                // assign_delivery will be added conditionally below
+                }
+            ];
+
+            // Admin-only columns
+            @if(Auth::user()->role->name === 'admin')
+                columns.push({
+                    data: 'assign_delivery',
+                    name: 'assign_delivery',
+                    orderable: false,
+                    searchable: false
+                });
+            @endif
+
+            // Common columns for all users
+            columns.push(
                 {
                     data: null,
                     name: 'order_details',
                     orderable: false,
                     searchable: false,
                     render: function (data, type, row) {
-                        return `<div class="d-flex justify-content-center align-items-center" style="height: 100%;">
-                            <a href="#" class="order-details-link btn btn-sm btn-primary control me-2" data-details='${JSON.stringify({
+                        const details = {
                             date: row.date_raw,
                             payment_mode: row.payment_mode,
                             delivery_method: row.delivery_method,
                             total_price: row.total_price
-                        })}'>
-                                <i class="mdi mdi-eye"></i>View
-                            </a>
-                        </div>`;
+                        };
+                        return `
+                                    <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                                        <a href="#" class="order-details-link btn btn-sm btn-primary control me-2" 
+                                        data-details='${JSON.stringify(details)}'>
+                                            <i class="mdi mdi-eye"></i>View
+                                        </a>
+                                    </div>
+                                `;
                     }
                 },
-                { data: 'status', name: 'status' },
+                {
+                    data: 'status',
+                    name: 'status'
+                },
                 {
                     data: 'status_control',
                     name: 'status_control',
                     orderable: false,
                     searchable: false
                 },
-                { data: 'action', name: 'action', orderable: false, searchable: false },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                },
                 {
                     data: 'invoice',
                     name: 'invoice',
                     orderable: false,
                     searchable: false
-                },
-                {
+                }
+            );
+
+            // Add delivery_info column only for admin
+            @if(Auth::user()->role->name === 'admin')
+                columns.push({
                     data: 'delivery_info',
                     name: 'delivery_info',
                     orderable: false,
                     searchable: false
-                }
-            ];
-
-            @if (Auth::user()->role->name === 'admin')
-                // Add assign_delivery column ONLY for admin
-                columns.splice(2, 0, { data: 'assign_delivery', name: 'assign_delivery', orderable: false, searchable: false });
-                // Splice at index 2 to insert after customer_name and before order_details
+                });
             @endif
+
 
             let table = $('#ordersTable').DataTable({
                 processing: true,
@@ -240,9 +275,20 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td.child td {
                         }
                     }
                 },
-                ajax: '{{ route('orderdetails') }}',
+                ajax: {
+                    url: '{{ route('orderdetails') }}',
+                    data: function (d) {
+                        d.order_date = $('#orderDate').val();
+                    }
+                },
                 columns: columns,
             });
+
+            $('#orderDate').on('change', function () {
+                table.draw();
+            });
+
+
 
             // Handle delivery person assignment
             $('#ordersTable').on('change', '.assign-delivery', function () {
@@ -269,20 +315,20 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td.child td {
         // Create modal markup once on page
         if (!$('#orderDetailsModal').length) {
             $('body').append(`
-                    <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                            <h5 class="modal-title" id="orderDetailsLabel">Order Details</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body"></div>
-                            <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                        </div>
-                    </div>`);
+                            <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <h5 class="modal-title" id="orderDetailsLabel">Order Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body"></div>
+                                    <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>`);
         }
 
         // Handle click on "View Details"
@@ -295,11 +341,11 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td.child td {
 
 
             let html = `
-                        <p><strong>Date:</strong> ${formattedDate}</p>
-                        <p><strong>Payment Mode:</strong> ${details.payment_mode}</p>
-                        <p><strong>Delivery Method:</strong> ${details.delivery_method}</p>
-                        <p><strong>Total Price:</strong> ₹${details.total_price}</p>
-                    `;
+                                <p><strong>Date:</strong> ${formattedDate}</p>
+                                <p><strong>Payment Mode:</strong> ${details.payment_mode}</p>
+                                <p><strong>Delivery Method:</strong> ${details.delivery_method}</p>
+                                <p><strong>Total Price:</strong> ₹${details.total_price}</p>
+                            `;
 
             $('#orderDetailsModal .modal-body').html(html);
             let modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
@@ -379,6 +425,23 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td.child td {
                     });
                 }
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.status-select').forEach(function (select) {
+                select.addEventListener('change', function () {
+                    const form = select.closest('form');
+                    const cancelInput = form.querySelector('.cancel-by-input');
+
+                    if (select.value === "2") {
+                        cancelInput.value = "admin";
+                    } else {
+                        cancelInput.value = "";
+                    }
+
+                    form.submit(); // auto-submit on change (optional, or you can add a button)
+                });
+            });
         });
 
     </script>

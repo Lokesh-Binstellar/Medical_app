@@ -100,6 +100,8 @@ Route::middleware('check.api.key')->group(function () {
 
         // MyOrders
         Route::get('/pharmacyMyOrders', [MyOrderController::class, 'getUserPharmacyOrders']);
+        Route::post('/cancelOrder/{id}', [MyOrderController::class, 'cancelOrder']);
+        Route::post('/returnOrder/{id}', [MyOrderController::class, 'returnOrder']);
 
         // Route::post('/broadcasting/auth', function (Request $request) {
         //     return Broadcast::auth($request);
