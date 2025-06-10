@@ -42,7 +42,7 @@ class LabtestController extends Controller
     }
 
     public function import(Request $request)
-    { 
+    {
         // Validate incoming request data
         $request->validate([
             'file' => 'required|max:2048',
@@ -63,12 +63,21 @@ class LabtestController extends Controller
     public function labTestDetails()
     {
         try {
-            $labtest = LabTest::all();
+            $labtests = LabTest::all()->map(function ($labtest) {
+                // Convert sub_reports string to array if not null
+                if (!empty($labtest->sub_reports)) {
+                    $labtest->sub_reports = array_map('trim', explode(',', $labtest->sub_reports));
+                } else {
+                    $labtest->sub_reports = [];
+                }
+
+                return $labtest;
+            });
 
             return response()->json(
                 [
                     'success' => true,
-                    'data' => $labtest,
+                    'data' => $labtests,
                 ],
                 200,
             );

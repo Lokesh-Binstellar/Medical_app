@@ -7,8 +7,12 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
+    /**
+     * Register the commands.
+     */
     protected $commands = [
         \App\Console\Commands\DeleteQuote::class,
+        \App\Console\Commands\FireMyEventCommand::class, // ← Make sure to include this
     ];
 
     /**
@@ -16,13 +20,15 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Run your custom artisan command every hour
+        // Run quote deletion every minute
         $schedule->command('delete:quote')->everyMinute();
 
-        // You can add more schedules here
-        // $schedule->command('another:command')->daily();
+        // Run quote request event every minute
+        $schedule->command('auto:request-quotes')->everyMinute();
+
+        // Log test every minute
         $schedule->call(function () {
-            \Log::info('Running inline closure.');
+            \Log::info('✅ Schedule running: inline closure fired.');
         })->everyMinute();
     }
 

@@ -139,7 +139,7 @@
                                             ->where('notifiable_type', 'App\\Models\\User')
                                             ->whereNull('read_at')
                                             ->orderBy('created_at', 'desc')
-                                            ->take(10)
+                                            // ->take(20)
                                             ->get();
                                     @endphp
 

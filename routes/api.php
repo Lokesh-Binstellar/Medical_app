@@ -134,4 +134,11 @@ Route::middleware('check.api.key')->group(function () {
     //    Laboratory
 
     Route::post('/getAllLaboratory', [LaboratoriesController::class, 'getAllLaboratory']);
+
+
+    //general Address
+    Route::post('/get-address-from-latlng', [CustomerAddressController::class, 'getAddressFromLatLng']);
+    Route::get('/place-autocomplete', [CustomerAddressController::class, 'placeAutocomplete']);
+
+
 });

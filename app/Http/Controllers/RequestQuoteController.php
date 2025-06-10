@@ -109,7 +109,7 @@ class RequestQuoteController extends Controller
             return response()->json(
                 [
                     'status' => false,
-                    'message' => 'No pharmacy found within 10 km radius.',
+                    'message' => 'No pharmacy found within 10 km radius. please select different address',
                 ],
                 404,
             );

@@ -105,4 +105,9 @@ class User extends Authenticatable
         return $this->hasOne(DeliveryPerson::class, 'user_id', 'id');
     }
 
+     public function routeNotificationForFcm()
+    {
+        return $this->fcm_token;  // column in your users table with device token
+    }
+
 }

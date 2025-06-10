@@ -4,6 +4,7 @@ use App\Http\Middleware\AuthTest;
 use App\Http\Middleware\CheckApiAccessKey;
 use App\Http\Middleware\checkPermission;
 use App\Http\Middleware\checkRole;
+use App\Http\Middleware\CheckSession;
 use App\Http\Middleware\PreventBackHistory;
 use App\Http\Middleware\TokenValidation;  // Import TokenValidation
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
@@ -28,7 +29,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'substituteBindings' => SubstituteBindings::class, 
             'tokenValidation' => TokenValidation::class, 
             'check.api.key' =>CheckApiAccessKey::class,
-            'authTest'=>AuthTest::class
+            'authTest'=>AuthTest::class,
+            'checkSession.auth'=>CheckSession::class
         ]);
         // $middleware->append(checkRole::class);
     })
