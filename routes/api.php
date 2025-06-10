@@ -59,7 +59,8 @@ Route::middleware('check.api.key')->group(function () {
     // with jwt token
     Route::middleware('authTest')->group(function () {
         Route::post('/bookpackageorlabtest', [LabPackageAndTestDetailsController::class, 'bookpackageorlabtest']);
-        Route::post('/customer/address', [CustomerAddressController::class, 'store']);
+        Route::post('/customer/address', [CustomerAddressController::class, 'saveAddress']);
+        Route::put('/customer/address/update', [CustomerAddressController::class,'updateAddress']);
         Route::get('/customerAddressFetch', [CustomerAddressController::class, 'getAddress']);
         Route::delete('/deleteAddress', [CustomerAddressController::class, 'deleteAddress']);
         Route::put('/customerDetails', [AuthController::class, 'update']);
@@ -135,10 +136,8 @@ Route::middleware('check.api.key')->group(function () {
 
     Route::post('/getAllLaboratory', [LaboratoriesController::class, 'getAllLaboratory']);
 
-
     //general Address
-    Route::post('/get-address-from-latlng', [CustomerAddressController::class, 'getAddressFromLatLng']);
+    Route::post('/getUserSelectLocation', [CustomerAddressController::class, 'getUserSelectLocation']);
     Route::get('/place-autocomplete', [CustomerAddressController::class, 'placeAutocomplete']);
-
-
+    Route::post('/get-city-state', [CustomerAddressController::class, 'getCityStateFromPostalCode']);
 });

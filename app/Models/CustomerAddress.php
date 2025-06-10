@@ -15,6 +15,7 @@ class CustomerAddress extends Model
         'lng',
        'house_number',
         'address_line',
+        'area',
         'city',
         'state',
         'postal_code',

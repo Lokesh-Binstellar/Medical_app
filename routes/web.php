@@ -4,6 +4,7 @@ use App\Events\MyEvent;
 use App\Http\Controllers\CustomerDetailsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaboratoriesController;
+use App\Http\Controllers\LabSlotController;
 use App\Http\Controllers\LabtestController;
 use App\Http\Controllers\AddLabTestController;
 use App\Http\Controllers\MedicineController;
@@ -61,6 +62,16 @@ Route::middleware(['auth', 'verified','checkSession.auth'])->group(function () {
 });
 
 
+    // Route::prefix('laboratory')->group(function () {
+    //     Route::get('/slots', [LabSlotController::class, 'mySlots'])->name('lab.my_slots');
+    //     Route::post('/slots', [LabSlotController::class, 'store'])->name('lab.slots.store');
+    //     Route::post('/slots/generate', [LabSlotController::class, 'generateSlots'])->name('lab.slots.generate');
+    //     Route::post('/slots/{slot}/status', [LabSlotController::class, 'updateStatus'])->name('lab.slots.status');
+    // });
+
+ Route::get('/calendar', [LabSlotController::class, 'index']);
+    Route::post('/calendar/save-slot', [LabSlotController::class, 'store'])->name('calendar.store');
+    Route::post('/calendar/toggle-slot', [LabSlotController::class, 'toggle']);
 
 // About Us Routes
 Route::prefix('cms/about-us')->name('cms.about-us.')->group(function () {

@@ -241,10 +241,10 @@ document.addEventListener('DOMContentLoaded', function () {
             let calendars = selectedCalendars();
             // We are reading event object from app-calendar-events.js file directly by including that file above app-calendar file.
             // You should make an API call, look into above commented API call for reference
-            let selectedEvents = currentEvents.filter(function (event) {
-                // console.log(event.extendedProps.calendar.toLowerCase());
-                return calendars.includes(event.extendedProps.calendar.toLowerCase());
-            });
+            // let selectedEvents = currentEvents.filter(function (event) {
+            //     // console.log(event.extendedProps.calendar.toLowerCase());
+            //     return calendars.includes(event.extendedProps.calendar.toLowerCase());
+            // });
             // if (selectedEvents.length > 0) {
             successCallback(selectedEvents);
             // }
@@ -452,25 +452,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (isFormValid) {
                     let newEvent = {
                         id: calendar.getEvents().length + 1,
-                        title: eventTitle.value,
+                        // title: eventTitle.value,
                         start: eventStartDate.value,
                         end: eventEndDate.value,
                         startStr: eventStartDate.value,
                         endStr: eventEndDate.value,
                         display: 'block',
                         extendedProps: {
-                            location: eventLocation.value,
+                            // location: eventLocation.value,
                             guests: eventGuests.val(),
                             calendar: eventLabel.val(),
-                            description: eventDescription.value
+                            // description: eventDescription.value
                         }
                     };
-                    if (eventUrl.value) {
-                        newEvent.url = eventUrl.value;
-                    }
-                    if (allDaySwitch.checked) {
-                        newEvent.allDay = true;
-                    }
+                    // if (eventUrl.value) {
+                    //     newEvent.url = eventUrl.value;
+                    // }
+                    // if (allDaySwitch.checked) {
+                    //     newEvent.allDay = true;
+                    // }
                     addEvent(newEvent);
                     bsAddEventSidebar.hide();
                 }
