@@ -438,104 +438,106 @@ class LaboratoriesController extends Controller
         }
     }
 
-    public function getAllLaboratory(Request $request)
-    {
-        try {
-            $latlong = $request->latlong;
-            if (!$latlong) {
-                return response()->json(['status' => false, 'message' => 'latlong is required'], 400);
-            }
-
-            [$userLat, $userLon] = explode(',', $latlong);
-            $userLat = trim($userLat);
-            $userLon = trim($userLon);
-
-            $apiKey = env('GOOGLE_MAPS_API_KEY');
-
-            // 1. Get city from coordinates using Geocoding API
-            $geoUrl = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$userLat,$userLon&key=$apiKey";
-            $geoResponse = file_get_contents($geoUrl);
-            $geoData = json_decode($geoResponse, true);
-
-            if (!$geoData || $geoData['status'] !== 'OK') {
-                return response()->json(['status' => false, 'message' => 'Could not determine city from location'], 400);
-            }
-
-            $city = null;
-            foreach ($geoData['results'][0]['address_components'] as $component) {
-                if (in_array('locality', $component['types'])) {
-                    $city = $component['long_name'];
-                    break;
-                }
-            }
-
-            if (!$city) {
-                return response()->json(['status' => false, 'message' => 'City not found in address data'], 400);
-            }
-
-            // 2. Get labs in that city
-            $labs = Laboratories::where('city', $city)->get(['id', 'lab_name', 'user_id', 'pickup', 'latitude', 'longitude', 'city']);
-
-            // 3. Calculate distance using Google Directions API
-            $result = [];
-            foreach ($labs as $lab) {
-                if ($lab->latitude && $lab->longitude) {
-                    $directionUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=$userLat,$userLon&destination={$lab->latitude},{$lab->longitude}&key=$apiKey";
-                    $response = file_get_contents($directionUrl);
-                    $data = json_decode($response, true);
-
-                    if ($data['status'] === 'OK') {
-                        $distanceMeters = $data['routes'][0]['legs'][0]['distance']['value'];
-                        $distanceKm = round($distanceMeters / 1000, 2);
-
-                        // Get rating
-                        $ratingData = Rating::where('rateable_type', 'Laboratory')->where('rateable_id', $lab->user_id)->selectRaw('AVG(rating) as avg_rating, COUNT(*) as rating_count')->first();
-
-                        $formattedRating = $ratingData->rating_count > 0 ? round($ratingData->avg_rating, 1) . ' (' . $ratingData->rating_count . ')' : null;
-
-                        $result[] = [
-                            'id' => $lab->id,
-                            'lab_name' => $lab->lab_name,
-                            'user_id' => $lab->user_id,
-                            'pickup' => $lab->pickup,
-                            'latitude' => $lab->latitude,
-                            'longitude' => $lab->longitude,
-                            'distance_km' => $distanceKm,
-                            'rating' => $formattedRating,
-                            'rating_value' => $ratingData->avg_rating ?? 0, // used only for sorting
-                            'lab_city' => $lab->city,
-                        ];
-                    }
-                }
-            }
-
-            // Sort labs by rating descending
-            usort($result, function ($a, $b) {
-                return $b['rating_value'] <=> $a['rating_value'];
-            });
-
-            // Remove internal sorting field
-            $result = array_map(function ($lab) {
-                unset($lab['rating_value']);
-                return $lab;
-            }, $result);
-
-            return response()->json([
-                'status' => true,
-                'city' => $city,
-                'data' => $result,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error in getAllLaboratory: ' . $e->getMessage());
-
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => 'Something went wrong. Please try again later.',
-                    'error' => $e->getMessage(), // remove in production
-                ],
-                500,
-            );
+   public function getAllLaboratory(Request $request)
+{
+    try {
+        $latlong = $request->latlong;
+        if (!$latlong) {
+            return response()->json(['status' => false, 'message' => 'latlong is required'], 400);
         }
+
+        [$userLat, $userLon] = array_map('trim', explode(',', $latlong));
+        $apiKey = env('GOOGLE_MAPS_API_KEY');
+
+        // Get city from coordinates using Geocoding API
+        $geoUrl = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$userLat,$userLon&key=$apiKey";
+        $geoData = json_decode(file_get_contents($geoUrl), true);
+
+        if (!$geoData || $geoData['status'] !== 'OK') {
+            return response()->json(['status' => false, 'message' => 'Could not determine city from location'], 400);
+        }
+
+        $city = collect($geoData['results'][0]['address_components'])
+            ->first(fn($comp) => in_array('locality', $comp['types']))['long_name'] ?? null;
+
+        if (!$city) {
+            return response()->json(['status' => false, 'message' => 'City not found in address data'], 400);
+        }
+
+        // Get labs in that city
+        $labs = Laboratories::where('city', $city)
+            ->get(['id', 'lab_name', 'pickup', 'latitude', 'longitude', 'image']);
+
+        $result = [];
+
+        foreach ($labs as $lab) {
+            if ($lab->latitude && $lab->longitude) {
+                $directionUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=$userLat,$userLon&destination={$lab->latitude},{$lab->longitude}&key=$apiKey";
+                $data = json_decode(file_get_contents($directionUrl), true);
+
+                if ($data['status'] === 'OK') {
+                    $distanceMeters = $data['routes'][0]['legs'][0]['distance']['value'];
+                    $distanceKm = round($distanceMeters / 1000, 2);
+
+                    // Get rating
+                    $ratingData = Rating::where('rateable_type', 'Laboratory')
+                        ->where('rateable_id', $lab->id)
+                        ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as rating_count')
+                        ->first();
+
+                    $formattedRating = $ratingData->rating_count > 0
+                        ? round($ratingData->avg_rating, 1) . ' (' . $ratingData->rating_count . ')'
+                        : null;
+
+                           $imageArray = [];
+                    if (!empty($lab->image)) {
+                        $rawImages = json_decode($lab->image, true); // Try JSON first
+                        if (json_last_error() === JSON_ERROR_NONE && is_array($rawImages)) {
+                            $imageArray = array_map(fn($img) => url('storage/lab_images/' . $img), $rawImages);
+                        } else {
+                            // fallback: comma-separated string
+                            $imageArray = array_map(
+                                fn($img) => url('assets/image/' . trim($img)),
+                                explode(',', $lab->image)
+                            );
+                        }
+                    }
+
+                    $result[] = [
+                        'id' => $lab->id,
+                        'lab_name' => $lab->lab_name,
+                        'pickup' => $lab->pickup,
+                        'latitude' => $lab->latitude,
+                        'longitude' => $lab->longitude,
+                       'image' =>  $imageArray ,
+                        'distance_km' => $distanceKm,
+                        'rating' => $formattedRating,
+                        'rating_value' => $ratingData->avg_rating ?? 0, // used for sorting
+                    ];
+                }
+            }
+        }
+
+        // Sort by rating descending
+        usort($result, fn($a, $b) => $b['rating_value'] <=> $a['rating_value']);
+
+        // Remove rating_value before returning
+        $result = array_map(fn($lab) => array_diff_key($lab, ['rating_value' => '']), $result);
+
+        return response()->json([
+            'status' => true,
+            'city' => $city,
+            'data' => $result,
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Error in getAllLaboratory: ' . $e->getMessage());
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong. Please try again later.',
+            'error' => $e->getMessage(), // Consider removing in production
+        ], 500);
     }
+}
+
 }
