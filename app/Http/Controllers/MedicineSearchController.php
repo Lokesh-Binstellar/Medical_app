@@ -33,8 +33,8 @@ class MedicineSearchController extends Controller
         $pharmacy = Pharmacies::where('user_id', Auth::user()->id)->first();
 
         $medicines = Phrmacymedicine::where('phrmacy_id', Auth::user()->id)->get();
-$commissionData = CommissionData::latest()->first();
-        return view('pharmacist.add-medicine', compact('medicines','commissionData'));
+        $commissionData = CommissionData::latest()->first();
+        return view('pharmacist.add-medicine', compact('medicines', 'commissionData'));
     }
 
     public function store(Request $request)
@@ -64,8 +64,8 @@ $commissionData = CommissionData::latest()->first();
 
         $medicine = new Phrmacymedicine();
         $medicine->medicine = json_encode($data['medicine']);
-        $medicine->quantity = $totalQuantity;
-        $medicine->substitute_medicines = json_encode($substituteMedicines);
+        // $medicine->quantity = $totalQuantity;
+        // $medicine->substitute_medicines = json_encode($substituteMedicines);
 
         $medicine->total_amount = $data['total_amount'] ?? 0;
         $medicine->mrp_amount = $data['mrp_amount'] ?? 0;
@@ -384,7 +384,7 @@ $commissionData = CommissionData::latest()->first();
             $now = \Carbon\Carbon::now();
 
             // Show message if more than 15 minutes old
-             if ($quoteTime->addMinutes(15)->lt($now)) {
+            if ($quoteTime->addMinutes(15)->lt($now)) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Request quote exceeded 15 minutes'
@@ -585,15 +585,15 @@ $commissionData = CommissionData::latest()->first();
                     'payment_mode',
                     fn($order) =>
                     $order->payment_option
-                    ? ucwords(str_replace('_', ' ', $order->payment_option))
-                    : 'N/A'
+                        ? ucwords(str_replace('_', ' ', $order->payment_option))
+                        : 'N/A'
                 )
                 ->addColumn(
                     'delivery_method',
                     fn($order) =>
                     $order->delivery_options
-                    ? ucwords(str_replace('_', ' ', $order->delivery_options))
-                    : 'N/A'
+                        ? ucwords(str_replace('_', ' ', $order->delivery_options))
+                        : 'N/A'
                 )
 
                 // ->addColumn('delivery_person', function ($order) {

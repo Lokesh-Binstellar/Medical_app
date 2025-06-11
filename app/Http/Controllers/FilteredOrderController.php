@@ -92,7 +92,7 @@ class FilteredOrderController extends Controller
                 })
                 // Use the joined pharmacy_name directly here
                 ->addColumn('pharmacy_name', function ($order) {
-                    return e($order->pharmacy_name ?? 'N/A');
+                    return ($order->pharmacy_name ?? 'N/A');
                 })
                 ->addColumn('pharmacy_city', function ($order) {
                     if (!$order->selected_pharmacy_address) return 'N/A';
@@ -103,8 +103,8 @@ class FilteredOrderController extends Controller
                     $count = count($parts);
                     return $count >= 3 ? $parts[$count - 3] : 'N/A';
                 })
-                ->addColumn('commission', function () {
-                    return ''; // Keep blank for now
+                ->addColumn('commission', function ($order) {
+                    return ($order->commission ?? 'N/A'); // Keep blank for now
                 })
                 ->rawColumns(['customer_name', 'status', 'action'])
                 ->make(true);

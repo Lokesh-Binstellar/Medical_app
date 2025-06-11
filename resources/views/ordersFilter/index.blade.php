@@ -378,44 +378,43 @@
             $('#total_commission').text('₹' + (data.total_commission || 0));
 
             // Prepare chart data with all key metrics
-          const chartData = [
-    {
-        name: "Total Orders",
-        y: 100,
-        count: totalOrders,
-        color: '#4B91D3'
-    },
-    {
-        name: "Completed",
-        y: totalOrders ? Math.round((data.completed_orders / totalOrders) * 100) : 0,
-        count: data.completed_orders || 0,
-        color: '#66A9E0'
-    },
-    {
-        name: "Accepted",
-        y: totalOrders ? Math.round((data.request_accepted_orders / totalOrders) * 100) : 0,
-        count: data.request_accepted_orders || 0,
-        color: '#85BFF0'
-    },
-    {
-        name: "Cancelled",
-        y: totalOrders ? Math.round((data.cancelled_orders / totalOrders) * 100) : 0,
-        count: data.cancelled_orders || 0,
-        color: '#A5D2F5'
-    },
-    {
-        name: "Sales ₹",
-        y: 100,
-        count: '₹' + (data.total_sales || 0),
-        color: '#CBE6FA'
-    },
-    {
-        name: "Commission ₹",
-        y: 100,
-        count: '₹' + (data.total_commission || 0),
-        color: '#E5F3FC'
-    }
-];
+            const chartData = [{
+                    name: "Total Orders",
+                    y: 100,
+                    count: totalOrders,
+                    color: '#4B91D3'
+                },
+                {
+                    name: "Completed",
+                    y: totalOrders ? Math.round((data.completed_orders / totalOrders) * 100) : 0,
+                    count: data.completed_orders || 0,
+                    color: '#66A9E0'
+                },
+                {
+                    name: "Accepted",
+                    y: totalOrders ? Math.round((data.request_accepted_orders / totalOrders) * 100) : 0,
+                    count: data.request_accepted_orders || 0,
+                    color: '#85BFF0'
+                },
+                {
+                    name: "Cancelled",
+                    y: totalOrders ? Math.round((data.cancelled_orders / totalOrders) * 100) : 0,
+                    count: data.cancelled_orders || 0,
+                    color: '#A5D2F5'
+                },
+                {
+                    name: "Sales ₹",
+                    y: 100,
+                    count: '₹' + (data.total_sales || 0),
+                    color: '#CBE6FA'
+                },
+                {
+                    name: "Commission ₹",
+                    y: 100,
+                    count: '₹' + (data.total_commission || 0),
+                    color: '#E5F3FC'
+                }
+            ];
 
 
             // Render polar flat column chart

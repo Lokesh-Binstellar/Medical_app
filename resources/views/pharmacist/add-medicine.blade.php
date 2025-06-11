@@ -492,10 +492,10 @@
 
             // Commission based on total MRP
             // const commission = total >= 300 ? 15 : 10;
-            const gstRate = {{ $commissionData->gstRate }}; //  18
-            const commissionAboveAmount = {{ $commissionData->commissionAboveAmount }}; //  18
-            const commissionBelowAmount = {{ $commissionData->commissionBelowAmount }}; //  10
-            const commonAmount = {{ $commissionData->commonAmount }}; // 300
+            // const gstRate = {{ $commissionData->gstRate ?? 0}}; //  18
+            const commissionAboveAmount = {{ $commissionData->commissionAboveAmount ?? 0 }}; //  18
+            const commissionBelowAmount = {{ $commissionData->commissionBelowAmount ?? 0}}; //  10
+            const commonAmount = {{ $commissionData->commonAmount ?? 0}}; // 300
 
             const commission = total >= commonAmount ?
                 // commissionAboveAmount + (commissionAboveAmount * gstRate / 100) :

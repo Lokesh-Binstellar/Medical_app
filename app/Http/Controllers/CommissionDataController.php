@@ -24,7 +24,7 @@ class CommissionDataController extends Controller
         <ul class="dropdown-menu">
             <li><a href="' . route('commission_data.edit', $row->id) . '" class="dropdown-item">Edit</a></li>
             <li>
-                <button class="dropdown-item btn-delete-pharmacist" data-id="' . $row->id . '" data-url="' . route('commission_data.destroy', $row->id) . '">
+                <button class="dropdown-item btn-delete-commission" data-id="' . $row->id . '" data-url="' . route('commission_data.destroy', $row->id) . '">
                     Delete
                 </button>
             </li>
@@ -80,10 +80,16 @@ class CommissionDataController extends Controller
         return redirect()->route('commission_data.index')->with('success', 'Updated successfully.');
     }
 
-    public function destroy($id)
-    {
-        $setting = CommissionData::findOrFail($id);
-        $setting->delete();
-        return redirect()->back()->with('success', 'Deleted successfully.');
-    }
+public function destroy($id)
+{
+    $commission = CommissionData::findOrFail($id);
+    $commission->delete();
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Commission deleted successfully.'
+    ], 200); // ✅ important: HTTP 200
+}
+
+
 }
