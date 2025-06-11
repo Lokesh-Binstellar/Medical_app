@@ -100,7 +100,7 @@ class FileUploadController extends Controller
         $currentHour = (int) date('H');
 
         // Allowed time: from 9 AM (9) to 9 PM (21)
-        if ($currentHour < 9 || $currentHour > 21) {
+        if ($currentHour < 9  || $currentHour > 21) {
             return response()->json([
                 'status' => false,
                 'message' => 'You can only upload prescriptions between 9 AM and 9 PM.',

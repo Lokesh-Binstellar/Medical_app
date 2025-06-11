@@ -6,6 +6,7 @@ use App\Events\MyEvent;
 use App\Events\Pharmacymedicine;
 use App\Models\Carts;
 use App\Models\Additionalcharges;
+use App\Models\CommissionData;
 use App\Models\CustomerAddress;
 use App\Models\Customers;
 use App\Models\DeliveryPerson;
@@ -32,8 +33,8 @@ class MedicineSearchController extends Controller
         $pharmacy = Pharmacies::where('user_id', Auth::user()->id)->first();
 
         $medicines = Phrmacymedicine::where('phrmacy_id', Auth::user()->id)->get();
-
-        return view('pharmacist.add-medicine', compact('medicines'));
+$commissionData = CommissionData::latest()->first();
+        return view('pharmacist.add-medicine', compact('medicines','commissionData'));
     }
 
     public function store(Request $request)
@@ -383,7 +384,7 @@ class MedicineSearchController extends Controller
             $now = \Carbon\Carbon::now();
 
             // Show message if more than 15 minutes old
-            if ($now->diffInMinutes($quoteTime) > 15) {
+             if ($quoteTime->addMinutes(15)->lt($now)) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Request quote exceeded 15 minutes'

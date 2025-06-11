@@ -323,7 +323,10 @@
     <script src="{{ asset('assets/js/daterangepicker.min.js') }}"></script>
     <script src="{{ asset('assets/js/chart.min.js') }}"></script>
     {{-- <script src="https://cdn.jsdelivr.net/npm/parsleyjs"></script>/ --}}
-    {{-- <script src="https://code.highcharts.com/highcharts.js"></script> --}}
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+{{-- <script src="https://code.highcharts.com/modules/solid-gauge.js"></script> --}}
+
     {{-- <script
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1mG52tiHM3duCJupl0CtEB3xpzUGiohQ&callback=initAutocomplete&libraries=places&v=weekly"
     defer

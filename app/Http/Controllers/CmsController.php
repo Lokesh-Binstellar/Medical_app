@@ -386,7 +386,7 @@ class CmsController extends Controller
             <li><a class="dropdown-item" href="' . $editUrl . '">Edit</a></li>
             </ul>
             </div>';
-            // <li><button class="dropdown-item btn-delete" data-id="' . $row->id . '" data-url="' . $deleteUrl . '">Delete</button></li>
+                    // <li><button class="dropdown-item btn-delete" data-id="' . $row->id . '" data-url="' . $deleteUrl . '">Delete</button></li>
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -423,7 +423,7 @@ class CmsController extends Controller
     {
         return view('cms.terms-and-conditions.edit', compact('termsAndCondition'));
     }
-    
+
 
     public function termsUpdate(Request $request, TermsAndCondition $termsAndCondition)
     {

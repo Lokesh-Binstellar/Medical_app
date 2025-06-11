@@ -126,11 +126,10 @@
 
 
 
-        
+
         {{-- customer --}}
         @if ($isSuperAdmin == 1)
-            <li
-                class="menu-item {{ in_array(Route::currentRouteName(), ['customer.list']) ? 'active open' : '' }}">
+            <li class="menu-item {{ in_array(Route::currentRouteName(), ['customer.list']) ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons mdi mdi-account-outline"></i>
                     <div data-i18n="Customer Details">Customer Details</div>
@@ -210,11 +209,12 @@
                             </a>
                         </li>
 
-                    <li class="menu-item {{ Route::current()->getName() == 'packageCategory.index' ? 'active' : '' }}">
-                        <a href="{{ route('packageCategory.index') }}" class="menu-link">
-                            <div data-i18n="Filter By Organs">Filter By Organs</div>
-                        </a>
-                    </li>
+                        <li
+                            class="menu-item {{ Route::current()->getName() == 'packageCategory.index' ? 'active' : '' }}">
+                            <a href="{{ route('packageCategory.index') }}" class="menu-link">
+                                <div data-i18n="Filter By Organs">Filter By Organs</div>
+                            </a>
+                        </li>
                     @endif
                 </ul>
             </li>
@@ -434,8 +434,37 @@
                 </a>
             </li>
         @endif
+        @if ($isSuperAdmin == 1)
+            <li class="menu-item {{ in_array(Route::currentRouteName(), ['filtered.orders']) ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons mdi mdi-filter-outline"></i>
+                    <div data-i18n="Filtered Orders">Filtered Orders</div>
+                </a>
+                <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
+                    <li class="menu-item {{ Route::currentRouteName() == 'filtered.orders' ? 'active' : '' }}">
+                        <a href="{{ route('filtered.orders') }}" class="menu-link">
+                            <div data-i18n="Pharmacy Ledger Report">Pharmacy Ledger Report</div>
+                        </a>
+                    </li>
 
-        @if (in_array('Pharmacies', $permissions) || $isSuperAdmin == 1 || in_array('Orders', $permissions) || in_array('Laboratories', $permissions) )
+                    {{-- Future Use: Laboratory Ledger Report --}}
+                    {{--
+            <li class="menu-item {{ Route::currentRouteName() == 'lab.ledger.report' ? 'active' : '' }}">
+                <a href="{{ route('lab.ledger.report') }}" class="menu-link">
+                    <div data-i18n="Laboratory Ledger Report">Laboratory Ledger Report</div>
+                </a>
+            </li>
+            --}}
+                </ul>
+            </li>
+        @endif
+
+
+
+        @if (in_array('Pharmacies', $permissions) ||
+                $isSuperAdmin == 1 ||
+                in_array('Orders', $permissions) ||
+                in_array('Laboratories', $permissions))
             <li class="menu-item {{ in_array(Route::current()->getName(), ['orderdetails']) ? 'active' : '' }}">
                 <a href="{{ route('orderdetails') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-view-list"></i>
@@ -443,6 +472,16 @@
                 </a>
             </li>
         @endif
+
+        @if ($isSuperAdmin == 1)
+<li class="menu-item {{ request()->is('commission_data*') ? 'active' : '' }}">
+    <a href="{{ route('commission_data.index') }}" class="menu-link">
+        <i class="menu-icon tf-icons mdi mdi-cash-multiple"></i>
+        <div data-i18n="Commission Data">Commission Data</div>
+    </a>
+</li>
+@endif
+
 
         {{-- @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
             <li class="menu-item {{ in_array(Route::current()->getName(), ['laboratorie.index']) ? 'active' : '' }}">

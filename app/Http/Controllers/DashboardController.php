@@ -69,22 +69,22 @@ class DashboardController extends Controller
                 ->selectRaw('SUM(commission_amount) as total_commission')
                 ->first();
 
-           $salesPerMonthData = Order::where('pharmacy_id', $pharmacyId)
-    ->whereMonth('created_at', $currentMonth)
-    ->whereYear('created_at', $currentYear)
-    ->selectRaw('DAY(created_at) as day, SUM(items_price) as total_sales')
-    ->groupBy('day')
-    ->orderBy('day')
-    ->pluck('total_sales', 'day')
-    ->toArray();
+            $salesPerMonthData = Order::where('pharmacy_id', $pharmacyId)
+                ->whereMonth('created_at', $currentMonth)
+                ->whereYear('created_at', $currentYear)
+                ->selectRaw('DAY(created_at) as day, SUM(items_price) as total_sales')
+                ->groupBy('day')
+                ->orderBy('day')
+                ->pluck('total_sales', 'day')
+                ->toArray();
 
-$dailySalesData = [];
-for ($i = 1; $i <= $daysInMonth; $i++) {
-    $dailySalesData[] = $salesPerMonthData[$i] ?? 0;
-}
+            $dailySalesData = [];
+            for ($i = 1; $i <= $daysInMonth; $i++) {
+                $dailySalesData[] = $salesPerMonthData[$i] ?? 0;
+            }
 
-// Calculate total sales of the month
-$totalSalesForMonth = array_sum($salesPerMonthData);
+            // Calculate total sales of the month
+            $totalSalesForMonth = array_sum($salesPerMonthData);
         }
 
 
