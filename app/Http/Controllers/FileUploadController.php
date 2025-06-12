@@ -186,7 +186,9 @@ class FileUploadController extends Controller
 
     public function search(Request $request)
     {
-        $term = $request->input('   q');
+
+        // dd('nsdghfhd');
+        $term = $request->input('q');
 
         $customers = Customers::where('firstName', 'like', "%{$term}%")
             ->orWhere('lastName', 'like', "%{$term}%")

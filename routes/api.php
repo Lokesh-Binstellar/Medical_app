@@ -6,6 +6,7 @@ use App\Http\Controllers\AppRatingController;
 use App\Http\Controllers\AddLabTestController;
 use App\Http\Controllers\LaboratoriesController;
 use App\Http\Controllers\LabPackageAndTestDetailsController;
+use App\Http\Controllers\LabSlotController;
 use App\Http\Controllers\MyOrderController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AuthTokenController;
@@ -109,6 +110,13 @@ Route::middleware('check.api.key')->group(function () {
         // });
         Route::post('/broadcasting/auth', [PusherController::class, 'authenticate']);
         Route::get('/trigger-call', [PusherController::class, 'triggerCall']);
+
+
+
+
+
+
+        Route::post('/book-slot', [LabSlotController::class, 'book']);
     });
     Route::get('/about-us', [CmsController::class, 'aboutUs']);
     Route::get('/contact-us', [CmsController::class, 'contactUs']);
@@ -140,4 +148,16 @@ Route::middleware('check.api.key')->group(function () {
     Route::post('/getUserSelectLocation', [CustomerAddressController::class, 'getUserSelectLocation']);
     Route::get('/place-autocomplete', [CustomerAddressController::class, 'placeAutocomplete']);
     Route::post('/get-city-state', [CustomerAddressController::class, 'getCityStateFromPostalCode']);
+
+
+//lab slots api
+Route::get('/lab-slots', [LabSlotController::class, 'getSlotsByLabAndDate']);
+// Route::post('/calendar/slot-booking-details', [LabSlotController::class, 'slotBookingDetails']);
+Route::get('/calendar/slot-users', [LabSlotController::class, 'getSlotCustomers']);
+
+
+
+
+
+
 });

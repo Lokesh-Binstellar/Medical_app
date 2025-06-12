@@ -230,22 +230,22 @@
                     <div data-i18n="Prescription & Cart">Prescription & Cart</div>
                 </a>
                 <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
-                    @if (in_array('Carts', $permissions) || $isSuperAdmin == 1)
-                        <li
-                            class="menu-item {{ Route::current()->getName() == 'addMedicine.index' ? 'active' : '' }}">
-                            <a href="{{ route('addMedicine.index') }}" class="menu-link">
-                                <div data-i18n="Add Medicine">Add Medicine</div>
-                            </a>
-                        </li>
-                    @endif
                     @if (in_array('Prescriptions', $permissions) || $isSuperAdmin == 1)
-                        <li
-                            class="menu-item {{ Route::current()->getName() == 'prescriptions.index' ? 'active' : '' }}">
-                            <a href="{{ route('prescriptions.index') }}" class="menu-link">
-                                <div data-i18n="Prescriptions">Prescriptions</div>
-                            </a>
-                        </li>
-                    @endif
+                    <li
+                    class="menu-item {{ Route::current()->getName() == 'prescriptions.index' ? 'active' : '' }}">
+                    <a href="{{ route('prescriptions.index') }}" class="menu-link">
+                        <div data-i18n="Prescriptions">Prescriptions</div>
+                    </a>
+                </li>
+                @endif
+                @if (in_array('Carts', $permissions) || $isSuperAdmin == 1)
+                    <li
+                        class="menu-item {{ Route::current()->getName() == 'addMedicine.index' ? 'active' : '' }}">
+                        <a href="{{ route('addMedicine.index') }}" class="menu-link">
+                            <div data-i18n="Add Medicine">Add Medicine</div>
+                        </a>
+                    </li>
+                @endif
                     @if (in_array('Prescriptions', $permissions) || $isSuperAdmin == 1)
                         <li
                             class="menu-item {{ Route::current()->getName() == 'prescriptions.upload' ? 'active' : '' }}">
@@ -628,6 +628,15 @@
             </li>
         @endif
 
+
+     @if (in_array('Laboratories', $permissions))
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['calendar.index']) ? 'active' : '' }}">
+                <a href="{{ route('calendar.index') }}" class="menu-link">
+               <i class="menu-icon tf-icons mdi mdi-calendar-blank-outline"></i>
+                    <div data-i18n="Slot Booking">Slot Booking</div>
+                </a>
+            </li>
+        @endif
 
 
         <li class="menu-item">

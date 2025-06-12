@@ -19,8 +19,8 @@
         }
 
         .fc .fc-view-harness .fc-event {
-            background-color: #f2f5f7;
-            color: #033a62;
+            background-color: #f2f5f7 !important;
+            color: #033a62 !important;
         }
 
         .fc .fc-timegrid .fc-timegrid-event {
@@ -58,6 +58,24 @@
             background-color: rgba(0, 123, 255, 0.15) !important;
             border: 1px dashed rgba(0, 123, 255, 0.4);
             border-radius: 4px;
+        }
+
+        .fc .fc-button-primary:not(.fc-prev-button):not(.fc-next-button) {
+            display: none !important;
+        }
+
+        .light-style .fc .fc-day-today {
+            background-color: rgba(0, 123, 255, 0.15) !important;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 @endsection
@@ -129,113 +147,157 @@
                     initialView: 'dayGridMonth',
                     plugins: [dayGridPlugin, timegridPlugin, listPlugin, interactionPlugin],
                     events: events,
-                    dayMaxEvents: 2, // 👉 Only 2 events visible, rest show "+X more"
-                    eventDisplay: 'block', // ensures each event shows as block
+                    dayMaxEvents: 2,
+                    eventDisplay: 'block',
                     height: 'auto',
-                    selectable: true,
+                    selectable: false,
                     headerToolbar: {
                         left: 'prev,next today',
                         center: 'title',
                         right: ''
-
                     },
-                    select: async function(info) {
-                        const selectedDate = info.startStr.slice(0, 10);
-                        const response = await fetch(
-                            `{{ route('calendar.slotsByDate') }}?date=${selectedDate}`);
-                        const existingSlots = await response.json();
+                    dayCellContent: function(arg) {
+                        const dateObj = arg.date;
+                        const date = dateObj.getFullYear() + '-' +
+                            String(dateObj.getMonth() + 1).padStart(2, '0') + '-' +
+                            String(dateObj.getDate()).padStart(2, '0');
 
-                        let html = '';
-
-                        for (let hour = 0; hour < 24; hour++) {
-                            const from = `${selectedDate}T${String(hour).padStart(2, '0')}:00`;
-                            const to = `${selectedDate}T${String((hour + 1) % 24).padStart(2, '0')}:00`;
-
-                            const isActive = existingSlots.find(slot => slot.start === from && slot
-                                .is_active);
-
-                            html += `
-            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                <div>${from.slice(11, 16)} - ${to.slice(11, 16)}</div>
-                <div class="form-check form-switch">
-                    <input class="form-check-input toggle-slot-switch" type="checkbox"
-                        data-start="${from}" data-end="${to}" ${isActive ? 'checked' : ''}>
-                </div>
-            </div>`;
-                        }
-
-                        slotListContainer.innerHTML = html;
-
-                        document.querySelectorAll('.toggle-slot-switch').forEach(switchBtn => {
-                            switchBtn.addEventListener('change', async function() {
-                                const start = this.getAttribute('data-start');
-                                const end = this.getAttribute('data-end');
-
-                                if (this.checked) {
-                                    const response = await fetch(
-                                        "{{ route('calendar.store') }}", {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'X-CSRF-TOKEN': document
-                                                    .querySelector(
-                                                        'meta[name=\"csrf-token\"]'
-                                                    ).content
-                                            },
-                                            body: JSON.stringify({
-                                                eventStartDate: start,
-                                                eventEndDate: end
-                                            })
-                                        });
-
-                                    if (response.ok) {
-                                        const event = {
-                                            title: `${start.slice(11, 16)} Slot Available`,
-                                            start: start,
-                                            end: end,
-                                            color: '#28a745',
-                                            className: 'slot-enabled'
-                                        };
-                                        calendar.addEvent(event);
-                                    } else {
-                                        alert('Failed to save slot.');
-                                        this.checked = false;
-                                    }
-                                } else {
-                                    // Optional: disable logic
-                                }
-                            });
-                        });
-
-                        document.getElementById('addEventSidebarLabel').innerText =
-                            `Select Slot for ${selectedDate}`;
-                        bsAddEventSidebar.show();
+                        return {
+                            html: `
+            <div class="fc-day-number">${arg.dayNumberText}</div>
+            <div class="mt-1 d-flex justify-content-center gap-1">
+                <button class="btn btn-sm btn-icon btn-primary rounded-circle view-bookings-btn"
+                        data-date="${date}" data-bs-toggle="tooltip" title="View Bookings">
+                    <i class="bx bx-show text-white"></i>
+                </button>
+                <button class="btn btn-sm btn-icon btn-success rounded-circle enable-slots-btn"
+                        data-date="${date}" data-bs-toggle="tooltip" title="Enable Slots">
+                    <i class="bx bx-plus text-white"></i>
+                </button>
+            </div>`
+                        };
                     },
                     eventClick: function(info) {
-                        const event = info.event;
-                        const date = event.startStr.slice(0, 10); // Extract date
-
-                        // Optional: call your sidebar modal here with all events on this date
-                        fetch(`/calendar/slots-by-date?date=${date}`)
-                            .then(res => res.json())
-                            .then(slots => {
-                                let html = '';
-                                slots.forEach(slot => {
-                                    html += `
-                    <div class="border-bottom py-1">
-                        <strong>${slot.start.slice(11, 16)} - ${slot.end.slice(11, 16)}</strong>
-                        <span class="badge bg-${slot.is_active ? 'success' : 'secondary'} ms-2">${slot.is_active ? 'Enabled' : 'Disabled'}</span>
-                    </div>
-                `;
-                                });
-
-                                document.getElementById('slotDetailsContainer').innerHTML = html;
-                                new bootstrap.Offcanvas('#slotDetailsSidebar').show();
-                            });
+                        // Optional - disabled behavior if not needed
                     },
+                    select: function() {
+                        // No default slot selection
+                    }
                 });
 
                 calendar.render();
+
+                // Handle view button
+                $(document).on('click', '.view-bookings-btn', function(e) {
+                    e.preventDefault();
+                    const date = $(this).data('date');
+                    window.location.href = `/lab-slots/bookings-by-date?date=${date}`;
+                });
+
+                // Handle enable button
+                $(document).on('click', '.enable-slots-btn', async function(e) {
+                    e.preventDefault();
+                    const selectedDate = $(this).data('date');
+
+                    const response = await fetch(
+                        `{{ route('calendar.slotsByDate') }}?date=${selectedDate}`);
+                    const existingSlots = await response.json();
+
+                    let html = '';
+                    for (let hour = 0; hour < 24; hour++) {
+                        const from = `${selectedDate}T${String(hour).padStart(2, '0')}:00`;
+                        const to = `${selectedDate}T${String((hour + 1) % 24).padStart(2, '0')}:00`;
+
+                        const isActive = existingSlots.find(slot => slot.start === from && slot
+                            .is_active);
+
+                        html += `
+                        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                            <div>${from.slice(11, 16)} - ${to.slice(11, 16)}</div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input toggle-slot-switch" type="checkbox"
+                                    data-start="${from}" data-end="${to}" ${isActive ? 'checked' : ''}>
+                            </div>
+                        </div>`;
+                    }
+
+                    slotListContainer.innerHTML = html;
+
+                    document.querySelectorAll('.toggle-slot-switch').forEach(switchBtn => {
+                        switchBtn.addEventListener('change', async function() {
+                            const start = this.getAttribute('data-start');
+                            const end = this.getAttribute('data-end');
+
+                            if (this.checked) {
+                                const response = await fetch(
+                                    "{{ route('calendar.store') }}", {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': document
+                                                .querySelector(
+                                                    'meta[name="csrf-token"]')
+                                                .content
+                                        },
+                                        body: JSON.stringify({
+                                            eventStartDate: start,
+                                            eventEndDate: end
+                                        })
+                                    });
+
+                                if (response.ok) {
+                                    calendar.addEvent({
+                                        title: `${start.slice(11, 16)} Slot Available`,
+                                        start: start,
+                                        end: end,
+                                        className: 'slot-enabled'
+                                    });
+                                } else {
+                                    alert('Failed to save slot.');
+                                    this.checked = false;
+                                }
+                            } else {
+                                const response = await fetch(
+                                    "{{ route('calendar.disable') }}", {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': document
+                                                .querySelector(
+                                                    'meta[name="csrf-token"]')
+                                                .content
+                                        },
+                                        body: JSON.stringify({
+                                            eventStartDate: start,
+                                            eventEndDate: end
+                                        })
+                                    });
+
+                                if (response.ok) {
+                                    calendar.getEvents().forEach(event => {
+                                        if (
+                                            event.start.toISOString().slice(
+                                                0, 16) === new Date(start)
+                                            .toISOString().slice(0, 16) &&
+                                            event.end.toISOString().slice(0,
+                                                16) === new Date(end)
+                                            .toISOString().slice(0, 16)
+                                        ) {
+                                            event.remove();
+                                        }
+                                    });
+                                } else {
+                                    alert('Failed to disable slot.');
+                                    this.checked = true;
+                                }
+                            }
+                        });
+                    });
+
+                    document.getElementById('addEventSidebarLabel').innerText =
+                        `Select Slot for ${selectedDate}`;
+                    bsAddEventSidebar.show();
+                });
             }
 
             fetchSlots().then(data => {

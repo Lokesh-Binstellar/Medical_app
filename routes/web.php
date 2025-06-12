@@ -65,10 +65,16 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\CheckSession::class]
 
     //calendar
 
-    Route::get('/calendar', [LabSlotController::class, 'index'])->name('lab_slots.index');
+    Route::get('/calendar', [LabSlotController::class, 'index'])->name('calendar.index');
     Route::post('/calendar/save-slot', [LabSlotController::class, 'store'])->name('calendar.store');
     Route::get('/calendar/slots-by-date', [LabSlotController::class, 'getSlotsByDate'])->name('calendar.slotsByDate');
     Route::get('/calendar/fetch', [LabSlotController::class, 'fetch'])->name('calendar.fetch');
+    Route::post('/calendar/disable', [LabSlotController::class, 'disable'])->name('calendar.disable');
+Route::get('/lab-slots/bookings-by-date', [LabSlotController::class, 'viewBookingsByDate'])->name('lab-slots.bookings.by.date');
+
+
+    // web.php
+
 
     // About Us Routes
     Route::prefix('cms/about-us')
@@ -689,7 +695,8 @@ Route::prefix('CommissionData')->group(function () {
 });
 Route::get('/prescriptions', [FileUploadController::class, 'index'])->name('prescriptions.index');
 Route::get('/uploadprescription', [FileUploadController::class, 'uploadprescription'])->name('prescriptions.upload');
-Route::get('/customers/search', [FileUploadController::class, 'search']);
+// Route::get('/customers/search', [FileUploadController::class, 'search']);
+Route::get('/customers/search', [FileUploadController::class, 'search'])->name('customers.search');
 Route::post('/admin/store/prescriptions', [FileUploadController::class, 'store'])->name('admin.prescription.store');
 
 Route::post('/prescriptions/update-status/{id}', [FileUploadController::class, 'updateStatus']);

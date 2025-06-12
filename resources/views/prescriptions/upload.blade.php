@@ -51,28 +51,28 @@
         </div>
 @endsection
 @section('scripts')
-    <script>
-        $(document).ready(function () {
-            $('#customer').select2({
-                placeholder: 'Search by name or mobile number',
-                ajax: {
-                    url: '{{ url("/customers/search") }}',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                        return {
-                            q: params.term
-                        };
-                    },
-                    processResults: function (data) {
-                        return {
-                            results: data.results
-                        };
-                    },
-                    cache: true
+   <script>
+    $(document).ready(function () {
+        $('#customer').select2({
+            placeholder: 'Search by name or mobile number',
+            ajax: {
+                url: '{{ url("/customers/search") }}',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term
+                    };
                 },
-                minimumInputLength: 2
-            });
+                processResults: function (data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 2
         });
-    </script>
+    });
+</script>
 @endsection

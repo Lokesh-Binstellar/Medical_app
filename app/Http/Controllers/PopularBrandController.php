@@ -28,10 +28,14 @@ class PopularBrandController extends Controller
                         <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
                         <ul class="dropdown-menu">
                             <li>
-                                <a href="' . route('popular.edit', $row->id) . '" class="dropdown-item">Edit</a>
+                                <a href="' .
+                        route('popular.edit', $row->id) .
+                        '" class="dropdown-item">Edit</a>
                             </li>
                             <li>
-                                <button type="button" onclick="deleteUser(' . $row->id . ')" class="dropdown-item text-danger">Delete</button>
+                                <button type="button" onclick="deleteUser(' .
+                        $row->id .
+                        ')" class="dropdown-item text-danger">Delete</button>
                             </li>
                         </ul>
                     </div>';
@@ -39,25 +43,16 @@ class PopularBrandController extends Controller
                 ->rawColumns(['action', 'logo'])
                 ->make(true);
         }
-        
-        $medicineMarketers = Medicine::select('marketer')
-            ->whereNotNull('marketer')
-            ->distinct()
-            ->pluck('marketer');
 
-        $otcManufacturers = Otcmedicine::select('manufacturers')
-            ->whereNotNull('manufacturers')
-            ->distinct()
-            ->pluck('manufacturers');
+        $medicineMarketers = Medicine::select('marketer')->whereNotNull('marketer')->distinct()->pluck('marketer');
+
+        $otcManufacturers = Otcmedicine::select('manufacturers')->whereNotNull('manufacturers')->distinct()->pluck('manufacturers');
 
         $popularBrands = $medicineMarketers->merge($otcManufacturers)->unique()->values();
         $AddedBrands = PopularBrand::all();
 
         return view('popular.index', compact('popularBrands', 'AddedBrands'));
     }
-
-
-
 
     public function store(Request $request)
     {
@@ -87,7 +82,6 @@ class PopularBrandController extends Controller
             // ✅ Save only the original filename
             $brand->logo = $saveName;
         }
-
 
         $brand->save();
 
@@ -149,19 +143,20 @@ class PopularBrandController extends Controller
                 'id' => $brand->id,
                 'name' => $brand->name,
                 'logo' => $brand->logo ? url('popular/brands/' . basename($brand->logo)) : [],
-
             ];
         });
 
-        return response()->json([
-            'status' => true,
-            'data' => $brandsData
-        ], 200);
+        return response()->json(
+            [
+                'status' => true,
+                'data' => $brandsData,
+            ],
+            200,
+        );
     }
 
     public function productListByBrand(Request $request, $brandName)
     {
-
         $page = $request->query('page', 1);
         $perPage = $request->query('per_page', 20);
 
@@ -172,16 +167,17 @@ class PopularBrandController extends Controller
         $productFormArray = $productFormFilter ? array_map('trim', explode(',', $productFormFilter)) : null;
 
         if (!$brandName) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Brand parameter is required.'
-            ], 400);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Brand parameter is required.',
+                ],
+                400,
+            );
         }
 
         $baseUrl = url('medicines');
         $defaultImage = "{$baseUrl}/placeholder.png";
-
-
 
         // --- Fetch and transform Medicines ---
         $medicines = Medicine::where('marketer', $brandName)
@@ -191,7 +187,7 @@ class PopularBrandController extends Controller
             ->when($packageArray, function ($q) use ($packageArray) {
                 return $q->whereIn('package', $packageArray);
             })
-            ->select('product_id', 'product_name', 'salt_composition', 'package', 'image_url', 'marketer', 'product_form')
+            ->select('product_id', 'product_name', 'salt_composition', 'package', 'image_url', 'marketer', 'product_form', 'prescription_required')
             ->get()
             ->map(function ($item) use ($baseUrl, $defaultImage) {
                 return [
@@ -200,14 +196,12 @@ class PopularBrandController extends Controller
                     'salt_composition' => $item->salt_composition,
                     'packaging_detail' => $item->package,
                     'product_form' => $item->product_form,
-                    'image_url' => $item->image_url
-                        ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
-                        : [$defaultImage],
+                    'prescription_required' => $item->prescription_required == true ? true : false,
+                    'image_url' => $item->image_url ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img))) : [$defaultImage],
                     'type' => 'medicine',
                     'brand' => $item->marketer ?? '',
                 ];
             });
-
 
         // --- Fetch and transform OTC Medicines ---
         $otc = Otcmedicine::where('manufacturers', $brandName)
@@ -222,9 +216,8 @@ class PopularBrandController extends Controller
                     'salt_composition' => null,
                     'packaging_detail' => $item->package,
                     'product_form' => $item->product_form,
-                    'image_url' => $item->image_url
-                        ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img)))
-                        : [$defaultImage],
+                    'prescription_required' => $item->prescription_required == true ? true : false,
+                    'image_url' => $item->image_url ? collect(explode(',', $item->image_url))->map(fn($img) => "{$baseUrl}/" . trim(basename($img))) : [$defaultImage],
                     'type' => 'otc',
                     'brand' => $item->manufacturers ?? '',
                 ];
@@ -237,13 +230,7 @@ class PopularBrandController extends Controller
         $paginated = $merged->slice(($page - 1) * $perPage, $perPage)->values();
 
         // --- Paginate manually ---
-        $paginator = new LengthAwarePaginator(
-            $paginated,
-            $total,
-            $perPage,
-            $page,
-            ['path' => url()->current(), 'query' => $request->query()]
-        );
+        $paginator = new LengthAwarePaginator($paginated, $total, $perPage, $page, ['path' => url()->current(), 'query' => $request->query()]);
 
         // --- Return JSON response ---
         return response()->json([
@@ -254,7 +241,7 @@ class PopularBrandController extends Controller
                 'per_page' => $paginator->perPage(),
                 'current_page' => $paginator->currentPage(),
                 'last_page' => $paginator->lastPage(),
-            ]
+            ],
         ]);
     }
 
@@ -286,32 +273,16 @@ class PopularBrandController extends Controller
         }
 
         // Unique product forms
-        $medicineForms = (clone $medicineQuery)
-            ->whereNotNull('product_form')
-            ->where('product_form', '!=', '')
-            ->distinct()
-            ->pluck('product_form');
+        $medicineForms = (clone $medicineQuery)->whereNotNull('product_form')->where('product_form', '!=', '')->distinct()->pluck('product_form');
 
-        $otcForms = (clone $otcQuery)
-            ->whereNotNull('product_form')
-            ->where('product_form', '!=', '')
-            ->distinct()
-            ->pluck('product_form');
+        $otcForms = (clone $otcQuery)->whereNotNull('product_form')->where('product_form', '!=', '')->distinct()->pluck('product_form');
 
         $productForms = $medicineForms->merge($otcForms)->unique()->values();
 
         // Unique package details
-        $medicinePackages = (clone $medicineQuery)
-            ->whereNotNull('package')
-            ->where('package', '!=', '')
-            ->distinct()
-            ->pluck('package');
+        $medicinePackages = (clone $medicineQuery)->whereNotNull('package')->where('package', '!=', '')->distinct()->pluck('package');
 
-        $otcPackages = (clone $otcQuery)
-            ->whereNotNull('package')
-            ->where('package', '!=', '')
-            ->distinct()
-            ->pluck('package');
+        $otcPackages = (clone $otcQuery)->whereNotNull('package')->where('package', '!=', '')->distinct()->pluck('package');
 
         $package = $medicinePackages->merge($otcPackages)->unique()->values();
 
@@ -319,8 +290,8 @@ class PopularBrandController extends Controller
             'status' => true,
             'filters' => [
                 'product_forms' => $productForms,
-                'package' => $package
-            ]
+                'package' => $package,
+            ],
         ]);
     }
 }
