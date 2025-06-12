@@ -217,11 +217,11 @@
                 <div class="col-lg-6">
                     <div class="card overflow-hidden h-100">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title mb-0">Top Pharmacies</h4>
+                            <h4 class="card-title mb-0">Top Pharmacies By Rating</h4>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="display table table-striped table-hover "id="topPharmaciesTable">
+                                <table class="display table table-striped table-hover " id="topPharmaciesTable">
                                     <thead>
                                         <tr>
                                             <th></th>

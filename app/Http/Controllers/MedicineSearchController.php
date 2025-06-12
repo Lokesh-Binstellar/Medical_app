@@ -17,6 +17,7 @@ use App\Models\Patient;
 use App\Models\Pharmacies;
 use App\Models\Phrmacymedicine;
 use App\Models\Prescription;
+use App\Models\QuoteAcceptLog;
 use App\Models\RequestQuote;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -73,7 +74,22 @@ class MedicineSearchController extends Controller
         $medicine->phrmacy_id = $pharmacy->user_id;
         $medicine->customer_id = $data['customer'][0]['customer_id'] ?? null;
         $medicine->save();
+// Fetch latest matching request
+$existingRequest = DB::table('request_quotes')
+    ->where('customer_id', $medicine->customer_id)
+    ->where('pharmacy_id', $pharmacy->user_id)
+    ->latest()
+    ->first();
 
+// If found, store in log table
+if ($existingRequest) {
+    QuoteAcceptLog::create([
+        'customer_id' => $medicine->customer_id,
+        'pharmacy_id' => $pharmacy->user_id,
+        'requested_at' => $existingRequest->created_at,
+        'accepted_at' => $medicine->created_at,
+    ]);
+}
         DB::table('request_quotes')
             ->where('customer_id', $data['customer'][0]['customer_id'] ?? 0)
             ->where('pharmacy_id', $pharmacy->user_id)

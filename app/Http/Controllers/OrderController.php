@@ -7,6 +7,8 @@ use App\Models\CustomerAddress;
 use App\Models\Order;
 use App\Models\Pharmacies;
 use App\Models\Phrmacymedicine;
+use Carbon\Carbon;
+use DB;
 use Illuminate\Http\Request;
 class OrderController extends Controller
 {
@@ -30,7 +32,26 @@ class OrderController extends Controller
             $products = json_decode($cartItems->products_details, true);
 
             $productData = Phrmacymedicine::where('customer_id', $userId)->first();
+// Fetch pharmacy medicine entry correctly
+$productData = Phrmacymedicine::where('customer_id', $userId)
+    ->where('phrmacy_id', $request->pharmacy_id)
+    ->latest()
+    ->first();
 
+// Fetch request quote entry
+$existingRequest = DB::table('request_quotes')
+    ->where('customer_id', $userId)
+    ->where('pharmacy_id', $request->pharmacy_id)
+    ->latest()
+    ->first();
+
+// Parse timestamps safely
+$requestedAt = $existingRequest?->created_at ? Carbon::parse($existingRequest->created_at) : null;
+$acceptedAt = $productData?->created_at ? Carbon::parse($productData->created_at) : now();
+// Calculate difference
+$quoteDiff = ($requestedAt && $acceptedAt) ? $requestedAt->diffInMinutes($acceptedAt) : null;
+
+// dd($quoteDiff);
 
             $customerAddDetails = CustomerAddress::where('customer_id', $userId)
                 ->where('address_type', $request->delivery_address)
@@ -80,7 +101,11 @@ class OrderController extends Controller
                 'status' => 0,
                 'selected_pharmacy_address' => $selected_pharmacy_address,
                 'selected_pharmacy_latlong' => $selected_pharmacy_latlong,
-                'commission' => $productData->commission_amount
+                'commission' => $productData->commission_amount,
+                'requested_at' => $requestedAt,
+
+'quote_diff_minutes' => $quoteDiff,
+
             ]);
 
 

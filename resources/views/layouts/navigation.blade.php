@@ -438,7 +438,7 @@
             <li class="menu-item {{ in_array(Route::currentRouteName(), ['filtered.orders']) ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons mdi mdi-filter-outline"></i>
-                    <div data-i18n="Filtered Orders">Filtered Orders</div>
+                    <div data-i18n="Ledger Orders">Ledger Orders</div>
                 </a>
                 <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
                     <li class="menu-item {{ Route::currentRouteName() == 'filtered.orders' ? 'active' : '' }}">

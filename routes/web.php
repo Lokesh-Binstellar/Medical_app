@@ -473,6 +473,199 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\CheckSession::class]
             Route::get('/addLabTestSearch', [AddLabTestController::class, 'search'])->name('addLabTest.search');
             Route::get('/get-contains', [AddLabTestController::class, 'getContains'])->name('addLabTest.contains');
         });
+
+        //Pharmacist
+        Route::prefix('pharmacy')->group(function () {
+            Route::get('/', [PharmaciesController::class, 'index'])->name('pharmacist.index');
+            Route::group(['middleware' => 'permission:Pharmacies,create'], function () {
+                Route::get('/create', [PharmaciesController::class, 'create'])->name('pharmacist.create');
+                Route::post('/store', [PharmaciesController::class, 'store'])->name('pharmacist.store');
+            });
+            Route::group(['middleware' => 'permission:Pharmacies,update'], function () {
+                Route::get('{id}/edit', [PharmaciesController::class, 'edit'])->name('pharmacist.edit');
+                Route::put('/{id}', [PharmaciesController::class, 'update'])->name('pharmacist.update');
+            });
+            Route::group(['middleware' => 'permission:Pharmacies,delete'], function () {
+                Route::delete('/{id}', [PharmaciesController::class, 'destroy'])->name('pharmacist.destroy');
+            });
+            Route::group(['middleware' => 'permission:Pharmacies,read'], function () {
+                Route::get('/{id}', [PharmaciesController::class, 'show'])->name('pharmacist.show');
+            });
+        });
+
+        //laboratories
+        Route::prefix('laboratory')->group(function () {
+            Route::get('', [LaboratoriesController::class, 'index'])->name('laboratorie.index');
+            Route::group(['middleware' => 'permission:Laboratories,create'], function () {
+                Route::get('/create', [LaboratoriesController::class, 'create'])->name('laboratorie.create');
+                Route::post('/store', [LaboratoriesController::class, 'store'])->name('laboratorie.store');
+            });
+            Route::group(['middleware' => 'permission:Laboratories,update'], function () {
+                Route::get('/{id}/edit', [LaboratoriesController::class, 'edit'])->name('laboratorie.edit');
+                Route::put('/{id}', [LaboratoriesController::class, 'update'])->name('laboratorie.update');
+            });
+            Route::group(['middleware' => 'permission:Laboratories,delete'], function () {
+                Route::delete('/{id}', [LaboratoriesController::class, 'destroy'])->name('laboratorie.destroy');
+            });
+            Route::group(['middleware' => 'permission:Laboratories,read'], function () {
+                Route::get('/{id}', [LaboratoriesController::class, 'show'])->name('laboratorie.show');
+            });
+        });
+
+        //DeliveryPerson
+        Route::prefix('DeliveryPerson')->group(function () {
+            Route::get('/', [DeliveryPersonController::class, 'index'])->name('delivery_person.index');
+            Route::get('/create', [DeliveryPersonController::class, 'create'])->name('delivery_person.create');
+            Route::post('/store', [DeliveryPersonController::class, 'store'])->name('delivery_person.store');
+            Route::get('{id}/edit', [DeliveryPersonController::class, 'edit'])->name('delivery_person.edit');
+            Route::put('/{id}', [DeliveryPersonController::class, 'update'])->name('delivery_person.update');
+            Route::delete('/{id}', [DeliveryPersonController::class, 'destroy'])->name('delivery_person.destroy');
+            Route::get('/{id}', [DeliveryPersonController::class, 'show'])->name('delivery_person.show');
+        });
+
+        //Medicine
+        Route::prefix('medicine')->group(function () {
+            Route::get('', [MedicineController::class, 'index'])->name('medicine.index');
+            Route::post('import', [MedicineController::class, 'import'])->name('medicine.import');
+            Route::group(['middleware' => 'permission:PopularBrand,read'], function () {
+                Route::get('/{id}', [MedicineController::class, 'show'])->name('medicine.show');
+            });
+        });
+
+        //PopularCategory
+        Route::prefix('popularCategory')->group(function () {
+            Route::get('/', [PopularCategoryController::class, 'index'])->name('popular_category.index');
+            Route::group(['middleware' => 'permission:PopularCategory,create'], function () {
+                Route::post('/store', [PopularCategoryController::class, 'store'])->name('popular_category.store');
+            });
+            Route::group(['middleware' => 'permission:PopularCategory,update'], function () {
+                Route::get('{id}/edit', [PopularCategoryController::class, 'edit'])->name('popular_category.edit');
+                Route::put('{id}', [PopularCategoryController::class, 'update'])->name('popular_category.update');
+            });
+            Route::group(['middleware' => 'permission:PopularCategory,delete'], function () {
+                Route::delete('{id}', [PopularCategoryController::class, 'destroy'])->name('popular_category.destroy');
+            });
+        });
+
+        //Otc Medicine
+        Route::prefix('otcmedicine')->group(function () {
+            Route::get('', [OtcController::class, 'index'])->name('otcmedicine.index');
+            Route::post('import', [OtcController::class, 'import'])->name('otcmedicine.import');
+            Route::get('/{id}', [OtcController::class, 'show'])->name('otcmedicine.show');
+        });
+
+        //Popular Brand
+        Route::prefix('popularBrand')->group(function () {
+            Route::get('/', [PopularBrandController::class, 'index'])->name('popular.index');
+            Route::group(['middleware' => 'permission:PopularBrand,create'], function () {
+                Route::post('/store', [PopularBrandController::class, 'store'])->name('popular.store');
+            });
+            Route::group(['middleware' => 'permission:PopularBrand,update'], function () {
+                Route::get('/{id}/edit', [PopularBrandController::class, 'edit'])->name('popular.edit');
+                Route::put('/{id}', [PopularBrandController::class, 'update'])->name('popular.update');
+            });
+            Route::group(['middleware' => 'permission:PopularBrand,delete'], function () {
+                Route::delete('/{id}', [PopularBrandController::class, 'destroy'])->name('popular.destroy');
+            });
+        });
+
+        // Lab Test
+        Route::prefix('labtest')->group(function () {
+            Route::get('', [LabtestController::class, 'index'])->name('labtest.index');
+            Route::post('import', [LabtestController::class, 'import'])->name('labtest.import');
+            Route::get('/{id}', [LabtestController::class, 'show'])->name('labtest.show');
+        });
+
+        //Package Category
+        Route::prefix('packageCategory')->group(function () {
+            Route::get('', [packageCategoryController::class, 'index'])->name('packageCategory.index');
+            Route::get('/create', [packageCategoryController::class, 'create'])->name('packageCategory.create');
+            Route::post('/', [packageCategoryController::class, 'store'])->name('packageCategory.store');
+            Route::get('/{id}/edit', [packageCategoryController::class, 'edit'])->name('packageCategory.edit');
+            Route::put('/{id}', [packageCategoryController::class, 'update'])->name('packageCategory.update');
+            Route::delete('/{id}', [packageCategoryController::class, 'destroy'])->name('packageCategory.destroy');
+        });
+
+        //Add Lab Packages
+        Route::prefix('labPackage')->group(function () {
+            Route::get('', [PackageController::class, 'index'])->name('labPackage.index');
+            Route::post('/', [PackageController::class, 'store'])->name('labPackage.store');
+            Route::get('/create', [PackageController::class, 'create'])->name('labPackage.create');
+            Route::post('import', [PackageController::class, 'import'])->name('labPackage.import');
+            Route::get('/{id}/edit', [PackageController::class, 'edit'])->name('labPackage.edit');
+            Route::put('/{id}', [PackageController::class, 'update'])->name('labPackage.update');
+            Route::get('/{id}', [PackageController::class, 'show'])->name('labPackage.show');
+            Route::delete('/{id}', [PackageController::class, 'destroy'])->name('labPackage.destroy');
+        });
+
+        //Add Medicine
+        Route::prefix('addMedicine')->group(function () {
+            Route::get('', [AddMedicineController::class, 'index'])->name('addMedicine.index');
+
+            Route::post('', [AddMedicineController::class, 'store'])->name('addMedicine.store');
+            // web.php or api.php (depending on where you're calling it from)
+            Route::get('/get-medicine-strip', [AddMedicineController::class, 'getMedicineStrip'])->name('medicine.strip');
+            Route::get('/search-medicines', [AddMedicineController::class, 'searchMedicines'])->name('medicines.search');
+            Route::get('/prescription/select', [AddMedicineController::class, 'prescriptionSelect'])->name('prescription.select');
+            Route::get('/prescriptions/{customerId}/prescriptions', [AddMedicineController::class, 'getPrescriptionsByCustomer']);
+            //fetch-customer-cart
+            Route::get('/fetch-customer-cart', [AddMedicineController::class, 'fetchCustomerCart']);
+            Route::get('/fetch-prescription-files', [AddMedicineController::class, 'fetchPrescriptionFiles']);
+        });
+        Route::prefix('search-medicine')->group(function () {
+            Route::get('/pharmacist/add-medicine', [MedicineSearchController::class, 'index'])->name('add.medicine');
+            Route::get('/pharmacist/order-details', [MedicineSearchController::class, 'orderdetails'])->name('orderdetails');
+            Route::put('/pharmacy/orders/{id}/status', [MedicineSearchController::class, 'updateOrderStatus'])->name('pharmacy.updateOrderStatus');
+            Route::get('/orders/{id}/medicines', [MedicineSearchController::class, 'showMedicines'])->name('orders.medicines');
+            //Route::post('/orders/{order}/assign-delivery', [MedicineSearchController::class, 'assignDeliveryPerson'])->name('orders.assignDeliveryPerson');
+            Route::post('/orders/assign-delivery-person', [MedicineSearchController::class, 'assignDeliveryPerson'])->name('orders.assignDeliveryPerson');
+
+            Route::get('/search-medicine/invoice/download/{id}', [MedicineSearchController::class, 'downloadInvoice'])->name('invoice.download');
+
+
+            Route::get('/search-medicine', [MedicineSearchController::class, 'search'])->name('search.medicine');
+            Route::post('/add-medicine', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
+            Route::post('/medicines/store', [MedicineSearchController::class, 'store'])->name('medicines.store');
+            Route::get('/customers/select', [MedicineSearchController::class, 'customerSelect'])->name('customers.select');
+            // Only one route definition for get-substitute-medicines, no duplicates
+            Route::get('/get-substitute-medicines', [MedicineSearchController::class, 'fetchSubstituteBySalt'])->name('get-substitute-medicines');
+
+            Route::get('/get-medicine-salt', [MedicineSearchController::class, 'getSalt'])->name('get-medicine-salt');
+
+
+            Route::get('/fetch-cart-by-customer', [MedicineSearchController::class, 'fetchCartByCustomer']);
+            Route::get('/fetch-prescription-files', [MedicineSearchController::class, 'fetchPrescriptionFiles'])->name('search.prescription');
+
+
+
+            Route::get('/orders-filter', [FilteredOrderController::class, 'index'])->name('filtered.orders');
+            Route::get('/orders-filter/sales-data', [FilteredOrderController::class, 'salesData'])->name('orders.salesData');
+            Route::get('/orders-filter/pharmacy-order-stats', [FilteredOrderController::class, 'getPharmacyOrderStats'])->name('orders.stats');
+            Route::get('/orders-filter/pharmacy-order-response', [FilteredOrderController::class, 'getPharmacyOrderResponce'])->name('orders.response');
+             Route::get('/orders-filter/pharmacy-top-order', [FilteredOrderController::class, 'getTopPharmacyStats'])->name('orders.top');
+             Route::get('/orders-filter/pharmacy-Repeat-Orders', [FilteredOrderController::class, 'getRepeatCustomerStats'])->name('orders.repeat');
+        });
+        Route::get('customer-list', [CustomerDetailsController::class, 'index'])->name('customer.list');
+        Route::get('/customers/{id}', [CustomerDetailsController::class, 'show'])->name('customer.show');
+
+
+
+
+
+        // Route::post('/add-medicine/store', [MedicineSearchController::class, 'store'])->name('add.medicine.store');
+
+        // rating
+        Route::get('/app-ratings', [AppRatingController::class, 'index'])->name('app_ratings.index');
+
+        // zip_code_vise_delivery
+        Route::get('/zipcodes', [ZipCodeViceDeliveryController::class, 'index'])->name('zip_code_vise_delivery.index');
+        Route::post('/zipcodes/upload', [ZipCodeViceDeliveryController::class, 'uploadZipcodes'])->name('zip_code_vise_delivery.upload');
+        Route::delete('/zipcodes/delete-all', [ZipCodeViceDeliveryController::class, 'deleteAll'])->name('zip_code_vise_delivery.deleteAll');
+
+        Route::get('/addLabTest', [AddLabTestController::class, 'index'])->name('addLabTest.index');
+        Route::post('/store', [AddLabTestController::class, 'store'])->name('addLabTest.store');
+        Route::get('/addLabTestSearch', [AddLabTestController::class, 'search'])->name('addLabTest.search');
+        Route::get('/get-contains', [AddLabTestController::class, 'getContains'])->name('addLabTest.contains');
     });
 });
 require __DIR__ . '/auth.php';

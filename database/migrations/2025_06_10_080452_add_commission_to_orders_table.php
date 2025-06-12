@@ -19,10 +19,13 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
-    {
-        Schema::table('orders', function (Blueprint $table) {
+   public function down(): void
+{
+    Schema::table('orders', function (Blueprint $table) {
+        if (Schema::hasColumn('orders', 'commission')) {
             $table->dropColumn('commission');
-        });
-    }
+        }
+    });
+}
+
 };
