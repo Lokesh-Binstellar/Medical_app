@@ -1,26 +1,18 @@
 @extends('layouts.app')
-@section('styles')
-    {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
-    <style>
-        /* .select2 {
-                width: 300px !important;
-            }
 
-            body>span.select2-container.select2-container--default.select2-container--open {
-                width: auto !important;
-            } */
-        .fv-plugins-message-container.fv-plugins-message-container--enabled.invalid-feedback {
+@section('styles')
+    <style>
+        /* .fv-plugins-message-container.fv-plugins-message-container--enabled.invalid-feedback {
             min-height: 1.5rem;
-        }
+        } */
     </style>
 @endsection
+
 @section('content')
 
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="card-title mb-0 ">Home Screen Banner </h4>
-
-
+            <h4 class="card-title mb-0 ">Upload QR Code</h4>
         </div>
 
         <div class="card-body">
@@ -34,45 +26,39 @@
                         </ul>
                     </div>
                 @endif
-                <form action="{{ route('homebanner.store') }}" method="POST" enctype="multipart/form-data"
-                    class="row g-3 align-items-center" id="importForm">
+ @if (session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+                <form action="{{ route('upload_qr.store') }}" method="POST" enctype="multipart/form-data"
+                    class="row g-3 align-items-end" id="qrForm">
                     @csrf
                     <div class="error-msg col-md-4">
-                        <label for="logo" class="form-label"> Banner
-                            (jpeg,png,jpg,gif,svg)</label>
-                        <input type="file" name="image" class="form-control" required>
-
-                    </div>
-                    <div class="error-msg col-md-4">
-                        <label for="name" class="form-label">Select priority</label>
-                        <input type="number" name="priority" class="form-control" placeholder="Priority" min="0"
-                            required>
+                        <label for="qr" class="form-label">QR Code (jpeg, png, jpg)</label>
+                        <input type="file" name="qr_image" class="form-control" required>
                     </div>
 
                     <div class="col-md-4 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary ">+ Add Banner</button>
+                        <button type="submit" class="btn btn-primary">+ Upload QR Code</button>
                     </div>
-
                 </form>
+
+
             </div>
-            @if (session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
 
-
+           
 
             <div class="table-responsive">
-                <table id="add-row" class="display table table-striped table-hover data-table sortingclose">
+                <table id="qr-table" class="display table table-striped table-hover data-table sortingclose">
                     <thead>
                         <tr>
-                            <th>Id</th>
-                            <th>Banner</th>
+                            <th>ID</th>
+                            <th>QR Code</th>
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
+
             </div>
         </div>
     </div>
@@ -85,13 +71,13 @@
             let table = $('.data-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('homebanner.index') }}",
+                ajax: "{{ route('upload_qr.index') }}",
                 columns: [{
                         data: 'DT_RowIndex'
                     },
                     {
-                        data: 'image',
-                        name: 'image'
+                        data: 'qr_image',
+                        name: 'qr_image'
                     },
                     {
                         data: 'action',
@@ -100,9 +86,10 @@
                         searchable: false
                     }
                 ]
+
             });
 
-            window.deleteBanner = function(id) {
+            window.deleteQR = function(id) {
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -119,7 +106,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "/homebanners/" + id,
+                            url: "/upload-qr/" + id,
                             type: 'DELETE',
                             data: {
                                 _token: '{{ csrf_token() }}'
@@ -127,7 +114,7 @@
                             success: function(response) {
                                 Swal.fire({
                                     title: 'Deleted!',
-                                    text: 'The banner has been deleted.',
+                                    text: 'The QR code has been deleted.',
                                     icon: 'success',
                                     timer: 1500,
                                     showConfirmButton: false
@@ -147,16 +134,6 @@
                     }
                 });
             };
-
-
-
-            window.editBanner = function(id) {
-                $.get('/home-banners/' + id + '/edit', function(data) {
-                    // You can open a modal and populate image for editing
-                    console.log(data);
-                });
-            }
         });
     </script>
-    <script src="{{ asset('js/homebanner/homebanner_form.js') }}"></script>
 @endsection

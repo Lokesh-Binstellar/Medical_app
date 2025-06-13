@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Models\Phlebotomist;
 use App\Models\Laboratories;
-
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -21,7 +22,7 @@ class PhlebotomistController extends Controller
             // dd($userId->id);
 
 
-      
+
             $data = Phlebotomist::where('laboratory_id', $laboratory->id)->latest();
 
             return DataTables::of($data)
@@ -61,18 +62,47 @@ class PhlebotomistController extends Controller
         $laboratory = Laboratories::where('user_id', $user->id)->first();
 
         $request->validate([
-            'name' => 'required|string',
+            'phlebotomists_name' => 'required',
+            'email' => 'required|email|unique:users,email',
             'contact_number' => 'required|string',
+            'city' => 'nullable',
+            'state' => 'nullable',
+            'pincode' => 'nullable',
+            'address' => 'nullable',
+            'username' => 'required',
+            'password' => 'required',
         ]);
 
-        phlebotomist::create([
-            'name' => $request->name,
+
+        // Create user
+        $roleId = \App\Models\Role::where('name', 'delivery_person')->value('id');
+
+        $createdUser = User::create([
+            'name' => $request->username,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role_id' => $roleId,
+        ]);
+
+        // Create phlebotomist
+        Phlebotomist::create([
+            'laboratory_id' => $laboratory->id,
+            'phlebotomists_name' => $request->phlebotomists_name,
             'contact_number' => $request->contact_number,
-            'laboratory_id' => $laboratory->id, // ✅ fixed
+            'email' => $request->email,
+            'city' => $request->city,
+            'state' => $request->state,
+            'pincode' => $request->pincode,
+            'address' => $request->address,
+            'username' => $request->username,
+            'password' => Hash::make($request->password),
         ]);
 
-        return redirect()->route('phlebotomist.index')->with('success', 'phlebotomist added successfully.');
+
+        return redirect()->route('phlebotomist.index')->with('success', 'Phlebotomist created successfully!');
     }
+
+
 
 
     public function edit($id)
@@ -83,20 +113,55 @@ class PhlebotomistController extends Controller
         return view('phlebotomist.edit', compact('phlebotomist'));
     }
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|string',
-            'contact_number' => 'required|string',
-        ]);
-
-        $laboratory = Laboratories::where('user_id', Auth::user()->id)->firstOrFail();
+    public function update(Request $request,string $id)
+{
+   $laboratory = Laboratories::where('user_id', Auth::user()->id)->firstOrFail();
         $phlebotomist = phlebotomist::where('laboratory_id', $laboratory->id)->findOrFail($id);
 
-        $phlebotomist->update($request->only('name', 'contact_number'));
+    // 2️⃣ Validate, using correct user_id
+   $validation = validator($request->all(), [
+        'phlebotomists_name' => 'required',
+       'email' => 'required|email',
+        'contact_number' => 'required|string',
+        'city' => 'required',
+        'state' => 'required',
+        'pincode' => 'required',
+        'address' => 'required',
+        'username' => 'required',
+        'password' => 'nullable',
+    ]);
 
-        return redirect()->route('phlebotomist.index')->with('success', 'phlebotomist updated successfully.');
+    if ($validation->fails()) {
+            return back()->withErrors($validation)->withInput();
+        }
+    // 3️⃣ Update related User
+    $user = User::find($phlebotomist->user_id);
+    if ($user) {
+        $user->name = $request->username;
+        $user->email = $request->email;
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+        $user->save();
     }
+
+    // 4️⃣ Update phlebotomist record
+    $phlebotomist->update([
+        'phlebotomists_name' => $request->phlebotomists_name,
+        'contact_number' => $request->contact_number,
+        'email' => $request->email,
+        'city' => $request->city,
+        'state' => $request->state,
+        'pincode' => $request->pincode,
+        'address' => $request->address,
+        'username' => $request->username,
+        // 'password' => $request->filled('password') ? Hash::make($request->password) : $phlebotomist->password,
+    ]);
+
+    return redirect()->route('phlebotomist.index')->with('success', 'Phlebotomist updated successfully!');
+}
+
+
 
     public function destroy($id)
     {

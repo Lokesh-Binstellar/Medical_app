@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('additional_charges', function (Blueprint $table) {
+        Schema::create('upload_qr', function (Blueprint $table) {
             $table->id();
-            $table->string('platfrom_fee');
+               $table->string('qr_image');
             $table->timestamps();
         });
-        
     }
 
     /**
@@ -24,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('additional_charges');
+        Schema::dropIfExists('upload_qr');
     }
 };

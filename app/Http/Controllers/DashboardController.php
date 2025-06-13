@@ -20,17 +20,17 @@ use Yajra\DataTables\Facades\DataTables;
 class DashboardController extends Controller
 {
 
-//     public function __construct()
-// {
-//     $this->middleware('auth'); // Redirects to login if not authenticated
-// }
+    //     public function __construct()
+    // {
+    //     $this->middleware('auth'); // Redirects to login if not authenticated
+    // }
     public function index(Request $request)
     {
 
 
-          if (!Auth::check()) {
-        return redirect()->route('login');
-    }
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
         $totalUsers = User::count();
         $totalAdmins = User::where('role_id', 1)->count();
         $totalCustomers = Customers::count();
@@ -630,4 +630,7 @@ class DashboardController extends Controller
             ->addIndexColumn()
             ->make(true);
     }
+
+
+
 }

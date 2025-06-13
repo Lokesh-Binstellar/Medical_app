@@ -72,7 +72,6 @@ class User extends Authenticatable
     }
 
 
-
     public function hasRolePermission($module)
     {
         if ($this->permissions()->where('module', $module)->first()) {

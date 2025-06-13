@@ -14,8 +14,16 @@ return new class extends Migration
         Schema::create('phlebotomists', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('laboratory_id');
-            $table->string('name');
-        $table->string('contact_number');
+            
+            $table->string('phlebotomists_name');
+            $table->string('contact_number');
+            $table->string('email');
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+            $table->string('pincode')->nullable();
+            $table->text('address')->nullable();
+            $table->string('username')->nullable();
+            $table->string('password');
             $table->timestamps();
         });
     }

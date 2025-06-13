@@ -194,6 +194,9 @@ class RoleController extends Controller
             if ($tablesArr['orders']) {
                 $filterArr['Orders'] = 'Orders';
             }
+             if ($tablesArr['upload_qr']) {
+                $filterArr['Upload QR'] = 'Upload QR';
+            }
             $permissionData = new Permission();
             return view('role.edit', ['pageConfigs' => $pageConfigs, 'role' => $role, 'accessData' => $filterArr, 'permissionData' => $permissionData]);
         } else {

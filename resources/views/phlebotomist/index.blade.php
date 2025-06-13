@@ -1,64 +1,70 @@
 @extends('layouts.app')
 @section('content')
+    <div class="card shadow">
+        <div class="card-header d-flex justify-content-between align-items-center rounded-top">
+            <h4 class="card-title mb-0 text-white">Phlebotomist</h4>
 
-                    <div class="card shadow">
-                        <div class="card-header d-flex justify-content-between align-items-center rounded-top">
-                            <h4 class="card-title mb-0 text-white">Phlebotomist</h4>
+            <a href="{{ route('phlebotomist.create') }}" class="btn btn-primary addButton text-nowrap px-5">
+                + Add Phlebotomist
+            </a>
 
-                            <a href="{{ route('phlebotomist.create') }}" class="btn btn-primary addButton text-nowrap px-5">
-                                + Add Phlebotomist
-                            </a>
+        </div>
 
-                        </div>
-
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="add-row" class="display table table-striped table-hover data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Id</th>
-                                            <th>Name</th>
-                                            <th>Contact Number</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-               
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="add-row" class="display table table-striped table-hover data-table">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Contact Number</th>
+                            <th>City</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('scripts')
     <script>
-
-
         $(function() {
             // ✅ DataTable Initialization
             var table = $('.data-table').DataTable({
                 processing: true,
                 serverSide: true,
-                 ajax: "{{ route('phlebotomist.index') }}",
-                    columns: [{
-                            data: 'DT_RowIndex',
-                            name: 'DT_RowIndex',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'name',
-                            name: 'name'
-                        },
-                        {
-                            data: 'contact_number',
-                            name: 'contact_number'
-                        },
-                        {
-                            data: 'action',
-                            name: 'action',
-                            orderable: false,
-                            searchable: false
-                        }
+                ajax: "{{ route('phlebotomist.index') }}",
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+    data: 'phlebotomists_name',
+    name: 'phlebotomists_name'
+},
+                    {
+                        data: 'email',
+                        name: 'email'
+                    },
+                    {
+                        data: 'contact_number',
+                        name: 'contact_number'
+                    },
+                    {
+                        data: 'city',
+                        name: 'city'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
                 ]
             });
 

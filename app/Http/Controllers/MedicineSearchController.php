@@ -74,22 +74,22 @@ class MedicineSearchController extends Controller
         $medicine->phrmacy_id = $pharmacy->user_id;
         $medicine->customer_id = $data['customer'][0]['customer_id'] ?? null;
         $medicine->save();
-// Fetch latest matching request
-$existingRequest = DB::table('request_quotes')
-    ->where('customer_id', $medicine->customer_id)
-    ->where('pharmacy_id', $pharmacy->user_id)
-    ->latest()
-    ->first();
+        // Fetch latest matching request
+        $existingRequest = DB::table('request_quotes')
+            ->where('customer_id', $medicine->customer_id)
+            ->where('pharmacy_id', $pharmacy->user_id)
+            ->latest()
+            ->first();
 
-// If found, store in log table
-if ($existingRequest) {
-    QuoteAcceptLog::create([
-        'customer_id' => $medicine->customer_id,
-        'pharmacy_id' => $pharmacy->user_id,
-        'requested_at' => $existingRequest->created_at,
-        'accepted_at' => $medicine->created_at,
-    ]);
-}
+        // If found, store in log table
+        if ($existingRequest) {
+            QuoteAcceptLog::create([
+                'customer_id' => $medicine->customer_id,
+                'pharmacy_id' => $pharmacy->user_id,
+                'requested_at' => $existingRequest->created_at,
+                'accepted_at' => $medicine->created_at,
+            ]);
+        }
         DB::table('request_quotes')
             ->where('customer_id', $data['customer'][0]['customer_id'] ?? 0)
             ->where('pharmacy_id', $pharmacy->user_id)
@@ -175,13 +175,13 @@ if ($existingRequest) {
     public function allPharmacyRequests(Request $request)
     {
         $currentCustomer = $request->get('user_id');  // e.g. 2
-        
+
         $getMedicine = Phrmacymedicine::with('pharmacy')
-        ->whereHas('pharmacy', function ($query) use ($currentCustomer) {
-            $query->where('customer_id', $currentCustomer);
-        })
-        ->get();
-        
+            ->whereHas('pharmacy', function ($query) use ($currentCustomer) {
+                $query->where('customer_id', $currentCustomer);
+            })
+            ->get();
+
         try {
             $combinations = $getMedicine->map(function ($item) {
                 return [
@@ -189,41 +189,41 @@ if ($existingRequest) {
                     'pharmacy_id' => $item->phrmacy_id,
                 ];
             });
-            
+
             $quoteAddresses = RequestQuote::where(function ($query) use ($combinations) {
                 foreach ($combinations as $combo) {
                     $query->orWhere(function ($q) use ($combo) {
                         $q->where('customer_id', $combo['customer_id'])
-                        ->where('pharmacy_id', $combo['pharmacy_id']);
+                            ->where('pharmacy_id', $combo['pharmacy_id']);
                     });
                 }
             })->get()->mapWithKeys(function ($quote) {
                 $address = json_decode($quote->customer_address, true);
                 $key = $quote->customer_id . '_' . $quote->pharmacy_id;
-                
+
                 return [
                     $key => [
                         'type' => $address['type'] ?? null,
                         'lat' => trim($address['lat'] ?? ''),
                         'lng' => trim($address['lng'] ?? ''),
-                        ]
-                    ];
-                });
-                
-                $apiKey = env('GOOGLE_MAPS_API_KEY');
-                $userId = $request->get('user_id');
-                
-                $carts = Carts::where('customer_id', $userId)->get()->flatMap(function ($cart) {
-                    try {
-                        return json_decode($cart->products_details, true);
-                    } catch (\Exception $e) {
-                        return [];
-                    }
-                });
-                $cartQuantities = collect($carts)->mapWithKeys(function ($item) {
-                    return [$item['product_id'] => $item['quantity']];
-                });
-                
+                    ]
+                ];
+            });
+
+            $apiKey = env('GOOGLE_MAPS_API_KEY');
+            $userId = $request->get('user_id');
+
+            $carts = Carts::where('customer_id', $userId)->get()->flatMap(function ($cart) {
+                try {
+                    return json_decode($cart->products_details, true);
+                } catch (\Exception $e) {
+                    return [];
+                }
+            });
+            $cartQuantities = collect($carts)->mapWithKeys(function ($item) {
+                return [$item['product_id'] => $item['quantity']];
+            });
+
 
             $grouped = $getMedicine->groupBy('phrmacy_id')->map(function ($group, $pharmacyId) use ($cartQuantities, $quoteAddresses, $apiKey, $userId) {
                 $pharmacy = $group->first()->pharmacy;

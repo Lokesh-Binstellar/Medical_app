@@ -231,21 +231,21 @@
                 </a>
                 <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
                     @if (in_array('Prescriptions', $permissions) || $isSuperAdmin == 1)
-                    <li
-                    class="menu-item {{ Route::current()->getName() == 'prescriptions.index' ? 'active' : '' }}">
-                    <a href="{{ route('prescriptions.index') }}" class="menu-link">
-                        <div data-i18n="Prescriptions">Prescriptions</div>
-                    </a>
-                </li>
-                @endif
-                @if (in_array('Carts', $permissions) || $isSuperAdmin == 1)
-                    <li
-                        class="menu-item {{ Route::current()->getName() == 'addMedicine.index' ? 'active' : '' }}">
-                        <a href="{{ route('addMedicine.index') }}" class="menu-link">
-                            <div data-i18n="Add Medicine">Add Medicine</div>
-                        </a>
-                    </li>
-                @endif
+                        <li
+                            class="menu-item {{ Route::current()->getName() == 'prescriptions.index' ? 'active' : '' }}">
+                            <a href="{{ route('prescriptions.index') }}" class="menu-link">
+                                <div data-i18n="Prescriptions">Prescriptions</div>
+                            </a>
+                        </li>
+                    @endif
+                    @if (in_array('Carts', $permissions) || $isSuperAdmin == 1)
+                        <li
+                            class="menu-item {{ Route::current()->getName() == 'addMedicine.index' ? 'active' : '' }}">
+                            <a href="{{ route('addMedicine.index') }}" class="menu-link">
+                                <div data-i18n="Add Medicine">Add Medicine</div>
+                            </a>
+                        </li>
+                    @endif
                     @if (in_array('Prescriptions', $permissions) || $isSuperAdmin == 1)
                         <li
                             class="menu-item {{ Route::current()->getName() == 'prescriptions.upload' ? 'active' : '' }}">
@@ -318,15 +318,26 @@
         @if (in_array('Carts', $permissions) ||
                 in_array('Join', $permissions) ||
                 in_array('App Rating', $permissions) ||
+                in_array('Upload QR', $permissions) ||
                 $isSuperAdmin == 1)
             <li
-                class="menu-item {{ in_array(Route::currentRouteName(), ['additionalcharges', 'joinus.index', 'app_ratings.index', 'zip_code_vise_delivery.index']) ? 'active open' : '' }}">
+                class="menu-item 
+    {{ in_array(Route::currentRouteName(), [
+        'additionalcharges',
+        'joinus.index',
+        'app_ratings.index',
+        'upload_qr.index',
+        'zip_code_vise_delivery.index',
+    ])
+        ? 'active open'
+        : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons mdi mdi-tools"></i>
                     <div data-i18n="Admin Utilities">Admin Utilities</div>
                 </a>
+
                 <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
-                    @if (in_array('Carts', $permissions) || $isSuperAdmin == 1)
+                    @if (in_array('Carts', $permissions) || $isSuperAdmin == 1 || auth()->user()->role === 'Delivery Boy')
                         <li class="menu-item {{ Route::currentRouteName() == 'additionalcharges' ? 'active' : '' }}">
                             <a href="{{ route('additionalcharges') }}" class="menu-link">
                                 <div data-i18n="Additional Charges">Additional Charges</div>
@@ -334,7 +345,7 @@
                         </li>
                     @endif
 
-                    @if (in_array('Join', $permissions) || $isSuperAdmin == 1)
+                    @if (in_array('Join', $permissions) || $isSuperAdmin == 1 || auth()->user()->role === 'Delivery Boy')
                         <li class="menu-item {{ Route::currentRouteName() == 'joinus.index' ? 'active' : '' }}">
                             <a href="{{ route('joinus.index') }}" class="menu-link">
                                 <div data-i18n="Join Us">Join Us</div>
@@ -342,7 +353,7 @@
                         </li>
                     @endif
 
-                    @if (in_array('App Rating', $permissions) || $isSuperAdmin == 1)
+                    @if (in_array('App Rating', $permissions) || $isSuperAdmin == 1 || auth()->user()->role === 'Delivery Boy')
                         <li class="menu-item {{ Route::currentRouteName() == 'app_ratings.index' ? 'active' : '' }}">
                             <a href="{{ route('app_ratings.index') }}" class="menu-link">
                                 <div data-i18n="App Rating">App Rating</div>
@@ -350,7 +361,16 @@
                         </li>
                     @endif
 
-                    @if ($isSuperAdmin)
+                    {{-- ✅ Upload QR Code option --}}
+                    @if (in_array('Upload QR', $permissions) || $isSuperAdmin == 1)
+                        <li class="menu-item {{ Route::currentRouteName() == 'upload_qr.index' ? 'active' : '' }}">
+                            <a href="{{ route('upload_qr.index') }}" class="menu-link">
+                                <div data-i18n="Upload QR Code">Upload QR Code</div>
+                            </a>
+                        </li>
+                    @endif
+
+                    @if ($isSuperAdmin == 1)
                         <li
                             class="menu-item {{ Route::currentRouteName() == 'zip_code_vise_delivery.index' ? 'active' : '' }}">
                             <a href="{{ route('zip_code_vise_delivery.index') }}" class="menu-link">
@@ -358,68 +378,6 @@
                             </a>
                         </li>
                     @endif
-                </ul>
-            </li>
-        @endif
-        @if (in_array('About', $permissions) || $isSuperAdmin == 1)
-            @php
-                $cmsRoutes = [
-                    'cms.about-us.index',
-                    'cms.contact-us.index',
-                    'cms.faqs.index',
-                    'cms.terms-and-conditions.index',
-                    'cms.return-policies.index',
-                    'cms.privacy-policies.index',
-                    // 'cms.shipping-policies.index',
-                ];
-            @endphp
-
-            <li class="menu-item {{ in_array(Route::currentRouteName(), $cmsRoutes) ? 'active open' : '' }}">
-                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    <i class="menu-icon tf-icons mdi mdi-information-outline"></i>
-                    <div data-i18n="About Gomeds 24/7">About Gomeds 24/7</div>
-                </a>
-                <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
-                    <li class="menu-item {{ Route::currentRouteName() == 'cms.about-us.index' ? 'active' : '' }}">
-                        <a href="{{ route('cms.about-us.index') }}" class="menu-link">
-                            <div data-i18n="About Us">About Us</div>
-                        </a>
-                    </li>
-
-                    <li class="menu-item {{ Route::currentRouteName() == 'cms.contact-us.index' ? 'active' : '' }}">
-                        <a href="{{ route('cms.contact-us.index') }}" class="menu-link">
-                            <div data-i18n="Contact Us">Contact Us</div>
-                        </a>
-                    </li>
-
-                    <li class="menu-item {{ Route::currentRouteName() == 'cms.faqs.index' ? 'active' : '' }}">
-                        <a href="{{ route('cms.faqs.index') }}" class="menu-link">
-                            <div data-i18n="FAQs">FAQ's</div>
-                        </a>
-                    </li>
-
-                    <li
-                        class="menu-item {{ Route::currentRouteName() == 'cms.terms-and-conditions.index' ? 'active' : '' }}">
-                        <a href="{{ route('cms.terms-and-conditions.index') }}" class="menu-link">
-                            <div data-i18n="Terms and Conditions">Terms and Conditions</div>
-                        </a>
-                    </li>
-
-                    <li
-                        class="menu-item {{ Route::currentRouteName() == 'cms.return-policies.index' ? 'active' : '' }}">
-                        <a href="{{ route('cms.return-policies.index') }}" class="menu-link">
-                            <div data-i18n="Return Policy">Return Policy</div>
-                        </a>
-                    </li>
-
-                    <li
-                        class="menu-item {{ Route::currentRouteName() == 'cms.privacy-policies.index' ? 'active' : '' }}">
-                        <a href="{{ route('cms.privacy-policies.index') }}" class="menu-link">
-                            <div data-i18n="Privacy Policy">Privacy Policy</div>
-                        </a>
-                    </li>
-
-
                 </ul>
             </li>
         @endif
@@ -434,6 +392,9 @@
                 </a>
             </li>
         @endif
+
+
+
         @if ($isSuperAdmin == 1)
             <li class="menu-item {{ in_array(Route::currentRouteName(), ['filtered.orders']) ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -474,14 +435,30 @@
         @endif
 
         @if ($isSuperAdmin == 1)
-<li class="menu-item {{ request()->is('commission_data*') ? 'active' : '' }}">
-    <a href="{{ route('commission_data.index') }}" class="menu-link">
-        <i class="menu-icon tf-icons mdi mdi-cash-multiple"></i>
-        <div data-i18n="Commission Data">Commission Data</div>
-    </a>
-</li>
-@endif
+            <li class="menu-item {{ request()->is('commission_data*') ? 'active' : '' }}">
+                <a href="{{ route('commission_data.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons mdi mdi-cash-multiple"></i>
+                    <div data-i18n="Commission Data">Commission Data</div>
+                </a>
+            </li>
+        @endif
 
+        @if (in_array('Laboratories', $permissions))
+            <li class="menu-item {{ in_array(Route::current()->getName(), ['phlebotomist.index']) ? 'active' : '' }}">
+                <a href="{{ route('phlebotomist.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons mdi mdi-account-plus"></i>
+                    <div data-i18n="Add phlebotomist">Add phlebotomist</div>
+                </a>
+            </li>
+        @endif
+        @if (in_array('Laboratories', $permissions) || in_array('Pharmacies', $permissions))
+            <li class="menu-item {{ Route::currentRouteName() == 'free_delivery_charge' ? 'active' : '' }}">
+                <a href="{{ route('free_delivery_charge') }}" class="menu-link">
+                    <i class="menu-icon tf-icons mdi mdi-truck-delivery-outline"></i>
+                    <div data-i18n="Free Delivery Charge">Free Delivery Charge</div>
+                </a>
+            </li>
+        @endif
 
         {{-- @if (in_array('Laboratories', $permissions) || $isSuperAdmin == 1)
             <li class="menu-item {{ in_array(Route::current()->getName(), ['laboratorie.index']) ? 'active' : '' }}">
@@ -619,20 +596,13 @@
             </li>
         @endif --}}
 
+
+
+
         @if (in_array('Laboratories', $permissions))
-            <li class="menu-item {{ in_array(Route::current()->getName(), ['phlebotomist.index']) ? 'active' : '' }}">
-                <a href="{{ route('phlebotomist.index') }}" class="menu-link">
-                    <i class="menu-icon tf-icons mdi mdi-account-plus"></i>
-                    <div data-i18n="Add phlebotomist">Add phlebotomist</div>
-                </a>
-            </li>
-        @endif
-
-
-     @if (in_array('Laboratories', $permissions))
             <li class="menu-item {{ in_array(Route::current()->getName(), ['calendar.index']) ? 'active' : '' }}">
                 <a href="{{ route('calendar.index') }}" class="menu-link">
-               <i class="menu-icon tf-icons mdi mdi-calendar-blank-outline"></i>
+                    <i class="menu-icon tf-icons mdi mdi-calendar-blank-outline"></i>
                     <div data-i18n="Slot Booking">Slot Booking</div>
                 </a>
             </li>

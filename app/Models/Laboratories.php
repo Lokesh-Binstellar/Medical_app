@@ -8,6 +8,7 @@ class Laboratories extends Model
 {
     protected $fillable = [
         'lab_name',
+        'free_delivery_charge',
         'owner_name',
         'user_id',
         'email',

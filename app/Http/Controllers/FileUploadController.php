@@ -181,31 +181,26 @@ class FileUploadController extends Controller
 
     public function uploadprescription()
     {
-        return view('prescriptions.upload');
+        $selectedCustomers = Customers::all();
+        return view('prescriptions.upload',compact('selectedCustomers'));
     }
 
-    public function search(Request $request)
-    {
+//     public function search(Request $request)
+// {
+//     $customers = Customers::select('id', 'firstName', 'lastName', 'mobile_no')->get();
 
-        // dd('nsdghfhd');
-        $term = $request->input('q');
+//     $results = $customers->map(function ($customer) {
+//         return [
+//             'id' => $customer->id,
+//             'text' => "{$customer->firstName} {$customer->lastName} - {$customer->mobile_no}",
+//         ];
+//     });
 
-        $customers = Customers::where('firstName', 'like', "%{$term}%")
-            ->orWhere('lastName', 'like', "%{$term}%")
-            ->orWhere('mobile_no', 'like', "%{$term}%")
-            ->select('id', 'firstName', 'lastName', 'mobile_no')
-            ->limit(10)
-            ->get();
+//     return response()->json(['results' => $results]);
+// }
 
-        $results = $customers->map(function ($customer) {
-            return [
-                'id' => $customer->id,
-                'text' => "{$customer->firstName} {$customer->lastName} - {$customer->mobile_no}",
-            ];
-        });
 
-        return response()->json(['results' => $results]);
-    }
+
 
     public function store(Request $request)
     {
