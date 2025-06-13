@@ -143,6 +143,7 @@ Route::middleware('check.api.key')->group(function () {
     //    Laboratory
 
     Route::post('/getAllLaboratory', [LaboratoriesController::class, 'getAllLaboratory']);
+    Route::get('/getLaboratoryDetailsById/{laboratorie_id}', [LaboratoriesController::class, 'getLaboratoryDetailsById']);
 
     //general Address
     Route::post('/getUserSelectLocation', [CustomerAddressController::class, 'getUserSelectLocation']);
@@ -151,7 +152,7 @@ Route::middleware('check.api.key')->group(function () {
 
 
 //lab slots api
-Route::get('/lab-slots', [LabSlotController::class, 'getSlotsByLabAndDate']);
+Route::post('/getUpcomingLabSlots', [LabSlotController::class, 'getUpcomingSlots']);
 // Route::post('/calendar/slot-booking-details', [LabSlotController::class, 'slotBookingDetails']);
 Route::get('/calendar/slot-users', [LabSlotController::class, 'getSlotCustomers']);
 

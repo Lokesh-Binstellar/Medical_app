@@ -32,71 +32,115 @@ class LabSlotController extends Controller
         ]);
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'eventStartDate' => 'required|date',
-            'eventEndDate' => 'required|date',
-        ]);
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'eventStartDate' => 'required|date',
+    //         'eventEndDate' => 'required|date',
+    //     ]);
 
-        $startDate = Carbon::parse($request->eventStartDate)->startOfDay();
-        $endDate = Carbon::parse($request->eventEndDate)->endOfDay();
+    //     $startDate = Carbon::parse($request->eventStartDate)->startOfDay();
+    //     $endDate = Carbon::parse($request->eventEndDate)->endOfDay();
 
-        $fromTime = '09:30';
-        $toTime = '17:30';
+    //     $fromTime = '09:30';
+    //     $toTime = '17:30';
 
-        $createdSlots = [];
+    //     $createdSlots = [];
 
-        if ($request->has('autoSlots')) {
-            // Generate hourly slots for each date in range
-            for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
-                $from = Carbon::parse($date->format('Y-m-d') . ' ' . $fromTime);
-                $to = Carbon::parse($date->format('Y-m-d') . ' ' . $toTime);
+    //     if ($request->has('autoSlots')) {
+    //         // Generate hourly slots for each date in range
+    //         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+    //             $from = Carbon::parse($date->format('Y-m-d') . ' ' . $fromTime);
+    //             $to = Carbon::parse($date->format('Y-m-d') . ' ' . $toTime);
 
-                while ($from < $to) {
-                    $slot = LabSlot::create([
-                        'laboratory_id' => auth()->id(),
-                        'eventStartDate' => $from->copy(),
-                        'eventEndDate' => $from->copy()->addHour(),
-                        'is_active' => true,
-                    ]);
+    //             while ($from < $to) {
+    //                 $slot = LabSlot::create([
+    //                     'laboratory_id' => auth()->id(),
+    //                     'eventStartDate' => $from->copy(),
+    //                     'eventEndDate' => $from->copy()->addHour(),
+    //                     'is_active' => true,
+    //                 ]);
 
-                    $slotDate = $from->format('Y-m-d');
-                    $createdSlots[$slotDate][] = [
-                        'start' => $slot->eventStartDate->format('H:i'),
-                        'end' => $slot->eventEndDate->format('H:i'),
-                        'id' => $slot->id,
-                        'is_active' => $slot->is_active,
-                    ];
+    //                 $slotDate = $from->format('Y-m-d');
+    //                 $createdSlots[$slotDate][] = [
+    //                     'start' => $slot->eventStartDate->format('H:i'),
+    //                     'end' => $slot->eventEndDate->format('H:i'),
+    //                     'id' => $slot->id,
+    //                     'is_active' => $slot->is_active,
+    //                 ];
 
-                    $from->addHour();
-                }
-            }
-        } else {
-            // Save only single slot
-            $slot = LabSlot::create([
-                'laboratory_id' => auth()->id(),
-                'eventStartDate' => Carbon::parse($request->eventStartDate),
-                'eventEndDate' => Carbon::parse($request->eventEndDate),
-                'is_active' => true,
-            ]);
+    //                 $from->addHour();
+    //             }
+    //         }
+    //     } else {
+    //         // Save only single slot
+    //         $slot = LabSlot::create([
+    //             'laboratory_id' => auth()->id(),
+    //             'eventStartDate' => Carbon::parse($request->eventStartDate),
+    //             'eventEndDate' => Carbon::parse($request->eventEndDate),
+    //             'is_active' => true,
+    //         ]);
 
-            $slotDate = $slot->eventStartDate->format('Y-m-d');
-            $createdSlots[$slotDate][] = [
-                'start' => $slot->eventStartDate->format('H:i'),
-                'end' => $slot->eventEndDate->format('H:i'),
-                'id' => $slot->id,
-                'is_active' => $slot->is_active,
-            ];
-        }
+    //         $slotDate = $slot->eventStartDate->format('Y-m-d');
+    //         $createdSlots[$slotDate][] = [
+    //             'start' => $slot->eventStartDate->format('H:i'),
+    //             'end' => $slot->eventEndDate->format('H:i'),
+    //             'id' => $slot->id,
+    //             'is_active' => $slot->is_active,
+    //         ];
+    //     }
 
-        // Return JSON response (instead of redirect)
-        return response()->json([
-            'success' => true,
-            'message' => 'Slots created successfully!',
-            'slots' => $createdSlots,
+    //     // Return JSON response (instead of redirect)
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Slots created successfully!',
+    //         'slots' => $createdSlots,
+    //     ]);
+    // }
+
+public function store(Request $request)
+{
+    $request->validate([
+        'eventStartDate' => 'required|date',
+        'eventEndDate' => 'required|date',
+    ]);
+
+    $eventStart = Carbon::parse($request->eventStartDate);
+    $eventEnd = Carbon::parse($request->eventEndDate);
+
+    // ✅ Check if this slot already exists
+    $existingSlot = LabSlot::where('laboratory_id', auth()->id())
+        ->where('eventStartDate', $eventStart)
+        ->where('eventEndDate', $eventEnd)
+        ->first();
+
+    if ($existingSlot) {
+        $existingSlot->update(['is_active' => true]);
+        $slot = $existingSlot;
+    } else {
+        $slot = LabSlot::create([
+            'laboratory_id' => auth()->id(),
+            'eventStartDate' => $eventStart,
+            'eventEndDate' => $eventEnd,
+            'is_active' => true,
         ]);
     }
+
+    $slotDate = $slot->eventStartDate->format('Y-m-d');
+    $createdSlots[$slotDate][] = [
+        'start' => $slot->eventStartDate->format('H:i'),
+        'end' => $slot->eventEndDate->format('H:i'),
+        'id' => $slot->id,
+        'is_active' => $slot->is_active,
+    ];
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Slot saved successfully!',
+        'slots' => $createdSlots,
+    ]);
+}
+
 
     //update slots
     public function update(Request $request, $id)
@@ -145,16 +189,17 @@ public function viewBookingsByDate(Request $request)
     }
     
     $labId = auth()->id(); // Or pass lab_id in request if admin use
-    
+
     $slots = LabSlot::with(['bookings.customer'])
-    ->where('laboratory_id', $labId)
-    ->whereDate('eventStartDate', $date)
-    ->orderBy('eventStartDate')
-    ->get();
-    
-    // dd($slots);
+        ->where('laboratory_id', $labId)
+        ->whereDate('eventStartDate', $date)
+        ->where('is_active', 1) // ✅ Only show active slots
+        ->orderBy('eventStartDate')
+        ->get();
+
     return view('lab_slots.show', compact('slots', 'date'));
 }
+
 
 
     //get slots By date
@@ -178,54 +223,155 @@ public function viewBookingsByDate(Request $request)
     }
 
     //disable slots on calendar
-    public function disable(Request $request)
-    {
-        $request->validate([
-            'eventStartDate' => 'required|date',
-            'eventEndDate' => 'required|date',
+    // public function disable(Request $request)
+    // {
+    //     $request->validate([
+    //         'eventStartDate' => 'required|date',
+    //         'eventEndDate' => 'required|date',
+    //     ]);
+
+    //     $slot = LabSlot::where('laboratory_id', auth()->id())
+    //         ->where('eventStartDate', $request->eventStartDate)
+    //         ->where('eventEndDate', $request->eventEndDate)
+    //         ->first();
+
+    //     if ($slot) {
+    //         $slot->update(['is_active' => false]);
+    //         return response()->json(['success' => true]);
+    //     }
+
+    //     return response()->json(['success' => false, 'message' => 'Slot not found'], 404);
+    // }
+
+public function disable(Request $request)
+{
+    $request->validate([
+        'eventStartDate' => 'required|date',
+        'eventEndDate' => 'required|date',
+    ]);
+
+    $eventStart = Carbon::parse($request->eventStartDate);
+    $eventEnd = Carbon::parse($request->eventEndDate);
+
+    $slot = LabSlot::where('laboratory_id', auth()->id())
+        ->where('eventStartDate', $eventStart)
+        ->where('eventEndDate', $eventEnd)
+        ->first();
+
+    if ($slot) {
+        $slot->update(['is_active' => false]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Slot disabled successfully.'
         ]);
-
-        $slot = LabSlot::where('laboratory_id', auth()->id())
-            ->where('eventStartDate', $request->eventStartDate)
-            ->where('eventEndDate', $request->eventEndDate)
-            ->first();
-
-        if ($slot) {
-            $slot->update(['is_active' => false]);
-            return response()->json(['success' => true]);
-        }
-
-        return response()->json(['success' => false, 'message' => 'Slot not found'], 404);
     }
+
+    return response()->json([
+        'success' => false,
+        'message' => 'Slot not found.'
+    ], 404);
+}
+
+
     //api for get date wise slots
 
-    public function getSlotsByLabAndDate(Request $request)
+//     public function getSlotsByLabAndDate(Request $request)
+// {
+//     try {
+//         // Validate inputs
+//         // $request->validate([
+//         //     'laboratory_id' => 'required|integer|exists:laboratories,id',
+//         //     'date' => 'required|date_format:Y-m-d',
+//         // ]);
+
+//         // Fetch slots
+//         $slots = LabSlot::where('laboratory_id', $request->laboratory_id)
+//             ->whereDate('eventStartDate', $request->date)
+//             ->get()
+//             ->map(function ($slot) {
+//                 return [
+//                     // 'start' => $slot->eventStartDate,
+//                     // 'end' => $slot->eventEndDate,
+//                     'is_active' => $slot->is_active,
+//                     'title' => Carbon::parse($slot->eventStartDate)->format('h:i A') . ' - ' .
+//                                Carbon::parse($slot->eventEndDate)->format('h:i A'),
+//                 ];
+//             });
+
+//         return response()->json([
+//             'status' => true,
+//             'message' => 'Slots fetched successfully.',
+//             'data' => $slots,
+//         ]);
+
+//     } catch (\Illuminate\Validation\ValidationException $e) {
+//         return response()->json([
+//             'status' => false,
+//             'message' => 'Validation failed.',
+//             'errors' => $e->errors(),
+//         ], 422);
+
+//     } catch (\Exception $e) {
+//         Log::error('Error fetching lab slots: ' . $e->getMessage());
+
+//         return response()->json([
+//             'status' => false,
+//             'message' => 'Something went wrong.',
+//         ], 500);
+//     }
+// }
+public function getUpcomingSlots(Request $request)
 {
     try {
-        // Validate inputs
         // $request->validate([
         //     'laboratory_id' => 'required|integer|exists:laboratories,id',
-        //     'date' => 'required|date_format:Y-m-d',
         // ]);
 
-        // Fetch slots
-        $slots = LabSlot::where('laboratory_id', $request->laboratory_id)
-            ->whereDate('eventStartDate', $request->date)
+        $labId = $request->laboratory_id;
+        $tomorrow = Carbon::tomorrow()->startOfDay();
+
+        // Get all future slots grouped by date
+        $slots = LabSlot::where('laboratory_id', $labId)
+            ->whereDate('eventStartDate', '>=', $tomorrow)
+            ->orderBy('eventStartDate')
             ->get()
-            ->map(function ($slot) {
-                return [
-                    // 'start' => $slot->eventStartDate,
-                    // 'end' => $slot->eventEndDate,
-                    'is_active' => $slot->is_active,
-                    'title' => Carbon::parse($slot->eventStartDate)->format('h:i A') . ' - ' .
-                               Carbon::parse($slot->eventEndDate)->format('h:i A'),
-                ];
+            ->groupBy(function ($slot) {
+                return Carbon::parse($slot->eventStartDate)->format('Y-m-d');
             });
+
+        $groupedSlots = [];
+
+        foreach ($slots as $date => $slotGroup) {
+            $groupedSlots[$date] = [
+                'morning' => [],
+                'afternoon' => [],
+                'evening' => [],
+            ];
+
+            foreach ($slotGroup as $slot) {
+                $start = Carbon::parse($slot->eventStartDate);
+                $formattedSlot = [
+                    'title' => $start->format('h:i A') . ' - ' .
+                               Carbon::parse($slot->eventEndDate)->format('h:i A'),
+                    'is_active' => $slot->is_active,
+                ];
+
+                // Slot time classification
+                if ($start->between($start->copy()->setTime(6, 0), $start->copy()->setTime(11, 59))) {
+                    $groupedSlots[$date]['morning'][] = $formattedSlot;
+                } elseif ($start->between($start->copy()->setTime(12, 0), $start->copy()->setTime(16, 59))) {
+                    $groupedSlots[$date]['afternoon'][] = $formattedSlot;
+                } elseif ($start->between($start->copy()->setTime(17, 0), $start->copy()->setTime(21, 0))) {
+                    $groupedSlots[$date]['evening'][] = $formattedSlot;
+                }
+            }
+        }
 
         return response()->json([
             'status' => true,
-            'message' => 'Slots fetched successfully.',
-            'data' => $slots,
+            'message' => 'Upcoming slots fetched successfully.',
+            'data' => $groupedSlots,
         ]);
 
     } catch (\Illuminate\Validation\ValidationException $e) {
@@ -234,9 +380,8 @@ public function viewBookingsByDate(Request $request)
             'message' => 'Validation failed.',
             'errors' => $e->errors(),
         ], 422);
-
     } catch (\Exception $e) {
-        Log::error('Error fetching lab slots: ' . $e->getMessage());
+        Log::error('Error fetching upcoming lab slots: ' . $e->getMessage());
 
         return response()->json([
             'status' => false,
@@ -318,6 +463,24 @@ public function getSlotCustomers(Request $request)
 }
 
 
+// Controller Method
+public function fetchSlotCounts(Request $request)
+{
+    $labId = auth()->id();
+    
+    $slots = LabSlot::selectRaw('DATE(eventStartDate) as date, COUNT(*) as count')
+        ->where('laboratory_id', $labId)
+        ->where('is_active', 1)
+        ->groupBy('date')
+        ->get();
+
+    $data = [];
+    foreach ($slots as $slot) {
+        $data[$slot->date] = $slot->count;
+    }
+
+    return response()->json($data);
+}
 
 
 

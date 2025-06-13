@@ -206,6 +206,7 @@
                                 <td>
                                     <select class="form-select medicine_search medicineDropdown" disabled
                                         name="medicine[0][medicine_id]"></select>
+                                        <input type="hidden" class="medicine_add_id" name="medicine[0][medicine_id]">
                                     <input type="hidden" class="medicine_name" name="medicine[0][medicine_name]">
                                 </td>
                                 <td>
@@ -1010,6 +1011,7 @@
 
                                 // Set the hidden medicine name field
                                 $targetRow.find('.medicine_name').val(product.name);
+                                $targetRow.find('.medicine_add_id').val(product.product_id);
 
                                 // Set quantity
                                 $targetRow.find('.quantity').val(product.quantity);

@@ -131,6 +131,15 @@
     <!-- FullCalendar JS -->
     <script src="{{ asset('assets/vendor/libs/fullcalendar/fullcalendar.js') }}"></script> --}}
     <script>
+        let slotCountMap = {}; // Holds { '2025-06-13': 5, ... }
+
+        async function fetchSlotCounts() {
+            const response = await fetch("{{ route('calendar.fetchSlotCounts') }}");
+            slotCountMap = await response.json();
+        }
+
+
+
         document.addEventListener('DOMContentLoaded', function() {
             const calendarEl = document.getElementById('calendar');
             const slotListContainer = document.getElementById('slotList');
@@ -141,6 +150,12 @@
                 const response = await fetch("{{ route('calendar.fetch') }}");
                 return await response.json();
             }
+            fetchSlotCounts().then(() => {
+                fetchSlots().then(data => {
+                    initializeCalendar(data);
+                });
+            });
+
 
             function initializeCalendar(events = []) {
                 calendar = new Calendar(calendarEl, {
@@ -157,31 +172,51 @@
                         right: ''
                     },
                     dayCellContent: function(arg) {
-                        const dateObj = arg.date;
-                        const date = dateObj.getFullYear() + '-' +
-                            String(dateObj.getMonth() + 1).padStart(2, '0') + '-' +
-                            String(dateObj.getDate()).padStart(2, '0');
+                            const dateObj = arg.date;
+                            const date = dateObj.getFullYear() + '-' +
+                                String(dateObj.getMonth() + 1).padStart(2, '0') + '-' +
+                                String(dateObj.getDate()).padStart(2, '0');
 
-                        return {
-                            html: `
+                            const count = slotCountMap[date] || 0;
+
+                            return {
+                                html: `
             <div class="fc-day-number">${arg.dayNumberText}</div>
-            <div class="mt-1 d-flex justify-content-center gap-1">
-                <button class="btn btn-sm btn-icon btn-primary rounded-circle view-bookings-btn"
-                        data-date="${date}" data-bs-toggle="tooltip" title="View Bookings">
-                    <i class="bx bx-show text-white"></i>
-                </button>
-                <button class="btn btn-sm btn-icon btn-success rounded-circle enable-slots-btn"
-                        data-date="${date}" data-bs-toggle="tooltip" title="Enable Slots">
-                    <i class="bx bx-plus text-white"></i>
-                </button>
-            </div>`
-                        };
-                    },
+            <div class="mt-1 d-flex flex-column gap-1" data-date="${date}">
+                <span class="badge bg-primary px-2 py-1 view-bookings-btn"
+                      style="cursor:pointer; font-size: 10px;"
+                      data-date="${date}" data-bs-toggle="tooltip" title="View Bookings">
+                    View Bookings
+                </span>
+                <div class="position-relative d-inline-block">
+                    <span class="badge bg-success px-2 py-1 enable-slots-btn"
+                          style="cursor:pointer; font-size: 10px;"
+                          data-date="${date}" data-bs-toggle="tooltip" title="Enable Slots">
+                        Enable/Disable Slots
+                    </span>
+                    </div>
+                    </div>
+                    ${count > 0 ? `
+                            <span class="position-absolute top-10 left-0 start-100 translate-middle badge rounded-pill bg-danger slot-count-badge"
+                                  style="font-size: 8px;">
+                                ${count}
+                            </span>` : ''
+                    }
+        `
+                            };
+                        }
+
+                        ,
                     eventClick: function(info) {
                         // Optional - disabled behavior if not needed
                     },
                     select: function() {
                         // No default slot selection
+                    },
+                    eventDidMount: function(info) {
+                        if (info.event.title.includes("Slot")) {
+                            info.el.style.display = "none";
+                        }
                     }
                 });
 

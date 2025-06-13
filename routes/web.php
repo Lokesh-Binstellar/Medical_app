@@ -74,6 +74,9 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\CheckSession::class]
     Route::get('/calendar/fetch', [LabSlotController::class, 'fetch'])->name('calendar.fetch');
     Route::post('/calendar/disable', [LabSlotController::class, 'disable'])->name('calendar.disable');
     Route::get('/lab-slots/bookings-by-date', [LabSlotController::class, 'viewBookingsByDate'])->name('lab-slots.bookings.by.date');
+    Route::get('/calendar/fetchSlotCounts', [LabSlotController::class, 'fetchSlotCounts'])->name('calendar.fetchSlotCounts');
+    
+Route::get('/lab-slots/bookings-by-date', [LabSlotController::class, 'viewBookingsByDate'])->name('lab-slots.bookings.by.date');
 
 
     // web.php
