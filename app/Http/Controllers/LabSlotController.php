@@ -226,11 +226,11 @@ public function getUpcomingSlots(Request $request)
                 ];
 
                 // Slot time classification
-                if ($start->between($start->copy()->setTime(6, 0), $start->copy()->setTime(11, 59))) {
+                if ($start->between($start->copy()->setTime(00, 0), $start->copy()->setTime(11, 59))) {
                     $groupedSlots[$date]['morning'][] = $formattedSlot;
                 } elseif ($start->between($start->copy()->setTime(12, 0), $start->copy()->setTime(16, 59))) {
                     $groupedSlots[$date]['afternoon'][] = $formattedSlot;
-                } elseif ($start->between($start->copy()->setTime(17, 0), $start->copy()->setTime(21, 0))) {
+                } elseif ($start->between($start->copy()->setTime(17, 0), $start->copy()->setTime(00, 0))) {
                     $groupedSlots[$date]['evening'][] = $formattedSlot;
                 }
             }
