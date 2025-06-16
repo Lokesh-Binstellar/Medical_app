@@ -691,4 +691,59 @@ class LaboratoriesController extends Controller
             );
         }
     }
+
+    public function getTestDetailsById($test_id)
+    {
+        $test = LabTest::find($test_id);
+
+        if (!$test) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Test not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $test,
+        ]);
+    }
+
+    public function getPackageDetailsByName(Request $request, $packageName)
+    {
+        $labId = $request->query('laboratory_id');
+
+        if (!$labId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Laboratory ID is missing.',
+            ], 400);
+        }
+
+        $lab = Laboratories::find($labId);
+
+        if (!$lab) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Laboratory not found.',
+            ], 404);
+        }
+
+        $packageDetails = json_decode($lab->package_details, true); // decode JSON to array
+
+        $matchedPackage = collect($packageDetails)->firstWhere('package_name', $packageName);
+
+        if (!$matchedPackage) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Package not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $matchedPackage,
+        ]);
+    }
+
 }

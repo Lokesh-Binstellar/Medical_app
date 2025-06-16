@@ -144,6 +144,8 @@ Route::middleware('check.api.key')->group(function () {
 
     Route::post('/getAllLaboratory', [LaboratoriesController::class, 'getAllLaboratory']);
     Route::get('/getLaboratoryDetailsById/{laboratorie_id}', [LaboratoriesController::class, 'getLaboratoryDetailsById']);
+    Route::get('/getTestDetailsById/{test_id}', [LaboratoriesController::class, 'getTestDetailsById']);
+    Route::get('/getPackageDetailsByName/{packagename}', [LaboratoriesController::class, 'getPackageDetailsByName']);
 
     //general Address
     Route::post('/getUserSelectLocation', [CustomerAddressController::class, 'getUserSelectLocation']);
