@@ -309,7 +309,7 @@ class PharmaciesController extends Controller
     }
 
     public function popularpharmacydetails(Request $request, $id)
-    {
+    { 
         $pharmacy = Pharmacies::find($id);
         // Fetch rating info
         $ratingData = Rating::where('rateable_type', 'Pharmacy')

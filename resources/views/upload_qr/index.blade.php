@@ -3,8 +3,8 @@
 @section('styles')
     <style>
         /* .fv-plugins-message-container.fv-plugins-message-container--enabled.invalid-feedback {
-            min-height: 1.5rem;
-        } */
+                        min-height: 1.5rem;
+                    } */
     </style>
 @endsection
 
@@ -12,7 +12,7 @@
 
     <div class="card shadow">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="card-title mb-0 ">Upload QR Code</h4>
+            <h4 class="card-title mb-0 ">Gomeds QR Code</h4>
         </div>
 
         <div class="card-body">
@@ -26,16 +26,20 @@
                         </ul>
                     </div>
                 @endif
- @if (session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
+                @if (session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
                 <form action="{{ route('upload_qr.store') }}" method="POST" enctype="multipart/form-data"
-                    class="row g-3 align-items-end" id="qrForm">
+                    class="row g-3 align-items-end" id="qrForm" data-parsley-validate>
                     @csrf
+
                     <div class="error-msg col-md-4">
                         <label for="qr" class="form-label">QR Code (jpeg, png, jpg)</label>
-                        <input type="file" name="qr_image" class="form-control" required>
+                        <input type="file" name="qr_image" class="form-control" data-parsley-required="true"
+                            data-parsley-required-message="Please select a QR code image"
+                            data-parsley-fileextension="jpeg,jpg,png" accept=".jpeg,.jpg,.png">
                     </div>
+
 
                     <div class="col-md-4 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary">+ Upload QR Code</button>
@@ -43,9 +47,10 @@
                 </form>
 
 
+
             </div>
 
-           
+
 
             <div class="table-responsive">
                 <table id="qr-table" class="display table table-striped table-hover data-table sortingclose">
@@ -67,6 +72,30 @@
 
 @section('scripts')
     <script>
+        $(document).ready(function() {
+
+            // ✅ Add custom file extension validator
+            window.Parsley.addValidator('fileextension', {
+                validateString: function(value, requirement) {
+                    var fileExtension = value.split('.').pop().toLowerCase();
+                    var allowedExtensions = requirement.split(',');
+                    return allowedExtensions.indexOf(fileExtension) !== -1;
+                },
+                messages: {
+                    en: 'Allowed file types: jpeg, jpg, png'
+                }
+            });
+
+            // ✅ Initialize Parsley
+            $('#qrForm').parsley({
+                errorClass: 'is-invalid',
+                successClass: 'is-valid',
+                errorsWrapper: '<span class="invalid-feedback d-block"></span>',
+                errorTemplate: '<span></span>',
+                trigger: 'change'
+            });
+        });
+
         $(function() {
             let table = $('.data-table').DataTable({
                 processing: true,
@@ -86,7 +115,6 @@
                         searchable: false
                     }
                 ]
-
             });
 
             window.deleteQR = function(id) {

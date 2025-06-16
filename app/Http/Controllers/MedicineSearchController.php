@@ -624,6 +624,8 @@ class MedicineSearchController extends Controller
                         case 2:
                             $reason = $order->cancel_by ? '<br><small class="text-danger">Cancelled By: ' . e($order->cancel_by) . '</small>' : '';
                             return '<span class="badge bg-danger">Cancelled</span>' . $reason;
+                        case 3:
+                            return '<span class="badge bg-info">Returned</span>';
                         default:
                             return '<span class="badge bg-secondary">Unknown</span>';
                     }
@@ -665,7 +667,10 @@ class MedicineSearchController extends Controller
                                 return '<span class="badge bg-success">Completed</span>';
                             } elseif ($order->status == 2) {
                                 return '<span class="badge bg-danger">Order is Cancelled</span>';
-                            } else {
+                            } elseif ($order->status == 3) {
+                                return '<span class="badge bg-info">Order is Returned</span>';
+                            }
+                            else {
                                 return ucfirst(str_replace('_', ' ', $order->delivery_options));
                             }
                         }
@@ -698,6 +703,8 @@ class MedicineSearchController extends Controller
                             $html .= '<span class="badge bg-success">Delivered to Customer</span>';
                         } elseif ($order->status == 2) {
                             $html .= '<span class="badge bg-danger">Order Cancelled</span>';
+                        } elseif ($order->status == 3) {
+                            $html .= '<span class="badge bg-info">Order Returned</span>';
                         }
                     }
 
@@ -931,5 +938,140 @@ class MedicineSearchController extends Controller
         \Log::warning('Medicine or OTC not found for ID', ['medicine_id' => $medicineId]);
 
         return response()->json(['salt' => null]);
+    }
+
+    public function returnorderdetails(Request $request){
+         if ($request->ajax()) {
+            $roleName = Auth::user()->role->name;
+            $query = Order::with(['customer', 'pharmacy', 'deliveryPerson'])
+                     ->where('status', 3); // Only return orders with status 3
+
+            if ($request->filled('order_date')) {
+                $query->whereDate('created_at', $request->order_date);
+            }
+
+            if ($roleName === 'admin') {
+                $orders = $query->get();
+            } elseif ($roleName === 'pharmacy') {
+                $orders = $query->where('pharmacy_id', Auth::id())->get();
+            } elseif ($roleName === 'laboratory') {
+                $orders = $query->where('lab_id', Auth::id())->get();
+            } elseif ($roleName === 'delivery_person') {
+                $orders = $query->where('delivery_person_id', Auth::id())->get();
+            } else {
+                $orders = collect();
+            }
+
+            $deliveryPersons = User::whereHas('role', function ($q) {
+                $q->where('name', 'delivery_person');
+            })->with('deliveryProfile')->get();
+
+            return DataTables::of($orders)
+                ->addColumn('date_formatted', function ($order) {
+                    if (!$order->created_at)
+                        return 'N/A';
+
+                    return $order->created_at->format('d M Y h:i A');
+                })
+                ->addColumn('date_raw', function ($order) {
+                    if (!$order->created_at)
+                        return null;
+
+                    return $order->created_at->toDateTimeString(); // e.g. "2025-06-05 15:45:00"
+                })
+
+
+                ->addColumn('customer_name', function ($order) {
+                    if (!$order->customer) {
+                        return 'N/A';
+                    }
+
+                    $fullName = $order->customer->firstName . ' ' . $order->customer->lastName;
+                    $phone = $order->customer->mobile_no;
+
+                    return '<div style="white-space: normal; word-wrap: break-word; max-width: 150px;">'
+                        . e($fullName) . ' (' . e($phone) . ')'
+                        . '</div>';
+                })
+                ->rawColumns(['customer_name']) // <-- important to render the HTML
+
+
+                // ->addColumn('total_price', function ($order) {
+                //     return '₹' . number_format($order->total_price, 2);
+                // })
+
+                ->addColumn(
+                    'payment_mode',
+                    fn($order) =>
+                    $order->payment_option
+                    ? ucwords(str_replace('_', ' ', $order->payment_option))
+                    : 'N/A'
+                )
+                ->addColumn(
+                    'delivery_method',
+                    fn($order) =>
+                    $order->delivery_options
+                    ? ucwords(str_replace('_', ' ', $order->delivery_options))
+                    : 'N/A'
+                )
+
+                // ->addColumn('delivery_person', function ($order) {
+                //     return $order->deliveryPerson?->name ?? 'Unassigned';
+                // })
+                ->addColumn('status', function ($order) {
+                    switch ($order->status) {
+                        case 0:
+                            return '<span class="badge bg-warning">Request Accepted</span>';
+                        case 1:
+                            return '<span class="badge bg-success">Completed</span>';
+                        case 2:
+                            $reason = $order->cancel_by ? '<br><small class="text-danger">Cancelled By: ' . e($order->cancel_by) . '</small>' : '';
+                            return '<span class="badge bg-danger">Cancelled</span>' . $reason;
+                        case 3:
+                            return '<span class="badge bg-info">Returned</span>';
+                        default:
+                            return '<span class="badge bg-secondary">Unknown</span>';
+                    }
+                })
+
+                ->addColumn('status_control', function ($order) {
+                    $html = '<div class="text-center">';
+
+                    if ($order->status == 0) {
+                        $html .= '<form action="' . route('pharmacy.updateOrderStatus', $order->id) . '" method="POST" class="d-inline-block status-form">';
+                        $html .= csrf_field();
+                        $html .= method_field('PUT');
+
+                        $html .= '<select name="status" class="form-select form-select-sm me-2 fw-bold text-black border border-dark status-select" data-role="' . auth()->user()->role->name . '">';
+                        $html .= '<option value="">-- Update Status --</option>';
+
+                        if (auth()->user()->role->name === 'delivery_person') {
+                            $html .= '<option value="1">Complete</option>';
+                        } else {
+                            $html .= '<option value="1">Complete</option>';
+                            $html .= '<option value="2">Cancel</option>';
+                        }
+
+                        $html .= '</select>';
+                        $html .= '<input type="hidden" name="cancel_by" class="cancel-by-input" value="">';
+                        $html .= '</form>';
+                    } else {
+                        if ($order->status == 1) {
+                            $html .= '<span class="badge bg-success">Delivered to Customer</span>';
+                        } elseif ($order->status == 2) {
+                            $html .= '<span class="badge bg-danger">Order Cancelled</span>';
+                        } elseif ($order->status == 3) {
+                            $html .= '<span class="badge bg-info">Order Returned</span>';
+                        }
+                    }
+
+                    $html .= '</div>';
+                    return $html;
+                })
+
+                ->rawColumns(['status', 'date', 'customer_name', 'status_control'])
+                ->make(true);
+        }
+        return view('pharmacist.returnorderdetails');
     }
 }

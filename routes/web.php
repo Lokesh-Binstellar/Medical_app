@@ -351,6 +351,7 @@ Route::get('/lab-slots/bookings-by-date', [LabSlotController::class, 'viewBookin
         });
         Route::prefix('search-medicine')->group(function () {
             Route::get('/pharmacist/add-medicine', [MedicineSearchController::class, 'index'])->name('add.medicine');
+            Route::get('/pharmacist/return-order-details', [MedicineSearchController::class, 'returnorderdetails'])->name('returnorderdetails');
             Route::get('/pharmacist/order-details', [MedicineSearchController::class, 'orderdetails'])->name('orderdetails');
             Route::put('/pharmacy/orders/{id}/status', [MedicineSearchController::class, 'updateOrderStatus'])->name('pharmacy.updateOrderStatus');
             Route::get('/orders/{id}/medicines', [MedicineSearchController::class, 'showMedicines'])->name('orders.medicines');
@@ -405,7 +406,7 @@ Route::get('/lab-slots/bookings-by-date', [LabSlotController::class, 'viewBookin
         Route::get('/get-contains', [AddLabTestController::class, 'getContains'])->name('addLabTest.contains');
     });
 });
-require __DIR__ . '/auth.php';
+
 
 // phlebotomist routes group with resource controller style
 Route::prefix('phlebotomist')->group(function () {
@@ -545,3 +546,5 @@ Route::prefix('qrcode')->group(function () {
 
 
 Route::get('/trigger-event', [PusherController::class, 'trigger']);
+
+require __DIR__ . '/auth.php';

@@ -646,7 +646,7 @@ class LaboratoriesController extends Controller
             }
 
             // Rating data
-            $ratingData = Rating::where('rateable_type', 'Laboratory')->where('rateable_id', $lab->id)->selectRaw('AVG(rating) as avg_rating, COUNT(*) as rating_count')->first();
+            $ratingData = Rating::where('rateable_type', 'Laboratory')->where('rateable_id', $lab->user_id)->selectRaw('AVG(rating) as avg_rating, COUNT(*) as rating_count')->first();
 
             $formattedRating = $ratingData->rating_count > 0 ? round($ratingData->avg_rating, 1) . ' (' . $ratingData->rating_count . ')' : null;
 
