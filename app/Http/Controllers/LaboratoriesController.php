@@ -547,7 +547,7 @@ class LaboratoriesController extends Controller
                 );
             }
 
-            $lab = Laboratories::where('user_id', $userId)->first();
+            $lab = Laboratories::where('id', $userId)->first();
 
             if (!$lab) {
                 return response()->json(
