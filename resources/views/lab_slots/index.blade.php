@@ -79,14 +79,8 @@
         }
 
 
-        /* White close button */
         .btn-close {
-            filter: invert(1);
-        }
-
-        /* Red close button */
-        .btn-close {
-            filter: brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(500%) hue-rotate(0deg);
+            filter: brightness(0) saturate(100%);
         }
     </style>
 @endsection
@@ -206,10 +200,10 @@
                     </div>
                     </div>
                     ${count > 0 ? `
-                                                    <span class="position-absolute top-10 left-0 start-100 translate-middle badge rounded-pill bg-danger slot-count-badge"
-                                                          style="font-size: 8px;">
-                                                        ${count}
-                                                    </span>` : ''
+                                                        <span class="position-absolute top-10 left-0 start-100 translate-middle badge rounded-pill bg-danger slot-count-badge"
+                                                              style="font-size: 8px;">
+                                                            ${count}
+                                                        </span>` : ''
                     }
         `
                             };
