@@ -77,6 +77,17 @@
             align-items: center;
             justify-content: center;
         }
+
+
+        /* White close button */
+        .btn-close {
+            filter: invert(1);
+        }
+
+        /* Red close button */
+        .btn-close {
+            filter: brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(500%) hue-rotate(0deg);
+        }
     </style>
 @endsection
 @section('content')
@@ -127,18 +138,17 @@
 @section('scripts')
     <script src="{{ asset('assets/vendor/libs/fullcalendar/fullcalendar.js') }}"></script>
 
-    {{-- @section('scripts')
-    <!-- FullCalendar JS -->
-    <script src="{{ asset('assets/vendor/libs/fullcalendar/fullcalendar.js') }}"></script> --}}
     <script>
+        $('#addEventSidebar').on('hidden.bs.offcanvas', function() {
+            window.location.href = window.location.pathname + '?t=' + new Date().getTime();
+        });
+
         let slotCountMap = {}; // Holds { '2025-06-13': 5, ... }
 
         async function fetchSlotCounts() {
             const response = await fetch("{{ route('calendar.fetchSlotCounts') }}");
             slotCountMap = await response.json();
         }
-
-
 
         document.addEventListener('DOMContentLoaded', function() {
             const calendarEl = document.getElementById('calendar');
@@ -155,7 +165,6 @@
                     initializeCalendar(data);
                 });
             });
-
 
             function initializeCalendar(events = []) {
                 calendar = new Calendar(calendarEl, {
@@ -197,10 +206,10 @@
                     </div>
                     </div>
                     ${count > 0 ? `
-                            <span class="position-absolute top-10 left-0 start-100 translate-middle badge rounded-pill bg-danger slot-count-badge"
-                                  style="font-size: 8px;">
-                                ${count}
-                            </span>` : ''
+                                                    <span class="position-absolute top-10 left-0 start-100 translate-middle badge rounded-pill bg-danger slot-count-badge"
+                                                          style="font-size: 8px;">
+                                                        ${count}
+                                                    </span>` : ''
                     }
         `
                             };
@@ -263,68 +272,83 @@
                             const start = this.getAttribute('data-start');
                             const end = this.getAttribute('data-end');
 
-                            if (this.checked) {
-                                const response = await fetch(
-                                    "{{ route('calendar.store') }}", {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': document
-                                                .querySelector(
-                                                    'meta[name="csrf-token"]')
-                                                .content
-                                        },
-                                        body: JSON.stringify({
-                                            eventStartDate: start,
-                                            eventEndDate: end
-                                        })
-                                    });
+                            // Disable all switches during processing
+                            document.querySelectorAll('.toggle-slot-switch')
+                                .forEach(btn => btn.disabled = true);
 
-                                if (response.ok) {
-                                    calendar.addEvent({
-                                        title: `${start.slice(11, 16)} Slot Available`,
-                                        start: start,
-                                        end: end,
-                                        className: 'slot-enabled'
-                                    });
-                                } else {
-                                    alert('Failed to save slot.');
-                                    this.checked = false;
-                                }
-                            } else {
-                                const response = await fetch(
-                                    "{{ route('calendar.disable') }}", {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': document
-                                                .querySelector(
-                                                    'meta[name="csrf-token"]')
-                                                .content
-                                        },
-                                        body: JSON.stringify({
-                                            eventStartDate: start,
-                                            eventEndDate: end
-                                        })
-                                    });
+                            try {
+                                if (this.checked) {
+                                    const response = await fetch(
+                                        "{{ route('calendar.store') }}", {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': document
+                                                    .querySelector(
+                                                        'meta[name="csrf-token"]'
+                                                    ).content
+                                            },
+                                            body: JSON.stringify({
+                                                eventStartDate: start,
+                                                eventEndDate: end
+                                            })
+                                        });
 
-                                if (response.ok) {
-                                    calendar.getEvents().forEach(event => {
-                                        if (
-                                            event.start.toISOString().slice(
-                                                0, 16) === new Date(start)
-                                            .toISOString().slice(0, 16) &&
-                                            event.end.toISOString().slice(0,
-                                                16) === new Date(end)
-                                            .toISOString().slice(0, 16)
-                                        ) {
-                                            event.remove();
-                                        }
-                                    });
+                                    if (response.ok) {
+                                        calendar.addEvent({
+                                            title: `${start.slice(11, 16)} Slot Available`,
+                                            start: start,
+                                            end: end,
+                                            className: 'slot-enabled'
+                                        });
+                                    } else {
+                                        alert('Failed to save slot.');
+                                        this.checked = false;
+                                    }
                                 } else {
-                                    alert('Failed to disable slot.');
-                                    this.checked = true;
+                                    const response = await fetch(
+                                        "{{ route('calendar.disable') }}", {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': document
+                                                    .querySelector(
+                                                        'meta[name="csrf-token"]'
+                                                    ).content
+                                            },
+                                            body: JSON.stringify({
+                                                eventStartDate: start,
+                                                eventEndDate: end
+                                            })
+                                        });
+
+                                    if (response.ok) {
+                                        calendar.getEvents().forEach(event => {
+                                            if (
+                                                event.start.toISOString()
+                                                .slice(0, 16) === new Date(
+                                                    start).toISOString()
+                                                .slice(0, 16) &&
+                                                event.end.toISOString()
+                                                .slice(0, 16) === new Date(
+                                                    end).toISOString()
+                                                .slice(0, 16)
+                                            ) {
+                                                event.remove();
+                                            }
+                                        });
+                                    } else {
+                                        alert('Failed to disable slot.');
+                                        this.checked = true;
+                                    }
                                 }
+                            } catch (error) {
+                                console.error('Error:', error);
+                                alert('An error occurred while processing slot.');
+                            } finally {
+                                // Re-enable all switches
+                                document.querySelectorAll('.toggle-slot-switch')
+                                    .forEach(btn => btn.disabled = false);
                             }
                         });
                     });
