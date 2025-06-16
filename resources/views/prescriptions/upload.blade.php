@@ -2,21 +2,21 @@
 @section('styles')
 @endsection
 @section('content')
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
 
-    @if (session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
-
-    <div class="card">
-        <div class="card-header rounded-top">
-            <div class="d-flex align-items-center justify-content-between">
-                <h4 class="card-title mb-0 text-white">Upload Prescription</h4>
-            </div>
+<div class="card">
+    <div class="card-header rounded-top">
+        <div class="d-flex align-items-center justify-content-between">
+            <h4 class="card-title mb-0 text-white">Upload Prescription</h4>
         </div>
-        <div class="card-body">
+    </div>
+    <div class="card-body">
+            @if (session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            
+            @if (session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
             <form action="{{ route('admin.prescription.store') }}" method="POST" enctype="multipart/form-data"
                 class="row g-3 fv-plugins-bootstrap5 fv-plugins-framework">
                 @csrf

@@ -99,10 +99,18 @@ class User extends Authenticatable
         return $this->hasOne(Laboratories::class);
     }
 
-    public function deliveryProfile()
+    // public function deliveryProfile()
+    // {
+    //     return $this->hasOne(DeliveryPerson::class, 'user_id', 'id');
+    // }
+     public function deliveryProfile()
     {
-        return $this->hasOne(DeliveryPerson::class, 'user_id', 'id');
+        return $this->hasOne(DeliveryPerson::class);
     }
+    public function phlebotomist() {
+    return $this->hasOne(Phlebotomist::class);
+}
+
 
      public function routeNotificationForFcm()
     {

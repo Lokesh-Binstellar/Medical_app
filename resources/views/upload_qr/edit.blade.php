@@ -4,7 +4,7 @@
 
     <div class="card">
         <div class="card-header">
-            <h4>Edit QR Code</h4>
+            <h4>Edit Gomeds QR Code</h4>
         </div>
 
         <div class="card-body">

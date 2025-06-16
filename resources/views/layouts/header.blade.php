@@ -22,6 +22,10 @@
                             {{ Auth::user()->laboratories->lab_name }}
                         @elseif(Auth::user()->pharmacies)
                             {{ Auth::user()->pharmacies->pharmacy_name }}
+                        @elseif(Auth::user()->deliveryProfile)
+                            {{ Auth::user()->deliveryProfile->delivery_person_name }}
+                        @elseif(Auth::user()->phlebotomists)
+                            {{ Auth::user()->phlebotomists->phlebotomists_name }}
                         @else
                             {{ auth()->user()->name }}
                         @endif!
@@ -31,6 +35,7 @@
                         Welcome, Guest!
                     </span>
                 @endauth
+
 
                 @auth
                     <span class="fw-bold text-primary d-block mt-1">

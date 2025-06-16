@@ -365,7 +365,7 @@
                     @if (in_array('Upload QR', $permissions) || $isSuperAdmin == 1)
                         <li class="menu-item {{ Route::currentRouteName() == 'upload_qr.index' ? 'active' : '' }}">
                             <a href="{{ route('upload_qr.index') }}" class="menu-link">
-                                <div data-i18n="Upload QR Code">Upload QR Code</div>
+                                <div data-i18n="QR Code">QR Code</div>
                             </a>
                         </li>
                     @endif
