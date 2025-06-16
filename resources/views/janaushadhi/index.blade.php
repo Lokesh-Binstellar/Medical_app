@@ -67,12 +67,14 @@
             <h5 class="card-title m-0 me-2 text-secondary">Janaushadhi Kendra Medicine</h5>
             <div>
                 <form action="{{ route('janaushadhi.import') }}" id="importForm" method="POST" enctype="multipart/form-data"
-                    class="d-flex gap-2">
+                    class="d-flex gap-2" data-parsley-validate>
 
                     @csrf
                     <div class="error-msg">
 
-                        <input type="file" name="file" class="form-control" id="file" accept=".xlsx, .xls, .csv" required>
+                        <input type="file" name="file" class="form-control" id="file" accept=".xlsx, .xls, .csv"
+                            required data-parsley-required-message="Please select a valid file to import."
+                            data-parsley-fileextension="xlsx,xls,csv">
                     </div>
                     <div>
 
@@ -112,6 +114,7 @@
     </div>
 @endsection
 @section('scripts')
+    <script src="{{ asset('assets/js/parsley.min.js') }}"></script>
     <script type="text/javascript">
         $(document).ready(function() {
 

@@ -4,6 +4,7 @@ use App\Events\MyEvent;
 use App\Http\Controllers\AddMedicineController;
 use App\Http\Controllers\AppRatingController;
 use App\Http\Controllers\AddLabTestController;
+use App\Http\Controllers\JanaushadhiController;
 use App\Http\Controllers\LaboratoriesController;
 use App\Http\Controllers\LabPackageAndTestDetailsController;
 use App\Http\Controllers\LabSlotController;
@@ -61,7 +62,7 @@ Route::middleware('check.api.key')->group(function () {
     Route::middleware('authTest')->group(function () {
         Route::post('/bookpackageorlabtest', [LabPackageAndTestDetailsController::class, 'bookpackageorlabtest']);
         Route::post('/customer/address', [CustomerAddressController::class, 'saveAddress']);
-        Route::put('/customer/address/update', [CustomerAddressController::class,'updateAddress']);
+        Route::put('/customer/address/update', [CustomerAddressController::class, 'updateAddress']);
         Route::get('/customerAddressFetch', [CustomerAddressController::class, 'getAddress']);
         Route::delete('/deleteAddress', [CustomerAddressController::class, 'deleteAddress']);
         Route::put('/customerDetails', [AuthController::class, 'update']);
@@ -153,14 +154,14 @@ Route::middleware('check.api.key')->group(function () {
     Route::post('/get-city-state', [CustomerAddressController::class, 'getCityStateFromPostalCode']);
 
 
-//lab slots api
-Route::post('/getUpcomingLabSlots', [LabSlotController::class, 'getUpcomingSlots']);
-// Route::post('/calendar/slot-booking-details', [LabSlotController::class, 'slotBookingDetails']);
-Route::get('/calendar/slot-users', [LabSlotController::class, 'getSlotCustomers']);
+    //lab slots api
+    Route::post('/getUpcomingLabSlots', [LabSlotController::class, 'getUpcomingSlots']);
+    // Route::post('/calendar/slot-booking-details', [LabSlotController::class, 'slotBookingDetails']);
+    Route::get('/calendar/slot-users', [LabSlotController::class, 'getSlotCustomers']);
 
-
-
-
-
+    Route::prefix('janaushadhi')->group(function () {
+        Route::get('getJanaushadhiAll', [JanaushadhiController::class, 'getJanaushadhiAll']);
+        Route::post('getJanaushadhiByDrugCode/{id}', [JanaushadhiController::class, 'getJanaushadhiByDrugCode']);
+    });
 
 });

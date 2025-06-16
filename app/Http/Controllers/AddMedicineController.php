@@ -225,7 +225,7 @@ class AddMedicineController extends Controller
         return redirect()->back()->with('success', 'Products added to cart successfully');
     }
 
-    
+
     public function getAddToCart(Request $request)
     {
         $id = $request->get('user_id');
@@ -237,9 +237,9 @@ class AddMedicineController extends Controller
                 return response()->json(
                     [
                         'status' => true,
-                        'data' => []
+                        'data' => [],
                     ],
-                    200,
+                    200
                 );
             }
 
@@ -249,6 +249,9 @@ class AddMedicineController extends Controller
             if (is_array($productDetails)) {
                 foreach ($productDetails as $product) {
                     $productId = $product['product_id'] ?? null;
+                    $quantity = $product['quantity'] ?? 1;
+                    $isSubstitute = $product['is_substitute'] ?? 'no';
+
                     if (!$productId) {
                         continue;
                     }
@@ -262,37 +265,63 @@ class AddMedicineController extends Controller
                         $medicine = \App\Models\Otcmedicine::where('otc_id', $productId)->first();
                         if ($medicine) {
                             $type = 'otc';
+                        } else {
+                            $medicine = \App\Models\Janaushadhi::where('drug_code', $productId)->first();
+                            if ($medicine) {
+                                $type = 'janaushadhi';
+                            }
                         }
                     }
 
                     if ($medicine && $type) {
-                        $name = $type === 'medicine' ? $medicine->product_name ?? '' : $medicine->name ?? '';
+                        if ($type === 'medicine' || $type === 'otc') {
+                            $name = $type === 'medicine' ? $medicine->product_name ?? '' : $medicine->name ?? '';
+                            $packaging = $product['packaging_detail'] ?? ($medicine->packaging ?? ($medicine->packaging_detail ?? ''));
+                            $prescriptionRequired = $medicine->prescription_required === 'Prescription Required';
 
-                        $packageDetail = $product['packaging_detail'] ?? ($medicine->packaging ?? ($medicine->packaging_detail ?? ''));
-                        $quantity = $product['quantity'] ?? ($medicine->qty ?? 1);
-                        // echo $quantity;die;
-                        $baseUrl = url('medicines');
-                        $defaultImage = "{$baseUrl}/placeholder.png";
-                        $imageUrls = [$defaultImage];
-                        if (!empty($medicine->image_url)) {
-                            $images = is_array($medicine->image_url) ? $medicine->image_url : (json_decode($medicine->image_url, true) ?: explode(',', $medicine->image_url));
+                            $baseUrl = url('medicines');
+                            $defaultImage = "{$baseUrl}/placeholder.png";
+                            $imageUrls = [$defaultImage];
 
-                            $imageUrls = array_map(function ($img) {
-                                $img = trim($img);
-                                return Str::startsWith($img, 'medicines/') ? asset('storage/' . $img) : asset('storage/medicines/' . $img);
-                            }, $images);
+                            if (!empty($medicine->image_url)) {
+                                $images = is_array($medicine->image_url)
+                                    ? $medicine->image_url
+                                    : (json_decode($medicine->image_url, true) ?: explode(',', $medicine->image_url));
+
+                                $imageUrls = array_map(function ($img) {
+                                    $img = trim($img);
+                                    return Str::startsWith($img, 'medicines/')
+                                        ? asset('storage/' . $img)
+                                        : asset('storage/medicines/' . $img);
+                                }, $images);
+                            }
+
+                            $detailedProducts[] = [
+                                'product_id' => $type === 'medicine' ? $medicine->product_id : $medicine->otc_id,
+                                'type' => $type,
+                                'name' => $name,
+                                'prescription_required' => $prescriptionRequired,
+                                'packaging_detail' => $packaging,
+                                'quantity' => $quantity,
+                                'is_substitute' => $isSubstitute,
+                                'image_url' => $imageUrls,
+                            ];
+                        } elseif ($type === 'janaushadhi') {
+                            $name = $medicine->generic_name ?? '';
+                            $packaging = $medicine->unit_size ?? '';
+                            $prescriptionRequired = false;
+
+                            $detailedProducts[] = [
+                                'product_id' => $medicine->drug_code,
+                                'type' => 'janaushadhi',
+                                'name' => $name,
+                                'prescription_required' => $prescriptionRequired,
+                                'packaging_detail' => $packaging,
+                                'quantity' => $quantity,
+                                'is_substitute' => $isSubstitute,
+                                'mrp' => $medicine->mrp,
+                            ];
                         }
-
-                        $detailedProducts[] = [
-                            'product_id' => $type === 'medicine' ? $medicine->product_id : $medicine->otc_id,
-                            'type' => $type,
-                            'name' => $name,
-                            'prescription_required' => $medicine->prescription_required === 'Prescription Required',
-                            'packaging_detail' => $packageDetail,
-                            'quantity' => $quantity,
-                            'is_substitute' => $product['is_substitute'] ?? 'no',
-                            'image_url' => $imageUrls,
-                        ];
                     }
                 }
             }
@@ -314,10 +343,11 @@ class AddMedicineController extends Controller
                     'message' => 'Something went wrong.',
                     'error' => $e->getMessage(),
                 ],
-                500,
+                500
             );
         }
     }
+
 
     public function removeProduct($cartId, $productId)
     {
@@ -457,24 +487,41 @@ class AddMedicineController extends Controller
             );
         }
 
-        // Check which table the product belongs to and get packaging_detail
+        // Determine which product table it belongs to
+        $productType = null;
         $packagingDetail = null;
+        $productDetails = [];
 
         $otcProduct = \App\Models\Otcmedicine::where('otc_id', $productId)->first();
         if ($otcProduct) {
+            $productType = 'otc';
             $packagingDetail = $otcProduct->packaging;
+            $productDetails = [
+                'packaging_detail' => $packagingDetail,
+            ];
         } else {
             $medProduct = \App\Models\Medicine::where('product_id', $productId)->first();
             if ($medProduct) {
+                $productType = 'med';
                 $packagingDetail = $medProduct->packaging_detail;
+                $productDetails = [
+                    'packaging_detail' => $packagingDetail,
+                ];
             } else {
-                return response()->json(
-                    [
+                $janaushadhi = \App\Models\Janaushadhi::where('drug_code', (int) $productId)->first();
+                if ($janaushadhi) {
+                    $productType = 'janaushadhi';
+                    $productDetails = [
+                        'drug_code' => $janaushadhi->drug_code,
+                        'unit_size' => $janaushadhi->unit_size,
+                        'mrp' => $janaushadhi->mrp,
+                    ];
+                } else {
+                    return response()->json([
                         'status' => false,
-                        'message' => 'Product not found in both otcmedicines and medicines',
-                    ],
-                    404,
-                );
+                        'message' => 'Product not found in otcmedicines, medicines or janaushadhi',
+                    ], 404);
+                }
             }
         }
 
@@ -504,7 +551,7 @@ class AddMedicineController extends Controller
         if (!$found) {
             $currentProducts[] = [
                 'product_id' => $productId,
-                'packaging_detail' => $packagingDetail,
+                'packaging_detail' => $packagingDetail ?? $productDetails['unit_size'],
                 'quantity' => $quantity,
                 'is_substitute' => 'no',
             ];

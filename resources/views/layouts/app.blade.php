@@ -113,7 +113,9 @@
         }
 
         .parsley-errors-list {
-            font-size: 12px !important;
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
         }
 
         .table-responsive {

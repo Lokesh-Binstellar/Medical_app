@@ -58,19 +58,20 @@ class JanaushadhiController extends Controller
         return view('janaushadhi.index');
     }
 
-    public function import(request $request)
+    public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|max:2048',
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:2048',
         ]);
-
-        if ($request->fails()) {
-            return redirect()->back()->withErrors($request)->withInput();
-        }
 
         try {
             Excel::import(new janushadhiImport, $request->file('file'));
             return back()->with(['status' => 'success', 'message' => 'Imported successfully!']);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            // If there's a validation issue with rows (from WithValidation interface)
+            $failures = $e->failures();
+            $firstError = $failures[0]->errors()[0] ?? 'Import validation failed.';
+            return back()->with(['status' => 'danger', 'message' => $firstError]);
         } catch (\Exception $e) {
             Log::error('Import Error: ' . $e->getMessage());
             return back()->with(['status' => 'danger', 'message' => 'Import Failed!']);
@@ -164,5 +165,55 @@ class JanaushadhiController extends Controller
                 'message' => 'Failed to delete janaushadhi. ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    // API
+
+    public function getJanaushadhiAll(Request $request)
+    {
+        $perPage = $request->filled('per_page') && is_numeric($request->per_page) && $request->per_page > 0
+            ? (int) $request->per_page
+            : 10;
+
+        $page = $request->filled('page') && is_numeric($request->page) && $request->page > 0
+            ? (int) $request->page
+            : 1;
+
+        $data = Janaushadhi::paginate($perPage, ['*'], 'page', $page);
+
+        if ($data->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Janaushadhi not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $data->items(), // actual rows
+            'meta' => [
+                'total' => $data->total(),
+                'per_page' => $data->perPage(),
+                'current_page' => $data->currentPage(),
+                'last_page' => $data->lastPage()
+            ]
+        ]);
+    }
+
+    public function getJanaushadhiByDrugCode($drugCode)
+    {
+        $data = Janaushadhi::where('drug_code', $drugCode)->first();
+
+        if (!$data) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Janaushadhi not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $data
+        ]);
     }
 }
