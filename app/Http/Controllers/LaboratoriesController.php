@@ -740,11 +740,14 @@ class LaboratoriesController extends Controller
             ], 404);
         }
 
+        // ✅ Add lab_name inside the data
+        $matchedPackage['lab_name'] = $lab->lab_name;
+
         return response()->json([
             'success' => true,
-            'lab_name' => $lab->lab_name, // 👈 add lab name here
             'data' => $matchedPackage,
         ]);
+
     }
 
 }
