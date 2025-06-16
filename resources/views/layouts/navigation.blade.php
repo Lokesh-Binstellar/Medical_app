@@ -437,10 +437,22 @@
 
         @if (in_array('Pharmacies', $permissions) || $isSuperAdmin == 1 || in_array('Orders', $permissions) || in_array('Laboratories', $permissions) )
             <li class="menu-item {{ in_array(Route::current()->getName(), ['orderdetails']) ? 'active' : '' }}">
-                <a href="{{ route('orderdetails') }}" class="menu-link">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons mdi mdi-view-list"></i>
                     <div data-i18n="Order Details ">Order Details </div>
                 </a>
+                 <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
+                    <li class="menu-item {{ Route::currentRouteName() == 'orderdetails' ? 'active' : '' }}">
+                        <a href="{{ route('orderdetails') }}" class="menu-link">
+                            <div data-i18n="Order Details">Order Details</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {{ Route::currentRouteName() == 'returnorderdetails' ? 'active' : '' }}">
+                        <a href="{{ route('returnorderdetails') }}" class="menu-link">
+                            <div data-i18n="Return Order Details">Return Order Details</div>
+                        </a>
+                    </li>
+                </ul>
             </li>
         @endif
 

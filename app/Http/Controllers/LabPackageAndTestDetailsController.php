@@ -124,6 +124,7 @@ class LabPackageAndTestDetailsController extends Controller
         $testId = $request->input('test_id');
         $packageName = $request->input('package_name');
         $contains = $request->input('contains');
+        
 
         // 1. Retrieve or create LabCart for the customer
         $labCart = LabCart::firstOrCreate(
@@ -133,6 +134,7 @@ class LabPackageAndTestDetailsController extends Controller
                 'prescription_id' => null,
             ]
         );
+       
 
         // 2. Decode current test_details
         $testDetails = json_decode($labCart->test_details, true) ?? [];

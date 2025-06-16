@@ -314,6 +314,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::prefix('search-medicine')->group(function () {
         Route::get('/pharmacist/add-medicine', [MedicineSearchController::class, 'index'])->name('add.medicine');
         Route::get('/pharmacist/order-details', [MedicineSearchController::class, 'orderdetails'])->name('orderdetails');
+        Route::get('/pharmacist/return-order-details', [MedicineSearchController::class, 'returnorderdetails'])->name('returnorderdetails');
         Route::put('/pharmacy/orders/{id}/status', [MedicineSearchController::class, 'updateOrderStatus'])->name('pharmacy.updateOrderStatus');
         Route::get('/orders/{id}/medicines', [MedicineSearchController::class, 'showMedicines'])->name('orders.medicines');
         //Route::post('/orders/{order}/assign-delivery', [MedicineSearchController::class, 'assignDeliveryPerson'])->name('orders.assignDeliveryPerson');
