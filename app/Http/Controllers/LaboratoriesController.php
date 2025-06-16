@@ -729,7 +729,7 @@ class LaboratoriesController extends Controller
             ], 404);
         }
 
-        $packageDetails = json_decode($lab->package_details, true); // decode JSON to array
+        $packageDetails = json_decode($lab->package_details, true);
 
         $matchedPackage = collect($packageDetails)->firstWhere('package_name', $packageName);
 
@@ -742,6 +742,7 @@ class LaboratoriesController extends Controller
 
         return response()->json([
             'success' => true,
+            'lab_name' => $lab->lab_name, // 👈 add lab name here
             'data' => $matchedPackage,
         ]);
     }
