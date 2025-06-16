@@ -665,8 +665,6 @@ class LaboratoriesController extends Controller
                     'email' => $lab->email ?? null,
                     'image' => $imageArray,
                     'rating' => $formattedRating,
-                    'rating_value' => $ratingData->avg_rating ?? 0,
-                    'rating_count' => $ratingData->rating_count ?? 0,
                     'test' => $tests,
                     'package_details' => $packages,
                 ],
