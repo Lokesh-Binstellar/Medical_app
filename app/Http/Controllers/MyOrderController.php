@@ -180,8 +180,7 @@ class MyOrderController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Order has been successfully marked as returned.',
-                'order' => $order
+                'message' => 'Order has been successfully marked as returned.'
             ]);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
