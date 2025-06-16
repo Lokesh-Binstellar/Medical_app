@@ -206,6 +206,7 @@
                                 <td>
                                     <select class="form-select medicine_search medicineDropdown" disabled
                                         name="medicine[0][medicine_id]"></select>
+                                        <input type="hidden" class="medicine_add_id" name="medicine[0][medicine_id]">
                                     <input type="hidden" class="medicine_name" name="medicine[0][medicine_name]">
                                 </td>
                                 <td>
@@ -491,7 +492,18 @@
             $('.total-amount').text(total.toFixed(2));
 
             // Commission based on total MRP
-            const commission = total >= 300 ? 15 : 10;
+            // const commission = total >= 300 ? 15 : 10;
+            // const gstRate = {{ $commissionData->gstRate ?? 0}}; //  18
+            const commissionAboveAmount = {{ $commissionData->commissionAboveAmount ?? 0 }}; //  18
+            const commissionBelowAmount = {{ $commissionData->commissionBelowAmount ?? 0}}; //  10
+            const commonAmount = {{ $commissionData->commonAmount ?? 0}}; // 300
+
+            const commission = total >= commonAmount ?
+                // commissionAboveAmount + (commissionAboveAmount * gstRate / 100) :
+                commissionAboveAmount :
+                // (commissionBelowAmount - (commissionBelowAmount * gstRate / 100)) + (commissionBelowAmount * gstRate / 100);
+                // (commissionBelowAmount ) + (commissionBelowAmount * gstRate / 100);
+                commissionBelowAmount;
 
             $('#commission_amount').val(commission.toFixed(2));
             $('.commission-amount').text(commission.toFixed(2));
@@ -864,9 +876,9 @@
         //                     var data = $.map(columns, function(col) {
         //                         return col.title ?
         //                             `<tr data-dt-row="${col.rowIndex}" data-dt-column="${col.columnIndex}">
-        //                             <td><strong>${col.title}</strong></td>
-        //                             <td>${col.data}</td>
-        //                        </tr>` :
+    //                             <td><strong>${col.title}</strong></td>
+    //                             <td>${col.data}</td>
+    //                        </tr>` :
         //                             '';
         //                     }).join('');
 
@@ -999,6 +1011,7 @@
 
                                 // Set the hidden medicine name field
                                 $targetRow.find('.medicine_name').val(product.name);
+                                $targetRow.find('.medicine_add_id').val(product.product_id);
 
                                 // Set quantity
                                 $targetRow.find('.quantity').val(product.quantity);

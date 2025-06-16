@@ -6,6 +6,7 @@ use App\Events\MyEvent;
 use App\Events\Pharmacymedicine;
 use App\Models\Carts;
 use App\Models\Additionalcharges;
+use App\Models\CommissionData;
 use App\Models\CustomerAddress;
 use App\Models\Customers;
 use App\Models\DeliveryPerson;
@@ -16,6 +17,7 @@ use App\Models\Patient;
 use App\Models\Pharmacies;
 use App\Models\Phrmacymedicine;
 use App\Models\Prescription;
+use App\Models\QuoteAcceptLog;
 use App\Models\RequestQuote;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -32,8 +34,8 @@ class MedicineSearchController extends Controller
         $pharmacy = Pharmacies::where('user_id', Auth::user()->id)->first();
 
         $medicines = Phrmacymedicine::where('phrmacy_id', Auth::user()->id)->get();
-
-        return view('pharmacist.add-medicine', compact('medicines'));
+        $commissionData = CommissionData::latest()->first();
+        return view('pharmacist.add-medicine', compact('medicines', 'commissionData'));
     }
 
     public function store(Request $request)
@@ -63,8 +65,8 @@ class MedicineSearchController extends Controller
 
         $medicine = new Phrmacymedicine();
         $medicine->medicine = json_encode($data['medicine']);
-        //$medicine->quantity = $totalQuantity;
-        //$medicine->substitute_medicines = json_encode($substituteMedicines);
+        // $medicine->quantity = $totalQuantity;
+        // $medicine->substitute_medicines = json_encode($substituteMedicines);
 
         $medicine->total_amount = $data['total_amount'] ?? 0;
         $medicine->mrp_amount = $data['mrp_amount'] ?? 0;
@@ -72,7 +74,22 @@ class MedicineSearchController extends Controller
         $medicine->phrmacy_id = $pharmacy->user_id;
         $medicine->customer_id = $data['customer'][0]['customer_id'] ?? null;
         $medicine->save();
+        // Fetch latest matching request
+        $existingRequest = DB::table('request_quotes')
+            ->where('customer_id', $medicine->customer_id)
+            ->where('pharmacy_id', $pharmacy->user_id)
+            ->latest()
+            ->first();
 
+        // If found, store in log table
+        if ($existingRequest) {
+            QuoteAcceptLog::create([
+                'customer_id' => $medicine->customer_id,
+                'pharmacy_id' => $pharmacy->user_id,
+                'requested_at' => $existingRequest->created_at,
+                'accepted_at' => $medicine->created_at,
+            ]);
+        }
         DB::table('request_quotes')
             ->where('customer_id', $data['customer'][0]['customer_id'] ?? 0)
             ->where('pharmacy_id', $pharmacy->user_id)
@@ -157,7 +174,6 @@ class MedicineSearchController extends Controller
 
     public function allPharmacyRequests(Request $request)
     {
-        // echo "okk";die;
         $currentCustomer = $request->get('user_id');  // e.g. 2
 
         $getMedicine = Phrmacymedicine::with('pharmacy')
@@ -207,6 +223,7 @@ class MedicineSearchController extends Controller
             $cartQuantities = collect($carts)->mapWithKeys(function ($item) {
                 return [$item['product_id'] => $item['quantity']];
             });
+
 
             $grouped = $getMedicine->groupBy('phrmacy_id')->map(function ($group, $pharmacyId) use ($cartQuantities, $quoteAddresses, $apiKey, $userId) {
                 $pharmacy = $group->first()->pharmacy;
@@ -383,7 +400,7 @@ class MedicineSearchController extends Controller
             $now = \Carbon\Carbon::now();
 
             // Show message if more than 15 minutes old
-            if ($now->diffInMinutes($quoteTime) > 15) {
+            if ($quoteTime->addMinutes(15)->lt($now)) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Request quote exceeded 15 minutes'
@@ -584,15 +601,15 @@ class MedicineSearchController extends Controller
                     'payment_mode',
                     fn($order) =>
                     $order->payment_option
-                    ? ucwords(str_replace('_', ' ', $order->payment_option))
-                    : 'N/A'
+                        ? ucwords(str_replace('_', ' ', $order->payment_option))
+                        : 'N/A'
                 )
                 ->addColumn(
                     'delivery_method',
                     fn($order) =>
                     $order->delivery_options
-                    ? ucwords(str_replace('_', ' ', $order->delivery_options))
-                    : 'N/A'
+                        ? ucwords(str_replace('_', ' ', $order->delivery_options))
+                        : 'N/A'
                 )
 
                 // ->addColumn('delivery_person', function ($order) {

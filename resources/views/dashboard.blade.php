@@ -217,11 +217,11 @@
                 <div class="col-lg-6">
                     <div class="card overflow-hidden h-100">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title mb-0">Top Pharmacies</h4>
+                            <h4 class="card-title mb-0">Top Pharmacies By Rating</h4>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="display table table-striped table-hover "id="topPharmaciesTable">
+                                <table class="display table table-striped table-hover " id="topPharmaciesTable">
                                     <thead>
                                         <tr>
                                             <th></th>
@@ -759,73 +759,73 @@
 
         // customer orders data 
         $(document).ready(function() {
-    $('#customerDetailsTable').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "{{ route('dashboard.orders.data') }}",
-        columns: [
-            {
-                data: null,
-                defaultContent: '',
-                orderable: false
-            }, // control column for responsive toggle
-            {
-                data: 'order_id',
-                name: 'order_id'
-            },
-            {
-                data: 'name',
-                name: 'name',
-                orderable: false
-            },
-            {
-                data: 'status',
-                name: 'status',
-                orderable: false
-            },
-            {
-                data: 'action',
-                name: 'action',
-                orderable: false,
-                searchable: false
-            }
-        ],
-        columnDefs: [{
-            // For Responsive (first col is blank control)
-            targets: 0,
-            className: 'control',
-            orderable: false,
-            searchable: false,
-            responsivePriority: 1,
-            render: function(data, type, full, meta) {
-                return '';
-            }
-        }],
-        responsive: {
-            details: {
-                display: $.fn.dataTable.Responsive.display.modal({
-                    header: function(row) {
-                        var data = row.data();
-                        return 'Details of ' + (data.pharmacy_name || data.name || 'Customer');
+            $('#customerDetailsTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('dashboard.orders.data') }}",
+                columns: [{
+                        data: null,
+                        defaultContent: '',
+                        orderable: false
+                    }, // control column for responsive toggle
+                    {
+                        data: 'order_id',
+                        name: 'order_id'
+                    },
+                    {
+                        data: 'name',
+                        name: 'name',
+                        orderable: false
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        orderable: false
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
                     }
-                }),
-                type: 'column',
-                renderer: function(api, rowIdx, columns) {
-                    var data = $.map(columns, function(col, i) {
-                        return col.title !== '' ?
-                            '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' +
-                            col.columnIndex + '">' +
-                            '<td>' + col.title + ':</td>' +
-                            '<td>' + col.data + '</td>' +
-                            '</tr>' : '';
-                    }).join('');
+                ],
+                columnDefs: [{
+                    // For Responsive (first col is blank control)
+                    targets: 0,
+                    className: 'control',
+                    orderable: false,
+                    searchable: false,
+                    responsivePriority: 1,
+                    render: function(data, type, full, meta) {
+                        return '';
+                    }
+                }],
+                responsive: {
+                    details: {
+                        display: $.fn.dataTable.Responsive.display.modal({
+                            header: function(row) {
+                                var data = row.data();
+                                return 'Details of ' + (data.pharmacy_name || data.name ||
+                                    'Customer');
+                            }
+                        }),
+                        type: 'column',
+                        renderer: function(api, rowIdx, columns) {
+                            var data = $.map(columns, function(col, i) {
+                                return col.title !== '' ?
+                                    '<tr data-dt-row="' + col.rowIndex + '" data-dt-column="' +
+                                    col.columnIndex + '">' +
+                                    '<td>' + col.title + ':</td>' +
+                                    '<td>' + col.data + '</td>' +
+                                    '</tr>' : '';
+                            }).join('');
 
-                    return data ? $('<table class="table"/><tbody />').append(data) : false;
+                            return data ? $('<table class="table"/><tbody />').append(data) : false;
+                        }
+                    }
                 }
-            }
-        }
-    });
-});
+            });
+        });
 
 
         $(document).ready(function() {

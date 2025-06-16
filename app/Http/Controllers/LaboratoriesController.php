@@ -285,7 +285,7 @@ class LaboratoriesController extends Controller
             'lab_name' => 'required|string',
             'owner_name' => 'required|string',
             'email' => 'required|email|unique:users,email,' . $laboratorie->user_id,
-            
+
             'password' => 'nullable|string|min:6',
             'phone' => 'required|min:11|numeric',
             'city' => 'required|string',
@@ -446,79 +446,73 @@ class LaboratoriesController extends Controller
                 return response()->json(['status' => false, 'message' => 'latlong is required'], 400);
             }
 
-            [$userLat, $userLon] = explode(',', $latlong);
-            $userLat = trim($userLat);
-            $userLon = trim($userLon);
-
+            [$userLat, $userLon] = array_map('trim', explode(',', $latlong));
             $apiKey = env('GOOGLE_MAPS_API_KEY');
 
-            // 1. Get city from coordinates using Geocoding API
+            // Get city from coordinates using Geocoding API
             $geoUrl = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$userLat,$userLon&key=$apiKey";
-            $geoResponse = file_get_contents($geoUrl);
-            $geoData = json_decode($geoResponse, true);
+            $geoData = json_decode(file_get_contents($geoUrl), true);
 
             if (!$geoData || $geoData['status'] !== 'OK') {
                 return response()->json(['status' => false, 'message' => 'Could not determine city from location'], 400);
             }
 
-            $city = null;
-            foreach ($geoData['results'][0]['address_components'] as $component) {
-                if (in_array('locality', $component['types'])) {
-                    $city = $component['long_name'];
-                    break;
-                }
-            }
+            $city = collect($geoData['results'][0]['address_components'])->first(fn($comp) => in_array('locality', $comp['types']))['long_name'] ?? null;
 
             if (!$city) {
                 return response()->json(['status' => false, 'message' => 'City not found in address data'], 400);
             }
 
-            // 2. Get labs in that city
-            $labs = Laboratories::where('city', $city)->get(['id', 'lab_name', 'user_id', 'pickup', 'latitude', 'longitude', 'city']);
+            // Get labs in that city
+            $labs = Laboratories::where('city', $city)->get(['id', 'lab_name', 'pickup', 'latitude', 'longitude', 'image']);
 
-            // 3. Calculate distance using Google Directions API
             $result = [];
+
             foreach ($labs as $lab) {
                 if ($lab->latitude && $lab->longitude) {
                     $directionUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=$userLat,$userLon&destination={$lab->latitude},{$lab->longitude}&key=$apiKey";
-                    $response = file_get_contents($directionUrl);
-                    $data = json_decode($response, true);
+                    $data = json_decode(file_get_contents($directionUrl), true);
 
                     if ($data['status'] === 'OK') {
                         $distanceMeters = $data['routes'][0]['legs'][0]['distance']['value'];
                         $distanceKm = round($distanceMeters / 1000, 2);
 
                         // Get rating
-                        $ratingData = Rating::where('rateable_type', 'Laboratory')->where('rateable_id', $lab->user_id)->selectRaw('AVG(rating) as avg_rating, COUNT(*) as rating_count')->first();
+                        $ratingData = Rating::where('rateable_type', 'Laboratory')->where('rateable_id', $lab->id)->selectRaw('AVG(rating) as avg_rating, COUNT(*) as rating_count')->first();
 
                         $formattedRating = $ratingData->rating_count > 0 ? round($ratingData->avg_rating, 1) . ' (' . $ratingData->rating_count . ')' : null;
+
+                        $imageArray = [];
+                        if (!empty($lab->image)) {
+                            $rawImages = json_decode($lab->image, true); // Try JSON first
+                            if (json_last_error() === JSON_ERROR_NONE && is_array($rawImages)) {
+                                $imageArray = array_map(fn($img) => url('storage/lab_images/' . $img), $rawImages);
+                            } else {
+                                // fallback: comma-separated string
+                                $imageArray = array_map(fn($img) => url('assets/image/' . trim($img)), explode(',', $lab->image));
+                            }
+                        }
 
                         $result[] = [
                             'id' => $lab->id,
                             'lab_name' => $lab->lab_name,
-                            'user_id' => $lab->user_id,
                             'pickup' => $lab->pickup,
                             'latitude' => $lab->latitude,
                             'longitude' => $lab->longitude,
+                            'image' => $imageArray,
                             'distance_km' => $distanceKm,
                             'rating' => $formattedRating,
-                            'rating_value' => $ratingData->avg_rating ?? 0, // used only for sorting
-                            'lab_city' => $lab->city,
+                            'rating_value' => $ratingData->avg_rating ?? 0, // used for sorting
                         ];
                     }
                 }
             }
 
-            // Sort labs by rating descending
-            usort($result, function ($a, $b) {
-                return $b['rating_value'] <=> $a['rating_value'];
-            });
+            // Sort by rating descending
+            usort($result, fn($a, $b) => $b['rating_value'] <=> $a['rating_value']);
 
-            // Remove internal sorting field
-            $result = array_map(function ($lab) {
-                unset($lab['rating_value']);
-                return $lab;
-            }, $result);
+            // Remove rating_value before returning
+            $result = array_map(fn($lab) => array_diff_key($lab, ['rating_value' => '']), $result);
 
             return response()->json([
                 'status' => true,
@@ -527,12 +521,172 @@ class LaboratoriesController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error in getAllLaboratory: ' . $e->getMessage());
-
             return response()->json(
                 [
                     'status' => false,
                     'message' => 'Something went wrong. Please try again later.',
-                    'error' => $e->getMessage(), // remove in production
+                    'error' => $e->getMessage(), // Consider removing in production
+                ],
+                500,
+            );
+        }
+    }
+
+    public function getLaboratoryDetailsById($laboratorie_id)
+    {
+        try {
+            $userId = $laboratorie_id; // pulled from route
+
+            if (!$userId) {
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => 'laboratorie_id is required',
+                    ],
+                    400,
+                );
+            }
+
+            $lab = Laboratories::where('user_id', $userId)->first();
+
+            if (!$lab) {
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => 'Laboratory not found.',
+                    ],
+                    404,
+                );
+            }
+
+            // Process images
+            $imageArray = [];
+            if (!empty($lab->image)) {
+                $rawImages = json_decode($lab->image, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($rawImages)) {
+                    $imageArray = array_map(fn($img) => url('storage/lab_images/' . $img), $rawImages);
+                } else {
+                    $imageArray = array_map(fn($img) => url('assets/image/' . trim($img)), explode(',', $lab->image));
+                }
+            }
+
+            // Decode test and package_details
+            $tests = [];
+            $packages = [];
+
+            if (!empty($lab->test)) {
+                $rawTests = json_decode($lab->test, true);
+
+                if (is_array($rawTests)) {
+                    // Extract all test IDs
+                    $testIds = collect($rawTests)->pluck('test')->filter(fn($id) => is_numeric($id))->unique()->values()->toArray();
+
+                    // Fetch test names
+                    $testMap = LabTest::whereIn('id', $testIds)->pluck('name', 'id')->toArray();
+
+                    // Map names into the test list
+                    foreach ($rawTests as $item) {
+                        $testId = $item['test'] ?? null;
+                        unset($item['test']); // Remove old 'test' key
+                        $item['test_id'] = $testId;
+                        $item['test_name'] = $testMap[$testId] ?? null;
+                        $tests[] = $item;
+                    }
+                }
+            }
+
+            if (!empty($lab->package_details)) {
+                $rawPackages = json_decode($lab->package_details, true);
+
+                if (is_array($rawPackages)) {
+                    $categoryIds = [];
+
+                    // Collect all IDs (flattened)
+                    foreach ($rawPackages as $pkg) {
+                        if (!empty($pkg['package_category'])) {
+                            if (is_array($pkg['package_category'])) {
+                                $categoryIds = array_merge($categoryIds, $pkg['package_category']);
+                            } else {
+                                $categoryIds[] = $pkg['package_category'];
+                            }
+                        }
+                    }
+
+                    $categoryIds = array_unique($categoryIds);
+
+                    // Get category names mapped by ID
+                    $categoryMap = PackageCategory::whereIn('id', $categoryIds)->pluck('name', 'id')->toArray();
+
+                    foreach ($rawPackages as $pkg) {
+                        $pkgWithNames = $pkg;
+
+                        // Remove ID field
+                        unset($pkgWithNames['package_category']);
+
+                        // Add names
+                        $pkgWithNames['package_category_name'] = null;
+
+                        if (!empty($pkg['package_category'])) {
+                            if (is_array($pkg['package_category'])) {
+                                $names = [];
+                                foreach ($pkg['package_category'] as $id) {
+                                    if (isset($categoryMap[$id])) {
+                                        $names[] = $categoryMap[$id];
+                                    }
+                                }
+                                $pkgWithNames['package_category_name'] = $names;
+                            } else {
+                                $pkgWithNames['package_category_name'] = $categoryMap[$pkg['package_category']] ?? null;
+                            }
+                        }
+
+                        $packages[] = $pkgWithNames;
+                    }
+                }
+            }
+
+            // Rating data
+            $ratingData = Rating::where('rateable_type', 'Laboratory')->where('rateable_id', $lab->id)->selectRaw('AVG(rating) as avg_rating, COUNT(*) as rating_count')->first();
+
+            $formattedRating = $ratingData->rating_count > 0 ? round($ratingData->avg_rating, 1) . ' (' . $ratingData->rating_count . ')' : null;
+
+            // Final response
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'id' => $lab->id,
+                    'lab_name' => $lab->lab_name,
+                    'pickup' => $lab->pickup,
+                    'latitude' => $lab->latitude,
+                    'longitude' => $lab->longitude,
+                    'city' => $lab->city,
+                    'address' => $lab->address ?? null,
+                    'contact' => $lab->phone ?? null,
+                    'email' => $lab->email ?? null,
+                    'image' => $imageArray,
+                    'rating' => $formattedRating,
+                    'rating_value' => $ratingData->avg_rating ?? 0,
+                    'rating_count' => $ratingData->rating_count ?? 0,
+                    'test' => $tests,
+                    'package_details' => $packages,
+                ],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Validation error.',
+                    'errors' => $e->errors(),
+                ],
+                422,
+            );
+        } catch (\Exception $e) {
+            Log::error('Error in getLaboratoryDetailsById: ' . $e->getMessage());
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Something went wrong.',
+                    'error' => $e->getMessage(),
                 ],
                 500,
             );

@@ -6,6 +6,7 @@ use App\Http\Controllers\AppRatingController;
 use App\Http\Controllers\AddLabTestController;
 use App\Http\Controllers\LaboratoriesController;
 use App\Http\Controllers\LabPackageAndTestDetailsController;
+use App\Http\Controllers\LabSlotController;
 use App\Http\Controllers\MyOrderController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AuthTokenController;
@@ -59,7 +60,8 @@ Route::middleware('check.api.key')->group(function () {
     // with jwt token
     Route::middleware('authTest')->group(function () {
         Route::post('/bookpackageorlabtest', [LabPackageAndTestDetailsController::class, 'bookpackageorlabtest']);
-        Route::post('/customer/address', [CustomerAddressController::class, 'store']);
+        Route::post('/customer/address', [CustomerAddressController::class, 'saveAddress']);
+        Route::put('/customer/address/update', [CustomerAddressController::class,'updateAddress']);
         Route::get('/customerAddressFetch', [CustomerAddressController::class, 'getAddress']);
         Route::delete('/deleteAddress', [CustomerAddressController::class, 'deleteAddress']);
         Route::put('/customerDetails', [AuthController::class, 'update']);
@@ -108,6 +110,13 @@ Route::middleware('check.api.key')->group(function () {
         // });
         Route::post('/broadcasting/auth', [PusherController::class, 'authenticate']);
         Route::get('/trigger-call', [PusherController::class, 'triggerCall']);
+
+
+
+
+
+
+        Route::post('/book-slot', [LabSlotController::class, 'book']);
     });
     Route::get('/about-us', [CmsController::class, 'aboutUs']);
     Route::get('/contact-us', [CmsController::class, 'contactUs']);
@@ -134,11 +143,22 @@ Route::middleware('check.api.key')->group(function () {
     //    Laboratory
 
     Route::post('/getAllLaboratory', [LaboratoriesController::class, 'getAllLaboratory']);
-
+    Route::get('/getLaboratoryDetailsById/{laboratorie_id}', [LaboratoriesController::class, 'getLaboratoryDetailsById']);
 
     //general Address
-    Route::post('/get-address-from-latlng', [CustomerAddressController::class, 'getAddressFromLatLng']);
+    Route::post('/getUserSelectLocation', [CustomerAddressController::class, 'getUserSelectLocation']);
     Route::get('/place-autocomplete', [CustomerAddressController::class, 'placeAutocomplete']);
+    Route::post('/get-city-state', [CustomerAddressController::class, 'getCityStateFromPostalCode']);
+
+
+//lab slots api
+Route::post('/getUpcomingLabSlots', [LabSlotController::class, 'getUpcomingSlots']);
+// Route::post('/calendar/slot-booking-details', [LabSlotController::class, 'slotBookingDetails']);
+Route::get('/calendar/slot-users', [LabSlotController::class, 'getSlotCustomers']);
+
+
+
+
 
 
 });

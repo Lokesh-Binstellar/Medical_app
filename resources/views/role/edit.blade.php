@@ -28,7 +28,7 @@
                             </div>
                             <div class="input-field col-sm-12">
                                 <div class="card">
-                                    <h5 class="card-header">Table Basic</h5>
+                                    <h5 class="card-header">Permissions</h5>
                                     <div class="table-responsive text-nowrap">
                                         <table class="table">
                                             <thead>

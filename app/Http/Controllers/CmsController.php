@@ -386,7 +386,7 @@ class CmsController extends Controller
             <li><a class="dropdown-item" href="' . $editUrl . '">Edit</a></li>
             </ul>
             </div>';
-            // <li><button class="dropdown-item btn-delete" data-id="' . $row->id . '" data-url="' . $deleteUrl . '">Delete</button></li>
+                    // <li><button class="dropdown-item btn-delete" data-id="' . $row->id . '" data-url="' . $deleteUrl . '">Delete</button></li>
                 })
                 ->rawColumns(['action'])
                 ->make(true);
@@ -423,7 +423,7 @@ class CmsController extends Controller
     {
         return view('cms.terms-and-conditions.edit', compact('termsAndCondition'));
     }
-    
+
 
     public function termsUpdate(Request $request, TermsAndCondition $termsAndCondition)
     {
@@ -527,79 +527,115 @@ class CmsController extends Controller
             return response()->json(['status' => false, 'message' => 'Failed to delete.']);
         }
     }
-    public function aboutUs()
-    {
-        $about = AboutUs::latest()->first();
+   public function aboutUs()
+{
+    $about = AboutUs::latest()->first();
+ 
+    if (!$about) {
         return response()->json([
-            'status' => true,
-            'data' => $about,
-        ]);
+            'status' => false,
+            'message' => 'About Us content not found.'
+        ], 404);
     }
-
-    public function contactUs()
-    {
-        $contact = ContactUs::latest()->first();
+ 
+    return response()->json([
+        'status' => true,
+        'data' => $about,
+    ]);
+}
+ 
+public function contactUs()
+{
+    $contact = ContactUs::latest()->first();
+ 
+    if (!$contact) {
         return response()->json([
-            'status' => true,
-            'data' => $contact,
-        ]);
+            'status' => false,
+            'message' => 'Contact Us content not found.'
+        ], 404);
     }
-
-    public function faqs()
-    {
-        $faqs = Faq::orderBy('id', 'desc')->get();
+ 
+    return response()->json([
+        'status' => true,
+        'data' => $contact,
+    ]);
+}
+ 
+public function faqs()
+{
+    $faqs = Faq::orderBy('id', 'desc')->get();
+ 
+    if ($faqs->isEmpty()) {
         return response()->json([
-            'status' => true,
-            'data' => $faqs,
-        ]);
+            'status' => false,
+            'message' => 'FAQs not found.'
+        ], 404);
     }
-
+ 
+    return response()->json([
+        'status' => true,
+        'data' => $faqs,
+    ]);
+}
+ 
 public function terms()
 {
     $terms = TermsAndCondition::latest()->first();
-
+ 
+    if (!$terms) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Terms and Conditions not found.'
+        ], 404);
+    }
+ 
     $description = '<div style="text-align:justify;">' . $terms->description . '</div>';
-
+ 
     return response()->json([
         'status' => true,
         'data' => [
             'id' => $terms->id,
             'description' => $description,
-            'created_at' => $terms->created_at,
-            'updated_at' => $terms->updated_at,
         ]
     ], 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 }
-
-
+ 
 public function returnPolicy()
 {
     $returnPolicy = ReturnPolicy::latest()->first();
-
+ 
+    if (!$returnPolicy) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Return Policy not found.'
+        ], 404);
+    }
+ 
     return response()->json([
         'status' => true,
         'data' => [
             'id' => $returnPolicy->id,
             'description' => '<div style="text-align:justify;">' . $returnPolicy->description . '</div>',
-            'created_at' => $returnPolicy->created_at,
-            'updated_at' => $returnPolicy->updated_at,
         ],
     ]);
 }
-
-
-
-   public function privacyPolicy()
+ 
+public function privacyPolicy()
 {
     $privacyPolicy = PrivacyPolicy::latest()->first();
-
+ 
+    if (!$privacyPolicy) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Privacy Policy not found.'
+        ], 404);
+    }
+ 
     return response()->json([
         'status' => true,
         'data' => [
             'id' => $privacyPolicy->id,
             'description' => '<div style="text-align:justify;">' . $privacyPolicy->description . '</div>',
-            'created_at' => $privacyPolicy->created_at,
-            'updated_at' => $privacyPolicy->updated_at,
         ],
     ]);
 }

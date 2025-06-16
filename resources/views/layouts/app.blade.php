@@ -49,9 +49,11 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/apex-charts/apex-charts.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/swiper/swiper.css') }}" />
 
+
     <!-- Page CSS -->
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/cards-statistics.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/cards-analytics.css') }}" />
+
 
 
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
@@ -70,8 +72,8 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
     <link rel="stylesheet"
         href="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css') }}">
-  
-            <link rel="stylesheet" href="{{ asset('assets/css/daterangepicker.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('assets/css/daterangepicker.css') }}">
     {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/parsleyjs/src/parsley.css"> --}}
     {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css"> --}}
     <style>
@@ -292,6 +294,7 @@
     <script src="{{ asset('assets/js/form-layouts.js') }}"></script>
   
 
+
     {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
     <script src="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.js') }}"></script>
 
@@ -310,7 +313,7 @@
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
- 
+
 
 
     {{-- chaet script  --}}
@@ -318,7 +321,10 @@
     <script src="{{ asset('assets/js/daterangepicker.min.js') }}"></script>
     <script src="{{ asset('assets/js/chart.min.js') }}"></script>
     {{-- <script src="https://cdn.jsdelivr.net/npm/parsleyjs"></script>/ --}}
-    {{-- <script src="https://code.highcharts.com/highcharts.js"></script> --}}
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+{{-- <script src="https://code.highcharts.com/modules/solid-gauge.js"></script> --}}
+
     {{-- <script
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1mG52tiHM3duCJupl0CtEB3xpzUGiohQ&callback=initAutocomplete&libraries=places&v=weekly"
     defer
@@ -328,7 +334,7 @@
 
 
     @yield('scripts')
-    @livewireScripts
+
     {{-- <script>
         $(document).ready(function() {
 

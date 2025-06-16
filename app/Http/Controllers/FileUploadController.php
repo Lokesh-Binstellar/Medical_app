@@ -100,7 +100,7 @@ class FileUploadController extends Controller
         $currentHour = (int) date('H');
 
         // Allowed time: from 9 AM (9) to 9 PM (21)
-        if ($currentHour < 9 || $currentHour > 21) {
+        if ($currentHour < 9  || $currentHour > 21) {
             return response()->json([
                 'status' => false,
                 'message' => 'You can only upload prescriptions between 9 AM and 9 PM.',
@@ -181,30 +181,29 @@ class FileUploadController extends Controller
 
     public function uploadprescription()
     {
-        return view('prescriptions.upload');
+        $selectedCustomers = Customers::all();
+        return view('prescriptions.upload',compact('selectedCustomers'));
     }
 
-    public function search(Request $request)
-    {
-        $term = $request->input('q');
+//     public function search(Request $request)
+// {
+//     $customers = Customers::select('id', 'firstName', 'lastName', 'mobile_no')->get();
 
-        $customers = Customers::where('firstName', 'like', "%{$term}%")
-            ->orWhere('lastName', 'like', "%{$term}%")
-            ->orWhere('mobile_no', 'like', "%{$term}%")
-            ->select('id', 'firstName', 'lastName', 'mobile_no')
-            ->limit(10)
-            ->get();
+//     $results = $customers->map(function ($customer) {
+//         return [
+//             'id' => $customer->id,
+//             'text' => "{$customer->firstName} {$customer->lastName} - {$customer->mobile_no}",
+//         ];
+//     });
 
-        $results = $customers->map(function ($customer) {
-            return [
-                'id' => $customer->id,
-                'text' => "{$customer->firstName} {$customer->lastName} - {$customer->mobile_no}",
-            ];
-        });
+//     return response()->json(['results' => $results]);
+// }
 
-        return response()->json(['results' => $results]);
-    }
 
+
+
+    
+    
     public function store(Request $request)
     {
         $request->validate([

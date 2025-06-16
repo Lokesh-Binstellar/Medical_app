@@ -72,7 +72,6 @@ class User extends Authenticatable
     }
 
 
-
     public function hasRolePermission($module)
     {
         if ($this->permissions()->where('module', $module)->first()) {
@@ -109,5 +108,11 @@ class User extends Authenticatable
     {
         return $this->fcm_token;  // column in your users table with device token
     }
+
+
+    public function labSlots()
+{
+    return $this->hasMany(LabSlot::class, 'laboratory_id');
+}
 
 }

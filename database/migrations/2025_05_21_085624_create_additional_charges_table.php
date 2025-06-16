@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('platfrom_fee');
             $table->timestamps();
         });
+        
     }
 
     /**

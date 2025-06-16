@@ -9,6 +9,7 @@ class Pharmacies extends Model
 {
     protected $fillable = [
         'pharmacy_name',
+        'free_delivery_charge',
         'owner_name',
         'user_id',
         'email',

@@ -112,6 +112,7 @@ class AuthTokenController extends Controller
             'token' => $token,
             'user' => $userData
         ]);
+        
     }
 
 

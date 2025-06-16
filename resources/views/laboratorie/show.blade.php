@@ -187,7 +187,7 @@
                                                     <th>Description</th>
                                                     <th>Visiting Price</th>
                                                     <th>Home Price</th>
-                                                    <th>Report</th>
+                                                    <th>Report Time</th>
                                                     <th>Offer Visiting Price</th>
                                                     <th>Offer Home Price</th>
                                                     <th>Categories</th>

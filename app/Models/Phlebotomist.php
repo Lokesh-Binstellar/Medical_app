@@ -6,5 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class Phlebotomist extends Model
 {
-    protected $fillable = ['name', 'contact_number', 'laboratory_id'];
+   protected $table = 'phlebotomists';
+
+    protected $fillable = [
+        'laboratory_id',
+        'phlebotomists_name',
+        'contact_number',
+        'email',
+        'city',
+        'state',
+        'pincode',
+        'address',
+        'username',
+        'password',
+    ];
+
+    protected $hidden = ['password'];
 }
