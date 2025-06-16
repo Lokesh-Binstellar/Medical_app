@@ -11,6 +11,11 @@ class LabSlot extends Model
 
     protected $fillable = ['eventStartDate', 'eventEndDate', 'is_active', 'laboratory_id'];
 
+    protected $casts = [
+        'eventStartDate' => 'datetime',
+        'eventEndDate' => 'datetime',
+    ];
+
     public function laboratory()
     {
         return $this->belongsTo(User::class, 'laboratory_id');
