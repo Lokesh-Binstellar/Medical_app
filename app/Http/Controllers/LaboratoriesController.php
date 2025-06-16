@@ -665,6 +665,7 @@ class LaboratoriesController extends Controller
                     'email' => $lab->email ?? null,
                     'image' => $imageArray,
                     'rating' => $formattedRating,
+                    'nabl_iso_certified' => $lab->nabl_iso_certified == 1 ? 'Yes' : 'No',
                     'test' => $tests,
                     'package_details' => $packages,
                 ],
