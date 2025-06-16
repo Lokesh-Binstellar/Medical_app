@@ -4,49 +4,48 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" /> --}}
 @endsection
 @section('content')
+    <div class="card shadow">
+        <div class="card-header d-flex justify-content-between align-items-center rounded-top">
+            <h4 class="card-title mb-0 text-white">Medicine</h4>
+            <div class="d-flex justify-content-between align-items-center">
+                <form action="{{ route('medicine.import') }}" id="importForm" method="POST" enctype="multipart/form-data"
+                    class="d-flex gap-2">
 
-                    <div class="card shadow">
-                        <div class="card-header d-flex justify-content-between align-items-center rounded-top">
-                            <h4 class="card-title mb-0 text-white">Medicine</h4>
-                            <div class="d-flex justify-content-between align-items-center">
-                            <form action="{{ route('medicine.import') }}" id="importForm" method="POST"
-                                enctype="multipart/form-data" class="d-flex gap-2">
+                    @csrf
 
-                                @csrf
-                                <div class="error-msg">
+                        <input type="file" name="file" class="form-control" id="file">
+                        @error('file')
+                            <small class="red-text ml-10" role="alert">{{ $message }}</small>
+                        @enderror
+                    <div>
 
-                                    <input type="file" name="file" class="form-control" id="file" required>
-                                </div>
-                                <div>
-
-                                    <button type="submit" class="btn btn-primary addButton text-nowrap px-5">
-                                        + Import Medicine
-                                    </button>
-                                </div>
-                            </form>
-                            </div>
-
-                        </div>
-
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="add-row" class="display table table-striped table-hover data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>id</th>
-                                            <th>product id</th>
-                                            <th>Name</th>
-                                            <th>Salt composition</th>
-                                            <th style="width: 10%">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <button type="submit" class="btn btn-primary addButton text-nowrap px-5">
+                            + Import Medicine
+                        </button>
                     </div>
-                
+                </form>
+            </div>
+
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="add-row" class="display table table-striped table-hover data-table">
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>product id</th>
+                            <th>Name</th>
+                            <th>Salt composition</th>
+                            <th style="width: 10%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('scripts')
     <script>

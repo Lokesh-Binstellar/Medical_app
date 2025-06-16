@@ -3,6 +3,7 @@
 use App\Events\MyEvent;
 use App\Http\Controllers\CustomerDetailsController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\JanaushadhiController;
 use App\Http\Controllers\LaboratoriesController;
 use App\Http\Controllers\LabSlotController;
 use App\Http\Controllers\LabtestController;
@@ -266,6 +267,25 @@ Route::get('/lab-slots/bookings-by-date', [LabSlotController::class, 'viewBookin
             Route::post('import', [MedicineController::class, 'import'])->name('medicine.import');
             Route::group(['middleware' => 'permission:PopularBrand,read'], function () {
                 Route::get('/{id}', [MedicineController::class, 'show'])->name('medicine.show');
+            });
+        });
+
+        Route::prefix('janaushadhi')->group(function () {
+            Route::get('', [JanaushadhiController::class, 'index'])->name('janaushadhi.index');
+            Route::post('import', [JanaushadhiController::class, 'import'])->name('janaushadhi.import');
+            Route::group(['middleware' => 'permission:User,create'], function () {
+                Route::get('/create', [JanaushadhiController::class, 'create'])->name('janaushadhi.create');
+                Route::post('/store', [JanaushadhiController::class, 'store'])->name('janaushadhi.store');
+            });
+            Route::group(['middleware' => 'permission:User,read'], function () {
+                Route::get('/{id}', [JanaushadhiController::class, 'show'])->name('janaushadhi.show');
+            });
+            Route::group(['middleware' => 'permission:User,update'], function () {
+                Route::get('/{user}/edit', [JanaushadhiController::class, 'edit'])->name('janaushadhi.edit');
+                Route::put('/{id}', [JanaushadhiController::class, 'update'])->name('janaushadhi.update');
+            });
+            Route::group(['middleware' => 'permission:User,delete'], function () {
+                Route::get('delete/{id}', [JanaushadhiController::class, 'destroy'])->name('janaushadhi.destroy');
             });
         });
 
