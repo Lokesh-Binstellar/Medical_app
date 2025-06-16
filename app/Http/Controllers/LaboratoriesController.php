@@ -582,17 +582,23 @@ class LaboratoriesController extends Controller
                     $testIds = collect($rawTests)->pluck('test')->filter(fn($id) => is_numeric($id))->unique()->values()->toArray();
 
                     // Fetch test names
-                    $testMap = LabTest::whereIn('id', $testIds)->pluck('name', 'id')->toArray();
+                    $testMap = LabTest::whereIn('id', $testIds)
+                        ->get(['id', 'name', 'contains'])
+                        ->keyBy('id');
 
                     // Map names into the test list
                     foreach ($rawTests as $item) {
                         $testId = $item['test'] ?? null;
-                        unset($item['test']); // Remove old 'test' key
+
                         $item['test_id'] = $testId;
-                        $item['test_name'] = $testMap[$testId] ?? null;
+                        $item['test_name'] = $testMap[$testId]->name ?? null;
+                        $item['contains'] = $testMap[$testId]->contains ?? null;
+                        unset($item['test']); // optional: remove original 'test' if not needed
+
                         $tests[] = $item;
                     }
                 }
+
             }
 
             if (!empty($lab->package_details)) {
