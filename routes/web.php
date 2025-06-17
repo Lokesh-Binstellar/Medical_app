@@ -64,6 +64,9 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\CheckSession::class]
         Route::get('/pending-quotes-data', [DashboardController::class, 'pendingQuotesData'])->name('pending.quotes');
         Route::get('/fetch-ratings', [DashboardController::class, 'fetchRatings']);
         Route::get('/top-pharmacies', [DashboardController::class, 'getTopPharmaciesData']);
+        //  Route::get('/delivery-dashboard', [DashboardController::class, 'index'])->name('delivery.dashboard');
+        Route::get('/delivery-dashboard/sales-data', [DashboardController::class, 'salesDeliveryData'])->name('delivery.dashboard.salesDeliveryData');
+        Route::get('/delivery-orders-filter', [DashboardController::class, 'deliveryPersonpOrders'])->name('filteredBy.orders');
     });
     Route::get('/free-delivery-charge', [FreeDeliveryChargeController::class, 'freedeliveryindex'])->name('free_delivery_charge');
     Route::post('/free-delivery-charge', [FreeDeliveryChargeController::class, 'storeOrUpdate'])->name('delivery_charges.store');
@@ -76,8 +79,8 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\CheckSession::class]
     Route::post('/calendar/disable', [LabSlotController::class, 'disable'])->name('calendar.disable');
     Route::get('/lab-slots/bookings-by-date', [LabSlotController::class, 'viewBookingsByDate'])->name('lab-slots.bookings.by.date');
     Route::get('/calendar/fetchSlotCounts', [LabSlotController::class, 'fetchSlotCounts'])->name('calendar.fetchSlotCounts');
-    
-Route::get('/lab-slots/bookings-by-date', [LabSlotController::class, 'viewBookingsByDate'])->name('lab-slots.bookings.by.date');
+
+    Route::get('/lab-slots/bookings-by-date', [LabSlotController::class, 'viewBookingsByDate'])->name('lab-slots.bookings.by.date');
 
 
     // web.php
@@ -372,6 +375,9 @@ Route::get('/lab-slots/bookings-by-date', [LabSlotController::class, 'viewBookin
         Route::prefix('search-medicine')->group(function () {
             Route::get('/pharmacist/add-medicine', [MedicineSearchController::class, 'index'])->name('add.medicine');
             Route::get('/pharmacist/return-order-details', [MedicineSearchController::class, 'returnorderdetails'])->name('returnorderdetails');
+            Route::get('/orders/{id}/returnmedicines', [MedicineSearchController::class, 'showReturnMedicines'])->name('orders.returnmedicines');
+            Route::post('/orders/save-return-accepted', [MedicineSearchController::class, 'saveReturnAccepted'])->name('orders.saveReturnAccepted');
+
             Route::get('/pharmacist/order-details', [MedicineSearchController::class, 'orderdetails'])->name('orderdetails');
             Route::put('/pharmacy/orders/{id}/status', [MedicineSearchController::class, 'updateOrderStatus'])->name('pharmacy.updateOrderStatus');
             Route::get('/orders/{id}/medicines', [MedicineSearchController::class, 'showMedicines'])->name('orders.medicines');

@@ -223,109 +223,109 @@
             </div>
         </div>
 
-<div class="col-lg-12">
-        <div class="card ">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0">Pharmacy Order Statistics</h4>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="display table table-striped table-hover" id="perPharmacyTable">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>#</th>
-                                <th>Pharmacy Name</th>
-                                <th>Accepted Orders</th>
-                                <th>Placed Orders</th>
-                                <th>Cancelled Orders</th>
-                                <th>Avg Accept Time (min)</th>
-                                {{-- <th>Avg Placed Time (min)</th>
+        <div class="col-lg-12">
+            <div class="card ">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">Pharmacy Order Statistics</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="display table table-striped table-hover" id="perPharmacyTable">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>#</th>
+                                    <th>Pharmacy Name</th>
+                                    <th>Accepted Orders</th>
+                                    <th>Placed Orders</th>
+                                    <th>Cancelled Orders</th>
+                                    <th>Avg Accept Time (min)</th>
+                                    {{-- <th>Avg Placed Time (min)</th>
                                     <th>Avg Cancel Time (min)</th> --}}
-                            </tr>
-                        </thead>
+                                </tr>
+                            </thead>
 
-                        <tbody></tbody>
-                    </table>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-</div>
 
-<div class="col-lg-6">
-        <div class="card ">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0">Order Response Time</h4>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="display table table-striped table-hover" id="perPharmacyOrderResponseTable">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>#</th>
-                                <th>Order Id</th>
-                                <th>Pharmacy Name</th>
-                                <th>Accept Time (min)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+        <div class="col-lg-6">
+            <div class="card ">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">Order Response Time</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="display table table-striped table-hover" id="perPharmacyOrderResponseTable">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>#</th>
+                                    <th>Order Id</th>
+                                    <th>Pharmacy Name</th>
+                                    <th>Accept Time (min)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-</div>
 
-<div class="col-lg-6">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0">Top Pharmacy By Orders</h4>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="display table table-striped table-hover" id="topPharmaciesTable">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>#</th>
-                                <th>Pharmacy Name</th>
-                                <th>Accepted Orders</th>
-                                <th>Completed Orders</th>
-                                <th>Avg Delivery Time (min)</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">Top Pharmacy By Orders</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="display table table-striped table-hover" id="topPharmaciesTable">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>#</th>
+                                    <th>Pharmacy Name</th>
+                                    <th>Accepted Orders</th>
+                                    <th>Completed Orders</th>
+                                    <th>Avg Delivery Time (min)</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-</div>
 
-<div class="col-lg-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0">Top Pharmacies by Repeat Customers</h4>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="display table table-striped table-hover" id="repeatOrdersTable">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>#</th>
-                                <th>Pharmacy Name</th>
-                                <th>Repeat Customers</th>
-                                <th>Total Repeat Orders</th>
-                                <th>Top Repeat Customer</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">Top Pharmacies by Repeat Customers</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="display table table-striped table-hover" id="repeatOrdersTable">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>#</th>
+                                    <th>Pharmacy Name</th>
+                                    <th>Repeat Customers</th>
+                                    <th>Total Repeat Orders</th>
+                                    <th>Top Repeat Customer</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-</div>
 
         {{-- Modal for viewing details --}}
         <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsLabel"

@@ -633,4 +633,98 @@ class DashboardController extends Controller
 
 
 
+    public function salesDeliveryData(Request $request)
+    {
+        $query = Order::query();
+        // ✅ Filter only logged-in delivery person's orders
+        if (auth()->check()) {
+            $query->where('delivery_person_id', auth()->user()->id);
+        }
+
+
+        // ✅ Get data
+        $orders = $query->get();
+
+        $totalOrders = $orders->count();
+        $completedOrders = $orders->where('status', 1)->count();
+        // $cancelledOrders = $orders->where('status', 2)->count();
+        $acceptedOrders = $orders->where('status', 0)->count();
+
+
+        // $chartData = $orders
+        //     ->groupBy(function ($order) {
+        //         return Carbon::parse($order->created_at)->format('Y-m-d');
+        //     })
+        //     ->map(function ($group, $date) {
+        //         return [
+        //             'label' => $date,
+        //             'value' => $group->sum('total_price'),
+        //         ];
+        //     })
+        //     ->values();
+
+        // ✅ Return JSON (or Blade if you want server-side)
+        return response()->json([
+            'total_orders' => $totalOrders,
+            'completed_orders' => $completedOrders,
+            // 'cancelled_orders' => $cancelledOrders,
+            'request_accepted_orders' => $acceptedOrders,
+            // 'chartData' => $chartData
+        ]);
+    }
+
+
+    public function deliveryPersonpOrders(Request $request)
+    {
+        if ($request->ajax()) {
+            $query = Order::query()
+                ->where('delivery_person_id', auth()->user()->id) // ✅ bas apne delivery person ke person
+                ->orderBy('created_at', 'desc');
+                // dd(auth()->user()->id);
+            return DataTables::of($query)
+                ->addIndexColumn()
+
+                // ✅ Order ID explicitly add कर दे:
+                ->editColumn('order_id', function ($order) {
+                    return $order->order_id;
+                })
+
+                ->addColumn('customer_name', function ($order) {
+                    if (!$order->customer) return 'N/A';
+                    return $order->customer->firstName . ' ' . $order->customer->lastName
+                        . ' (' . $order->customer->mobile_no . ')';
+                })
+
+                ->addColumn('status', function ($order) {
+                    return match ($order->status) {
+                        0 => '<span class="badge bg-warning">Request Accepted</span>',
+                        1 => '<span class="badge bg-success">Completed</span>',
+                        default => '<span class="badge bg-secondary">Unknown</span>',
+                    };
+                })
+
+                // ->addColumn('order_details', function ($order) {
+                    // $details = [
+                    //     'date' => $order->created_at,
+                    //     'payment_mode' => $order->payment_option ?? '',
+                    //     'delivery_method' => $order->delivery_options ?? '',
+                    //     'total_price' => $order->total_price ?? '',
+                    //     'selected_pharmacy_address' => $order->selected_pharmacy_address ?? '',
+                    //     'delivery_address' => $order->delivery_address ?? ''
+                    // ];
+                    // return view('partials.order_details_button', compact('details'))->render();
+                // })
+
+                ->addColumn('action', function ($order) {
+                    return '<a href="' . route('orders.medicines', $order->id) . '" 
+            class="btn btn-sm btn-primary">
+            <i class="mdi mdi-eye"></i> View</a>';
+                })
+
+                ->rawColumns(['status', 'order_details', 'action'])
+                ->make(true);
+        }
+
+        // return view('dashboard');
+    }
 }

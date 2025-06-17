@@ -43,6 +43,10 @@ class Laboratories extends Model
         return $this->morphMany(Rating::class, 'rateable');
     }
 
+//    public function phlebotomists()
+//     {
+//         return $this->hasOne(Phlebotomist::class);
+//     }
 
     //     public function labtests()
     // {

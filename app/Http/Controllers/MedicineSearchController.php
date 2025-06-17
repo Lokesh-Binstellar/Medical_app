@@ -669,8 +669,7 @@ class MedicineSearchController extends Controller
                                 return '<span class="badge bg-danger">Order is Cancelled</span>';
                             } elseif ($order->status == 3) {
                                 return '<span class="badge bg-info">Order is Returned</span>';
-                            }
-                            else {
+                            } else {
                                 return ucfirst(str_replace('_', ' ', $order->delivery_options));
                             }
                         }
@@ -783,6 +782,46 @@ class MedicineSearchController extends Controller
 
         return view('pharmacist.medicine_details', compact('order', 'medicines', 'patient'));
     }
+ public function showReturnMedicines($id)
+{
+    $order = Order::with('customer')->findOrFail($id);
+
+    $medicines = json_decode($order->returned_items, true);
+    $acceptedItems = json_decode($order->return_accepted_items, true);
+
+    // Merge
+    if ($acceptedItems) {
+        foreach ($medicines as &$item) {
+            foreach ($acceptedItems as $accepted) {
+                if ($item['medicine_id'] == $accepted['medicine_id']) { // ✅ fixed key
+                    $item['return_status'] = $accepted['return_status'];
+                    $item['return_amount'] = $accepted['return_amount'];
+                }
+            }
+        }
+    }
+
+    return view('pharmacist.return_medicine_details', compact('order', 'medicines'));
+}
+
+public function saveReturnAccepted(Request $request)
+{
+    $order = Order::findOrFail($request->order_id);
+
+    // ⛔ Prevent duplicate save
+    if ($order->return_accepted_items) {
+        return response()->json(['message' => 'Already saved!'], 400);
+    }
+
+    $order->return_accepted_items = json_encode($request->data);
+    $total = collect($request->data)->sum('return_amount');
+    $order->total_return_amount = $total;
+    $order->save();
+
+    return response()->json(['message' => 'Return Accepted status saved successfully!']);
+}
+
+
 
     public function assignDeliveryPerson(Request $request, Order $order)
     {
@@ -940,11 +979,12 @@ class MedicineSearchController extends Controller
         return response()->json(['salt' => null]);
     }
 
-    public function returnorderdetails(Request $request){
-         if ($request->ajax()) {
+    public function returnorderdetails(Request $request)
+    {
+        if ($request->ajax()) {
             $roleName = Auth::user()->role->name;
             $query = Order::with(['customer', 'pharmacy', 'deliveryPerson'])
-                     ->where('status', 3); // Only return orders with status 3
+                ->where('status', 3); // Only return orders with status 3
 
             if ($request->filled('order_date')) {
                 $query->whereDate('created_at', $request->order_date);
@@ -1004,15 +1044,15 @@ class MedicineSearchController extends Controller
                     'payment_mode',
                     fn($order) =>
                     $order->payment_option
-                    ? ucwords(str_replace('_', ' ', $order->payment_option))
-                    : 'N/A'
+                        ? ucwords(str_replace('_', ' ', $order->payment_option))
+                        : 'N/A'
                 )
                 ->addColumn(
                     'delivery_method',
                     fn($order) =>
                     $order->delivery_options
-                    ? ucwords(str_replace('_', ' ', $order->delivery_options))
-                    : 'N/A'
+                        ? ucwords(str_replace('_', ' ', $order->delivery_options))
+                        : 'N/A'
                 )
 
                 // ->addColumn('delivery_person', function ($order) {
@@ -1033,7 +1073,15 @@ class MedicineSearchController extends Controller
                             return '<span class="badge bg-secondary">Unknown</span>';
                     }
                 })
-
+                ->addColumn('action', function ($order) {
+                    return '
+                <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                <a href="' . route('orders.returnmedicines', $order->id) . '" 
+                class="btn btn-sm btn-primary control me-2">
+                    <i class="mdi mdi-eye"></i> View
+                </a>
+                </div>';
+                })
                 ->addColumn('status_control', function ($order) {
                     $html = '<div class="text-center">';
 
@@ -1069,7 +1117,7 @@ class MedicineSearchController extends Controller
                     return $html;
                 })
 
-                ->rawColumns(['status', 'date', 'customer_name', 'status_control'])
+                ->rawColumns(['status', 'action', 'date', 'customer_name', 'status_control'])
                 ->make(true);
         }
         return view('pharmacist.returnorderdetails');

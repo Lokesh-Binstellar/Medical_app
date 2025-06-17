@@ -352,8 +352,7 @@
             modal.show();
         });
 
-    </script>
-    <script>
+
         document.addEventListener('change', function (e) {
             if (e.target && e.target.classList.contains('status-select')) {
                 const select = e.target;

@@ -25,7 +25,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
-        
+
     ];
 
     /**
@@ -103,24 +103,24 @@ class User extends Authenticatable
     // {
     //     return $this->hasOne(DeliveryPerson::class, 'user_id', 'id');
     // }
-     public function deliveryProfile()
+    public function deliveryProfile()
     {
         return $this->hasOne(DeliveryPerson::class);
     }
-    public function phlebotomist() {
-    return $this->hasOne(Phlebotomist::class);
-}
+    public function phlebotomists()
+    {
+        return $this->hasOne(Phlebotomist::class);
+    }
 
 
-     public function routeNotificationForFcm()
+    public function routeNotificationForFcm()
     {
         return $this->fcm_token;  // column in your users table with device token
     }
 
 
     public function labSlots()
-{
-    return $this->hasMany(LabSlot::class, 'laboratory_id');
-}
-
+    {
+        return $this->hasMany(LabSlot::class, 'laboratory_id');
+    }
 }

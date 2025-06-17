@@ -75,15 +75,15 @@ class PhlebotomistController extends Controller
 
 
         // Create user
-        $roleId = \App\Models\Role::where('name', 'delivery_person')->value('id');
+        $roleId = \App\Models\Role::where('name', 'phlebotomists')->value('id');
 
-        $createdUser = User::create([
+        $user = User::create([
             'name' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role_id' => $roleId,
-        ]);
-
+        ]); 
+        
         // Create phlebotomist
         Phlebotomist::create([
             'laboratory_id' => $laboratory->id,
@@ -96,6 +96,7 @@ class PhlebotomistController extends Controller
             'address' => $request->address,
             'username' => $request->username,
             'password' => Hash::make($request->password),
+            'user_id' => $user->id
         ]);
 
 

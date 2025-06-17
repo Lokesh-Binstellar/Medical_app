@@ -51,7 +51,7 @@
 
 
 
-        @if (auth()->user()->role_id == 1)
+        @if (Auth::user()->role->name == 'admin')
             <div class="row ">
                 <div class="col-lg-9">
                     <div class="card h-100">
@@ -241,7 +241,7 @@
             </div>
         @endif
 
-        @if (auth()->user()->role_id == 2)
+        @if (Auth::user()->role->name == 'pharmacy')
             <div class="row g-6 mb-6 ">
 
                 {{-- <div class="col-lg-3 col-sm-6">
@@ -480,6 +480,100 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+
+            </div>
+        @endif
+
+        {{-- @if (auth()->user()->role_id == 56) --}}
+         @if (Auth::user()->role->name == 'delivery_person')
+            <div class="row g-6 mb-6 ">
+                <div class="card shadow ">
+                    <div class="card-header d-flex justify-content-between align-items-center rounded-top">
+                        <h4 class="card-title mb-0 text-white">Delivery Person Dashboard</h4>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-12 col-12 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center rounded-top">
+                                        <h4 class="card-title mb-0 text-white">Order Overview</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row align-items-center ">
+                                            <div class="col-md-6 p-0" style="position: relative;">
+                                                <div id="orderChart"></div>
+                                                <div class="spinner-border spinner-border-lg text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 p-0">
+                                                <span class="mdi mdi-circle me-2" style="color: #5066f7;"></span>
+                                                <span class="title">Total Orders</span><br>
+                                                <p class="pt-3 sub-title" id="total_orders"></p>
+                                                <hr>
+
+                                                <span class="mdi mdi-circle me-2" style="color: #6e7cd8;"></span>
+                                                <span class="title">Accepted</span><br>
+                                                <p class="pt-3 sub-title" id="accepted_orders"></p>
+                                                <hr>
+                                                <span class="mdi mdi-circle me-2" style="color: #7082f8;"></span>
+                                                <span class="title">Completed</span><br>
+                                                <p class="pt-3 sub-title" id="completed_orders"></p>
+                                                <hr>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="display table table-striped table-hover data-table" id="ordersTable">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>#</th>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Order Details</th>
+                                        <th>Order Status</th>
+                                        <th>Medicine Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+                    {{-- Modal for viewing details --}}
+                    <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="orderDetailsLabel">Order Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body"></div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                 </div>
 
 
@@ -753,10 +847,6 @@
         }
 
 
-
-
-
-
         // customer orders data 
         $(document).ready(function() {
             $('#customerDetailsTable').DataTable({
@@ -900,8 +990,6 @@
         });
 
 
-
-
         // Commission This Month 
         let commissionChart; // chart instance
 
@@ -1035,8 +1123,6 @@
         }
 
 
-
-
         // Sales This Month 
         let salesChart;
 
@@ -1167,6 +1253,215 @@
         }
 
 
+
+        $(document).ready(function() {
+            getOrderGraphData();
+
+            function getOrderGraphData(dateRange = '') {
+                $.ajax({
+                    url: '{{ route('delivery.dashboard.salesDeliveryData') }}',
+                    type: 'GET',
+                    data: {
+                        dateRange: dateRange
+                    },
+                    beforeSend: function() {
+                        $('#orderChart').html('');
+                    },
+                    success: function(data) {
+                        orderGraph(data);
+                    },
+                    error: function() {
+                        alert('Error loading data.');
+                    }
+                });
+            }
+        });
+
+        function orderGraph(data) {
+            var totalOrders = data.total_orders || 0;
+
+            $('#total_orders').text(totalOrders);
+            $('#completed_orders').text(data.completed_orders);
+            // $('#cancelled_orders').text(data.cancelled_orders);
+            $('#accepted_orders').text(data.request_accepted_orders);
+            // $('#total_sales').text('₹' + (data.total_sales || 0));
+            // $('#total_commission').text('₹' + (data.total_commission || 0));
+
+            const chartData = [{
+                    name: "Total Orders",
+                    y: 100,
+                    count: totalOrders,
+                    color: '#4B91D3'
+                },
+                {
+                    name: "Completed",
+                    y: totalOrders ? Math.round((data.completed_orders / totalOrders) * 100) : 0,
+                    count: data.completed_orders || 0,
+                    color: '#66A9E0'
+                },
+                {
+                    name: "Accepted",
+                    y: totalOrders ? Math.round((data.request_accepted_orders / totalOrders) * 100) : 0,
+                    count: data.request_accepted_orders || 0,
+                    color: '#85BFF0'
+                },
+                // {
+                //     name: "Cancelled",
+                //     y: totalOrders ? Math.round((data.cancelled_orders / totalOrders) * 100) : 0,
+                //     count: data.cancelled_orders || 0,
+                //     color: '#A5D2F5'
+                // }
+            ];
+
+            Highcharts.chart('orderChart', {
+                chart: {
+                    type: 'column',
+                    inverted: true,
+                    polar: true,
+                    backgroundColor: 'transparent'
+                },
+                title: {
+                    text: ''
+                },
+                pane: {
+                    innerSize: '20%',
+                    endAngle: 270
+                },
+                tooltip: {
+                    pointFormat: '<b>{point.count}</b>'
+                },
+                xAxis: {
+                    categories: ['Total Orders', 'Completed', 'Accepted'],
+                    tickInterval: 1,
+                    labels: {
+                        align: 'right',
+                        step: 1,
+                        style: {
+                            fontSize: '13px'
+                        }
+                    },
+                    lineWidth: 0,
+                    gridLineWidth: 0,
+                },
+                yAxis: {
+                    visible: false
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        borderWidth: 0,
+                        pointPadding: 0,
+                        groupPadding: 0,
+                        borderRadius: 0
+                    }
+                },
+                series: [{
+                    showInLegend: false,
+                    data: chartData,
+                    dataLabels: {
+                        enabled: true,
+                        useHTML: true,
+                        format: '{y}%',
+                        align: 'center',
+                        inside: false,
+                        style: {
+                            fontSize: '14px',
+                            color: '#000'
+                        }
+                    }
+                }]
+            });
+        }
+
+
+
+
+        let table = $('#ordersTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{{ route('filteredBy.orders') }}', // bas ek hi route call hoga
+            columns: [{
+                    data: null,
+                    className: 'control',
+                    orderable: false,
+                    searchable: false,
+                    defaultContent: ''
+                },
+                {
+                    data: null,
+                    name: 'serial_no',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                },
+                {
+                    data: 'order_id',
+                    name: 'order_id'
+                },
+                {
+                    data: 'customer_name',
+                    name: 'customer_name'
+                },
+                
+                {
+                    data: null,
+                    name: 'order_details',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row) {
+                        const safeDetails = JSON.stringify({
+                            date: row.date_raw || '',
+                            payment_mode: row.payment_mode || '',
+                            delivery_method: row.delivery_method || '',
+                            total_price: row.total_price || '',
+                            selected_pharmacy_address: row.selected_pharmacy_address ||
+                                '',
+                            delivery_address: row.delivery_address || ''
+                        }).replace(/'/g, "&#39;");
+
+                        return `
+                <a href="#" class="order-details-link btn btn-sm btn-primary" data-details='${safeDetails}'>
+                    <i class="mdi mdi-eye"></i> View
+                </a>`;
+                    }
+                },
+                {
+                    data: 'status',
+                    name: 'status'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }
+            ],
+            responsive: true
+        });
+
+        $('#ordersTable').on('click', '.order-details-link', function(e) {
+            e.preventDefault();
+            let details = $(this).data('details');
+            if (typeof details === 'string') {
+                details = JSON.parse(details);
+            }
+
+            const formattedDate = details.date ?
+                new Date(details.date).toLocaleString() : 'N/A';
+
+            const html = `
+            <p><strong>Date:</strong> ${formattedDate}</p>
+            <p><strong>Payment Mode:</strong> ${details.payment_mode}</p>
+            <p><strong>Delivery Method:</strong> ${details.delivery_method}</p>
+            <p><strong>Total Price:</strong> ₹${details.total_price}</p>
+            <p><strong>Pharmacy Address:</strong> ${details.selected_pharmacy_address}</p>
+            <p><strong>Delivery Address:</strong> ${details.delivery_address}</p>`;
+
+            $('#orderDetailsModal .modal-body').html(html);
+            new bootstrap.Modal(document.getElementById('orderDetailsModal')).show();
+        });
 
         // document.addEventListener("DOMContentLoaded", function() {
         //     var salesData = {!! json_encode($dailySalesData) !!};

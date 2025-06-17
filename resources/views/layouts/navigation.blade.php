@@ -390,7 +390,7 @@
                 </ul>
             </li>
         @endif
-   @if (in_array('About', $permissions) || $isSuperAdmin == 1)
+        @if (in_array('About', $permissions) || $isSuperAdmin == 1)
             @php
                 $cmsRoutes = [
                     'cms.about-us.index',
@@ -402,7 +402,7 @@
                     // 'cms.shipping-policies.index',
                 ];
             @endphp
- 
+
             <li class="menu-item {{ in_array(Route::currentRouteName(), $cmsRoutes) ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <i class="menu-icon tf-icons mdi mdi-information-outline"></i>
@@ -414,45 +414,45 @@
                             <div data-i18n="About Us">About Us</div>
                         </a>
                     </li>
- 
+
                     <li class="menu-item {{ Route::currentRouteName() == 'cms.contact-us.index' ? 'active' : '' }}">
                         <a href="{{ route('cms.contact-us.index') }}" class="menu-link">
                             <div data-i18n="Contact Us">Contact Us</div>
                         </a>
                     </li>
- 
+
                     <li class="menu-item {{ Route::currentRouteName() == 'cms.faqs.index' ? 'active' : '' }}">
                         <a href="{{ route('cms.faqs.index') }}" class="menu-link">
                             <div data-i18n="FAQs">FAQ's</div>
                         </a>
                     </li>
- 
+
                     <li
                         class="menu-item {{ Route::currentRouteName() == 'cms.terms-and-conditions.index' ? 'active' : '' }}">
                         <a href="{{ route('cms.terms-and-conditions.index') }}" class="menu-link">
                             <div data-i18n="Terms and Conditions">Terms and Conditions</div>
                         </a>
                     </li>
- 
+
                     <li
                         class="menu-item {{ Route::currentRouteName() == 'cms.return-policies.index' ? 'active' : '' }}">
                         <a href="{{ route('cms.return-policies.index') }}" class="menu-link">
                             <div data-i18n="Return Policy">Return Policy</div>
                         </a>
                     </li>
- 
+
                     <li
                         class="menu-item {{ Route::currentRouteName() == 'cms.privacy-policies.index' ? 'active' : '' }}">
                         <a href="{{ route('cms.privacy-policies.index') }}" class="menu-link">
                             <div data-i18n="Privacy Policy">Privacy Policy</div>
                         </a>
                     </li>
- 
- 
+
+
                 </ul>
             </li>
         @endif
- 
+
 
 
         @if (in_array('Pharmacies', $permissions))
@@ -503,7 +503,7 @@
                     <i class="menu-icon tf-icons mdi mdi-view-list"></i>
                     <div data-i18n="Order Details ">Order Details </div>
                 </a>
-                 <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
+                <ul class="menu-sub" style="list-style: none; padding-left: 0; margin: 0;">
                     <li class="menu-item {{ Route::currentRouteName() == 'orderdetails' ? 'active' : '' }}">
                         <a href="{{ route('orderdetails') }}" class="menu-link">
                             <div data-i18n="Order Details">Order Details</div>

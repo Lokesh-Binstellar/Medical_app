@@ -10,6 +10,7 @@ class Phlebotomist extends Model
 
     protected $fillable = [
         'laboratory_id',
+        'user_id',
         'phlebotomists_name',
         'contact_number',
         'email',

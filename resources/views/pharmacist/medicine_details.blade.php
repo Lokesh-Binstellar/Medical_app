@@ -33,7 +33,7 @@
                                             @php
                                                 $mrp = (float) ($item['mrp'] ?? 0);
                                                 $discount = (float) ($item['discount'] ?? 0);
-                                                $finalPrice = $mrp - $discount;
+                                                // $finalPrice = $mrp - $discount;
                                             @endphp
                                             <tr>
                                                 <td style="max-width: 300px; word-break: break-word;" class="fw-bold text-black">
@@ -41,7 +41,7 @@
                                                 </td>
                                                 <td class="fw-bold text-black">{{ number_format($mrp, 2) }}</td>
                                                 <td class="fw-bold text-black">{{ $item['discount_percent'] ?? '0' }}%</td>
-                                                <td class="fw-bold text-black">{{ number_format($finalPrice, 2) }}</td>
+                                                <td class="fw-bold text-black">{{ number_format($discount, 2) }}</td>
                                                 <td class="fw-bold text-black">{{ ucfirst($item['is_substitute'] ?? 'no') }}</td>
                                                 <td class="fw-bold text-black">
                                                     @if (($item['available'] ?? 'no') == 'yes')

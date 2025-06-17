@@ -132,9 +132,10 @@
                             <th>Order Details</th> {{-- new combined column --}}
                             <th>Order Status</th>
                             <th>Update Status</th>
-                             @if (Auth::user()->role->name === 'pharmacy')
+                            <th>Return Orders</th>
+                             {{-- @if (Auth::user()->role->name === 'pharmacy')
                                 <th class="fw-bold fs-6 ">Return Accepted</th>
-                            @endif
+                            @endif --}}
                         </tr>
                     </thead>
 
@@ -202,7 +203,13 @@
                     name: 'status_control',
                     orderable: false,
                     searchable: false
-                }
+                },
+                 {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                },
             );
 
 
