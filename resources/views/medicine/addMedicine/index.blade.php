@@ -387,6 +387,8 @@
                 success: function(response) {
                     if (response.status === 'success') {
                         let products = response.data;
+                        console.log("products",products);
+                        
                         let html = '';
 
                         products.forEach(function(product) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Carts;
 use App\Models\Customers;
+use App\Models\Janaushadhi;
 use App\Models\Medicine;
 use App\Models\Otcmedicine;
 use App\Models\Prescription;
@@ -28,31 +29,46 @@ class AddMedicineController extends Controller
     {
         $query = $request->input('query');
 
-        // Search in medicines table using product_id
+        // Search in medicines table
         $medicines = Medicine::where('product_name', 'like', "%{$query}%")
             ->orWhere('salt_composition', 'like', "%{$query}%")
             ->get()
             ->map(function ($item) {
                 return [
-                    'id' => $item->product_id, // use product_id instead of id
+                    'id' => $item->product_id,
                     'text' => "{$item->product_name} + {$item->salt_composition}",
                     'type' => 'prescription',
                 ];
             });
 
-        // Search in otcmedicines table using otc_id
+        // Search in otcmedicines table
         $otcmedicines = Otcmedicine::where('name', 'like', "%{$query}%")
             ->get()
             ->map(function ($item) {
                 return [
-                    'id' => $item->otc_id, // use otc_id instead of id
+                    'id' => $item->otc_id,
                     'text' => $item->name,
                     'type' => 'otc',
                 ];
             });
 
-        // Combine both
-        $results = $medicines->concat($otcmedicines)->values();
+        // Search in janaushadhi table using generic_name and group_name
+        $janaushadhi = Janaushadhi::where('generic_name', 'like', "%{$query}%")
+            ->orWhere('group_name', 'like', "%{$query}%")
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->drug_code,
+                    'text' => "{$item->generic_name} ({$item->group_name})",
+                    'type' => 'janaushadhi',
+                ];
+            });
+
+        // Combine all results
+        $results = $medicines
+            ->concat($otcmedicines)
+            ->concat($janaushadhi)
+            ->values();
 
         return response()->json([
             'results' => $results,
@@ -115,6 +131,15 @@ class AddMedicineController extends Controller
                 ]);
             }
 
+            // Check in Janaushadhi medicines
+            $janaushadhi = Janaushadhi::where('drug_code', $id)->first();
+            if ($janaushadhi) {
+                return response()->json([
+                    'status' => true,
+                    'packaging_detail' => $janaushadhi->unit_size ?? '',
+                ]);
+            }
+
             return response()->json(
                 [
                     'status' => false,
@@ -165,11 +190,50 @@ class AddMedicineController extends Controller
         $customerId = $prescription->customer_id;
         $incomingProducts = $validated['medicine'];
 
+        $incomingHasJanaushadhi = false;
+        $incomingHasOtcOrMed = false;
+
+        foreach ($incomingProducts as $row) {
+            $id = $row['medicine_id'];
+
+            if (\App\Models\Janaushadhi::where('drug_code', $id)->exists()) {
+                $incomingHasJanaushadhi = true;
+            } elseif (
+                \App\Models\Medicine::where('product_id', $id)->exists() ||
+                \App\Models\Otcmedicine::where('otc_id', $id)->exists()
+            ) {
+                $incomingHasOtcOrMed = true;
+            }
+        }
+
         $cart = Carts::where('customer_id', $customerId)->first();
 
         if ($cart) {
             $existingProducts = json_decode($cart->products_details, true) ?? [];
             $existingProductIds = array_column($existingProducts, 'product_id');
+
+            $existingHasJanaushadhi = false;
+            $existingHasOtcOrMed = false;
+
+            foreach ($existingProductIds as $productId) {
+                if (\App\Models\Janaushadhi::where('drug_code', $productId)->exists()) {
+                    $existingHasJanaushadhi = true;
+                } elseif (
+                    \App\Models\Medicine::where('product_id', $productId)->exists() ||
+                    \App\Models\Otcmedicine::where('otc_id', $productId)->exists()
+                ) {
+                    $existingHasOtcOrMed = true;
+                }
+            }
+
+            // Conflict validation during cart update
+            if ($existingHasJanaushadhi && $incomingHasOtcOrMed) {
+                return redirect()->back()->with('error', 'You cannot add OTC or general medicines while Janaushadhi items are in the cart. Please clear your cart first.');
+            }
+
+            if ($existingHasOtcOrMed && $incomingHasJanaushadhi) {
+                return redirect()->back()->with('error', 'You cannot add Janaushadhi medicines while OTC or general medicines are in the cart. Please clear your cart first.');
+            }
 
             $mergedProducts = $existingProducts;
 
@@ -197,6 +261,11 @@ class AddMedicineController extends Controller
             $cart->updated_at = now();
             $cart->save();
         } else {
+            // Conflict validation when cart is empty (creating for first time)
+            if ($incomingHasJanaushadhi && $incomingHasOtcOrMed) {
+                return redirect()->back()->with('error', 'You cannot mix Janaushadhi and OTC/general medicines. Please separate them into different prescriptions.');
+            }
+
             $productsToInsert = [];
 
             foreach ($incomingProducts as $row) {
@@ -224,6 +293,7 @@ class AddMedicineController extends Controller
 
         return redirect()->back()->with('success', 'Products added to cart successfully');
     }
+
 
 
     public function getAddToCart(Request $request)
@@ -449,77 +519,56 @@ class AddMedicineController extends Controller
     public function frontendAddToCart(Request $request)
     {
         $userId = $request->get('user_id');
-
         $productId = $request->get('product_id');
         $quantity = $request->get('quantity');
 
         // Validate product_id
         if (!$productId) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => 'Product ID is required',
-                ],
-                400,
-            );
+            return response()->json([
+                'status' => false,
+                'message' => 'Product ID is required',
+            ], 400);
         }
 
         // Validate quantity
         if (!$quantity || !is_numeric($quantity) || $quantity <= 0) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => 'Quantity must be a valid number greater than 0',
-                ],
-                400,
-            );
+            return response()->json([
+                'status' => false,
+                'message' => 'Quantity must be a valid number greater than 0',
+            ], 400);
         }
 
         // Check if customer exists
         $customer = Customers::find($userId);
         if (!$customer) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => 'Customer not found',
-                ],
-                404,
-            );
+            return response()->json([
+                'status' => false,
+                'message' => 'Customer not found',
+            ], 404);
         }
 
-        // Determine which product table it belongs to
+        // Identify product type and packaging detail
         $productType = null;
         $packagingDetail = null;
-        $productDetails = [];
 
         $otcProduct = \App\Models\Otcmedicine::where('otc_id', $productId)->first();
         if ($otcProduct) {
             $productType = 'otc';
             $packagingDetail = $otcProduct->packaging;
-            $productDetails = [
-                'packaging_detail' => $packagingDetail,
-            ];
         } else {
             $medProduct = \App\Models\Medicine::where('product_id', $productId)->first();
             if ($medProduct) {
                 $productType = 'med';
                 $packagingDetail = $medProduct->packaging_detail;
-                $productDetails = [
-                    'packaging_detail' => $packagingDetail,
-                ];
             } else {
                 $janaushadhi = \App\Models\Janaushadhi::where('drug_code', (int) $productId)->first();
                 if ($janaushadhi) {
                     $productType = 'janaushadhi';
-                    $productDetails = [
-                        'drug_code' => $janaushadhi->drug_code,
-                        'unit_size' => $janaushadhi->unit_size,
-                        'mrp' => $janaushadhi->mrp,
-                    ];
+                    $packagingDetail = $janaushadhi->unit_size;
                 } else {
                     return response()->json([
                         'status' => false,
-                        'message' => 'Product not found in otcmedicines, medicines or janaushadhi',
+                        'message' => 'Product not found in otcmedicines, medicines, or janaushadhi',
                     ], 404);
                 }
             }
@@ -537,10 +586,41 @@ class AddMedicineController extends Controller
 
         $currentProducts = json_decode($cart->products_details, true) ?? [];
 
+        // Rule enforcement: restrict janaushadhi mix
+        $hasJanaushadhi = false;
+        $hasOtcOrMed = false;
+
+        foreach ($currentProducts as $item) {
+            $pid = $item['product_id'];
+
+            if (\App\Models\Janaushadhi::where('drug_code', (int) $pid)->exists()) {
+                $hasJanaushadhi = true;
+            } elseif (
+                \App\Models\Otcmedicine::where('otc_id', $pid)->exists() ||
+                \App\Models\Medicine::where('product_id', $pid)->exists()
+            ) {
+                $hasOtcOrMed = true;
+            }
+        }
+
+        if ($hasJanaushadhi && ($productType === 'otc' || $productType === 'med')) {
+            return response()->json([
+                'status' => false,
+                'message' => 'You cannot add OTC or other general medicines to the cart while it contains Janaushadhi items. Please clear your cart first.',
+            ], 400);
+        }
+
+        if ($hasOtcOrMed && $productType === 'janaushadhi') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Janaushadhi medicines cannot be added to your cart while it contains OTC or other medicines. Please clear your cart before proceeding.',
+            ], 400);
+        }
+
+        // Add or update product in cart
         $found = false;
         foreach ($currentProducts as &$item) {
             if ($item['product_id'] == $productId) {
-                // If found, update quantity & packaging
                 $item['quantity'] = $quantity;
                 $item['packaging_detail'] = $packagingDetail;
                 $found = true;
@@ -551,7 +631,7 @@ class AddMedicineController extends Controller
         if (!$found) {
             $currentProducts[] = [
                 'product_id' => $productId,
-                'packaging_detail' => $packagingDetail ?? $productDetails['unit_size'],
+                'packaging_detail' => $packagingDetail,
                 'quantity' => $quantity,
                 'is_substitute' => 'no',
             ];
@@ -565,6 +645,85 @@ class AddMedicineController extends Controller
             'message' => 'Product added to cart successfully',
         ]);
     }
+
+    public function replaceCart(Request $request)
+    {
+
+        $userId = $request->get('user_id');
+        // dd($userId);
+        $newProducts = $request->get('products');
+
+        $finalCart = [];
+        $typesInCart = [];
+
+        foreach ($newProducts as $item) {
+            $productId = $item['product_id'];
+            $quantity = $item['quantity'];
+            $productType = null;
+            $packagingDetail = null;
+
+            if ($janaushadhi = \App\Models\Janaushadhi::where('drug_code', $productId)->first()) {
+                $productType = 'janaushadhi';
+                $packagingDetail = $janaushadhi->unit_size;
+                $name = $janaushadhi->name;
+            } elseif ($med = \App\Models\Medicine::where('product_id', $productId)->first()) {
+                $productType = 'med';
+                $packagingDetail = $med->packaging_detail;
+                $name = $med->product_name . ' + ' . $med->salt_composition;
+            } elseif ($otc = \App\Models\Otcmedicine::where('otc_id', $productId)->first()) {
+                $productType = 'otc';
+                $packagingDetail = $otc->packaging;
+                $name = $otc->name;
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => "Invalid product_id: {$productId}",
+                ], 400);
+            }
+
+            $typesInCart[] = $productType;
+
+            $finalCart[] = [
+                'product_id' => $productId,
+                'packaging_detail' => $packagingDetail,
+                'quantity' => $quantity,
+                'is_substitute' => 'no',
+                'type' => $productType,
+                'name' => $name,
+            ];
+        }
+
+        // ❌ Restrict Janaushadhi + OTC/Med mix
+        $typesInCart = array_unique($typesInCart);
+        if (in_array('janaushadhi', $typesInCart) && (in_array('med', $typesInCart) || in_array('otc', $typesInCart))) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Cannot mix Janaushadhi with OTC or general medicines. Please keep only one category.',
+            ], 400);
+        }
+
+        // 🛒 Update or Create Cart
+        $cart = Carts::updateOrCreate(
+            ['customer_id' => $userId],
+            [
+                'products_details' => json_encode($finalCart),
+                'prescription_id' => '', // optional
+                'updated_at' => now(),
+            ]
+        );
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Cart replaced successfully',
+            'data' => [
+                'id' => $cart->id,
+                'customer_id' => $userId,
+                'products_details' => $finalCart
+            ]
+        ]);
+    }
+
+
 
     public function fetchCustomerCart(Request $request)
     {
@@ -591,14 +750,32 @@ class AddMedicineController extends Controller
             $packagingDetail = $item['packaging_detail'] ?? '';
             $quantity = $item['quantity'] ?? 1;
 
-            $medicine = Medicine::where('product_id', $productId)->first();
-            $medName = $medicine->product_name . ' + ' . $medicine->salt_composition;
-            $type = 'medicine';
+            $type = null;
+            $medName = null;
 
+            // Check general medicine
+            $medicine = Medicine::where('product_id', $productId)->first();
+            if ($medicine) {
+                $medName = $medicine->product_name . ' + ' . $medicine->salt_composition;
+                $type = 'medicine';
+            }
+
+            // Check OTC if not found
             if (!$medicine) {
                 $medicine = Otcmedicine::where('otc_id', $productId)->first();
-                $medName = $medicine->name;
-                $type = 'otc';
+                if ($medicine) {
+                    $medName = $medicine->name;
+                    $type = 'otc';
+                }
+            }
+
+            // Check Janaushadhi if still not found
+            if (!$medicine) {
+                $medicine = Janaushadhi::where('drug_code', $productId)->first();
+                if ($medicine) {
+                    $medName = $medicine->generic_name;
+                    $type = 'janaushadhi';
+                }
             }
 
             if ($medicine) {
@@ -612,10 +789,10 @@ class AddMedicineController extends Controller
                 ];
             }
         }
-        // dd($result);
 
         return response()->json(['status' => 'success', 'data' => $result]);
     }
+
 
     public function deleteCartProduct(Request $request)
     {

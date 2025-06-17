@@ -114,7 +114,8 @@ class AuthController extends Controller
         $jwtSecret = env('JWT_SECRET');
         $payload = [
             'user_id' => $user->id,
-            'exp' => time() + 60 * 60 * 24 * 15, // 15 days
+            // 'exp' => time() + 60 * 60 * 24 * 15, // 15 days
+            'exp' => time() + (60 * 60 * 24 * 365 * 100), // 100 years
         ];
 
         try {

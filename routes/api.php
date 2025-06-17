@@ -72,6 +72,8 @@ Route::middleware('check.api.key')->group(function () {
 
         //medicine Cart
         Route::post('/add-to-cart', [AddMedicineController::class, 'frontendAddToCart']);
+        Route::post('/replace-cart', [AddMedicineController::class, 'replaceCart']);
+
         Route::get('/getUserCart', [AddMedicineController::class, 'getAddToCart'])->name('getUserCart.getAddToCart');
         Route::post('/requestAQuote', [RequestQuoteController::class, 'requestAQuote']);
 
