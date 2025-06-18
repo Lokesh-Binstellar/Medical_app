@@ -2,69 +2,12 @@
 @section('title', 'Janaushadhi Listing')
 @section('styles')
     <style>
-        #overlay {
-            height: 100%;
-            width: 100%;
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            z-index: 99999;
-            background-color: #000;
-            filter: alpha(opacity=75);
-            -moz-opacity: 0.75;
-            opacity: 0.3;
-            border-radius: 10px;
-            display: none;
-        }
-
-        .dataTables_processing {
-            z-index: 99999;
-        }
-
-        .addButton {
-            color: #fff !important;
-            border-color: #fff;
-        }
-
-        .addButton:hover {
-            color: #A27835 !important;
-            background-color: #fff !important;
-        }
-
-        .light-style .swal2-container {
-            z-index: 99999;
-        }
-
-        [type="search"]::-webkit-search-cancel-button {
-            -webkit-appearance: none;
-            appearance: none;
-            height: 10px;
-            width: 10px;
-            background-image: url('{{ asset('assets/img/branding/search-close.png') }}');
-            background-size: 10px 10px;
-        }
-
-        div.dataTables_wrapper div.dataTables_length select {
-            width: 80px;
-        }
-
-        div.dataTables_wrapper div.col-sm-12 {
-            padding: 0 !important;
-        }
-
-        @media screen and (max-width: 425px) {
-            .modal-dialog {
-                display: flex;
-                align-items: center;
-                min-height: calc(100% - var(--bs-modal-margin)* 2);
-            }
-        }
     </style>
 @endsection
 @section('content')
-    <div class="card">
-        <div class="card-header d-flex align-items-center justify-content-between py-2">
-            <h5 class="card-title m-0 me-2 text-secondary">Janaushadhi Kendra Medicine</h5>
+    <div class="card shadow">
+        <div class="card-header d-flex justify-content-between align-items-center rounded-top">
+            <h4 class="card-title mb-0 text-white">Janaushadhi Kendra Medicine</h4>
             <div>
                 <form action="{{ route('janaushadhi.import') }}" id="importForm" method="POST" enctype="multipart/form-data"
                     class="d-flex gap-2" data-parsley-validate>

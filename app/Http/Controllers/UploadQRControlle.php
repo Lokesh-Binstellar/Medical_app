@@ -13,10 +13,10 @@ class UploadQRControlle extends Controller
 
     public function index(Request $request)
     {
-        if (auth()->user()->role->name === 'delivery_person' || 'phlebotomists') {
-            // dd(auth()->user()->role );
-            return redirect()->route('upload_qr.show', 1);
-        }
+        // if (auth()->user()->role->name === 'delivery_person' || 'phlebotomists') {
+        //     // dd(auth()->user()->role );
+        //     return redirect()->route('upload_qr.show', 1);
+        // }
         
         if ($request->ajax()) {
             return datatables()->of(UploadQR::latest()->get())

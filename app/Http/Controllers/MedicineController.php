@@ -26,12 +26,12 @@ class MedicineController extends Controller
                     return '
                 <div class="dropdown">
                   <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="dropdown">Action</button>
-  <ul class="dropdown-menu">
+                    <ul class="dropdown-menu">
                     <li>
                      <a href="' .
                         route('medicine.show', $row->id) .
                         '"class="dropdown-item" >View
-    </a>
+                    </a>
                     </li>
 
                     

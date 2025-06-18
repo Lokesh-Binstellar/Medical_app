@@ -49,7 +49,7 @@
             $isSuperAdmin = $loggedInUser->role_id == 1 ? 1 : 0;
         @endphp --}}
 
-
+        
 
         @if (Auth::user()->role->name == 'admin')
             <div class="row ">
@@ -1115,7 +1115,6 @@
 
                 let commission = parseFloat(data.commissionGraphData.totalCommission) || 0;
                 $('#commissionText').text('₹' + commission.toFixed(2));
-
                 if (data.commissionGraphData.chartData.length > 0) {
                     renderCommissionChart(data.commissionGraphData.chartData);
                 }

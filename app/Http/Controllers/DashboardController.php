@@ -181,6 +181,7 @@ class DashboardController extends Controller
             'commissionGraphData' => $this->commissionGraphData($commissionStartDate, $commissionEndDate),
             'salesGraphData' => $this->salesGraphData($salesStartDate, $salesEndDate),
         ];
+        // dd($data);
         return response()->json($data);
     }
 
@@ -492,6 +493,7 @@ class DashboardController extends Controller
                     0 => '<span class="badge bg-warning">Request Accepted</span>',
                     1 => '<span class="badge bg-success">Completed</span>',
                     2 => '<span class="badge bg-danger">Cancelled</span>',
+                     3 => '<span class="badge bg-info ">Returned</span>',
                 };
             })
             ->addColumn('action', function ($order) {

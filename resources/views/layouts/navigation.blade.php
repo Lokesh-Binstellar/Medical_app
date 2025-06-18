@@ -192,14 +192,14 @@
             </li>
         @endif
 
-        {{-- @if (in_array('Pharmacies', $permissions)) --}}
+        @if (in_array('Janaushadhi', $permissions))
             <li class="menu-item {{ in_array(Route::current()->getName(), ['janaushadhi.index']) ? 'active' : '' }}">
                 <a href="{{ route('janaushadhi.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons mdi mdi-hospital-box"></i>
                     <div data-i18n="Janaushadhi Management">Janaushadhi Management</div>
                 </a>
             </li>
-        {{-- @endif --}}
+        @endif
 
         {{-- Laboratory Management --}}
         @if ($isSuperAdmin == 1)
